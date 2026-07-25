@@ -1,4 +1,4 @@
-const CACHE_NAME = 'agen-damri-cache-v6';
+const CACHE_NAME = 'agen-damri-cache-v7';
 const urlsToCache = [
   '/',
   '/index.html',
