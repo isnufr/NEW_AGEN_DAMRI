@@ -1889,6 +1889,12 @@
         if(document.getElementById('ticketKeterangan')) {
             document.getElementById('ticketKeterangan').innerText = b.keterangan || '-';
         }
+        if(document.getElementById('ticketKursi')) {
+            document.getElementById('ticketKursi').innerText = b.kursi || '-';
+        }
+        if(document.getElementById('ticketQty')) {
+            document.getElementById('ticketQty').innerText = qty;
+        }
 
         const tglBeliObj = new Date(b.createdAt || new Date());
         const tglBeli = String(tglBeliObj.getDate()).padStart(2, '0') + '/' + String(tglBeliObj.getMonth() + 1).padStart(2, '0') + '/' + tglBeliObj.getFullYear() + ' ' + String(tglBeliObj.getHours()).padStart(2, '0') + ':' + String(tglBeliObj.getMinutes()).padStart(2, '0');
@@ -2810,7 +2816,13 @@
         
         addLine("Nomor Kursi");
         add(CMD.BOLD_ON);
-        addLine("-");
+        addLine(t.kursi || "-");
+        add(CMD.BOLD_OFF);
+        add(CMD.LF);
+        
+        addLine("Keterangan");
+        add(CMD.BOLD_ON);
+        addLine(t.keterangan || "-");
         add(CMD.BOLD_OFF);
         add(CMD.LF);
         
