@@ -936,7 +936,7 @@
         </p>
 
         <div id="armadaGridBus" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-20 text-center">
-            <!-- Data Armada akan dirender otomatis melalui JavaScript berdasarkan Google Sheets -->
+            <!-- Data Armada akan dirender otomatis melalui JavaScript berdasarkan Database -->
         </div>
 
         <!-- Tiket Pesawat & Kapal Laut -->
@@ -1235,7 +1235,7 @@
 <script>
     let fleetData = [];
 
-    // Mengambil data dari Google Sheets saat halaman dimuat
+    // Mengambil data dari Database saat halaman dimuat
     window.addEventListener('DOMContentLoaded', async () => {
         const dateInput = document.getElementById('bookTanggal');
         if (dateInput) {
@@ -1473,7 +1473,7 @@
         let msg = `Halo Admin Agen Damri Kawunganten,\nsaya ingin boking tiket:\n\n*ID Booking:* ${bookingId}\n*Armada:* ${a}\n*Tujuan:* ${t}\n*Tanggal:* ${fd}\n*Waktu:* ${w}\n\n*Nama:* ${n}\n*HP:* ${h}\n\n*Jumlah Penumpang:* ${j} orang\n*Total Bayar:* ${tot}\n*Metode Pembayaran:* ${mb}${rekInfo}\n\n`;
         if (k.trim()) msg += `*Notes:* ${k}\n`;
 
-        // POST Data ke Google Sheets
+        // POST Data ke Database
         const submitBtn = document.querySelector('#bookingModal button[onclick="submitBooking()"]');
         if(submitBtn) { submitBtn.innerText = "Memproses..."; submitBtn.disabled = true; }
 

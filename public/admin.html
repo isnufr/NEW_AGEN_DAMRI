@@ -197,7 +197,7 @@
     <div id="loadingOverlay" class="fixed inset-0 bg-white/90 backdrop-blur-sm z-[100] flex flex-col items-center justify-center transition-all duration-500">
         <div class="w-20 h-20 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin mb-4"></div>
         <h2 class="text-xl font-black text-blue-900 tracking-tighter uppercase italic">MENSINKRONISASI DATA...</h2>
-        <p class="text-sm font-bold text-gray-500 mt-2 animate-pulse">Menghubungkan ke Google Sheets</p>
+        <p class="text-sm font-bold text-gray-500 mt-2 animate-pulse">Menghubungkan ke Server Database</p>
     </div>
 
     <!-- Sidebar Overlay (mobile) -->
@@ -1976,7 +1976,7 @@
                     cachedBookings[bIndex].pembayaran = 'LUNAS';
                     localStorage.setItem("app_bookings", JSON.stringify(cachedBookings));
                 }
-                showMessage("Berhasil! Data di Google Sheets sudah di-ACC.");
+                showMessage("Berhasil! Data di database sudah di-ACC.");
             } else {
                 showMessage("Gagal ACC: " + (res.message || "Unknown error"));
             }
