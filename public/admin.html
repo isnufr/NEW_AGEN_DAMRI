@@ -2360,6 +2360,7 @@
     // ADMIN BOOKING & THERMAL E-TICKETING
     // ========================================
     let currentTicketWaText = "";
+    let currentTicketDataForBT = null;
 
     async function submitAdminBooking(e) {
         e.preventDefault();
@@ -2441,20 +2442,18 @@
                 currentTicketWaText = `https://wa.me/${waNum}?text=${encodeURIComponent(textWa)}`;
 
                 // Simpan data untuk Web Bluetooth API
-                if(typeof currentTicketDataForBT !== 'undefined') {
-                    currentTicketDataForBT = {
-                        idTiket: idTiket,
-                        tglBeli: tglBeli,
-                        nama: payload['NAMA'],
-                        tujuan: payload['Tujuan'],
-                        tglBerangkat: formattedDate,
-                        jam: payload['WAKTU'],
-                        jumlahPnp: qty + ' Orang',
-                        armada: payload['JENIS KENDARAAN'],
-                        totalHarga: formatRupiah(total),
-                        status: statusPay
-                    };
-                }
+                currentTicketDataForBT = {
+                    idTiket: idTiket,
+                    tglBeli: tglBeli,
+                    nama: payload['NAMA'],
+                    tujuan: payload['Tujuan'],
+                    tglBerangkat: formattedDate,
+                    jam: payload['WAKTU'],
+                    jumlahPnp: qty + ' Orang',
+                    armada: payload['JENIS KENDARAAN'],
+                    totalHarga: formatRupiah(total),
+                    status: statusPay
+                };
 
                 openEticketModal();
             } else {
