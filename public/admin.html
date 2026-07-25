@@ -720,120 +720,117 @@
         <span id="alertText" class="text-sm font-bold tracking-wide"></span>
     </div>
 
-    <!-- E-Ticketing Thermal Print Area (Hidden unless printing) -->
-    <div id="thermalReceipt" class="hidden print-only text-black" style="font-family: monospace; font-size: 12px; width: 58mm; margin: 0; padding: 0;">
-        <div style="text-align: center; margin-bottom: 5px;">
-            <p style="margin: 0; font-size: 10px;">TGL BELI : <span id="r_tgl_beli"></span></p>
-            <h1 style="font-size: 12px; font-weight: bold; margin: 2px 0 0 0;">AGEN DAMRI KAWUNGANTEN</h1>
+    <!-- E-Ticketing Thermal Print Area & Modal (Unified UI) -->
+    <div id="eticketModal" class="fixed inset-0 bg-gray-900 z-[150] hidden flex-col justify-start items-center">
+        <!-- Header -->
+        <div class="w-full max-w-md bg-blue-700 text-white flex justify-between items-center px-4 py-4 shadow-md shrink-0">
+            <button onclick="closeEticketModal()" class="text-white hover:text-gray-200 transition-colors">
+                <i class="fas fa-arrow-left text-xl"></i>
+            </button>
+            <div class="flex gap-6">
+                <button onclick="sendWaAdmin()" class="text-white hover:text-gray-200 transition-colors">
+                    <i class="fas fa-share-alt text-xl"></i>
+                </button>
+                <button id="btnCetakThermalBT" onclick="printThermalReceiptBT()" class="text-white hover:text-gray-200 transition-colors">
+                    <i class="fas fa-print text-xl"></i>
+                </button>
+            </div>
         </div>
         
-        <div style="text-align: center; margin: 10px 0; border-top: 1px dashed #000; border-bottom: 1px dashed #000; padding: 5px 0;">
-            <h2 id="r_bus" style="font-size: 16px; font-weight: bold; margin: 0; text-transform: uppercase;"></h2>
-        </div>
-
-        <div style="display: flex; justify-content: center; align-items: center; margin-bottom: 10px; font-size: 10px;">
-            <span>Kode Boking : </span>
-            <span id="r_id" style="background: black; color: white; padding: 2px 4px; font-weight: bold; margin-left: 5px;"></span>
-        </div>
-
-        <div style="margin-bottom: 8px;">
-            <p style="margin: 0; font-size: 10px;">Keberangkatan</p>
-            <p id="r_tgl" style="margin: 0; font-size: 14px; font-weight: bold;"></p>
-        </div>
-
-        <div style="margin-bottom: 8px;">
-            <p style="margin: 0; font-size: 10px;">Waktu</p>
-            <p id="r_jam" style="margin: 0; font-size: 14px; font-weight: bold;"></p>
-        </div>
-
-        <div style="margin-bottom: 8px;">
-            <p style="margin: 0; font-size: 10px;">Asal</p>
-            <p style="margin: 0; font-size: 14px; font-weight: bold;">Kawunganten</p>
-        </div>
-
-        <div style="margin-bottom: 8px;">
-            <p style="margin: 0; font-size: 10px;">Tujuan</p>
-            <p id="r_rute" style="margin: 0; font-size: 14px; font-weight: bold;"></p>
-        </div>
-
-        <div style="margin-bottom: 8px;">
-            <p style="margin: 0; font-size: 10px;">Nama</p>
-            <p id="r_nama" style="margin: 0; font-size: 14px; font-weight: bold; text-transform: capitalize;"></p>
-        </div>
-
-        <div style="margin-bottom: 8px;">
-            <p style="margin: 0; font-size: 10px;">Jumlah Pnp</p>
-            <p id="r_pnp" style="margin: 0; font-size: 14px; font-weight: bold;"></p>
-        </div>
-
-        <div style="margin-bottom: 8px;">
-            <p style="margin: 0; font-size: 10px;">Nomor Kursi</p>
-            <p id="r_kursi" style="margin: 0; font-size: 14px; font-weight: bold;">-</p>
-        </div>
-
-        <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 10px;">
-            <div>
-                <p style="margin: 0; font-size: 10px;">Harga</p>
-                <p id="r_harga" style="margin: 0; font-size: 14px; font-weight: bold;"></p>
-            </div>
-            <div style="text-align: right;">
-                <p style="margin: 0; font-size: 10px;">Total Harga</p>
-                <p id="r_total" style="background: black; color: white; padding: 2px 4px; font-size: 14px; font-weight: bold; margin: 0;"></p>
-            </div>
-        </div>
-
-        <div style="font-size: 10px; margin-bottom: 10px;">
-            <p id="r_rute_short" style="margin: 0; font-weight: bold;"></p>
-        </div>
-
-        <div style="text-align: center; font-size: 10px; line-height: 1.2;">
-            <p style="margin: 0; font-style: italic;">Dimohon untuk berkumpul di Agen setengah jam sebelum keberangkatan</p>
-            <p style="margin: 5px 0;">Terima Kasih</p>
-            <p style="margin: 0;">Info Pemesanan : 082133607759</p>
-            <p style="margin: 0;">Alamat : JL.Raya Kawunganten</p>
-            <p style="margin: 0;">(Depan Koramil Kawunganten)</p>
-        </div>
-
-        <!-- Arsip Agen -->
-        <div style="margin-top: 15px; border-top: 1px dashed #000; padding-top: 5px; text-align: center;">
-            <h3 style="font-size: 12px; font-weight: bold; margin: 0 0 5px 0;">Arsip Agen</h3>
-            <p style="margin: 0; font-size: 10px;">AGEN DAMRI KAWUNGANTEN</p>
-            <p id="r_bus_arsip" style="font-size: 12px; font-weight: bold; margin: 5px 0; text-transform: uppercase;"></p>
-            
-            <div style="display: flex; justify-content: space-between; text-align: left; font-size: 10px; margin-top: 10px;">
-                <div style="width: 30%; text-align: center;">
-                    <p id="r_pnp_arsip_num" style="font-size: 16px; font-weight: bold; margin: 0;"></p>
-                    <p style="margin: 0;">ORANG</p>
+        <!-- Receipt Container -->
+        <div class="w-full max-w-md bg-white flex-1 overflow-y-auto flex justify-center py-8">
+            <div id="thermalReceipt" class="text-black" style="font-family: monospace; font-size: 12px; width: 58mm; margin: 0; padding: 0;">
+                <div style="text-align: center; margin-bottom: 5px;">
+                    <p style="margin: 0; font-size: 10px; font-weight: bold;">TGL BELI : <span id="r_tgl_beli" style="font-weight: 900;"></span></p>
+                    <h1 style="font-size: 14px; font-weight: 900; margin: 4px 0 0 0;">AGEN DAMRI KAWUNGANTEN</h1>
                 </div>
-                <div style="width: 70%; padding-left: 10px;">
-                    <p style="margin: 0;">Kawunganten</p>
-                    <p id="r_rute_arsip" style="margin: 0;"></p>
-                    <p id="r_nama_arsip" style="margin: 0;"></p>
-                    <p id="r_tgl_arsip" style="margin: 0;"></p>
+                
+                <div style="text-align: center; margin: 10px 0; border-top: 1px dashed #000; border-bottom: 1px dashed #000; padding: 5px 0;">
+                    <h2 id="r_bus" style="font-size: 16px; font-weight: 900; margin: 0; text-transform: uppercase;"></h2>
                 </div>
-            </div>
-        </div>
-    </div>
 
-    <!-- E-Ticket Action Modal -->
-    <div id="eticketModal" class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm z-[150] hidden items-center justify-center p-4">
-        <div class="bg-white rounded-3xl p-6 w-full max-w-sm shadow-2xl text-center relative" id="eticketModalContent">
-            <div class="absolute -top-4 -right-4 w-10 h-10 bg-slate-200 rounded-full flex items-center justify-center text-slate-500 cursor-pointer hover:bg-slate-300 transition-colors" onclick="closeEticketModal()">
-                <i class="fas fa-times"></i>
-            </div>
-            <div class="w-16 h-16 bg-green-100 text-green-500 rounded-full flex items-center justify-center text-3xl mx-auto mb-4">
-                <i class="fas fa-check-circle"></i>
-            </div>
-            <h3 class="text-xl font-black text-slate-800 tracking-tight">Booking Berhasil!</h3>
-            <p class="text-xs font-bold text-slate-500 mt-2 mb-6">Pilih aksi selanjutnya untuk tiket ini.</p>
-            
-            <div class="space-y-3">
-                <button id="btnCetakThermalBT" onclick="printThermalReceiptBT()" class="w-full py-3 bg-slate-800 hover:bg-black text-white rounded-xl text-sm font-black uppercase tracking-widest transition-colors flex items-center justify-center gap-2">
-                    <i class="fas fa-print"></i> Cetak Struk (Thermal)
-                </button>
-                <button onclick="sendWaAdmin()" class="w-full py-3 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl text-sm font-black uppercase tracking-widest transition-colors flex items-center justify-center gap-2">
-                    <i class="fab fa-whatsapp text-lg"></i> Kirim Info via WA
-                </button>
+                <div style="display: flex; justify-content: center; align-items: center; margin-bottom: 10px; font-size: 10px;">
+                    <span style="font-weight: bold;">Kode Boking : </span>
+                    <span id="r_id" style="background: black; color: white; padding: 2px 4px; font-weight: 900; margin-left: 5px;"></span>
+                </div>
+
+                <div style="margin-bottom: 8px;">
+                    <p style="margin: 0; font-size: 10px; font-weight: bold;">Keberangkatan</p>
+                    <p id="r_tgl" style="margin: 0; font-size: 14px; font-weight: 900;"></p>
+                </div>
+
+                <div style="margin-bottom: 8px;">
+                    <p style="margin: 0; font-size: 10px; font-weight: bold;">Waktu</p>
+                    <p id="r_jam" style="margin: 0; font-size: 14px; font-weight: 900;"></p>
+                </div>
+
+                <div style="margin-bottom: 8px;">
+                    <p style="margin: 0; font-size: 10px; font-weight: bold;">Asal</p>
+                    <p style="margin: 0; font-size: 14px; font-weight: 900;">Kawunganten</p>
+                </div>
+
+                <div style="margin-bottom: 8px;">
+                    <p style="margin: 0; font-size: 10px; font-weight: bold;">Tujuan</p>
+                    <p id="r_rute" style="margin: 0; font-size: 14px; font-weight: 900;"></p>
+                </div>
+
+                <div style="margin-bottom: 8px;">
+                    <p style="margin: 0; font-size: 10px; font-weight: bold;">Nama</p>
+                    <p id="r_nama" style="margin: 0; font-size: 14px; font-weight: 900; text-transform: capitalize;"></p>
+                </div>
+
+                <div style="margin-bottom: 8px;">
+                    <p style="margin: 0; font-size: 10px; font-weight: bold;">Jumlah Pnp</p>
+                    <p id="r_pnp" style="margin: 0; font-size: 14px; font-weight: 900;"></p>
+                </div>
+
+                <div style="margin-bottom: 8px;">
+                    <p style="margin: 0; font-size: 10px; font-weight: bold;">Nomor Kursi</p>
+                    <p id="r_kursi" style="margin: 0; font-size: 14px; font-weight: 900;">-</p>
+                </div>
+
+                <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 10px;">
+                    <div>
+                        <p style="margin: 0; font-size: 10px; font-weight: bold;">Harga</p>
+                        <p id="r_harga" style="margin: 0; font-size: 14px; font-weight: 900;"></p>
+                    </div>
+                    <div style="text-align: right;">
+                        <p style="margin: 0; font-size: 10px; font-weight: bold;">Total Harga</p>
+                        <p id="r_total" style="background: black; color: white; padding: 2px 4px; font-size: 14px; font-weight: 900; margin: 0;"></p>
+                    </div>
+                </div>
+
+                <div style="font-size: 10px; margin-bottom: 10px;">
+                    <p id="r_rute_short" style="margin: 0; font-weight: 900;"></p>
+                </div>
+
+                <div style="text-align: center; font-size: 10px; line-height: 1.2;">
+                    <p style="margin: 0; font-style: italic; font-weight: bold;">Dimohon untuk berkumpul di Agen setengah jam sebelum keberangkatan</p>
+                    <p style="margin: 5px 0; font-weight: bold;">Terima Kasih</p>
+                    <p style="margin: 0; font-weight: bold;">Info Pemesanan : 082133607759</p>
+                    <p style="margin: 0; font-weight: bold;">Alamat : JL.Raya Kawunganten</p>
+                    <p style="margin: 0; font-weight: bold;">(Depan Koramil Kawunganten)</p>
+                </div>
+
+                <!-- Arsip Agen -->
+                <div style="margin-top: 15px; border-top: 1px dashed #000; padding-top: 5px; text-align: center;">
+                    <h3 style="font-size: 12px; font-weight: 900; margin: 0 0 5px 0;">Arsip Agen</h3>
+                    <p style="margin: 0; font-size: 10px; font-weight: bold;">AGEN DAMRI KAWUNGANTEN</p>
+                    <p id="r_bus_arsip" style="font-size: 12px; font-weight: 900; margin: 5px 0; text-transform: uppercase;"></p>
+                    
+                    <div style="display: flex; justify-content: space-between; text-align: left; font-size: 10px; margin-top: 10px;">
+                        <div style="width: 30%; text-align: center;">
+                            <p id="r_pnp_arsip_num" style="font-size: 16px; font-weight: 900; margin: 0;"></p>
+                            <p style="margin: 0; font-weight: bold;">ORANG</p>
+                        </div>
+                        <div style="width: 70%; padding-left: 10px;">
+                            <p style="margin: 0; font-weight: bold;">Kawunganten</p>
+                            <p id="r_rute_arsip" style="margin: 0; font-weight: 900;"></p>
+                            <p id="r_nama_arsip" style="margin: 0; font-weight: 900;"></p>
+                            <p id="r_tgl_arsip" style="margin: 0; font-weight: 900;"></p>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
