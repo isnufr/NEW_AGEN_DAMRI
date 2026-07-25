@@ -17,6 +17,9 @@ COPY . .
 # Generate Prisma client
 RUN npx prisma generate
 
+# Remove local .env file so it doesn't override Docker ENV
+RUN rm -f .env
+
 # Set database URL to the persistent data folder
 ENV DATABASE_URL="file:/app/data/database.sqlite"
 
