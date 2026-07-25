@@ -2529,41 +2529,119 @@
         }
         const t = currentTicketDataForBT;
         
-        let html = "<center>";
-        html += "<b>AGEN DAMRI KAWUNGANTEN</b><br>";
-        html += "Pusat Penjualan Tiket Resmi<br>";
-        html += "</center>";
-        html += "TGL BELI: " + t.tglBeli + "<br>";
-        html += "--------------------------------<br>";
-        html += "<center><big><b>" + String(t.armada).toUpperCase() + "</b></big></center>";
-        html += "Kode Boking : " + t.idTiket + "<br>";
-        html += "--------------------------------<br>";
-        html += "Keberangkatan<br>";
-        html += "<b>" + t.tglBerangkat + "</b><br>";
-        html += "Waktu<br>";
-        html += "<b>" + t.jam + "</b><br>";
-        html += "Asal<br>";
-        html += "<b>Kawunganten</b><br>";
-        html += "Tujuan<br>";
-        html += "<b>" + t.tujuan + "</b><br>";
-        html += "Nama<br>";
-        html += "<b>" + t.nama + "</b><br>";
-        html += "Jumlah Pnp<br>";
-        html += "<b>" + t.jumlahPnp + "</b><br>";
-        html += "Nomor Kursi<br>";
-        html += "<b>-</b><br>";
-        html += "--------------------------------<br>";
-        html += "Total Harga<br>";
-        html += "<right><b>" + t.totalHarga + "</b></right><br>";
-        html += "--------------------------------<br>";
-        html += "<center>";
-        html += "Dimohon kumpul di Agen 30 menit sblm keberangkatan<br>";
-        html += "Terima Kasih<br>";
-        html += "Info : 082133607759<br>";
-        html += "</center>";
+        // ESC/POS Commands
+        const CMD = {
+            INIT: [0x1B, 0x40],
+            ALIGN_LEFT: [0x1B, 0x61, 0x00],
+            ALIGN_CENTER: [0x1B, 0x61, 0x01],
+            ALIGN_RIGHT: [0x1B, 0x61, 0x02],
+            BOLD_ON: [0x1B, 0x45, 0x01],
+            BOLD_OFF: [0x1B, 0x45, 0x00],
+            TEXT_NORMAL: [0x1D, 0x21, 0x00],
+            TEXT_DOUBLE_HW: [0x1D, 0x21, 0x11],
+            LF: [0x0A]
+        };
 
-        // Call RawBT Intent using base64 HTML
-        const base64 = btoa(unescape(encodeURIComponent(html)));
+        let bytes = [];
+        
+        function strToBytes(str) {
+            let arr = [];
+            for (let i = 0; i < str.length; i++) {
+                arr.push(str.charCodeAt(i));
+            }
+            return arr;
+        }
+
+        function add(cmd) { bytes.push(...cmd); }
+        function addStr(str) { bytes.push(...strToBytes(str)); }
+        function addLine(str) { addStr(str); add(CMD.LF); }
+
+        // Start Document
+        add(CMD.INIT);
+        add(CMD.ALIGN_CENTER);
+        add(CMD.BOLD_ON);
+        addLine("AGEN DAMRI KAWUNGANTEN");
+        add(CMD.BOLD_OFF);
+        addLine("Pusat Penjualan Tiket Resmi");
+        add(CMD.LF);
+        
+        add(CMD.ALIGN_LEFT);
+        addLine("TGL BELI: " + t.tglBeli);
+        addLine("--------------------------------");
+        
+        add(CMD.ALIGN_CENTER);
+        add(CMD.BOLD_ON);
+        add(CMD.TEXT_DOUBLE_HW);
+        addLine(String(t.armada).toUpperCase());
+        add(CMD.TEXT_NORMAL);
+        add(CMD.BOLD_OFF);
+        
+        add(CMD.ALIGN_LEFT);
+        addLine("Kode Boking : " + t.idTiket);
+        addLine("--------------------------------");
+        
+        addLine("Keberangkatan");
+        add(CMD.BOLD_ON);
+        addLine(t.tglBerangkat);
+        add(CMD.BOLD_OFF);
+        
+        addLine("Waktu");
+        add(CMD.BOLD_ON);
+        addLine(t.jam);
+        add(CMD.BOLD_OFF);
+        
+        addLine("Asal");
+        add(CMD.BOLD_ON);
+        addLine("Kawunganten");
+        add(CMD.BOLD_OFF);
+        
+        addLine("Tujuan");
+        add(CMD.BOLD_ON);
+        addLine(t.tujuan);
+        add(CMD.BOLD_OFF);
+        
+        addLine("Nama");
+        add(CMD.BOLD_ON);
+        addLine(t.nama);
+        add(CMD.BOLD_OFF);
+        
+        addLine("Jumlah Pnp");
+        add(CMD.BOLD_ON);
+        addLine(t.jumlahPnp);
+        add(CMD.BOLD_OFF);
+        
+        addLine("Nomor Kursi");
+        add(CMD.BOLD_ON);
+        addLine("-");
+        add(CMD.BOLD_OFF);
+        
+        addLine("--------------------------------");
+        
+        addLine("Total Harga");
+        add(CMD.ALIGN_RIGHT);
+        add(CMD.BOLD_ON);
+        addLine(t.totalHarga);
+        add(CMD.BOLD_OFF);
+        add(CMD.ALIGN_LEFT);
+        
+        addLine("--------------------------------");
+        
+        add(CMD.ALIGN_CENTER);
+        addLine("Dimohon kumpul di Agen 30 menit sblm keberangkatan");
+        addLine("Terima Kasih");
+        addLine("Info : 082133607759");
+        add(CMD.LF);
+        add(CMD.LF);
+        add(CMD.LF); 
+
+        // Convert to binary string
+        let binStr = "";
+        for (let i = 0; i < bytes.length; i++) {
+            binStr += String.fromCharCode(bytes[i]);
+        }
+        
+        // Encode Base64 & call RawBT Intent
+        const base64 = btoa(binStr);
         const intentUrl = "intent:base64," + base64 + "#Intent;scheme=rawbt;package=ru.a402d.rawbtprinter;end;";
         window.location.href = intentUrl;
     }
