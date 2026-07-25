@@ -2371,8 +2371,13 @@
         const rawDate = document.getElementById('editBookingDate').value;
         let formattedDate = "";
         if(rawDate) {
-            const dObj = new Date(rawDate);
+            const [yyyy, mm, dd] = rawDate.split('-');
+            const dObj = new Date(parseInt(yyyy), parseInt(mm)-1, parseInt(dd));
             formattedDate = INDO_DAYS[dObj.getDay()] + ', ' + dObj.getDate() + ' ' + INDO_MONTHS[dObj.getMonth()] + ' ' + dObj.getFullYear();
+        } else {
+            // fallback if rawDate is empty
+            const b = cachedBookings.find(bk => bk.bookingId === id);
+            formattedDate = b ? b.dateTravel : '';
         }
 
         const qty = parseInt(document.getElementById('editBookingPnp').value) || 1;
@@ -2393,16 +2398,6 @@
             return;
         }
         const kursiString = filledKursiCount === qty ? kursiValues.join(', ') : '';
-
-        const rawDate = document.getElementById('editBookingDate').value; // "YYYY-MM-DD"
-        let formattedDate = "";
-        if(rawDate) {
-            const [yyyy, mm, dd] = rawDate.split('-');
-            const dObj = new Date(parseInt(yyyy), parseInt(mm)-1, parseInt(dd));
-            formattedDate = INDO_DAYS[dObj.getDay()] + ', ' + dObj.getDate() + ' ' + INDO_MONTHS[dObj.getMonth()] + ' ' + dObj.getFullYear();
-        } else {
-            formattedDate = b.dateTravel;
-        }
 
         const payload = {
             id_tiket: id,
