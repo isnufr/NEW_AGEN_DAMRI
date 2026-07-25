@@ -21,7 +21,7 @@ RUN npx prisma generate
 RUN rm -f .env
 
 # Set database URL to the persistent data folder
-ENV DATABASE_URL="file:/app/data/database.sqlite"
+ENV DATABASE_URL="file:///app/data/database.sqlite"
 
 # Expose port
 EXPOSE 3000
