@@ -2452,6 +2452,7 @@
                     jumlahPnp: qty + ' Orang',
                     armada: payload['JENIS KENDARAAN'],
                     totalHarga: formatRupiah(total),
+                    hargaSatuan: formatRupiah(armada ? armada.price : 0),
                     status: statusPay
                 };
 
@@ -2576,44 +2577,57 @@
         add(CMD.TEXT_NORMAL);
         add(CMD.BOLD_OFF);
         
-        add(CMD.ALIGN_LEFT);
         addLine("Kode Boking : " + t.idTiket);
+        add(CMD.ALIGN_LEFT);
         addLine("--------------------------------");
         
         addLine("Keberangkatan");
         add(CMD.BOLD_ON);
         addLine(t.tglBerangkat);
         add(CMD.BOLD_OFF);
+        add(CMD.LF);
         
         addLine("Waktu");
         add(CMD.BOLD_ON);
         addLine(t.jam);
         add(CMD.BOLD_OFF);
+        add(CMD.LF);
         
         addLine("Asal");
         add(CMD.BOLD_ON);
         addLine("Kawunganten");
         add(CMD.BOLD_OFF);
+        add(CMD.LF);
         
         addLine("Tujuan");
         add(CMD.BOLD_ON);
         addLine(t.tujuan);
         add(CMD.BOLD_OFF);
+        add(CMD.LF);
         
         addLine("Nama");
         add(CMD.BOLD_ON);
         addLine(t.nama);
         add(CMD.BOLD_OFF);
+        add(CMD.LF);
         
         addLine("Jumlah Pnp");
         add(CMD.BOLD_ON);
         addLine(t.jumlahPnp);
         add(CMD.BOLD_OFF);
+        add(CMD.LF);
         
         addLine("Nomor Kursi");
         add(CMD.BOLD_ON);
         addLine("-");
         add(CMD.BOLD_OFF);
+        add(CMD.LF);
+        
+        addLine("Harga / Tiket");
+        add(CMD.BOLD_ON);
+        addLine(t.hargaSatuan);
+        add(CMD.BOLD_OFF);
+        add(CMD.LF);
         
         addLine("--------------------------------");
         
@@ -2630,6 +2644,14 @@
         addLine("Dimohon kumpul di Agen 30 menit sblm keberangkatan");
         addLine("Terima Kasih");
         addLine("Info : 082133607759");
+        add(CMD.LF);
+        addLine("--------------------------------");
+        add(CMD.BOLD_ON);
+        addLine("ARSIP AGEN");
+        add(CMD.BOLD_OFF);
+        addLine(t.nama);
+        addLine(t.jumlahPnp);
+        addLine(t.tujuan);
         add(CMD.LF);
         add(CMD.LF);
         add(CMD.LF); 
