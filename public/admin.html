@@ -680,7 +680,11 @@
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <div>
                                         <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Jumlah PNP</label>
-                                        <input type="number" id="adminBookingPnp" min="1" value="1" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-bold text-slate-700 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all" oninput="recalcAdminBooking()" required>
+                                        <div class="flex items-center">
+                                            <button type="button" onclick="document.getElementById('adminBookingPnp').stepDown(); recalcAdminBooking();" class="bg-slate-200 text-slate-700 font-bold px-4 py-3 rounded-l-xl hover:bg-slate-300 transition-colors active:scale-95">-</button>
+                                            <input type="number" id="adminBookingPnp" min="1" value="1" class="w-full bg-slate-50 border-y border-slate-200 px-4 py-3 text-sm font-bold text-slate-700 outline-none text-center focus:border-blue-500 focus:ring-0 transition-all appearance-none" oninput="recalcAdminBooking()" required style="-moz-appearance: textfield;">
+                                            <button type="button" onclick="document.getElementById('adminBookingPnp').stepUp(); recalcAdminBooking();" class="bg-slate-200 text-slate-700 font-bold px-4 py-3 rounded-r-xl hover:bg-slate-300 transition-colors active:scale-95">+</button>
+                                        </div>
                                     </div>
                                     <div>
                                         <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Keterangan (Opsional)</label>
@@ -690,25 +694,25 @@
                             </div>
 
                             <!-- Step 3: Pembayaran -->
-                            <div class="space-y-4">
+                            <div class="mb-8 flex flex-col gap-5 mt-4">
                                 <h3 class="text-xs font-black text-slate-400 uppercase tracking-widest border-b border-slate-100 pb-2">3. Pembayaran</h3>
-                                <div class="grid grid-cols-2 gap-4">
-                                    <div>
-                                        <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Status Pembayaran</label>
-                                        <div class="flex gap-2">
-                                            <label class="flex-1 cursor-pointer">
-                                                <input type="radio" name="adminBookingStatus" value="LUNAS" class="peer hidden" checked>
-                                                <div class="text-center py-3 px-2 rounded-xl border border-slate-200 peer-checked:bg-green-500 peer-checked:text-white peer-checked:border-green-500 font-bold text-sm text-slate-500 transition-all">LUNAS</div>
-                                            </label>
-                                            <label class="flex-1 cursor-pointer">
-                                                <input type="radio" name="adminBookingStatus" value="BELUM LUNAS" class="peer hidden">
-                                                <div class="text-center py-3 px-2 rounded-xl border border-slate-200 peer-checked:bg-orange-500 peer-checked:text-white peer-checked:border-orange-500 font-bold text-sm text-slate-500 transition-all">BELUM LUNAS</div>
-                                            </label>
-                                        </div>
-                                    </div>
-                                    <div class="bg-blue-50 p-3 rounded-xl border border-blue-100 flex flex-col justify-center">
-                                        <span class="text-[9px] font-bold text-blue-700 uppercase tracking-widest">Total Harga</span>
-                                        <span class="font-black text-xl text-blue-600 leading-none mt-1" id="adminBookingTotalDisplay">Rp0</span>
+                                
+                                <div class="bg-blue-50 p-4 rounded-xl border border-blue-100 flex flex-col items-center justify-center text-center">
+                                    <span class="text-[10px] font-bold text-blue-700 uppercase tracking-widest">Total Harga</span>
+                                    <span class="font-black text-3xl text-blue-600 leading-none mt-2" id="adminBookingTotalDisplay">Rp0</span>
+                                </div>
+
+                                <div>
+                                    <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2 text-center">Status Pembayaran</label>
+                                    <div class="flex gap-4">
+                                        <label class="flex-1 cursor-pointer">
+                                            <input type="radio" name="adminBookingStatus" value="LUNAS" class="peer hidden" checked>
+                                            <div class="text-center py-3 px-2 rounded-xl border border-slate-200 peer-checked:bg-green-500 peer-checked:text-white peer-checked:border-green-500 font-bold text-sm text-slate-500 transition-all shadow-sm">LUNAS</div>
+                                        </label>
+                                        <label class="flex-1 cursor-pointer">
+                                            <input type="radio" name="adminBookingStatus" value="BELUM LUNAS" class="peer hidden">
+                                            <div class="text-center py-3 px-2 rounded-xl border border-slate-200 peer-checked:bg-orange-500 peer-checked:text-white peer-checked:border-orange-500 font-bold text-sm text-slate-500 transition-all shadow-sm">BELUM LUNAS</div>
+                                        </label>
                                     </div>
                                 </div>
                             </div>
@@ -2733,7 +2737,11 @@
                 </div>
                 <div>
                     <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Jumlah PNP</label>
-                    <input type="number" id="editBookingPnp" min="1" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-sm font-bold text-slate-700 outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-200 transition-all" oninput="recalcEditBooking()" required>
+                    <div class="flex items-center">
+                        <button type="button" onclick="document.getElementById('editBookingPnp').stepDown(); recalcEditBooking();" class="bg-slate-200 text-slate-700 font-bold px-4 py-2 rounded-l-xl hover:bg-slate-300 transition-colors active:scale-95">-</button>
+                        <input type="number" id="editBookingPnp" min="1" class="w-full bg-slate-50 border-y border-slate-200 px-4 py-2 text-sm font-bold text-slate-700 outline-none text-center focus:border-amber-500 focus:ring-0 transition-all appearance-none" oninput="recalcEditBooking()" required style="-moz-appearance: textfield;">
+                        <button type="button" onclick="document.getElementById('editBookingPnp').stepUp(); recalcEditBooking();" class="bg-slate-200 text-slate-700 font-bold px-4 py-2 rounded-r-xl hover:bg-slate-300 transition-colors active:scale-95">+</button>
+                    </div>
                 </div>
             </div>
             <div>
