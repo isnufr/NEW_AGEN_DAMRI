@@ -818,11 +818,7 @@
                 <div style="font-size: 10px; margin-bottom: 5px;">
                     <p id="r_rute_short" style="margin: 0; font-weight: 900;"></p>
                 </div>
-                
-                <div style="font-size: 10px; margin-bottom: 10px;">
-                    <p style="margin: 0; font-weight: bold;">Catatan:</p>
-                    <p id="r_keterangan" style="margin: 0; font-style: italic; font-weight: 900;"></p>
-                </div>
+
 
                 <div style="text-align: center; font-size: 10px; line-height: 1.2;">
                     <p style="margin: 0; font-style: italic; font-weight: bold;">Dimohon untuk berkumpul di Agen setengah jam sebelum keberangkatan</p>
@@ -2586,7 +2582,6 @@
                 document.getElementById('r_harga').innerText = formatRupiah(armada ? armada.price : 0);
                 document.getElementById('r_total').innerText = formatRupiah(total);
                 document.getElementById('r_rute_short').innerText = 'KWT - ' + String(payload['Tujuan']).substring(0,3).toUpperCase();
-                document.getElementById('r_keterangan').innerText = ket || '-';
                 
                 document.getElementById('r_bus_arsip').innerText = payload['JENIS KENDARAAN'];
                 document.getElementById('r_pnp_arsip_num').innerText = payload['JUMLAH PNP'];
@@ -2760,7 +2755,6 @@
         addLine("AGEN DAMRI KAWUNGANTEN");
         add(CMD.BOLD_OFF);
         addLine("Pusat Penjualan Tiket Resmi");
-        addLine("Jl.Raya Kawunganten (Depan Koramil Kawunganten)");
         add(CMD.LF);
         
         add(CMD.ALIGN_LEFT);
@@ -2819,12 +2813,7 @@
         addLine(t.kursi || "-");
         add(CMD.BOLD_OFF);
         add(CMD.LF);
-        
-        addLine("Keterangan");
-        add(CMD.BOLD_ON);
-        addLine(t.keterangan || "-");
-        add(CMD.BOLD_OFF);
-        add(CMD.LF);
+
         
         addLine("Harga / Tiket");
         add(CMD.BOLD_ON);
@@ -2847,6 +2836,7 @@
         addLine("Dimohon kumpul di Agen 30 menit sblm keberangkatan");
         addLine("Terima Kasih");
         addLine("Info : 082133607759");
+        addLine("Jl.Raya Kawunganten (Depan Koramil Kawunganten)");
         add(CMD.LF);
         addLine("TIKET YANG SUDAH DIBOOKING TIDAK BISA DICANCEL MENDADAK (HANGUS)");
         addLine("CANCEL/RESCHEDULE MAKSIMAL 1x24 JAM SEBELUM PEMBERANGKATAN");
