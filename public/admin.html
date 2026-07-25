@@ -641,19 +641,23 @@
                             <!-- Step 1: Armada, Jam, Rute -->
                             <div class="bg-slate-50 p-4 rounded-xl border border-slate-100 space-y-4">
                                 <h3 class="text-xs font-black text-slate-400 uppercase tracking-widest border-b border-slate-200 pb-2">1. Pemilihan Armada & Rute</h3>
-                                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                                    <div>
+                                        <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Tanggal</label>
+                                        <input type="date" id="adminBookingDate" class="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm font-bold text-slate-700 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all" required>
+                                    </div>
                                     <div>
                                         <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Pilih Armada</label>
                                         <select id="adminBookingArmadaName" class="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm font-bold text-slate-700 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all" onchange="updateAdminTime()" required>
                                         </select>
                                     </div>
                                     <div>
-                                        <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Jam Berangkat</label>
+                                        <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Jam</label>
                                         <select id="adminBookingTime" class="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm font-bold text-slate-700 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all" onchange="updateAdminRute()" required>
                                         </select>
                                     </div>
                                     <div>
-                                        <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Rute Armada</label>
+                                        <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Rute</label>
                                         <select id="adminBookingArmada" class="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm font-bold text-slate-700 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all" onchange="recalcAdminBooking()" required>
                                         </select>
                                     </div>
@@ -670,17 +674,17 @@
                                     </div>
                                     <div>
                                         <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">No HP / WA</label>
-                                        <input type="text" id="adminBookingHp" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-bold text-slate-700 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all" required>
+                                        <input type="tel" id="adminBookingHp" inputmode="numeric" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-bold text-slate-700 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all" required>
                                     </div>
                                 </div>
-                                <div class="grid grid-cols-2 gap-4">
-                                    <div>
-                                        <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Tanggal</label>
-                                        <input type="date" id="adminBookingDate" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-bold text-slate-700 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all" required>
-                                    </div>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <div>
                                         <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Jumlah PNP</label>
                                         <input type="number" id="adminBookingPnp" min="1" value="1" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-bold text-slate-700 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all" oninput="recalcAdminBooking()" required>
+                                    </div>
+                                    <div>
+                                        <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Keterangan (Opsional)</label>
+                                        <input type="text" id="adminBookingKeterangan" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-bold text-slate-700 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all" placeholder="Catatan tambahan...">
                                     </div>
                                 </div>
                             </div>
@@ -691,10 +695,16 @@
                                 <div class="grid grid-cols-2 gap-4">
                                     <div>
                                         <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Status Pembayaran</label>
-                                        <select id="adminBookingStatus" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-bold text-slate-700 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all" required>
-                                            <option value="LUNAS">LUNAS</option>
-                                            <option value="BELUM LUNAS">BELUM LUNAS</option>
-                                        </select>
+                                        <div class="flex gap-2">
+                                            <label class="flex-1 cursor-pointer">
+                                                <input type="radio" name="adminBookingStatus" value="LUNAS" class="peer hidden" checked>
+                                                <div class="text-center py-3 px-2 rounded-xl border border-slate-200 peer-checked:bg-green-500 peer-checked:text-white peer-checked:border-green-500 font-bold text-sm text-slate-500 transition-all">LUNAS</div>
+                                            </label>
+                                            <label class="flex-1 cursor-pointer">
+                                                <input type="radio" name="adminBookingStatus" value="BELUM LUNAS" class="peer hidden">
+                                                <div class="text-center py-3 px-2 rounded-xl border border-slate-200 peer-checked:bg-orange-500 peer-checked:text-white peer-checked:border-orange-500 font-bold text-sm text-slate-500 transition-all">BELUM LUNAS</div>
+                                            </label>
+                                        </div>
                                     </div>
                                     <div class="bg-blue-50 p-3 rounded-xl border border-blue-100 flex flex-col justify-center">
                                         <span class="text-[9px] font-bold text-blue-700 uppercase tracking-widest">Total Harga</span>
@@ -2375,9 +2385,10 @@
         const formattedDate = INDO_DAYS[dObj.getDay()] + ', ' + dObj.getDate() + ' ' + INDO_MONTHS[dObj.getMonth()] + ' ' + dObj.getFullYear();
         
         const qty = parseInt(document.getElementById('adminBookingPnp').value) || 1;
-        const statusPay = document.getElementById('adminBookingStatus').value;
+        const statusPay = document.querySelector('input[name="adminBookingStatus"]:checked').value;
         const hp = document.getElementById('adminBookingHp').value;
         const name = document.getElementById('adminBookingNama').value;
+        const ket = document.getElementById('adminBookingKeterangan').value;
         const total = armada ? (armada.price * qty) : 0;
         
         const generateId = () => {
@@ -2403,6 +2414,7 @@
             'WAKTU': armada ? armada.time : '',
             'PEMBAYARAN': 'CASH',
             'Status': statusPay,
+            'Keterangan': ket,
             'Total Harga': total
         };
 
