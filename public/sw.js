@@ -1,4 +1,4 @@
-const CACHE_NAME = 'agen-damri-cache-v2';
+const CACHE_NAME = 'agen-damri-cache-v3';
 const urlsToCache = [
   '/',
   '/index.html',
@@ -8,7 +8,8 @@ const urlsToCache = [
   '/logobiru.webp',
   'https://cdn.tailwindcss.com?v=2',
   'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css',
-  'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js?v=2'
+  'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js?v=2',
+  '/bluetooth-printer.js'
 ];
 
 self.addEventListener('install', event => {
