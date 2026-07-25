@@ -212,7 +212,7 @@ function formatRupiah(number) {
         style: 'currency',
         currency: 'IDR',
         minimumFractionDigits: 0
-    }).format(number);
+    }).format(number).replace(/[\u00A0\u202F]/g, ' ');
 }
 
 function generateBookingId() {
