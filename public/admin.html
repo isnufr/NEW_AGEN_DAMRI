@@ -731,7 +731,7 @@
                 <button onclick="sendWaAdmin()" class="text-white hover:text-gray-200 transition-colors">
                     <i class="fas fa-share-alt text-xl"></i>
                 </button>
-                <button id="btnCetakThermalBT" onclick="printThermalReceiptBT()" class="text-white hover:text-gray-200 transition-colors">
+                <button id="btnCetakThermalBT" onclick="printRawBT()" class="text-white hover:text-gray-200 transition-colors">
                     <i class="fas fa-print text-xl"></i>
                 </button>
             </div>
@@ -2523,6 +2523,49 @@
         document.getElementById('eticketModal').classList.remove('hidden');
         document.getElementById('eticketModal').classList.add('flex');
     }
+    function printRawBT() {
+        if(typeof currentTicketDataForBT === 'undefined' || !currentTicketDataForBT) {
+            alert('Data tiket tidak ditemukan.');
+            return;
+        }
+        const t = currentTicketDataForBT;
+        
+        let text = "";
+        text += "[C]AGEN DAMRI KAWUNGANTEN\n";
+        text += "[C]Pusat Penjualan Tiket Resmi\n";
+        text += "[L]\n";
+        text += "[L]TGL BELI: " + t.tglBeli + "\n";
+        text += "[C]--------------------------------\n";
+        text += "[C]<font size='big'>" + String(t.armada).toUpperCase() + "</font>\n";
+        text += "[L]Kode Boking : " + t.idTiket + "\n";
+        text += "[C]--------------------------------\n";
+        text += "[L]Keberangkatan\n";
+        text += "[L]<b>" + t.tglBerangkat + "</b>\n";
+        text += "[L]Waktu\n";
+        text += "[L]<b>" + t.jam + "</b>\n";
+        text += "[L]Asal\n";
+        text += "[L]<b>Kawunganten</b>\n";
+        text += "[L]Tujuan\n";
+        text += "[L]<b>" + t.tujuan + "</b>\n";
+        text += "[L]Nama\n";
+        text += "[L]<b>" + t.nama + "</b>\n";
+        text += "[L]Jumlah Pnp\n";
+        text += "[L]<b>" + t.jumlahPnp + "</b>\n";
+        text += "[L]Nomor Kursi\n";
+        text += "[L]<b>-</b>\n";
+        text += "[C]--------------------------------\n";
+        text += "[L]Total Harga\n";
+        text += "[R]<b>" + t.totalHarga + "</b>\n";
+        text += "[C]--------------------------------\n";
+        text += "[C]Dimohon kumpul di Agen 30 menit sblm keberangkatan\n";
+        text += "[C]Terima Kasih\n";
+        text += "[C]Info : 082133607759\n";
+
+        // Call RawBT Intent
+        const intentUrl = "intent:" + encodeURIComponent(text) + "#Intent;scheme=rawbt;package=ru.a402d.rawbtprinter;end;";
+        window.location.href = intentUrl;
+    }
+
     function closeEticketModal() {
         document.getElementById('eticketModal').classList.add('hidden');
         document.getElementById('eticketModal').classList.remove('flex');
