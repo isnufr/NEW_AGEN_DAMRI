@@ -1111,6 +1111,14 @@
     const INDO_MONTHS = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
     const INDO_DAYS = ['Minggu','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'];
 
+    function getLocalYYYYMMDD(dObj) {
+        if (!dObj) dObj = new Date();
+        const yyyy = dObj.getFullYear();
+        const mm = String(dObj.getMonth() + 1).padStart(2, '0');
+        const dd = String(dObj.getDate()).padStart(2, '0');
+        return `${yyyy}-${mm}-${dd}`;
+    }
+
     function parseIndoDate(str) {
         if (!str) return null;
         str = String(str).trim();
@@ -2269,7 +2277,7 @@
 
         const dObj = parseIndoDate(b.dateTravel);
         if(dObj) {
-            document.getElementById('editBookingDate').value = dObj.toISOString().split('T')[0];
+            document.getElementById('editBookingDate').value = getLocalYYYYMMDD(dObj);
         } else {
             document.getElementById('editBookingDate').value = '';
         }
@@ -2386,6 +2394,16 @@
         }
         const kursiString = filledKursiCount === qty ? kursiValues.join(', ') : '';
 
+        const rawDate = document.getElementById('editBookingDate').value; // "YYYY-MM-DD"
+        let formattedDate = "";
+        if(rawDate) {
+            const [yyyy, mm, dd] = rawDate.split('-');
+            const dObj = new Date(parseInt(yyyy), parseInt(mm)-1, parseInt(dd));
+            formattedDate = INDO_DAYS[dObj.getDay()] + ', ' + dObj.getDate() + ' ' + INDO_MONTHS[dObj.getMonth()] + ' ' + dObj.getFullYear();
+        } else {
+            formattedDate = b.dateTravel;
+        }
+
         const payload = {
             id_tiket: id,
             nama: document.getElementById('editBookingNama').value,
@@ -2489,7 +2507,8 @@
         const armada = getArmada(armadaId);
         
         const rawDate = document.getElementById('adminBookingDate').value;
-        const dObj = new Date(rawDate);
+        const [yyyy, mm, dd] = rawDate.split('-');
+        const dObj = new Date(parseInt(yyyy), parseInt(mm)-1, parseInt(dd));
         const formattedDate = INDO_DAYS[dObj.getDay()] + ', ' + dObj.getDate() + ' ' + INDO_MONTHS[dObj.getMonth()] + ' ' + dObj.getFullYear();
         
         const qty = parseInt(document.getElementById('adminBookingPnp').value) || 1;
@@ -2608,7 +2627,7 @@
 
     function resetAdminBooking() {
         document.getElementById('formAdminBooking').reset();
-        document.getElementById('adminBookingDate').value = new Date().toISOString().split('T')[0];
+        document.getElementById('adminBookingDate').value = getLocalYYYYMMDD(new Date());
         document.getElementById('adminBookingTotalDisplay').innerText = 'Rp0';
         updateAdminRute();
     }
@@ -2859,7 +2878,7 @@
 
     document.addEventListener('DOMContentLoaded', () => {
         if(document.getElementById('adminBookingDate')) {
-            document.getElementById('adminBookingDate').value = new Date().toISOString().split('T')[0];
+            document.getElementById('adminBookingDate').value = getLocalYYYYMMDD(new Date());
         }
     });
 </script>
