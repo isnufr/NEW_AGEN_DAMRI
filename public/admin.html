@@ -2378,7 +2378,16 @@
         const hp = document.getElementById('adminBookingHp').value;
         const name = document.getElementById('adminBookingNama').value;
         const total = armada ? (armada.price * qty) : 0;
-        const idTiket = 'DMR' + Math.floor(Math.random() * 1000000);
+        
+        const generateId = () => {
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+            let result = '';
+            for (let i = 0; i < 8; i++) {
+                result += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            return result;
+        };
+        const idTiket = generateId();
 
         const payload = {
             'Timestamp': new Date().toISOString(),
