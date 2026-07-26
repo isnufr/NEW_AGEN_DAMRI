@@ -191,6 +191,200 @@
                 margin: 0;
             }
         }
+
+        /* ============================================ */
+        /* DARK MODE — Smooth & Comprehensive            */
+        /* ============================================ */
+
+        /* Global smooth transition for ALL elements */
+        body, body *,
+        body *::before, body *::after {
+            transition: background-color 0.35s ease, color 0.25s ease, border-color 0.35s ease, box-shadow 0.35s ease;
+        }
+
+        /* Base body */
+        body.dark-mode {
+            background-color: #0b1120 !important;
+            color: #e2e8f0 !important;
+        }
+
+        /* --- Background Utilities --- */
+        body.dark-mode .bg-\[\#f1f5f9\] { background-color: #0b1120 !important; }
+        body.dark-mode .bg-white { background-color: #1e293b !important; }
+        body.dark-mode .bg-slate-50 { background-color: #131c2e !important; }
+        body.dark-mode .bg-slate-100 { background-color: #1e293b !important; }
+        body.dark-mode .bg-slate-200 { background-color: #334155 !important; }
+        body.dark-mode .bg-blue-50 { background-color: rgba(59,130,246,0.12) !important; }
+        body.dark-mode .bg-blue-50\/50 { background-color: rgba(59,130,246,0.08) !important; }
+        body.dark-mode .bg-gray-100 { background-color: #1e293b !important; }
+        body.dark-mode .bg-gray-200 { background-color: #334155 !important; }
+        body.dark-mode .bg-white\/90 { background-color: rgba(11,17,32,0.92) !important; }
+
+        /* --- Text Utilities --- */
+        body.dark-mode .text-slate-800, body.dark-mode .text-gray-800 { color: #f1f5f9 !important; }
+        body.dark-mode .text-slate-700, body.dark-mode .text-gray-700 { color: #e2e8f0 !important; }
+        body.dark-mode .text-slate-600, body.dark-mode .text-gray-600 { color: #cbd5e1 !important; }
+        body.dark-mode .text-slate-500, body.dark-mode .text-gray-500 { color: #94a3b8 !important; }
+        body.dark-mode .text-slate-400, body.dark-mode .text-gray-400 { color: #64748b !important; }
+        body.dark-mode .text-blue-900 { color: #93c5fd !important; }
+
+        /* --- Border Utilities --- */
+        body.dark-mode .border-slate-50,
+        body.dark-mode .border-slate-100,
+        body.dark-mode .border-slate-200,
+        body.dark-mode .border-gray-100,
+        body.dark-mode .border-gray-200,
+        body.dark-mode .border-gray-300 {
+            border-color: #1e293b !important;
+        }
+
+        /* --- Stat Cards & Chart Cards --- */
+        body.dark-mode .stat-card {
+            background: rgba(30,41,59,0.85) !important;
+            border-color: #334155 !important;
+            box-shadow: 0 4px 24px -4px rgba(0,0,0,0.3) !important;
+        }
+        body.dark-mode .chart-card {
+            background: #1e293b !important;
+            border-color: #334155 !important;
+            box-shadow: 0 4px 24px -4px rgba(0,0,0,0.3) !important;
+        }
+
+        /* --- Data Table --- */
+        body.dark-mode .data-table thead th {
+            background: #131c2e !important;
+            border-bottom-color: #334155 !important;
+            color: #64748b !important;
+        }
+        body.dark-mode .data-table tbody td {
+            border-bottom-color: #1e293b !important;
+            color: #cbd5e1 !important;
+        }
+        body.dark-mode .data-table tbody tr:hover { background: rgba(30,41,59,0.6) !important; }
+
+        /* --- Search Input --- */
+        body.dark-mode .search-input {
+            background: #131c2e !important;
+            border-color: #334155 !important;
+            color: #f1f5f9 !important;
+        }
+        body.dark-mode .search-input:focus {
+            border-color: #3b82f6 !important;
+            background: #1e293b !important;
+            box-shadow: 0 8px 20px -4px rgba(59,130,246,0.2) !important;
+        }
+
+        /* --- Filter Buttons --- */
+        body.dark-mode .filter-btn {
+            background: #1e293b !important;
+            border-color: #334155 !important;
+            color: #94a3b8 !important;
+        }
+        body.dark-mode .filter-btn:hover { background: #334155 !important; color: #e2e8f0 !important; }
+        body.dark-mode .filter-btn.active {
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8) !important;
+            color: white !important; border-color: transparent !important;
+        }
+
+        /* --- Mobile Topbar --- */
+        body.dark-mode .mobile-topbar {
+            background: rgba(11,17,32,0.92) !important;
+            backdrop-filter: blur(16px) !important;
+            border-bottom-color: #1e293b !important;
+        }
+
+        /* --- Form Inputs (all types) --- */
+        body.dark-mode input[type="text"],
+        body.dark-mode input[type="date"],
+        body.dark-mode input[type="number"],
+        body.dark-mode input[type="password"],
+        body.dark-mode input[type="email"],
+        body.dark-mode input[type="tel"],
+        body.dark-mode select,
+        body.dark-mode textarea {
+            background: #131c2e !important;
+            border-color: #334155 !important;
+            color: #f1f5f9 !important;
+        }
+        body.dark-mode input:focus, body.dark-mode select:focus, body.dark-mode textarea:focus {
+            border-color: #3b82f6 !important;
+            box-shadow: 0 0 0 3px rgba(59,130,246,0.15) !important;
+        }
+        body.dark-mode input::placeholder, body.dark-mode textarea::placeholder {
+            color: #475569 !important;
+        }
+
+        /* --- Modals (all) --- */
+        body.dark-mode [id$="Modal"] > div:not([class*="bg-gradient"]):not([class*="bg-gray-900"]):not([class*="bg-blue-700"]) {
+            background-color: #1e293b !important;
+            border-color: #334155 !important;
+        }
+        body.dark-mode #bookingModal > div { background-color: #1e293b !important; border-color: #334155 !important; }
+        body.dark-mode #ap3Modal #ap3ModalInner { background-color: #1e293b !important; }
+        body.dark-mode #confirmModal #confirmModalInner { background-color: #1e293b !important; }
+        body.dark-mode #deleteModal #deleteModalInner { background-color: #1e293b !important; }
+        body.dark-mode #deleteArmadaModal #deleteArmadaModalInner { background-color: #1e293b !important; }
+        body.dark-mode #notifModal #notifModalInner { background-color: #1e293b !important; border-color: #334155 !important; }
+        body.dark-mode #ticketModal #ticketModalInner { background-color: #1e293b !important; border-color: #334155 !important; }
+        body.dark-mode #adminModal > div { background-color: #1e293b !important; border-color: #334155 !important; }
+        body.dark-mode #deleteAdminModal > div { background-color: #1e293b !important; }
+
+        /* Modal inner sections */
+        body.dark-mode #notifListContainer { background-color: #131c2e !important; }
+        body.dark-mode #ap3Modal .bg-slate-50,
+        body.dark-mode #bookingModal .bg-slate-50 { background-color: #131c2e !important; }
+
+        /* --- Laporan / Report Cards --- */
+        body.dark-mode #sec-laporan .bg-white {
+            background-color: #1e293b !important;
+            border-color: #334155 !important;
+        }
+        body.dark-mode #sec-laporan .bg-blue-50 { background-color: rgba(59,130,246,0.1) !important; }
+        body.dark-mode #sec-laporan .bg-indigo-50 { background-color: rgba(99,102,241,0.1) !important; }
+        body.dark-mode #sec-laporan .bg-rose-50 { background-color: rgba(244,63,94,0.1) !important; }
+        body.dark-mode #sec-laporan .bg-amber-50 { background-color: rgba(245,158,11,0.1) !important; }
+
+        /* --- Pagination --- */
+        body.dark-mode #pesananPagination {
+            background-color: #1e293b !important;
+            border-top-color: #334155 !important;
+        }
+
+        /* --- Loading Overlay --- */
+        body.dark-mode #loadingOverlay {
+            background-color: rgba(11,17,32,0.95) !important;
+        }
+        body.dark-mode #loadingOverlay h2 { color: #93c5fd !important; }
+        body.dark-mode #loadingOverlay p { color: #64748b !important; }
+
+        /* --- Scrollbar (Webkit) --- */
+        body.dark-mode ::-webkit-scrollbar { width: 6px; height: 6px; }
+        body.dark-mode ::-webkit-scrollbar-track { background: #0b1120; }
+        body.dark-mode ::-webkit-scrollbar-thumb { background: #334155; border-radius: 8px; }
+        body.dark-mode ::-webkit-scrollbar-thumb:hover { background: #475569; }
+
+        /* --- Dark Mode Toggle Button --- */
+        .dark-mode-btn {
+            position: relative;
+            overflow: hidden;
+        }
+        .dark-mode-btn i {
+            transition: transform 0.5s cubic-bezier(0.4,0,0.2,1), color 0.3s ease;
+        }
+        body.dark-mode .dark-mode-btn {
+            background: linear-gradient(135deg, #1e293b, #334155) !important;
+            border-color: #475569 !important;
+            box-shadow: 0 0 20px -4px rgba(250,204,21,0.2), inset 0 1px 0 rgba(255,255,255,0.05) !important;
+        }
+        body.dark-mode .dark-mode-btn i {
+            color: #fbbf24 !important;
+            transform: rotate(360deg);
+            filter: drop-shadow(0 0 6px rgba(251,191,36,0.5));
+        }
+
+        /* --- Shadow overrides --- */
+        body.dark-mode .shadow-xl { box-shadow: 0 20px 25px -5px rgba(0,0,0,0.4), 0 8px 10px -6px rgba(0,0,0,0.3) !important; }
+        body.dark-mode .shadow-2xl { box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5) !important; }
     </style>
 </head>
 <body class="bg-[#f1f5f9] text-gray-800">
@@ -214,8 +408,8 @@
                 <div class="flex items-center gap-3 mb-1">
                     <img src="logo.png" alt="Logo" class="w-10 h-10 object-contain rounded-xl shadow-lg shadow-blue-600/30 bg-white p-1">
                     <div>
-                        <h1 class="text-sm font-black text-white tracking-tight uppercase leading-none">Admin Panel</h1>
-                        <p class="text-[9px] font-bold text-slate-500 uppercase tracking-widest mt-0.5">Agen Damri</p>
+                        <h1 class="text-sm font-black text-white tracking-tight uppercase leading-none">AGEN DAMRI</h1>
+                        <p class="text-[9px] font-bold text-slate-500 uppercase tracking-widest mt-0.5">KAWUNGANTEN</p>
                     </div>
                 </div>
             </div>
@@ -264,7 +458,7 @@
                     <i class="fas fa-sign-out-alt"></i>
                     <span>Logout</span>
                 </div>
-                <p class="text-[8px] text-slate-700 text-center mt-3 font-bold uppercase tracking-widest">&copy; 2026 Agen Damri</p>
+                <p class="text-[8px] text-slate-700 text-center mt-3 font-bold uppercase tracking-widest">&copy; 2026 KAWUNGANTEN</p>
             </div>
         </aside>
 
@@ -276,10 +470,13 @@
                     <i class="fas fa-bars"></i>
                 </button>
                 <div class="text-center">
-                    <h1 class="text-sm font-black text-blue-900 uppercase tracking-tight leading-none">Admin Panel</h1>
-                    <p class="text-[8px] font-bold text-gray-400 uppercase tracking-widest">Agen Damri</p>
+                    <h1 class="text-sm font-black text-blue-900 uppercase tracking-tight leading-none">AGEN DAMRI</h1>
+                    <p class="text-[8px] font-bold text-gray-400 uppercase tracking-widest">KAWUNGANTEN</p>
                 </div>
                 <div class="flex items-center gap-2">
+                    <button onclick="toggleDarkMode()" class="w-10 h-10 rounded-xl bg-white flex items-center justify-center text-slate-600 hover:text-amber-500 border border-slate-100 transition-colors dark-mode-btn">
+                        <i class="fas fa-moon text-sm"></i>
+                    </button>
                     <button onclick="openNotifModal()" class="relative w-10 h-10 rounded-xl bg-white flex items-center justify-center text-slate-600 hover:text-blue-600 border border-slate-100 transition-colors">
                         <i class="fas fa-bell text-sm"></i>
                         <span id="notifBadgeMobile" class="absolute -top-1 -right-1 bg-red-500 text-white text-[9px] font-black w-4 h-4 flex items-center justify-center rounded-full border border-white hidden">0</span>
@@ -290,8 +487,11 @@
                 </div>
             </div>
 
-            <!-- Desktop Notification Bell -->
-            <div class="hidden lg:block fixed top-6 right-8 z-[60]">
+            <!-- Desktop Notification Bell & Dark Mode -->
+            <div class="hidden lg:flex fixed top-6 right-8 z-[60] gap-3">
+                <button onclick="toggleDarkMode()" class="bg-white w-12 h-12 rounded-2xl shadow-xl flex items-center justify-center text-slate-600 hover:text-amber-500 transition-all border border-slate-100 hover:scale-105 dark-mode-btn">
+                    <i class="fas fa-moon text-xl"></i>
+                </button>
                 <button onclick="openNotifModal()" class="relative bg-white w-12 h-12 rounded-2xl shadow-xl flex items-center justify-center text-slate-600 hover:text-blue-600 transition-all border border-slate-100 hover:scale-105">
                     <i class="fas fa-bell text-xl"></i>
                     <span id="notifBadgeDesktop" class="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-black w-5 h-5 flex items-center justify-center rounded-full border-2 border-white hidden">0</span>
@@ -480,7 +680,9 @@
                         <div class="overflow-x-auto">
                             <table class="data-table">
                                 <tbody id="todayTableBody">
-                                    <tr><td colspan="6" class="text-center text-sm text-slate-400 font-bold py-8 italic uppercase tracking-widest">Memuat data...</td></tr>
+                                    <tr class="animate-pulse border-b border-slate-50"><td colspan="6" class="p-4"><div class="flex items-center gap-4"><div class="w-10 h-10 bg-slate-200 rounded-xl flex-shrink-0"></div><div class="flex-1 space-y-2"><div class="h-4 bg-slate-200 rounded w-1/3"></div><div class="h-3 bg-slate-100 rounded w-1/4"></div></div><div class="w-16 h-6 bg-slate-200 rounded-lg flex-shrink-0"></div></div></td></tr>
+                                    <tr class="animate-pulse border-b border-slate-50"><td colspan="6" class="p-4"><div class="flex items-center gap-4"><div class="w-10 h-10 bg-slate-200 rounded-xl flex-shrink-0"></div><div class="flex-1 space-y-2"><div class="h-4 bg-slate-200 rounded w-1/2"></div><div class="h-3 bg-slate-100 rounded w-1/3"></div></div><div class="w-16 h-6 bg-slate-200 rounded-lg flex-shrink-0"></div></div></td></tr>
+                                    <tr class="animate-pulse border-b border-slate-50"><td colspan="6" class="p-4"><div class="flex items-center gap-4"><div class="w-10 h-10 bg-slate-200 rounded-xl flex-shrink-0"></div><div class="flex-1 space-y-2"><div class="h-4 bg-slate-200 rounded w-2/5"></div><div class="h-3 bg-slate-100 rounded w-1/5"></div></div><div class="w-16 h-6 bg-slate-200 rounded-lg flex-shrink-0"></div></div></td></tr>
                                 </tbody>
                             </table>
                         </div>
@@ -514,7 +716,9 @@
                                     </tr>
                                 </thead>
                                 <tbody id="pesananTableBody">
-                                    <tr><td colspan="5" class="text-center text-sm text-slate-400 font-bold py-8 italic uppercase tracking-widest">Memuat data...</td></tr>
+                                    <tr class="animate-pulse border-b border-slate-50"><td colspan="5" class="p-4"><div class="flex items-center gap-4"><div class="w-10 h-10 bg-slate-200 rounded-xl flex-shrink-0"></div><div class="flex-1 space-y-2"><div class="h-4 bg-slate-200 rounded w-1/3"></div><div class="h-3 bg-slate-100 rounded w-1/4"></div></div><div class="w-16 h-6 bg-slate-200 rounded-lg flex-shrink-0"></div></div></td></tr>
+                                    <tr class="animate-pulse border-b border-slate-50"><td colspan="5" class="p-4"><div class="flex items-center gap-4"><div class="w-10 h-10 bg-slate-200 rounded-xl flex-shrink-0"></div><div class="flex-1 space-y-2"><div class="h-4 bg-slate-200 rounded w-1/2"></div><div class="h-3 bg-slate-100 rounded w-1/3"></div></div><div class="w-16 h-6 bg-slate-200 rounded-lg flex-shrink-0"></div></div></td></tr>
+                                    <tr class="animate-pulse border-b border-slate-50"><td colspan="5" class="p-4"><div class="flex items-center gap-4"><div class="w-10 h-10 bg-slate-200 rounded-xl flex-shrink-0"></div><div class="flex-1 space-y-2"><div class="h-4 bg-slate-200 rounded w-2/5"></div><div class="h-3 bg-slate-100 rounded w-1/5"></div></div><div class="w-16 h-6 bg-slate-200 rounded-lg flex-shrink-0"></div></div></td></tr>
                                 </tbody>
                             </table>
                         </div>
@@ -551,7 +755,9 @@
                                     </tr>
                                 </thead>
                                 <tbody id="armadaTableBody">
-                                    <tr><td colspan="5" class="text-center text-sm text-slate-400 font-bold py-8 italic uppercase tracking-widest">Memuat data...</td></tr>
+                                    <tr class="animate-pulse border-b border-slate-50"><td colspan="5" class="p-4"><div class="flex items-center gap-4"><div class="w-10 h-10 bg-slate-200 rounded-xl flex-shrink-0"></div><div class="flex-1 space-y-2"><div class="h-4 bg-slate-200 rounded w-1/3"></div><div class="h-3 bg-slate-100 rounded w-1/4"></div></div><div class="w-16 h-6 bg-slate-200 rounded-lg flex-shrink-0"></div></div></td></tr>
+                                    <tr class="animate-pulse border-b border-slate-50"><td colspan="5" class="p-4"><div class="flex items-center gap-4"><div class="w-10 h-10 bg-slate-200 rounded-xl flex-shrink-0"></div><div class="flex-1 space-y-2"><div class="h-4 bg-slate-200 rounded w-1/2"></div><div class="h-3 bg-slate-100 rounded w-1/3"></div></div><div class="w-16 h-6 bg-slate-200 rounded-lg flex-shrink-0"></div></div></td></tr>
+                                    <tr class="animate-pulse border-b border-slate-50"><td colspan="5" class="p-4"><div class="flex items-center gap-4"><div class="w-10 h-10 bg-slate-200 rounded-xl flex-shrink-0"></div><div class="flex-1 space-y-2"><div class="h-4 bg-slate-200 rounded w-2/5"></div><div class="h-3 bg-slate-100 rounded w-1/5"></div></div><div class="w-16 h-6 bg-slate-200 rounded-lg flex-shrink-0"></div></div></td></tr>
                                 </tbody>
                             </table>
                         </div>
@@ -1219,8 +1425,18 @@
         await loadAllData();
     });
 
+    const SKELETON_HTML = `
+        <tr class="animate-pulse border-b border-slate-50"><td colspan="6" class="p-4"><div class="flex items-center gap-4"><div class="w-10 h-10 bg-slate-200 rounded-xl flex-shrink-0"></div><div class="flex-1 space-y-2"><div class="h-4 bg-slate-200 rounded w-1/3"></div><div class="h-3 bg-slate-100 rounded w-1/4"></div></div><div class="w-16 h-6 bg-slate-200 rounded-lg flex-shrink-0"></div></div></td></tr>
+        <tr class="animate-pulse border-b border-slate-50"><td colspan="6" class="p-4"><div class="flex items-center gap-4"><div class="w-10 h-10 bg-slate-200 rounded-xl flex-shrink-0"></div><div class="flex-1 space-y-2"><div class="h-4 bg-slate-200 rounded w-1/2"></div><div class="h-3 bg-slate-100 rounded w-1/3"></div></div><div class="w-16 h-6 bg-slate-200 rounded-lg flex-shrink-0"></div></div></td></tr>
+        <tr class="animate-pulse border-b border-slate-50"><td colspan="6" class="p-4"><div class="flex items-center gap-4"><div class="w-10 h-10 bg-slate-200 rounded-xl flex-shrink-0"></div><div class="flex-1 space-y-2"><div class="h-4 bg-slate-200 rounded w-2/5"></div><div class="h-3 bg-slate-100 rounded w-1/5"></div></div><div class="w-16 h-6 bg-slate-200 rounded-lg flex-shrink-0"></div></div></td></tr>
+    `;
+
     async function loadAllData() {
-        document.getElementById('loadingOverlay').classList.remove('hidden');
+        // Tampilkan skeleton sebelum fetch data
+        ['todayTableBody', 'pesananTableBody', 'armadaTableBody'].forEach(id => {
+            if(document.getElementById(id)) document.getElementById(id).innerHTML = SKELETON_HTML;
+        });
+
         isDataLoaded = false;
         await initData();
         
@@ -1243,7 +1459,7 @@
 
 
         renderAll();
-        document.getElementById('loadingOverlay').classList.add('hidden');
+        // document.getElementById('loadingOverlay').classList.add('hidden');
     }
 
     // ========================================
@@ -1753,11 +1969,12 @@
                                             <tr class="hover:bg-slate-50 transition-colors border-b border-slate-50 last:border-0">
                                                 <td class="py-3 px-3 font-black text-[10px] text-blue-600">
                                                     <div>${b.bookingId || b.id || '-'}</div>
-                                                    ${b.keterangan ? `<div class="text-[9px] text-orange-500 font-bold mt-0.5">${b.keterangan}</div>` : ''}
+                                                    <div class="text-[9px] text-orange-500 font-bold mt-0.5">${b.armadaId !== 'UNKNOWN' && getArmada(b.armadaId) ? getArmada(b.armadaId).destination : (b.tujuan || b['Tujuan'] || '-')}</div>
                                                 </td>
                                                 <td class="py-3 px-3">
                                                     <p class="font-bold text-xs text-slate-800 uppercase">${b.name || b['NAMA'] || '-'}</p>
                                                     <p class="text-[10px] font-bold text-slate-400">${b.hp || b['NOMOR HP'] || '-'}</p>
+                                                    ${b.keterangan ? `<p class="text-[9px] text-slate-500 font-bold mt-0.5">${b.keterangan}</p>` : ''}
                                                 </td>
                                                 <td class="py-3 px-3 text-center font-black text-xs text-slate-700">${b.qty || b['JUMLAH PNP'] || 1}</td>
                                                 <td class="py-3 px-3 text-center font-bold text-xs text-slate-600">${b.kursi || '-'}</td>
@@ -4005,7 +4222,10 @@ let adminsData = [];
 async function renderAkun() {
     const tbody = document.getElementById('akunTableBody');
     if (!tbody) return;
-    tbody.innerHTML = '<tr><td colspan="4" class="text-center py-4"><i class="fas fa-spinner fa-spin"></i> Memuat data...</td></tr>';
+    tbody.innerHTML = `
+        <tr class="animate-pulse border-b border-slate-50"><td colspan="4" class="p-4"><div class="flex items-center gap-4"><div class="w-8 h-8 bg-slate-200 rounded flex-shrink-0"></div><div class="flex-1 space-y-2"><div class="h-4 bg-slate-200 rounded w-1/3"></div><div class="h-3 bg-slate-100 rounded w-1/4"></div></div><div class="w-16 h-6 bg-slate-200 rounded-lg flex-shrink-0"></div></div></td></tr>
+        <tr class="animate-pulse border-b border-slate-50"><td colspan="4" class="p-4"><div class="flex items-center gap-4"><div class="w-8 h-8 bg-slate-200 rounded flex-shrink-0"></div><div class="flex-1 space-y-2"><div class="h-4 bg-slate-200 rounded w-1/2"></div><div class="h-3 bg-slate-100 rounded w-1/3"></div></div><div class="w-16 h-6 bg-slate-200 rounded-lg flex-shrink-0"></div></div></td></tr>
+    `;
     
     try {
         const res = await fetch('/api?action=getAdmin');
@@ -4125,6 +4345,78 @@ document.getElementById('btnConfirmDeleteAdmin').addEventListener('click', async
     btn.innerHTML = 'Ya, Hapus';
     btn.disabled = false;
 });
+
+// ============================================
+// DARK MODE TOGGLE — Enhanced
+// ============================================
+function toggleDarkMode() {
+    const isDark = document.body.classList.toggle('dark-mode');
+    localStorage.setItem('adminDarkMode', isDark ? '1' : '0');
+    updateDarkModeIcons(isDark);
+    updateChartColors(isDark);
+}
+
+function updateDarkModeIcons(isDark) {
+    document.querySelectorAll('.dark-mode-btn i').forEach(icon => {
+        icon.style.transform = isDark ? 'rotate(360deg)' : 'rotate(0deg)';
+        if (isDark) {
+            icon.classList.replace('fa-moon', 'fa-sun');
+        } else {
+            icon.classList.replace('fa-sun', 'fa-moon');
+        }
+    });
+    // Update tooltip
+    document.querySelectorAll('.dark-mode-btn').forEach(btn => {
+        btn.title = isDark ? 'Mode Terang' : 'Mode Gelap';
+    });
+}
+
+function updateChartColors(isDark) {
+    if (typeof Chart === 'undefined') return;
+    const textColor = isDark ? '#94a3b8' : '#64748b';
+    const gridColor = isDark ? 'rgba(51,65,85,0.4)' : 'rgba(0,0,0,0.05)';
+
+    Chart.defaults.color = textColor;
+    Chart.defaults.borderColor = gridColor;
+
+    // Update all existing chart instances
+    Object.values(Chart.instances || {}).forEach(chart => {
+        if (!chart || !chart.config) return;
+        try {
+            // Update scales
+            if (chart.options.scales) {
+                Object.values(chart.options.scales).forEach(scale => {
+                    if (scale.ticks) scale.ticks.color = textColor;
+                    if (scale.grid) scale.grid.color = gridColor;
+                });
+            }
+            // Update legend
+            if (chart.options.plugins && chart.options.plugins.legend && chart.options.plugins.legend.labels) {
+                chart.options.plugins.legend.labels.color = textColor;
+            }
+            chart.update('none');
+        } catch(e) { /* skip */ }
+    });
+}
+
+// Initialize Dark Mode on load (prevents flash)
+(function initDarkMode() {
+    const saved = localStorage.getItem('adminDarkMode');
+    const isDark = saved === '1';
+    if (isDark) {
+        document.body.classList.add('dark-mode');
+    }
+    // Defer icon + chart update to after DOM ready
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', () => {
+            updateDarkModeIcons(isDark);
+            updateChartColors(isDark);
+        });
+    } else {
+        updateDarkModeIcons(isDark);
+        updateChartColors(isDark);
+    }
+})();
 </script>
 </body>
 </html>
