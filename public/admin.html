@@ -436,6 +436,42 @@
                         <h2 class="text-2xl font-black text-slate-800 tracking-tight">Manifest Keberangkatan</h2>
                         <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mt-1">Daftar penumpang yang berangkat hari ini dan mendatang</p>
                     </div>
+                    <!-- Summary Cards -->
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+                        <div class="bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl p-4 text-white shadow-lg shadow-blue-500/20 fade-up">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-[10px] font-bold uppercase tracking-widest text-blue-100">Penumpang Hari Ini</p>
+                                    <p class="text-2xl font-black mt-1" id="manifestTotalPnpToday">0</p>
+                                </div>
+                                <div class="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center">
+                                    <i class="fas fa-users text-lg"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-2xl p-4 text-white shadow-lg shadow-emerald-500/20 fade-up">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-[10px] font-bold uppercase tracking-widest text-emerald-100">Armada Berangkat</p>
+                                    <p class="text-2xl font-black mt-1" id="manifestTotalArmada">0</p>
+                                </div>
+                                <div class="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center">
+                                    <i class="fas fa-bus text-lg"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="bg-gradient-to-br from-amber-500 to-amber-600 rounded-2xl p-4 text-white shadow-lg shadow-amber-500/20 fade-up">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-[10px] font-bold uppercase tracking-widest text-amber-100">Omset Hari Ini</p>
+                                    <p class="text-2xl font-black mt-1" id="manifestOmsetToday">Rp 0</p>
+                                </div>
+                                <div class="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center">
+                                    <i class="fas fa-coins text-lg"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                     <div class="chart-card overflow-hidden fade-up">
                         <div class="flex items-center justify-between mb-4 flex-wrap gap-2">
                             <h4 class="text-xs font-black text-slate-500 uppercase tracking-widest"><i class="fas fa-clipboard-list mr-2 text-amber-500"></i>Daftar Manifest</h4>
@@ -1549,6 +1585,28 @@
                                 String(b.status).toUpperCase() === "PAID";
             return isTodayOrFuture(b.dateTravel) && isConfirmed;
         });
+
+        // --- Summary Cards ---
+        const todayOnlyBookings = manifestBookings.filter(b => isToday(b.dateTravel));
+        const todayPnp = todayOnlyBookings.reduce((sum, b) => sum + (parseInt(b.qty) || 1), 0);
+        
+        // Count unique armada berangkat hari ini
+        const todayArmadaSet = new Set();
+        todayOnlyBookings.forEach(b => {
+            const waktu = b.waktu || '-';
+            const armada = b.armadaId !== 'UNKNOWN' ? getArmada(b.armadaId) : null;
+            const armadaName = armada ? armada.name : '-';
+            todayArmadaSet.add(waktu + '___' + armadaName);
+        });
+        
+        const todayOmset = todayOnlyBookings.reduce((sum, b) => sum + (parseInt(b.totalPrice) || 0), 0);
+        
+        const elPnp = document.getElementById('manifestTotalPnpToday');
+        const elArmada = document.getElementById('manifestTotalArmada');
+        const elOmset = document.getElementById('manifestOmsetToday');
+        if (elPnp) elPnp.textContent = todayPnp + ' Orang';
+        if (elArmada) elArmada.textContent = todayArmadaSet.size + ' Armada';
+        if (elOmset) elOmset.textContent = formatRupiah(todayOmset);
 
         if (manifestBookings.length === 0) {
             tbody.innerHTML = '<tr><td class="text-center text-sm text-slate-400 font-bold py-8 italic uppercase tracking-widest">Tidak ada jadwal keberangkatan</td></tr>';
