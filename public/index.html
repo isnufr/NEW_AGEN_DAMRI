@@ -1169,6 +1169,138 @@
     </div>
 </section>
 
+<!-- Testimoni Pelanggan -->
+<section id="testimoni" class="py-20 bg-white">
+    <div class="container mx-auto px-4 text-center">
+        <h2 class="text-tertiary font-extrabold text-2xl md:text-3xl mb-4 uppercase tracking-tighter italic">Testimoni Pelanggan</h2>
+        <div class="w-20 h-1.5 bg-yellow-400 mx-auto rounded-full mb-12 text-center"></div>
+
+        <div class="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6">
+            <!-- Card 1 -->
+            <div class="modern-card p-6 text-left relative">
+                <i class="fas fa-quote-left text-blue-100 text-4xl absolute top-4 right-4 z-0"></i>
+                <div class="flex items-center gap-1 text-yellow-400 text-xs mb-4 relative z-10">
+                    <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+                </div>
+                <p class="text-gray-600 font-bold text-sm italic mb-6 relative z-10 leading-relaxed">"Pesan tiket travel di sini gampang banget, supirnya ramah dan tepat waktu. Fasilitas AC dingin dan sangat nyaman untuk perjalanan jauh!"</p>
+                <div class="flex items-center gap-3 relative z-10 border-t border-gray-100 pt-4">
+                    <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center text-blue-700 font-black">B</div>
+                    <div>
+                        <h5 class="text-blue-900 font-black text-xs uppercase">Budi Santoso</h5>
+                        <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Cilacap</p>
+                    </div>
+                </div>
+            </div>
+            <!-- Card 2 -->
+            <div class="modern-card p-6 text-left relative">
+                <i class="fas fa-quote-left text-blue-100 text-4xl absolute top-4 right-4 z-0"></i>
+                <div class="flex items-center gap-1 text-yellow-400 text-xs mb-4 relative z-10">
+                    <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+                </div>
+                <p class="text-gray-600 font-bold text-sm italic mb-6 relative z-10 leading-relaxed">"Sangat membantu saat butuh tiket mendadak. Admin WhatsApp responsif, e-ticket langsung dikirim. Pelayanan sangat memuaskan, mantap!"</p>
+                <div class="flex items-center gap-3 relative z-10 border-t border-gray-100 pt-4">
+                    <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center text-green-700 font-black">S</div>
+                    <div>
+                        <h5 class="text-blue-900 font-black text-xs uppercase">Siti Aminah</h5>
+                        <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Kawunganten</p>
+                    </div>
+                </div>
+            </div>
+            <!-- Card 3 -->
+            <div class="modern-card p-6 text-left relative">
+                <i class="fas fa-quote-left text-blue-100 text-4xl absolute top-4 right-4 z-0"></i>
+                <div class="flex items-center gap-1 text-yellow-400 text-xs mb-4 relative z-10">
+                    <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+                </div>
+                <p class="text-gray-600 font-bold text-sm italic mb-6 relative z-10 leading-relaxed">"Armada bersih, keberangkatan sesuai jadwal. Ga nyesel langganan di Agen Damri Kawunganten, sukses terus untuk pelayanannya."</p>
+                <div class="flex items-center gap-3 relative z-10 border-t border-gray-100 pt-4">
+                    <div class="w-10 h-10 bg-yellow-100 rounded-full flex items-center justify-center text-yellow-700 font-black">A</div>
+                    <div>
+                        <h5 class="text-blue-900 font-black text-xs uppercase">Agus Setiawan</h5>
+                        <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Yogyakarta</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- FAQ Section -->
+<section id="faq" class="py-20 bg-blue-50/30 border-t border-blue-100">
+    <div class="container mx-auto px-4">
+        <h2 class="text-tertiary font-extrabold text-2xl md:text-3xl mb-4 uppercase tracking-tighter italic text-center">Tanya Jawab (FAQ)</h2>
+        <div class="w-20 h-1.5 bg-yellow-400 mx-auto rounded-full mb-12 text-center"></div>
+
+        <div class="max-w-3xl mx-auto space-y-4">
+            <!-- FAQ Item 1 -->
+            <div class="modern-card overflow-hidden">
+                <button onclick="toggleFaq('faq1')" class="w-full text-left px-6 py-5 flex justify-between items-center focus:outline-none group">
+                    <div class="flex items-center gap-3">
+                        <i class="fas fa-shopping-cart text-blue-500 group-hover:text-blue-700 transition-colors w-4 text-center"></i>
+                        <span class="font-black text-blue-900 uppercase text-sm">Bagaimana prosedur pemesanan tiket?</span>
+                    </div>
+                    <i id="icon-faq1" class="fas fa-chevron-down text-gray-400 transition-transform duration-300"></i>
+                </button>
+                <div id="faq1" class="max-h-0 overflow-hidden transition-all duration-300 opacity-0 bg-gray-50 border-t border-gray-100">
+                    <p class="p-6 text-xs text-gray-500 font-bold italic leading-relaxed">Untuk memesan tiket, silakan klik tombol <b class="text-blue-700">"Boking Tiket"</b> pada armada pilihan Anda, lalu tentukan tujuan serta jam keberangkatan. Setelah mengisi formulir data diri dan melakukan pembayaran, kirimkan bukti transfer melalui WhatsApp admin. Jika pesanan disetujui, Anda akan mendapatkan ID Booking yang bisa digunakan pada menu <b class="text-blue-700">"Cek Tiket"</b> untuk mengunduh E-Ticket.</p>
+                </div>
+            </div>
+            <!-- FAQ Item 2 -->
+            <div class="modern-card overflow-hidden">
+                <button onclick="toggleFaq('faq2')" class="w-full text-left px-6 py-5 flex justify-between items-center focus:outline-none group">
+                    <div class="flex items-center gap-3">
+                        <i class="fas fa-child text-green-500 group-hover:text-green-700 transition-colors w-4 text-center"></i>
+                        <span class="font-black text-blue-900 uppercase text-sm">Berapakah batasan umur anak untuk dikenakan tarif penuh?</span>
+                    </div>
+                    <i id="icon-faq2" class="fas fa-chevron-down text-gray-400 transition-transform duration-300"></i>
+                </button>
+                <div id="faq2" class="max-h-0 overflow-hidden transition-all duration-300 opacity-0 bg-gray-50 border-t border-gray-100">
+                    <p class="p-6 text-xs text-gray-500 font-bold italic leading-relaxed">Bagi penumpang anak-anak yang telah berusia di atas <b class="text-blue-700">2 tahun</b>, akan dikenakan tarif 1 tiket penuh (harga normal).</p>
+                </div>
+            </div>
+            <!-- FAQ Item 3 -->
+            <div class="modern-card overflow-hidden">
+                <button onclick="toggleFaq('faq3')" class="w-full text-left px-6 py-5 flex justify-between items-center focus:outline-none group">
+                    <div class="flex items-center gap-3">
+                        <i class="fas fa-ban text-red-500 group-hover:text-red-700 transition-colors w-4 text-center"></i>
+                        <span class="font-black text-blue-900 uppercase text-sm">Apakah pesanan tiket dapat dibatalkan (Cancel)?</span>
+                    </div>
+                    <i id="icon-faq3" class="fas fa-chevron-down text-gray-400 transition-transform duration-300"></i>
+                </button>
+                <div id="faq3" class="max-h-0 overflow-hidden transition-all duration-300 opacity-0 bg-gray-50 border-t border-gray-100">
+                    <p class="p-6 text-xs text-gray-500 font-bold italic leading-relaxed">Pesanan tidak dapat dibatalkan secara mendadak. Proses pembatalan tiket hanya dapat dilakukan maksimal <b class="text-blue-700">1x24 jam sebelum jam keberangkatan</b>. Harap diperhatikan bahwa pembatalan akan dikenakan biaya potongan admin yang besarannya berbeda-beda tergantung kebijakan masing-masing PO (Perusahaan Otobus).</p>
+                </div>
+            </div>
+            <!-- FAQ Item 4 -->
+            <div class="modern-card overflow-hidden">
+                <button onclick="toggleFaq('faq4')" class="w-full text-left px-6 py-5 flex justify-between items-center focus:outline-none group">
+                    <div class="flex items-center gap-3">
+                        <i class="fas fa-calendar-alt text-yellow-500 group-hover:text-yellow-700 transition-colors w-4 text-center"></i>
+                        <span class="font-black text-blue-900 uppercase text-sm">Bagaimana kebijakan mengenai perubahan jadwal (Reschedule)?</span>
+                    </div>
+                    <i id="icon-faq4" class="fas fa-chevron-down text-gray-400 transition-transform duration-300"></i>
+                </button>
+                <div id="faq4" class="max-h-0 overflow-hidden transition-all duration-300 opacity-0 bg-gray-50 border-t border-gray-100">
+                    <p class="p-6 text-xs text-gray-500 font-bold italic leading-relaxed">Perubahan jadwal atau <i>reschedule</i> tiket dapat dilayani maksimal <b class="text-blue-700">1x24 jam sebelum waktu keberangkatan</b>. Proses <i>reschedule</i> ini akan dikenakan biaya potongan sebesar <b class="text-blue-700">20%</b> dari harga tiket Anda.</p>
+                </div>
+            </div>
+            <!-- FAQ Item 5 -->
+            <div class="modern-card overflow-hidden">
+                <button onclick="toggleFaq('faq5')" class="w-full text-left px-6 py-5 flex justify-between items-center focus:outline-none group">
+                    <div class="flex items-center gap-3">
+                        <i class="fas fa-mobile-alt text-indigo-500 group-hover:text-indigo-700 transition-colors w-4 text-center"></i>
+                        <span class="font-black text-blue-900 uppercase text-sm">Apakah saya harus mencetak (print) E-Ticket?</span>
+                    </div>
+                    <i id="icon-faq5" class="fas fa-chevron-down text-gray-400 transition-transform duration-300"></i>
+                </button>
+                <div id="faq5" class="max-h-0 overflow-hidden transition-all duration-300 opacity-0 bg-gray-50 border-t border-gray-100">
+                    <p class="p-6 text-xs text-gray-500 font-bold italic leading-relaxed">Tidak perlu mencetak sendiri sebelum berangkat. Anda cukup menunjukkan E-Ticket langsung dari layar <i>smartphone</i> Anda kepada petugas kami. Pencetakan tiket fisik akan dibantu oleh petugas kami di lokasi sebelum Anda berangkat.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
 <!-- Hubungi Kami -->
 <section id="kontak" class="py-24 bg-gray-50 text-center">
     <div class="container mx-auto px-4 text-center">
@@ -1211,6 +1343,12 @@
         </div>
     </div>
 </section>
+
+<!-- Floating WhatsApp Button -->
+<a href="https://wa.me/6282133607759" target="_blank" class="fixed bottom-6 right-6 z-[200] bg-[#25D366] text-white w-14 h-14 rounded-full flex items-center justify-center shadow-[0_10px_20px_rgba(37,211,102,0.3)] hover:scale-110 transition-transform duration-300 group">
+    <i class="fab fa-whatsapp text-3xl"></i>
+    <span class="absolute right-16 bg-white text-gray-800 text-[10px] font-black uppercase px-3 py-2 rounded-lg shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap pointer-events-none">Chat Admin</span>
+</a>
 
 <!-- Footer -->
 <footer class="bg-blue-900 py-12 text-center text-white border-t-4 border-yellow-400 text-center">
@@ -1627,6 +1765,7 @@
     function downloadTicket(id) { const target = document.getElementById('eTicketOutput'); html2canvas(target, { scale: 4, backgroundColor: "#ffffff", borderRadius: 32, useCORS: true }).then(c => { const l = document.createElement('a'); l.download = `E-Ticket-${id}.png`; l.href = c.toDataURL('image/png', 1.0); l.click(); }); }
     function toggleRoute(i) { const element = document.getElementById(i), icon = document.getElementById('icon-' + i); element.classList.toggle('show'); if (icon) icon.classList.toggle('active'); }
     function togglePrice(i) { const element = document.getElementById(i); element.classList.toggle('show'); }
+    function toggleFaq(id) { const c = document.getElementById(id), i = document.getElementById('icon-' + id); if(c.classList.contains('max-h-0')) { c.classList.remove('max-h-0', 'opacity-0'); c.classList.add('max-h-[500px]', 'opacity-100'); i.classList.add('rotate-180'); } else { c.classList.add('max-h-0', 'opacity-0'); c.classList.remove('max-h-[500px]', 'opacity-100'); i.classList.remove('rotate-180'); } }
     function toggleMobileMenu() { document.getElementById('mobileMenu').classList.toggle('open'); document.getElementById('mobileOverlay').classList.toggle('hidden'); }
     function scrollToArmada(i) { document.getElementById('heroResultsContainer').classList.add('hidden'); document.getElementById('produk').scrollIntoView({ behavior: 'smooth' }); setTimeout(() => { if (!document.getElementById(i).classList.contains('show')) toggleRoute(i); }, 800); }
 
