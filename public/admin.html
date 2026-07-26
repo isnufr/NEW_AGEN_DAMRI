@@ -693,28 +693,52 @@
                                         <input type="tel" id="adminBookingHp" inputmode="numeric" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-bold text-slate-700 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all" required>
                                     </div>
                                 </div>
-                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    <div>
-                                        <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Jumlah PNP</label>
-                                        <div class="flex items-center">
-                                            <button type="button" onclick="document.getElementById('adminBookingPnp').stepDown(); recalcAdminBooking();" class="bg-slate-200 text-slate-700 font-bold px-4 py-3 rounded-l-xl hover:bg-slate-300 transition-colors active:scale-95">-</button>
-                                            <input type="number" id="adminBookingPnp" min="1" value="1" class="w-full bg-slate-50 border-y border-slate-200 px-4 py-3 text-sm font-bold text-slate-700 outline-none text-center focus:border-blue-500 focus:ring-0 transition-all appearance-none" oninput="recalcAdminBooking()" required style="-moz-appearance: textfield;">
-                                            <button type="button" onclick="document.getElementById('adminBookingPnp').stepUp(); recalcAdminBooking();" class="bg-slate-200 text-slate-700 font-bold px-4 py-3 rounded-r-xl hover:bg-slate-300 transition-colors active:scale-95">+</button>
-                                        </div>
-                                    </div>
-                                    <div>
-                                        <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Keterangan (Opsional)</label>
-                                        <input type="text" id="adminBookingKeterangan" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-bold text-slate-700 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all" placeholder="Catatan tambahan...">
+                                <div>
+                                    <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Jumlah PNP</label>
+                                    <div class="flex items-center">
+                                        <button type="button" onclick="document.getElementById('adminBookingPnp').stepDown(); recalcAdminBooking();" class="bg-slate-200 text-slate-700 font-bold px-4 py-3 rounded-l-xl hover:bg-slate-300 transition-colors active:scale-95">-</button>
+                                        <input type="number" id="adminBookingPnp" min="1" value="1" class="w-full bg-slate-50 border-y border-slate-200 px-4 py-3 text-sm font-bold text-slate-700 outline-none text-center focus:border-blue-500 focus:ring-0 transition-all appearance-none" oninput="recalcAdminBooking()" required style="-moz-appearance: textfield;">
+                                        <button type="button" onclick="document.getElementById('adminBookingPnp').stepUp(); recalcAdminBooking();" class="bg-slate-200 text-slate-700 font-bold px-4 py-3 rounded-r-xl hover:bg-slate-300 transition-colors active:scale-95">+</button>
                                     </div>
                                 </div>
                                 <div id="adminBookingKursiContainer" class="mt-4"></div>
+                                <div class="mt-4">
+                                    <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Keterangan (Opsional)</label>
+                                    <input type="text" id="adminBookingKeterangan" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-bold text-slate-700 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all" placeholder="Catatan tambahan...">
+                                </div>
                             </div>
 
                             <!-- Step 3: Pembayaran -->
                             <div class="mb-8 flex flex-col gap-5 mt-4">
                                 <h3 class="text-xs font-black text-slate-400 uppercase tracking-widest border-b border-slate-100 pb-2">3. Pembayaran</h3>
+
+                                <!-- Biaya Tambahan Toggle -->
+                                <div>
+                                    <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2 text-center">Ada Biaya Tambahan?</label>
+                                    <div class="flex gap-4">
+                                        <label class="flex-1 cursor-pointer">
+                                            <input type="radio" name="adminBookingHasBiayaTambahan" value="no" class="peer hidden" checked onchange="toggleAdminBiayaTambahan()">
+                                            <div class="text-center py-3 px-2 rounded-xl border border-slate-200 peer-checked:bg-blue-500 peer-checked:text-white peer-checked:border-blue-500 font-bold text-sm text-slate-500 transition-all shadow-sm">TIDAK</div>
+                                        </label>
+                                        <label class="flex-1 cursor-pointer">
+                                            <input type="radio" name="adminBookingHasBiayaTambahan" value="yes" class="peer hidden" onchange="toggleAdminBiayaTambahan()">
+                                            <div class="text-center py-3 px-2 rounded-xl border border-slate-200 peer-checked:bg-blue-500 peer-checked:text-white peer-checked:border-blue-500 font-bold text-sm text-slate-500 transition-all shadow-sm">YA</div>
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <div id="adminBookingBiayaTambahanContainer" class="hidden grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Nominal Biaya Tambahan</label>
+                                        <input type="number" id="adminBookingBiayaTambahanNominal" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-bold text-slate-700 outline-none focus:border-blue-500 transition-all" value="0" oninput="recalcAdminBooking()">
+                                    </div>
+                                    <div>
+                                        <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Keterangan Biaya Tambahan</label>
+                                        <input type="text" id="adminBookingBiayaTambahanKet" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-bold text-slate-700 outline-none focus:border-blue-500 transition-all" placeholder="Contoh: Bagasi ekstra">
+                                    </div>
+                                </div>
                                 
-                                <div class="bg-blue-50 p-4 rounded-xl border border-blue-100 flex flex-col items-center justify-center text-center">
+                                <div class="bg-blue-50 p-4 rounded-xl border border-blue-100 flex flex-col items-center justify-center text-center mt-2">
                                     <span class="text-[10px] font-bold text-blue-700 uppercase tracking-widest">Total Harga</span>
                                     <span class="font-black text-3xl text-blue-600 leading-none mt-2" id="adminBookingTotalDisplay">Rp0</span>
                                 </div>
@@ -818,6 +842,16 @@
                 <div style="margin-bottom: 8px;">
                     <p style="margin: 0; font-size: 10px; font-weight: bold;">Nomor Kursi</p>
                     <p id="r_kursi" style="margin: 0; font-size: 14px; font-weight: 900;">-</p>
+                </div>
+
+                <div id="r_biaya_tambahan_container" style="display: none; justify-content: space-between; align-items: flex-end; margin-bottom: 8px;">
+                    <div>
+                        <p style="margin: 0; font-size: 10px; font-weight: bold;">Biaya Tambahan</p>
+                        <p id="r_biaya_tambahan_ket" style="margin: 0; font-size: 12px;"></p>
+                    </div>
+                    <div style="text-align: right;">
+                        <p id="r_biaya_tambahan" style="margin: 0; font-size: 14px; font-weight: 900;"></p>
+                    </div>
                 </div>
 
                 <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 10px;">
@@ -1023,6 +1057,10 @@
                 <!-- Price -->
                 <div class="space-y-2 border-b-2 border-dashed border-gray-300 pb-4 mb-4">
                     <div class="flex justify-between text-xs"><span class="text-gray-500">Harga/Tiket</span><strong id="ticketHargaSatuan">-</strong></div>
+                    <div id="ticketBiayaTambahanContainer" class="hidden flex justify-between text-xs items-center">
+                        <span class="text-gray-500 flex flex-col">Biaya Tambahan <span id="ticketBiayaTambahanKet" class="text-[9px] italic"></span></span>
+                        <strong id="ticketBiayaTambahan">-</strong>
+                    </div>
                     <div class="flex justify-between text-base mt-2 items-center"><span class="font-bold">TOTAL</span><strong class="bg-black text-white px-2 py-1 text-sm" id="ticketTotal">-</strong></div>
                 </div>
                 
@@ -1106,10 +1144,7 @@
             if(typeof recalcAdminBooking === 'function') recalcAdminBooking();
         }
         
-        const editArmadaSelect = document.getElementById('editBookingArmada');
-        if (editArmadaSelect) {
-            editArmadaSelect.innerHTML = armadas.map(a => `<option value="${a.id}">${a.name} - ${a.destination} (${formatRupiah(a.price)})</option>`).join('');
-        }
+
 
         renderAll();
         document.getElementById('loadingOverlay').classList.add('hidden');
@@ -2037,7 +2072,14 @@
         
         const qty = parseInt(b.qty) || 1;
         const harga = armada ? armada.price : 0;
-        const total = harga * qty;
+        
+        const totalHargaData = (b.totalHarga !== undefined && b.totalHarga !== null) ? parseInt(String(b.totalHarga).replace(/[^0-9]/g, '')) : (b.total !== undefined && b.total !== null ? parseInt(String(b.total).replace(/[^0-9]/g, '')) : (harga * qty));
+        const expectedTotal = harga * qty;
+        
+        const hasBiayaTambahan = totalHargaData > expectedTotal;
+        const nominalBiayaTambahan = hasBiayaTambahan ? (totalHargaData - expectedTotal) : 0;
+        
+        const total = totalHargaData > 0 ? totalHargaData : expectedTotal;
 
         let formattedDate = b.dateTravel || '-';
         const dObj = parseIndoDate(formattedDate);
@@ -2058,6 +2100,32 @@
         if(document.getElementById('ticketName')) document.getElementById('ticketName').innerText = b.name;
         if(document.getElementById('ticketTglBeli')) document.getElementById('ticketTglBeli').innerText = "TGL BELI: " + tglBeli;
         if(document.getElementById('ticketHargaSatuan')) document.getElementById('ticketHargaSatuan').innerText = formatRupiah(harga);
+        
+        let ketTambahan = '';
+        if (hasBiayaTambahan) {
+            const ketStr = b.keterangan || b.ket || '';
+            const m = ketStr.match(/Biaya Tambahan: (.*?) \(/);
+            ketTambahan = m ? m[1] : '';
+            
+            if(document.getElementById('ticketBiayaTambahanContainer')) {
+                document.getElementById('ticketBiayaTambahanContainer').classList.remove('hidden');
+                document.getElementById('ticketBiayaTambahan').innerText = formatRupiah(nominalBiayaTambahan);
+                document.getElementById('ticketBiayaTambahanKet').innerText = ketTambahan ? `(${ketTambahan})` : '';
+            }
+            if(document.getElementById('r_biaya_tambahan_container')) {
+                document.getElementById('r_biaya_tambahan_container').style.display = 'flex';
+                document.getElementById('r_biaya_tambahan').innerText = formatRupiah(nominalBiayaTambahan);
+                document.getElementById('r_biaya_tambahan_ket').innerText = ketTambahan || '-';
+            }
+        } else {
+            if(document.getElementById('ticketBiayaTambahanContainer')) {
+                document.getElementById('ticketBiayaTambahanContainer').classList.add('hidden');
+            }
+            if(document.getElementById('r_biaya_tambahan_container')) {
+                document.getElementById('r_biaya_tambahan_container').style.display = 'none';
+            }
+        }
+
         if(document.getElementById('ticketTotal')) document.getElementById('ticketTotal').innerText = formatRupiah(total);
         
         if(document.getElementById('ticketArmadaArsip')) document.getElementById('ticketArmadaArsip').innerText = armadaName;
@@ -2078,6 +2146,8 @@
             armada: armadaName,
             totalHarga: formatRupiah(total),
             hargaSatuan: formatRupiah(harga),
+            biayaTambahan: hasBiayaTambahan ? nominalBiayaTambahan : 0,
+            biayaTambahanKet: ketTambahan,
             status: statusPay,
             keterangan: b.keterangan || '-'
         };
@@ -2463,12 +2533,49 @@
             document.getElementById('editBookingDate').value = '';
         }
 
-        const armadaSelect = document.getElementById('editBookingArmada');
         const armadas = getArmadas();
-        armadaSelect.innerHTML = armadas.map(a => `<option value="${a.id}">${a.name} - ${a.destination} (${formatRupiah(a.price)})</option>`).join('');
+        const uniqueNames = [...new Set(armadas.map(a => a.name))];
+        const nameSelect = document.getElementById('editBookingArmadaName');
+        nameSelect.innerHTML = '<option value="">-- Pilih Armada --</option>' + uniqueNames.map(n => `<option value="${n}">${n}</option>`).join('');
+        document.getElementById('editBookingArmadaRute').innerHTML = '';
+        document.getElementById('editBookingArmadaJam').innerHTML = '';
+        document.getElementById('editBookingArmada').value = '';
         
         if (b.armadaId) {
-            armadaSelect.value = b.armadaId;
+            const currentArmada = getArmada(b.armadaId);
+            if (currentArmada) {
+                nameSelect.value = currentArmada.name;
+                updateEditBookingRute();
+                document.getElementById('editBookingArmadaRute').value = currentArmada.destination;
+                updateEditBookingJam();
+                document.getElementById('editBookingArmadaJam').value = currentArmada.time;
+                updateEditBookingArmadaId();
+            }
+        }
+
+        // Infer Biaya Tambahan
+        const currentArmada = getArmada(b.armadaId);
+        const expectedTotal = currentArmada ? (currentArmada.price * parseInt(b.qty || 1)) : 0;
+        const actualTotal = (b.totalHarga !== undefined && b.totalHarga !== null) ? parseInt(String(b.totalHarga).replace(/[^0-9]/g, '')) : (b.total !== undefined && b.total !== null ? parseInt(String(b.total).replace(/[^0-9]/g, '')) : 0);
+        
+        if (actualTotal > expectedTotal && expectedTotal > 0) {
+            const biayaTambahan = actualTotal - expectedTotal;
+            document.querySelector('input[name="editBookingHasBiayaTambahan"][value="yes"]').checked = true;
+            document.getElementById('editBookingBiayaTambahanNominal').value = biayaTambahan;
+            
+            const ketStr = b.keterangan || b.ket || '';
+            const ketMatch = ketStr.match(/Biaya Tambahan: (.*?) \(/);
+            if (ketMatch) {
+                document.getElementById('editBookingBiayaTambahanKet').value = ketMatch[1];
+            } else {
+                document.getElementById('editBookingBiayaTambahanKet').value = '';
+            }
+            if(typeof toggleEditBiayaTambahan === 'function') toggleEditBiayaTambahan();
+        } else {
+            document.querySelector('input[name="editBookingHasBiayaTambahan"][value="no"]').checked = true;
+            document.getElementById('editBookingBiayaTambahanNominal').value = 0;
+            document.getElementById('editBookingBiayaTambahanKet').value = '';
+            if(typeof toggleEditBiayaTambahan === 'function') toggleEditBiayaTambahan();
         }
 
         recalcEditBooking();
@@ -2485,6 +2592,49 @@
         const c = document.getElementById('modalEditBookingContent');
         m.classList.add('opacity-0'); c.classList.add('scale-95');
         setTimeout(() => { m.classList.add('hidden'); m.classList.remove('flex'); }, 300);
+    }
+
+    function updateEditBookingRute() {
+        const armadas = getArmadas();
+        const name = document.getElementById('editBookingArmadaName').value;
+        const ruteSelect = document.getElementById('editBookingArmadaRute');
+        
+        const filtered = armadas.filter(a => a.name === name);
+        const uniqueRute = [...new Set(filtered.map(a => a.destination))];
+        ruteSelect.innerHTML = '<option value="">-- Pilih Rute --</option>' + uniqueRute.map(r => `<option value="${r}">${r}</option>`).join('');
+        
+        document.getElementById('editBookingArmadaJam').innerHTML = '';
+        document.getElementById('editBookingArmada').value = '';
+        recalcEditBooking();
+    }
+
+    function updateEditBookingJam() {
+        const armadas = getArmadas();
+        const name = document.getElementById('editBookingArmadaName').value;
+        const rute = document.getElementById('editBookingArmadaRute').value;
+        const jamSelect = document.getElementById('editBookingArmadaJam');
+        
+        const filtered = armadas.filter(a => a.name === name && a.destination === rute);
+        const uniqueJam = [...new Set(filtered.map(a => a.time))];
+        jamSelect.innerHTML = '<option value="">-- Pilih Jam --</option>' + uniqueJam.map(j => `<option value="${j}">${j}</option>`).join('');
+        
+        document.getElementById('editBookingArmada').value = '';
+        recalcEditBooking();
+    }
+
+    function updateEditBookingArmadaId() {
+        const armadas = getArmadas();
+        const name = document.getElementById('editBookingArmadaName').value;
+        const rute = document.getElementById('editBookingArmadaRute').value;
+        const jam = document.getElementById('editBookingArmadaJam').value;
+        
+        const armada = armadas.find(a => a.name === name && a.destination === rute && a.time === jam);
+        if (armada) {
+            document.getElementById('editBookingArmada').value = armada.id;
+        } else {
+            document.getElementById('editBookingArmada').value = '';
+        }
+        recalcEditBooking();
     }
 
     let editLastPnp = 0;
@@ -2533,9 +2683,14 @@
         const qty = parseInt(document.getElementById('editBookingPnp').value) || 1;
         const armada = getArmada(armadaId);
         
+        const hasBiayaTambahan = document.querySelector('input[name="editBookingHasBiayaTambahan"]:checked').value === 'yes';
+        const nominalBiayaTambahan = hasBiayaTambahan ? (parseInt(document.getElementById('editBookingBiayaTambahanNominal').value) || 0) : 0;
+
         if(armada) {
-            const total = armada.price * qty;
+            const total = (armada.price * qty) + nominalBiayaTambahan;
             document.getElementById('editBookingTotalDisplay').innerText = formatRupiah(total);
+        } else {
+            document.getElementById('editBookingTotalDisplay').innerText = 'Rp 0';
         }
     }
 
@@ -2580,6 +2735,10 @@
         }
         const kursiString = filledKursiCount === qty ? kursiValues.join(', ') : '';
 
+        const hasBiayaTambahan = document.querySelector('input[name="editBookingHasBiayaTambahan"]:checked').value === 'yes';
+        const nominalBiayaTambahan = hasBiayaTambahan ? (parseInt(document.getElementById('editBookingBiayaTambahanNominal').value) || 0) : 0;
+        const ketBiayaTambahan = hasBiayaTambahan ? document.getElementById('editBookingBiayaTambahanKet').value : '';
+
         const payload = {
             id_tiket: id,
             nama: document.getElementById('editBookingNama').value,
@@ -2590,9 +2749,14 @@
             jumlahPnp: qty,
             nomorKursi: kursiString,
             harga: armada ? armada.price : 0,
-            totalHarga: armada ? (armada.price * qty) : 0,
+            totalHarga: armada ? (armada.price * qty) + nominalBiayaTambahan : 0,
             waktu: armada ? armada.time : ''
         };
+        
+        if (hasBiayaTambahan && nominalBiayaTambahan > 0) {
+            payload.biayaTambahan = nominalBiayaTambahan;
+            payload.keteranganBiayaTambahan = ketBiayaTambahan;
+        }
         const statusSelect = document.getElementById('editBookingStatus');
         if (statusSelect) payload.status = statusSelect.value;
 
@@ -2692,7 +2856,18 @@
         const hp = document.getElementById('adminBookingHp').value;
         const name = document.getElementById('adminBookingNama').value;
         const ket = document.getElementById('adminBookingKeterangan').value;
-        const total = armada ? (armada.price * qty) : 0;
+        
+        const hasBiayaTambahan = document.querySelector('input[name="adminBookingHasBiayaTambahan"]:checked').value === 'yes';
+        const nominalBiayaTambahan = hasBiayaTambahan ? (parseInt(document.getElementById('adminBookingBiayaTambahanNominal').value) || 0) : 0;
+        const ketBiayaTambahan = hasBiayaTambahan ? document.getElementById('adminBookingBiayaTambahanKet').value : '';
+        
+        let finalKet = ket;
+        if (hasBiayaTambahan && nominalBiayaTambahan > 0) {
+            const ketTambahanText = `Biaya Tambahan: ${ketBiayaTambahan} (${formatRupiah(nominalBiayaTambahan)})`;
+            finalKet = finalKet ? `${finalKet}, ${ketTambahanText}` : ketTambahanText;
+        }
+
+        const total = armada ? (armada.price * qty) + nominalBiayaTambahan : 0;
         
         let filledKursiCount = 0;
         let kursiValues = [];
@@ -2733,7 +2908,8 @@
             'WAKTU': armada ? armada.time : '',
             'PEMBAYARAN': 'CASH',
             'Status': statusPay,
-            'Keterangan': ket,
+            'Keterangan': finalKet,
+            'Biaya Tambahan': nominalBiayaTambahan,
             'NOMOR KURSI': kursiString,
             'Total Harga': total
         };
@@ -2759,6 +2935,15 @@
                 document.getElementById('r_bus').innerText = payload['JENIS KENDARAAN'];
                 document.getElementById('r_rute').innerText = payload['Tujuan'];
                 document.getElementById('r_harga').innerText = formatRupiah(armada ? armada.price : 0);
+                
+                if (hasBiayaTambahan && nominalBiayaTambahan > 0) {
+                    if(document.getElementById('r_biaya_tambahan_container')) document.getElementById('r_biaya_tambahan_container').style.display = 'flex';
+                    if(document.getElementById('r_biaya_tambahan_ket')) document.getElementById('r_biaya_tambahan_ket').innerText = ketBiayaTambahan || '-';
+                    if(document.getElementById('r_biaya_tambahan')) document.getElementById('r_biaya_tambahan').innerText = formatRupiah(nominalBiayaTambahan);
+                } else {
+                    if(document.getElementById('r_biaya_tambahan_container')) document.getElementById('r_biaya_tambahan_container').style.display = 'none';
+                }
+                
                 document.getElementById('r_total').innerText = formatRupiah(total);
                 document.getElementById('r_rute_short').innerText = 'KWT - ' + String(payload['Tujuan']).substring(0,3).toUpperCase();
                 
@@ -2786,6 +2971,8 @@
                     armada: payload['JENIS KENDARAAN'],
                     totalHarga: formatRupiah(total),
                     hargaSatuan: formatRupiah(armada ? armada.price : 0),
+                    biayaTambahan: hasBiayaTambahan ? nominalBiayaTambahan : 0,
+                    biayaTambahanKet: ketBiayaTambahan,
                     status: statusPay
                 };
 
@@ -2804,6 +2991,7 @@
         document.getElementById('formAdminBooking').reset();
         document.getElementById('adminBookingDate').value = getLocalYYYYMMDD(new Date());
         document.getElementById('adminBookingTotalDisplay').innerText = 'Rp0';
+        if(typeof toggleAdminBiayaTambahan === 'function') toggleAdminBiayaTambahan();
         updateAdminRute();
     }
 
@@ -2882,11 +3070,26 @@
         const armadaId = document.getElementById('adminBookingArmada').value;
         const qty = parseInt(document.getElementById('adminBookingPnp').value) || 1;
         const armada = getArmada(armadaId);
+        
+        const hasBiayaTambahan = document.querySelector('input[name="adminBookingHasBiayaTambahan"]:checked').value === 'yes';
+        const nominalBiayaTambahan = hasBiayaTambahan ? (parseInt(document.getElementById('adminBookingBiayaTambahanNominal').value) || 0) : 0;
+
         if(armada) {
-            document.getElementById('adminBookingTotalDisplay').innerText = formatRupiah(armada.price * qty);
+            document.getElementById('adminBookingTotalDisplay').innerText = formatRupiah((armada.price * qty) + nominalBiayaTambahan);
         } else {
             document.getElementById('adminBookingTotalDisplay').innerText = 'Rp0';
         }
+    }
+
+    function toggleAdminBiayaTambahan() {
+        const hasBiayaTambahan = document.querySelector('input[name="adminBookingHasBiayaTambahan"]:checked').value === 'yes';
+        const container = document.getElementById('adminBookingBiayaTambahanContainer');
+        if (hasBiayaTambahan) {
+            container.classList.remove('hidden');
+        } else {
+            container.classList.add('hidden');
+        }
+        recalcAdminBooking();
     }
 
     function openEticketModal() {
@@ -3114,10 +3317,23 @@
                     </div>
                 </div>
             </div>
-            <div>
-                <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Armada</label>
-                <select id="editBookingArmada" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-sm font-bold text-slate-700 outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-200 transition-all" onchange="recalcEditBooking()" required>
-                </select>
+            <input type="hidden" id="editBookingArmada" required>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Armada</label>
+                    <select id="editBookingArmadaName" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-sm font-bold text-slate-700 outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-200 transition-all" onchange="updateEditBookingRute()" required>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Rute</label>
+                    <select id="editBookingArmadaRute" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-sm font-bold text-slate-700 outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-200 transition-all" onchange="updateEditBookingJam()" required>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Jam</label>
+                    <select id="editBookingArmadaJam" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-sm font-bold text-slate-700 outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-200 transition-all" onchange="updateEditBookingArmadaId()" required>
+                    </select>
+                </div>
             </div>
             <div>
                 <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Status Pembayaran</label>
@@ -3126,6 +3342,33 @@
                     <option value="BELUM LUNAS">BELUM LUNAS</option>
                 </select>
             </div>
+
+            <!-- Tambahan: Biaya Tambahan untuk Edit -->
+            <div>
+                <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2 text-center">Ada Biaya Tambahan?</label>
+                <div class="flex gap-4">
+                    <label class="flex-1 cursor-pointer">
+                        <input type="radio" name="editBookingHasBiayaTambahan" value="no" class="peer hidden" checked onchange="if(typeof toggleEditBiayaTambahan === 'function') toggleEditBiayaTambahan()">
+                        <div class="text-center py-2 px-2 rounded-xl border border-slate-200 peer-checked:bg-amber-500 peer-checked:text-white peer-checked:border-amber-500 font-bold text-sm text-slate-500 transition-all shadow-sm">TIDAK</div>
+                    </label>
+                    <label class="flex-1 cursor-pointer">
+                        <input type="radio" name="editBookingHasBiayaTambahan" value="yes" class="peer hidden" onchange="if(typeof toggleEditBiayaTambahan === 'function') toggleEditBiayaTambahan()">
+                        <div class="text-center py-2 px-2 rounded-xl border border-slate-200 peer-checked:bg-amber-500 peer-checked:text-white peer-checked:border-amber-500 font-bold text-sm text-slate-500 transition-all shadow-sm">YA</div>
+                    </label>
+                </div>
+            </div>
+
+            <div id="editBookingBiayaTambahanContainer" class="hidden grid grid-cols-1 md:grid-cols-2 gap-3 mt-2">
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Nominal Biaya Tambahan</label>
+                    <input type="number" id="editBookingBiayaTambahanNominal" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-sm font-bold text-slate-700 outline-none focus:border-amber-500 transition-all" value="0" oninput="if(typeof recalcEditBooking === 'function') recalcEditBooking()">
+                </div>
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Keterangan Tambahan</label>
+                    <input type="text" id="editBookingBiayaTambahanKet" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-sm font-bold text-slate-700 outline-none focus:border-amber-500 transition-all" placeholder="Contoh: Bagasi ekstra">
+                </div>
+            </div>
+
             <div id="editBookingKursiContainer" class="mt-2"></div>
             <div class="bg-amber-50 p-3 rounded-xl border border-amber-100 flex justify-between items-center mt-2">
                 <span class="text-[10px] font-bold text-amber-700 uppercase tracking-widest">Total Harga Baru</span>
