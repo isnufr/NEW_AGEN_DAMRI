@@ -1020,7 +1020,7 @@
 
     <!-- E-Ticket Modal -->
     <div id="ticketModal" class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm z-[150] hidden items-center justify-center p-4">
-        <div class="bg-white rounded-xl shadow-2xl w-full max-w-sm transform scale-95 opacity-0 transition-all duration-300 flex flex-col font-mono text-sm text-gray-800 border-2 border-gray-200" id="ticketModalInner">
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-sm max-h-[90vh] overflow-y-auto transform scale-95 opacity-0 transition-all duration-300 flex flex-col font-mono text-sm text-gray-800 border-2 border-gray-200" id="ticketModalInner">
             
             <!-- Ticket Body -->
             <div class="p-6">
@@ -2922,6 +2922,40 @@
                 document.getElementById('r_rute_arsip').innerText = payload['Tujuan'];
                 document.getElementById('r_nama_arsip').innerText = payload['NAMA'];
                 document.getElementById('r_tgl_arsip').innerText = formattedDate;
+
+                // Populate E-Ticket Visual Modal (ticket*)
+                if(document.getElementById('ticketDate')) document.getElementById('ticketDate').innerText = formattedDate;
+                if(document.getElementById('ticketTime')) document.getElementById('ticketTime').innerText = payload['WAKTU'] || '-';
+                if(document.getElementById('ticketArmada')) document.getElementById('ticketArmada').innerText = payload['JENIS KENDARAAN'];
+                if(document.getElementById('ticketTujuan')) document.getElementById('ticketTujuan').innerText = payload['Tujuan'];
+                if(document.getElementById('ticketKursi')) document.getElementById('ticketKursi').innerText = kursiString || '-';
+                if(document.getElementById('ticketQty')) document.getElementById('ticketQty').innerText = payload['JUMLAH PNP'];
+                if(document.getElementById('ticketId')) document.getElementById('ticketId').innerText = idTiket;
+                if(document.getElementById('ticketName')) document.getElementById('ticketName').innerText = payload['NAMA'];
+                if(document.getElementById('ticketTglBeli')) document.getElementById('ticketTglBeli').innerText = "TGL BELI: " + tglBeli;
+                
+                if(document.getElementById('ticketHargaSatuan')) document.getElementById('ticketHargaSatuan').innerText = formatRupiah(armada ? armada.price : 0);
+                if(document.getElementById('ticketTotal')) document.getElementById('ticketTotal').innerText = formatRupiah(total);
+                
+                if (hasBiayaTambahan && nominalBiayaTambahan > 0) {
+                    if(document.getElementById('ticketBiayaTambahanContainer')) {
+                        document.getElementById('ticketBiayaTambahanContainer').classList.remove('hidden');
+                        document.getElementById('ticketBiayaTambahanContainer').classList.add('flex');
+                    }
+                    if(document.getElementById('ticketBiayaTambahanKet')) document.getElementById('ticketBiayaTambahanKet').innerText = '(' + (ketBiayaTambahan || 'Tambahan') + ')';
+                    if(document.getElementById('ticketBiayaTambahan')) document.getElementById('ticketBiayaTambahan').innerText = formatRupiah(nominalBiayaTambahan);
+                } else {
+                    if(document.getElementById('ticketBiayaTambahanContainer')) {
+                        document.getElementById('ticketBiayaTambahanContainer').classList.add('hidden');
+                        document.getElementById('ticketBiayaTambahanContainer').classList.remove('flex');
+                    }
+                }
+
+                if(document.getElementById('ticketArmadaArsip')) document.getElementById('ticketArmadaArsip').innerText = payload['JENIS KENDARAAN'];
+                if(document.getElementById('ticketNameArsip')) document.getElementById('ticketNameArsip').innerText = payload['NAMA'];
+                if(document.getElementById('ticketQtyArsip')) document.getElementById('ticketQtyArsip').innerText = payload['JUMLAH PNP'];
+                if(document.getElementById('ticketTujuanArsip')) document.getElementById('ticketTujuanArsip').innerText = payload['Tujuan'];
+                if(document.getElementById('ticketDateArsip')) document.getElementById('ticketDateArsip').innerText = formattedDate;
 
                 // Prepare WA Link
                 const waNum = String(hp).replace(/[^0-9]/g, '').replace(/^0/, '62');
