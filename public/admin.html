@@ -2553,29 +2553,6 @@
             }
         }
 
-        // Infer Biaya Tambahan
-        const currentArmada = getArmada(b.armadaId);
-        const expectedTotal = currentArmada ? (currentArmada.price * parseInt(b.qty || 1)) : 0;
-        const actualTotal = (b.totalHarga !== undefined && b.totalHarga !== null) ? parseInt(String(b.totalHarga).replace(/[^0-9]/g, '')) : (b.total !== undefined && b.total !== null ? parseInt(String(b.total).replace(/[^0-9]/g, '')) : 0);
-        
-        if (actualTotal > expectedTotal && expectedTotal > 0) {
-            const biayaTambahan = actualTotal - expectedTotal;
-            document.querySelector('input[name="editBookingHasBiayaTambahan"][value="yes"]').checked = true;
-            document.getElementById('editBookingBiayaTambahanNominal').value = biayaTambahan;
-            
-            const ketStr = b.keterangan || b.ket || '';
-            const ketMatch = ketStr.match(/Biaya Tambahan: (.*?) \(/);
-            if (ketMatch) {
-                document.getElementById('editBookingBiayaTambahanKet').value = ketMatch[1];
-            } else {
-                document.getElementById('editBookingBiayaTambahanKet').value = '';
-            }
-            if(typeof toggleEditBiayaTambahan === 'function') toggleEditBiayaTambahan();
-        } else {
-            document.querySelector('input[name="editBookingHasBiayaTambahan"][value="no"]').checked = true;
-            document.getElementById('editBookingBiayaTambahanNominal').value = 0;
-            document.getElementById('editBookingBiayaTambahanKet').value = '';
-            if(typeof toggleEditBiayaTambahan === 'function') toggleEditBiayaTambahan();
         }
 
         recalcEditBooking();
@@ -2584,13 +2561,20 @@
         const c = document.getElementById('modalEditBookingContent');
         m.classList.remove('hidden');
         m.classList.add('flex');
-        setTimeout(() => { m.classList.remove('opacity-0'); c.classList.remove('scale-95'); }, 10);
+        setTimeout(() => { 
+            m.classList.remove('opacity-0'); 
+            c.classList.remove('scale-95');
+            if (window.innerWidth < 768) {
+                c.style.transform = 'scale(0.9)';
+            }
+        }, 10);
     }
 
     function closeEditBookingModal() {
         const m = document.getElementById('modalEditBooking');
         const c = document.getElementById('modalEditBookingContent');
         m.classList.add('opacity-0'); c.classList.add('scale-95');
+        c.style.transform = '';
         setTimeout(() => { m.classList.add('hidden'); m.classList.remove('flex'); }, 300);
     }
 
@@ -2683,11 +2667,8 @@
         const qty = parseInt(document.getElementById('editBookingPnp').value) || 1;
         const armada = getArmada(armadaId);
         
-        const hasBiayaTambahan = document.querySelector('input[name="editBookingHasBiayaTambahan"]:checked').value === 'yes';
-        const nominalBiayaTambahan = hasBiayaTambahan ? (parseInt(document.getElementById('editBookingBiayaTambahanNominal').value) || 0) : 0;
-
         if(armada) {
-            const total = (armada.price * qty) + nominalBiayaTambahan;
+            const total = armada.price * qty;
             document.getElementById('editBookingTotalDisplay').innerText = formatRupiah(total);
         } else {
             document.getElementById('editBookingTotalDisplay').innerText = 'Rp 0';
@@ -2735,10 +2716,6 @@
         }
         const kursiString = filledKursiCount === qty ? kursiValues.join(', ') : '';
 
-        const hasBiayaTambahan = document.querySelector('input[name="editBookingHasBiayaTambahan"]:checked').value === 'yes';
-        const nominalBiayaTambahan = hasBiayaTambahan ? (parseInt(document.getElementById('editBookingBiayaTambahanNominal').value) || 0) : 0;
-        const ketBiayaTambahan = hasBiayaTambahan ? document.getElementById('editBookingBiayaTambahanKet').value : '';
-
         const payload = {
             id_tiket: id,
             nama: document.getElementById('editBookingNama').value,
@@ -2749,14 +2726,9 @@
             jumlahPnp: qty,
             nomorKursi: kursiString,
             harga: armada ? armada.price : 0,
-            totalHarga: armada ? (armada.price * qty) + nominalBiayaTambahan : 0,
+            totalHarga: armada ? (armada.price * qty) : 0,
             waktu: armada ? armada.time : ''
         };
-        
-        if (hasBiayaTambahan && nominalBiayaTambahan > 0) {
-            payload.biayaTambahan = nominalBiayaTambahan;
-            payload.keteranganBiayaTambahan = ketBiayaTambahan;
-        }
         const statusSelect = document.getElementById('editBookingStatus');
         if (statusSelect) payload.status = statusSelect.value;
 
@@ -3341,32 +3313,6 @@
                     <option value="LUNAS">LUNAS</option>
                     <option value="BELUM LUNAS">BELUM LUNAS</option>
                 </select>
-            </div>
-
-            <!-- Tambahan: Biaya Tambahan untuk Edit -->
-            <div>
-                <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2 text-center">Ada Biaya Tambahan?</label>
-                <div class="flex gap-4">
-                    <label class="flex-1 cursor-pointer">
-                        <input type="radio" name="editBookingHasBiayaTambahan" value="no" class="peer hidden" checked onchange="if(typeof toggleEditBiayaTambahan === 'function') toggleEditBiayaTambahan()">
-                        <div class="text-center py-2 px-2 rounded-xl border border-slate-200 peer-checked:bg-amber-500 peer-checked:text-white peer-checked:border-amber-500 font-bold text-sm text-slate-500 transition-all shadow-sm">TIDAK</div>
-                    </label>
-                    <label class="flex-1 cursor-pointer">
-                        <input type="radio" name="editBookingHasBiayaTambahan" value="yes" class="peer hidden" onchange="if(typeof toggleEditBiayaTambahan === 'function') toggleEditBiayaTambahan()">
-                        <div class="text-center py-2 px-2 rounded-xl border border-slate-200 peer-checked:bg-amber-500 peer-checked:text-white peer-checked:border-amber-500 font-bold text-sm text-slate-500 transition-all shadow-sm">YA</div>
-                    </label>
-                </div>
-            </div>
-
-            <div id="editBookingBiayaTambahanContainer" class="hidden grid grid-cols-1 md:grid-cols-2 gap-3 mt-2">
-                <div>
-                    <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Nominal Biaya Tambahan</label>
-                    <input type="number" id="editBookingBiayaTambahanNominal" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-sm font-bold text-slate-700 outline-none focus:border-amber-500 transition-all" value="0" oninput="if(typeof recalcEditBooking === 'function') recalcEditBooking()">
-                </div>
-                <div>
-                    <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Keterangan Tambahan</label>
-                    <input type="text" id="editBookingBiayaTambahanKet" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-sm font-bold text-slate-700 outline-none focus:border-amber-500 transition-all" placeholder="Contoh: Bagasi ekstra">
-                </div>
             </div>
 
             <div id="editBookingKursiContainer" class="mt-2"></div>
