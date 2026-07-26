@@ -992,12 +992,12 @@
                     <table class="w-full text-left" id="ap3Table">
                         <thead>
                             <tr>
-                                <th class="p-2 text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-200 w-8">No</th>
-                                <th class="p-2 text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-200">DARI</th>
-                                <th class="p-2 text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-200">KE</th>
-                                <th class="p-2 text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-200 w-24">PNP</th>
-                                <th class="p-2 text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-200 w-32">TARIF (Rp)</th>
-                                <th class="p-2 text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-200 w-10 text-center"><i class="fas fa-trash"></i></th>
+                                <th class="p-2 text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-200 w-8 min-w-[30px]">No</th>
+                                <th class="p-2 text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-200 min-w-[100px]">DARI</th>
+                                <th class="p-2 text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-200 min-w-[100px]">KE</th>
+                                <th class="p-2 text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-200 w-24 min-w-[60px]">PNP</th>
+                                <th class="p-2 text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-200 w-32 min-w-[100px]">TARIF (Rp)</th>
+                                <th class="p-2 text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-200 w-10 text-center min-w-[40px]"><i class="fas fa-trash"></i></th>
                             </tr>
                         </thead>
                         <tbody id="ap3Tbody">
@@ -2744,10 +2744,10 @@
         tr.id = 'ap3row-' + ap3RowCount;
         tr.innerHTML = `
             <td class="p-2 font-black text-xs text-slate-500 border-b border-slate-100">${ap3RowCount}</td>
-            <td class="p-2 border-b border-slate-100"><input type="text" class="ap3-dari w-full bg-white border border-slate-200 rounded px-2 py-1.5 text-xs focus:outline-none focus:border-amber-500 font-bold text-slate-800" placeholder="Dari"></td>
-            <td class="p-2 border-b border-slate-100"><input type="text" class="ap3-ke w-full bg-white border border-slate-200 rounded px-2 py-1.5 text-xs focus:outline-none focus:border-amber-500 font-bold text-slate-800" placeholder="Ke"></td>
-            <td class="p-2 border-b border-slate-100"><input type="number" class="ap3-pnp w-full bg-white border border-slate-200 rounded px-2 py-1.5 text-xs focus:outline-none focus:border-amber-500 font-bold text-slate-800" placeholder="PNP" min="1"></td>
-            <td class="p-2 border-b border-slate-100"><input type="number" class="ap3-tarif w-full bg-white border border-slate-200 rounded px-2 py-1.5 text-xs focus:outline-none focus:border-amber-500 font-bold text-slate-800" placeholder="Tarif" min="0"></td>
+            <td class="p-2 border-b border-slate-100"><input type="text" class="ap3-dari min-w-[100px] w-full bg-white border border-slate-200 rounded px-2 py-1.5 text-xs focus:outline-none focus:border-amber-500 font-bold text-slate-800" placeholder="Dari"></td>
+            <td class="p-2 border-b border-slate-100"><input type="text" class="ap3-ke min-w-[100px] w-full bg-white border border-slate-200 rounded px-2 py-1.5 text-xs focus:outline-none focus:border-amber-500 font-bold text-slate-800" placeholder="Ke"></td>
+            <td class="p-2 border-b border-slate-100"><input type="number" class="ap3-pnp min-w-[60px] w-full bg-white border border-slate-200 rounded px-2 py-1.5 text-xs focus:outline-none focus:border-amber-500 font-bold text-slate-800" placeholder="PNP" min="1"></td>
+            <td class="p-2 border-b border-slate-100"><input type="number" class="ap3-tarif min-w-[100px] w-full bg-white border border-slate-200 rounded px-2 py-1.5 text-xs focus:outline-none focus:border-amber-500 font-bold text-slate-800" placeholder="Tarif" min="0"></td>
             <td class="p-2 border-b border-slate-100 text-center"><button onclick="document.getElementById('ap3row-${ap3RowCount}').remove()" class="text-red-400 hover:text-red-600 bg-red-50 hover:bg-red-100 p-2 rounded-lg transition-colors"><i class="fas fa-times"></i></button></td>
         `;
         tbody.appendChild(tr);
