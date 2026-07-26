@@ -2731,6 +2731,8 @@
             BOLD_OFF: [0x1B, 0x45, 0x00],
             TEXT_NORMAL: [0x1D, 0x21, 0x00],
             TEXT_DOUBLE_HW: [0x1D, 0x21, 0x11],
+            INVERSE_ON: [0x1D, 0x42, 0x01],
+            INVERSE_OFF: [0x1D, 0x42, 0x00],
             LF: [0x0A]
         };
 
@@ -2754,24 +2756,23 @@
         add(CMD.BOLD_ON);
         addLine("AGEN DAMRI KAWUNGANTEN");
         add(CMD.BOLD_OFF);
-        addLine("Pusat Penjualan Tiket Resmi");
-        add(CMD.LF);
-        
-        add(CMD.ALIGN_LEFT);
-        addLine("TGL BELI: " + t.tglBeli);
         addLine("--------------------------------");
         
-        add(CMD.ALIGN_CENTER);
         add(CMD.BOLD_ON);
         add(CMD.TEXT_DOUBLE_HW);
         addLine(String(t.armada).toUpperCase());
         add(CMD.TEXT_NORMAL);
         add(CMD.BOLD_OFF);
-        
-        addLine("Kode Boking : " + t.idTiket);
-        add(CMD.ALIGN_LEFT);
         addLine("--------------------------------");
         
+        addStr("Kode Boking : ");
+        add(CMD.INVERSE_ON);
+        addStr(" " + t.idTiket + " ");
+        add(CMD.INVERSE_OFF);
+        add(CMD.LF);
+        add(CMD.LF);
+        
+        add(CMD.ALIGN_LEFT);
         addLine("Keberangkatan");
         add(CMD.BOLD_ON);
         addLine(t.tglBerangkat);
@@ -2813,42 +2814,84 @@
         addLine(t.kursi || "-");
         add(CMD.BOLD_OFF);
         add(CMD.LF);
-
         
-        addLine("Harga / Tiket");
+        // Harga and Total Harga side by side
+        let line1 = "Harga";
+        let right1 = "Total Harga";
+        let spaces1 = 32 - line1.length - right1.length;
+        if(spaces1 < 0) spaces1 = 0;
+        addLine(line1 + " ".repeat(spaces1) + right1);
+
+        let left2 = t.hargaSatuan;
+        let right2Text = " " + t.totalHarga + " ";
+        let spaces2 = 32 - left2.length - right2Text.length;
+        if(spaces2 < 0) spaces2 = 0;
+        
         add(CMD.BOLD_ON);
-        addLine(t.hargaSatuan);
+        addStr(left2);
+        addStr(" ".repeat(spaces2));
+        add(CMD.INVERSE_ON);
+        addStr(right2Text);
+        add(CMD.INVERSE_OFF);
         add(CMD.BOLD_OFF);
         add(CMD.LF);
+        add(CMD.LF);
         
-        addLine("--------------------------------");
-        
-        addLine("Total Harga");
-        add(CMD.ALIGN_RIGHT);
-        add(CMD.BOLD_ON);
-        addLine(t.totalHarga);
-        add(CMD.BOLD_OFF);
-        add(CMD.ALIGN_LEFT);
-        
-        addLine("--------------------------------");
+        addLine("KWT - " + (t.tujuan || "").substring(0,3).toUpperCase());
+        add(CMD.LF);
         
         add(CMD.ALIGN_CENTER);
-        addLine("Dimohon kumpul di Agen 30 menit sblm keberangkatan");
+        addLine("Dimohon untuk berkumpul di Agen");
+        addLine("setengah jam sebelum keberangkatan");
+        add(CMD.LF);
         addLine("Terima Kasih");
-        addLine("Info : 082133607759");
-        addLine("Jl.Raya Kawunganten (Depan Koramil Kawunganten)");
         add(CMD.LF);
-        addLine("TIKET YANG SUDAH DIBOOKING TIDAK BISA DICANCEL MENDADAK (HANGUS)");
-        addLine("CANCEL/RESCHEDULE MAKSIMAL 1x24 JAM SEBELUM PEMBERANGKATAN");
-        addLine("(Dipotong Denda Sesuai Aturan Masing - Masing PO)");
-        add(CMD.LF);
+        addLine("Info Pemesanan : 082133607759");
+        addLine("Alamat : Jl.Raya Kawunganten");
+        addLine("(Depan Koramil Kawunganten)");
         addLine("--------------------------------");
+        
         add(CMD.BOLD_ON);
-        addLine("ARSIP AGEN");
+        addLine("Arsip Agen");
+        addLine("AGEN DAMRI KAWUNGANTEN");
+        addLine(String(t.armada).toUpperCase());
         add(CMD.BOLD_OFF);
-        addLine(t.nama);
-        addLine(t.jumlahPnp);
-        addLine(t.tujuan);
+        add(CMD.LF);
+        
+        // 2 Columns Arsip
+        let qtyNum = (t.jumlahPnp || "").replace(/[^0-9]/g, '');
+        if(!qtyNum) qtyNum = "1";
+        
+        let rightLines = [
+            "Kawunganten",
+            t.tujuan,
+            t.nama,
+            t.tglBerangkat
+        ];
+        
+        let leftColWidth = 10;
+        function padRight(str, len) {
+            if(!str) str = "";
+            if(str.length >= len) return str.substring(0, len);
+            return str + " ".repeat(len - str.length);
+        }
+        function centerStr(str, len) {
+            if(!str) str = "";
+            if(str.length >= len) return str.substring(0, len);
+            let pad = len - str.length;
+            let left = Math.floor(pad/2);
+            let right = pad - left;
+            return " ".repeat(left) + str + " ".repeat(right);
+        }
+        
+        add(CMD.ALIGN_LEFT);
+        add(CMD.BOLD_ON);
+        addLine(padRight(centerStr(qtyNum, leftColWidth), leftColWidth) + (rightLines[0] || ""));
+        add(CMD.BOLD_OFF);
+        addLine(padRight(centerStr("ORANG", leftColWidth), leftColWidth) + (rightLines[1] || ""));
+        addLine(padRight("", leftColWidth) + (rightLines[2] || ""));
+        addLine(padRight("", leftColWidth) + (rightLines[3] || ""));
+        
         add(CMD.LF);
         add(CMD.LF);
         add(CMD.LF); 
