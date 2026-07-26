@@ -995,6 +995,7 @@
                     <h2 class="text-lg font-bold">AGEN DAMRI KAWUNGANTEN</h2>
                     <p class="text-xs">Pusat Penjualan Tiket</p>
                     <p class="text-[10px] mt-1" id="ticketTglBeli">TGL BELI: -</p>
+                    <p class="font-bold text-xs mt-2 tracking-widest">*** TIKET RESMI ***</p>
                 </div>
                 
                 <!-- Armada -->
@@ -2942,6 +2943,9 @@
         add(CMD.BOLD_OFF);
         addLine("Pusat Penjualan Tiket");
         addLine("TGL BELI: " + t.tglBeli);
+        add(CMD.BOLD_ON);
+        addLine("*** TIKET RESMI ***");
+        add(CMD.BOLD_OFF);
         addLine("================================");
         
         add(CMD.BOLD_ON);
@@ -2975,23 +2979,24 @@
         add(CMD.LF);
         addLine("--------------------------------");
         
-        function addTwoColumnsLeftRight(leftStr, rightStr) {
+        function addTwoColumnsLeftRight(leftStr, rightStr, extraSpacing = false) {
             if(!rightStr) rightStr = "";
             let spaces = 32 - leftStr.length - rightStr.length;
             if(spaces < 0) spaces = 0;
             addLine(leftStr + " ".repeat(spaces) + rightStr);
+            if(extraSpacing) add(CMD.LF);
         }
         
-        addTwoColumnsLeftRight("Tanggal", t.tglBerangkat);
-        addTwoColumnsLeftRight("Jam", t.jam);
-        addTwoColumnsLeftRight("Asal", "Kawunganten");
-        addTwoColumnsLeftRight("Tujuan", t.tujuan);
-        addTwoColumnsLeftRight("Nama", t.nama);
-        addTwoColumnsLeftRight("Jumlah Pnp", t.jumlahPnp);
-        addTwoColumnsLeftRight("Kursi", t.kursi || "-");
+        addTwoColumnsLeftRight("Tanggal", t.tglBerangkat, true);
+        addTwoColumnsLeftRight("Jam", t.jam, true);
+        addTwoColumnsLeftRight("Asal", "Kawunganten", true);
+        addTwoColumnsLeftRight("Tujuan", t.tujuan, true);
+        addTwoColumnsLeftRight("Nama", t.nama, true);
+        addTwoColumnsLeftRight("Jumlah Pnp", t.jumlahPnp, true);
+        addTwoColumnsLeftRight("Kursi", t.kursi || "-", true);
         
         addLine("--------------------------------");
-        addTwoColumnsLeftRight("Harga/Tiket", t.hargaSatuan);
+        addTwoColumnsLeftRight("Harga/Tiket", t.hargaSatuan, false);
         
         let lineTot = "TOTAL";
         let rightTot = " " + t.totalHarga + " ";
