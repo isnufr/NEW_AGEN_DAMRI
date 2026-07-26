@@ -1005,7 +1005,7 @@
                 <!-- ID -->
                 <div class="flex justify-between items-center border-b-2 border-dashed border-gray-300 pb-4 mb-4">
                     <span class="font-bold">Kode Boking</span>
-                    <span class="bg-black text-white px-2 py-0.5 font-bold" id="ticketId">-</span>
+                    <span class="font-bold text-base" id="ticketId">-</span>
                 </div>
                 
                 <!-- Details -->
@@ -1027,8 +1027,9 @@
                 
                 <!-- Footer -->
                 <div class="text-center text-[10px] space-y-1 text-gray-500 mb-4">
-                    <p>Hadir 30 mnt sblm berangkat</p>
-                    <p>Terima Kasih</p>
+                    <p>HADIR 30 MENIT SEBELUM PEMBERANGKATAN</p>
+                    <p>TIKET YANG SUDAH DIBOOKING TIDAK BISA DICANCEL MENDADAK (MAX 1x24jam)</p>
+                    <p class="mt-2">Terima Kasih</p>
                     <p>Info: 082133607759</p>
                 </div>
                 
@@ -2962,15 +2963,15 @@
         addLine("--------------------------------");
         
         let line1 = "Kode Boking";
-        let right1Text = " " + t.idTiket + " ";
+        let right1Text = t.idTiket;
         let spaces1 = 32 - line1.length - right1Text.length;
         if(spaces1 < 0) spaces1 = 0;
         add(CMD.ALIGN_LEFT);
         addStr(line1);
         addStr(" ".repeat(spaces1));
-        add(CMD.INVERSE_ON);
+        add(CMD.BOLD_ON);
         addStr(right1Text);
-        add(CMD.INVERSE_OFF);
+        add(CMD.BOLD_OFF);
         add(CMD.LF);
         addLine("--------------------------------");
         
@@ -3008,9 +3009,35 @@
         addLine("================================");
         
         add(CMD.ALIGN_CENTER);
-        addLine("Hadir 30 mnt sblm berangkat");
+        addLine("HADIR 30 MENIT SEBELUM");
+        addLine("PEMBERANGKATAN");
+        add(CMD.LF);
+        addLine("TIKET YANG SUDAH DIBOOKING");
+        addLine("TIDAK BISA DICANCEL MENDADAK");
+        addLine("(MAX 1x24jam)");
+        add(CMD.LF);
         addLine("Terima Kasih");
         addLine("Info: 082133607759");
+        addLine("--------------------------------");
+        
+        add(CMD.BOLD_ON);
+        addLine("ARSIP AGEN");
+        add(CMD.BOLD_OFF);
+        add(CMD.LF);
+        
+        add(CMD.BOLD_ON);
+        add(CMD.INVERSE_ON);
+        add(CMD.TEXT_DOUBLE_HW);
+        addLine(centerInverseDouble(armada, 16));
+        add(CMD.TEXT_NORMAL);
+        add(CMD.INVERSE_OFF);
+        add(CMD.BOLD_OFF);
+        add(CMD.LF);
+        
+        add(CMD.BOLD_ON);
+        addLine(t.nama + " (" + t.jumlahPnp + " Org) - " + t.tujuan);
+        add(CMD.BOLD_OFF);
+        addLine(t.tglBerangkat);
         add(CMD.LF);
         add(CMD.LF);
         add(CMD.LF); 
