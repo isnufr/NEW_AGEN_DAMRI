@@ -28,6 +28,8 @@
         .sidebar {
             width: 260px;
             min-height: 100vh;
+            max-height: 100vh;
+            overflow-y: auto;
             background: linear-gradient(180deg, #0f172a 0%, #1e293b 100%);
             transition: transform 0.35s cubic-bezier(0.4,0,0.2,1);
             z-index: 50;
@@ -701,7 +703,7 @@
                 <!-- BOOKING TIKET MODAL     -->
                 <!-- ======================= -->
                 <div id="bookingModal" class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm z-[140] hidden justify-center items-center p-4 lg:p-8 overflow-y-auto">
-                    <div class="bg-white rounded-[2rem] p-6 shadow-2xl border border-slate-100 max-w-2xl w-full relative max-h-full overflow-y-auto my-auto">
+                    <div class="bg-white rounded-[2rem] p-6 shadow-2xl border border-slate-100 max-w-2xl w-full relative max-h-[90dvh] overflow-y-auto my-auto">
                         <!-- Close Button -->
                         <button type="button" onclick="closeBookingModal()" class="absolute top-4 right-4 w-10 h-10 bg-slate-100 hover:bg-slate-200 text-slate-500 rounded-xl flex items-center justify-center transition-colors">
                             <i class="fas fa-times"></i>
@@ -3747,7 +3749,7 @@
 
 <!-- Modal Edit Booking -->
 <div id="modalEditBooking" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden items-center justify-center z-50 p-4 opacity-0 transition-opacity duration-300">
-    <div class="bg-white rounded-3xl p-6 w-full max-w-md shadow-2xl transform scale-95 transition-transform duration-300 relative" id="modalEditBookingContent">
+    <div class="bg-white rounded-3xl p-6 w-full max-w-md shadow-2xl transform scale-95 transition-transform duration-300 relative max-h-[90dvh] overflow-y-auto" id="modalEditBookingContent">
         <div class="absolute -top-4 -right-4 w-12 h-12 bg-amber-500 rounded-full flex items-center justify-center text-white text-xl shadow-lg cursor-pointer hover:bg-amber-600 transition-colors" onclick="closeEditBookingModal()">
             <i class="fas fa-times"></i>
         </div>
@@ -3825,7 +3827,7 @@
 
 <!-- Modal Edit Armada -->
 <div id="modalEditArmada" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden items-center justify-center z-50 p-4 opacity-0 transition-opacity duration-300">
-    <div class="bg-white rounded-3xl p-6 w-full max-w-md shadow-2xl transform scale-95 transition-transform duration-300 relative" id="modalEditArmadaContent">
+    <div class="bg-white rounded-3xl p-6 w-full max-w-md shadow-2xl transform scale-95 transition-transform duration-300 relative max-h-[90dvh] overflow-y-auto" id="modalEditArmadaContent">
         <div class="absolute -top-4 -right-4 w-12 h-12 bg-amber-500 rounded-full flex items-center justify-center text-white text-xl shadow-lg cursor-pointer hover:bg-amber-600 transition-colors" onclick="closeEditArmadaModal()">
             <i class="fas fa-times"></i>
         </div>
@@ -3876,7 +3878,7 @@
 
 <!-- MODALS UNTUK ADMIN AKUN -->
 <div id="adminModal" class="fixed inset-0 bg-gray-900/40 backdrop-blur-sm z-[150] hidden items-center justify-center p-4">
-    <div class="bg-white rounded-[2rem] shadow-2xl w-full max-w-md overflow-hidden animate-fade-in-up">
+    <div class="bg-white rounded-[2rem] shadow-2xl w-full max-w-md animate-fade-in-up max-h-[90dvh] overflow-y-auto">
         <div class="p-6 border-b border-gray-100 flex justify-between items-center bg-blue-50/50">
             <div>
                 <h3 class="text-lg font-black text-slate-800 tracking-tight">Form Akun Admin</h3>
