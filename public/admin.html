@@ -978,17 +978,28 @@
                 </div>
                 
                 <!-- Footer -->
-                <div class="text-center text-[10px] space-y-1 text-gray-500">
+                <div class="text-center text-[10px] space-y-1 text-gray-500 mb-4">
                     <p>Hadir 30 mnt sblm berangkat</p>
                     <p>Terima Kasih</p>
                     <p>Info: 082133607759</p>
                 </div>
                 
+                <!-- Arsip Agen -->
+                <div class="border-t-2 border-dashed border-gray-300 pt-4 text-xs text-center">
+                    <h3 class="font-bold mb-2">ARSIP AGEN</h3>
+                    <div class="bg-black text-white py-1 px-2 mb-2 inline-block font-black tracking-widest uppercase" id="ticketArmadaArsip">-</div>
+                    <p class="font-bold"><span id="ticketNameArsip">-</span> (<span id="ticketQtyArsip">-</span> Org) - <span id="ticketTujuanArsip">-</span></p>
+                    <p class="text-[10px] text-gray-500 mt-1" id="ticketDateArsip">-</p>
+                </div>
+                
                 <!-- Print & Close Action -->
-                <div class="mt-6 flex gap-3 no-print">
-                    <button onclick="closeETicket()" class="flex-1 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-600 font-bold text-xs uppercase tracking-widest rounded transition-all">Tutup</button>
+                <div class="mt-6 flex gap-2 no-print">
+                    <button onclick="closeETicket()" class="w-1/4 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-600 font-bold text-xs uppercase tracking-widest rounded transition-all">Tutup</button>
+                    <button onclick="kirimWaTicket()" class="flex-1 py-2.5 bg-green-500 hover:bg-green-600 text-white font-bold text-xs uppercase tracking-widest rounded shadow-lg shadow-green-200 transition-all flex items-center justify-center gap-2">
+                        <i class="fab fa-whatsapp text-sm"></i> Kirim WA
+                    </button>
                     <button onclick="printETicket()" class="flex-1 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs uppercase tracking-widest rounded shadow-lg shadow-blue-200 transition-all flex items-center justify-center gap-2">
-                        <i class="fas fa-print"></i> Cetak
+                        <i class="fas fa-print text-sm"></i> Cetak
                     </button>
                 </div>
             </div>
@@ -1887,6 +1898,12 @@
         if(document.getElementById('ticketTglBeli')) document.getElementById('ticketTglBeli').innerText = "TGL BELI: " + tglBeli;
         if(document.getElementById('ticketHargaSatuan')) document.getElementById('ticketHargaSatuan').innerText = formatRupiah(harga);
         if(document.getElementById('ticketTotal')) document.getElementById('ticketTotal').innerText = formatRupiah(total);
+        
+        if(document.getElementById('ticketArmadaArsip')) document.getElementById('ticketArmadaArsip').innerText = armadaName;
+        if(document.getElementById('ticketNameArsip')) document.getElementById('ticketNameArsip').innerText = b.name;
+        if(document.getElementById('ticketQtyArsip')) document.getElementById('ticketQtyArsip').innerText = qty;
+        if(document.getElementById('ticketTujuanArsip')) document.getElementById('ticketTujuanArsip').innerText = tujuan;
+        if(document.getElementById('ticketDateArsip')) document.getElementById('ticketDateArsip').innerText = formattedDate;
 
         currentTicketDataForBT = {
             idTiket: b.bookingId,
@@ -1946,6 +1963,14 @@
 
     function printETicket() {
         printRawBT();
+    }
+
+    function kirimWaTicket() {
+        if(typeof currentTicketWaText !== 'undefined' && currentTicketWaText) {
+            window.open(currentTicketWaText, '_blank');
+        } else {
+            alert('Link WhatsApp belum tersedia.');
+        }
     }
 
     async function executeAcc() {
