@@ -108,11 +108,12 @@ app.get('/api', async (req, res) => {
         }
 
         if (action === 'getAdmin') {
-            // Hardcode credentials from previous CSV or use env vars
-            const admins = [
-                { Username: 'admin', Password: 'rahasia123' }
-            ];
-            return res.json({ status: 'success', data: admins });
+            const admins = await prisma.admin.findMany();
+            const formattedAdmins = admins.map(a => ({
+                id: a.id,
+                Username: a.username
+            }));
+            return res.json({ status: 'success', data: formattedAdmins });
         }
 
         return res.status(400).json({ status: 'error', message: 'Action not found' });
@@ -229,6 +230,52 @@ app.post('/api', async (req, res) => {
                 where: { idArmada: id_armada }
             });
             return res.json({ status: 'success', message: 'Data armada berhasil dihapus' });
+        }
+
+        if (action === 'loginAdmin') {
+            const { username, password } = payload;
+            const admin = await prisma.admin.findUnique({ where: { username } });
+            if (admin && admin.password === password) {
+                return res.json({ status: 'success', message: 'Login berhasil' });
+            }
+            return res.json({ status: 'error', message: 'Username atau password salah' });
+        }
+
+        if (action === 'addAdmin') {
+            const { username, password } = payload;
+            const existing = await prisma.admin.findUnique({ where: { username } });
+            if (existing) {
+                return res.json({ status: 'error', message: 'Username sudah digunakan' });
+            }
+            await prisma.admin.create({ data: { username, password } });
+            return res.json({ status: 'success', message: 'Admin berhasil ditambahkan' });
+        }
+
+        if (action === 'editAdmin') {
+            const { id, username, password } = payload;
+            const existing = await prisma.admin.findUnique({ where: { username } });
+            if (existing && existing.id !== id) {
+                return res.json({ status: 'error', message: 'Username sudah digunakan' });
+            }
+            const updateData = { username };
+            if (password && password.trim() !== '') {
+                updateData.password = password;
+            }
+            await prisma.admin.update({
+                where: { id },
+                data: updateData
+            });
+            return res.json({ status: 'success', message: 'Admin berhasil diperbarui' });
+        }
+
+        if (action === 'deleteAdmin') {
+            const { id } = payload;
+            const count = await prisma.admin.count();
+            if (count <= 1) {
+                return res.json({ status: 'error', message: 'Tidak dapat menghapus admin terakhir' });
+            }
+            await prisma.admin.delete({ where: { id } });
+            return res.json({ status: 'success', message: 'Admin berhasil dihapus' });
         }
 
         return res.status(400).json({ status: 'error', message: 'Action not found' });

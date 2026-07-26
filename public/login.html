@@ -81,34 +81,24 @@
             alertBox.classList.add('hidden');
 
             try {
-                // Panggil endpoint getAdmin dari Google Apps Script
-                const res = await fetch(`${SCRIPT_URL}?action=getAdmin`);
-                const json = await res.json();
+                const res = await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        action: 'loginAdmin',
+                        payload: { username: u, password: p }
+                    })
+                });
                 
-                let admins = [];
-                // Handle struktur nested dari GAS
-                if (json && json.status === "success" && json.data) {
-                    admins = json.data;
-                } else if (Array.isArray(json)) {
-                    admins = json;
-                } else if (json && json.data) {
-                    admins = json.data;
-                }
+                const json = await res.json();
 
-                // Cek kecocokan Username dan Password
-                // Pastikan key-nya sama dengan header di spreadsheet (misalnya: Username, Password)
-                const isValid = admins.find(a => 
-                    String(a.Username || "").trim() === u && 
-                    String(a.Password || "").trim() === p
-                );
-
-                if (isValid) {
+                if (json.status === 'success') {
                     localStorage.setItem('isAdminLoggedIn', 'true');
                     alertBox.innerText = "Login Berhasil! Mengalihkan...";
                     alertBox.className = "mt-4 p-4 rounded-xl text-center text-xs font-bold uppercase tracking-widest bg-green-100 text-green-700 block animate-fade-in-up";
                     setTimeout(() => window.location.href = 'admin.html', 1000);
                 } else {
-                    alertBox.innerText = "Username atau password salah!";
+                    alertBox.innerText = json.message || "Username atau password salah!";
                     alertBox.className = "mt-4 p-4 rounded-xl text-center text-xs font-bold uppercase tracking-widest bg-red-100 text-red-700 block animate-fade-in-up";
                     btn.innerHTML = '<i class="fas fa-sign-in-alt"></i> MASUK';
                     btn.disabled = false;

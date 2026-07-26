@@ -83,11 +83,27 @@ async function seedBookings() {
     });
 }
 
+async function seedAdmins() {
+    const adminCount = await prisma.admin.count();
+    if (adminCount === 0) {
+        await prisma.admin.create({
+            data: {
+                username: 'admin',
+                password: 'rahasia123'
+            }
+        });
+        console.log('Seeded default Admin successfully');
+    } else {
+        console.log('Admins already exist, skipping admin seed.');
+    }
+}
+
 async function main() {
     try {
         console.log('Starting seed...');
         await seedArmada();
         await seedBookings();
+        await seedAdmins();
         console.log('Seed completed successfully');
     } catch (e) {
         console.error('Error during seed:', e);
