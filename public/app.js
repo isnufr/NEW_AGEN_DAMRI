@@ -70,7 +70,7 @@ async function initData() {
                     return null;
                 };
                 return {
-                    id: ("ARM" + Math.random().toString(36).substr(2, 5)),
+                    id: String(find(["id_armada", "idArmada", "ID Armada", "ID"]) || ("ARM" + Math.random().toString(36).substr(2, 5))).trim(),
                     name: String(find(["Armada", "nama_armada", "Nama Armada", "ARMADA"]) || "Unknown").trim(),
                     destination: String(find(["Tujuan", "tujuan_armada", "Tujuan Armada", "TUJUAN"]) || "Unknown").trim(),
                     time: String(find(["Jam", "jam", "JAM", "Waktu"]) || "00:00").trim(),

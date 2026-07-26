@@ -918,6 +918,21 @@
             </div>
         </div>
     </div>
+
+    <!-- Delete Armada Modal -->
+    <div id="deleteArmadaModal" class="fixed inset-0 bg-gray-900/40 backdrop-blur-sm z-[160] hidden items-center justify-center p-4">
+        <div class="bg-white rounded-3xl shadow-2xl p-6 md:p-8 w-full max-w-sm text-center transform scale-95 opacity-0 transition-all duration-300" id="deleteArmadaModalInner">
+            <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <i class="fas fa-trash-alt text-red-600 text-3xl"></i>
+            </div>
+            <h3 class="text-xl font-black text-gray-800 mb-2">Hapus Armada</h3>
+            <p class="text-sm text-gray-500 font-bold mb-6">Yakin ingin menghapus armada <br><span id="deleteArmadaId" class="text-red-600 text-lg"></span>?</p>
+            <div class="flex gap-3">
+                <button onclick="closeDeleteArmadaModal()" class="flex-1 py-3 bg-gray-100 hover:bg-gray-200 text-gray-600 font-black text-sm rounded-xl transition-all">BATAL</button>
+                <button onclick="executeDeleteArmada()" class="flex-1 py-3 bg-red-600 hover:bg-red-700 text-white font-black text-sm rounded-xl shadow-lg shadow-red-200 transition-all" id="btnExecuteDeleteArmada">HAPUS</button>
+            </div>
+        </div>
+    </div>
     <!-- Notification Modal -->
     <div id="notifModal" class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm z-[150] hidden items-center justify-center p-4">
         <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[85vh] flex flex-col transform scale-95 opacity-0 transition-all duration-300" id="notifModalInner">
@@ -1379,8 +1394,17 @@
         if (!tbody) return;
 
         const allBookings = getBookings();
-        // filter today and future
-        const manifestBookings = allBookings.filter(b => isTodayOrFuture(b.dateTravel));
+        // filter today and future AND confirmed (ACC/LUNAS)
+        const manifestBookings = allBookings.filter(b => {
+            const isConfirmed = b.status === "paid" || 
+                                b.pembayaran === "LUNAS" || 
+                                b.pembayaran === "ACC" || 
+                                String(b.pembayaran).toUpperCase() === "ACC" ||
+                                String(b.status).toUpperCase() === "ACC" ||
+                                String(b.status).toUpperCase() === "LUNAS" ||
+                                String(b.status).toUpperCase() === "PAID";
+            return isTodayOrFuture(b.dateTravel) && isConfirmed;
+        });
 
         if (manifestBookings.length === 0) {
             tbody.innerHTML = '<tr><td class="text-center text-sm text-slate-400 font-bold py-8 italic uppercase tracking-widest">Tidak ada jadwal keberangkatan</td></tr>';
@@ -1755,7 +1779,7 @@
             '<td><span class="font-bold text-sm text-slate-800 uppercase">' + a.destination + '</span></td>' +
             '<td class="text-right"><p class="font-black text-sm text-slate-800">' + formatRupiah(a.price) + '</p><p class="text-[11px] text-blue-500 font-bold mt-1"><i class="far fa-clock mr-1"></i>' + a.time + '</p></td>' +
             '<td class="text-center"><div class="flex gap-1 justify-center"><button onclick="openEditArmadaModal(\'' + a.id + '\')" class="bg-amber-500 hover:bg-amber-600 text-white w-7 h-7 flex items-center justify-center rounded-lg text-xs shadow-sm transition-all mx-auto" title="Edit Armada"><i class="fas fa-edit"></i></button>' +
-            '<button onclick="hapusArmada(\'' + a.id + '\')" class="bg-red-500 hover:bg-red-600 text-white w-7 h-7 flex items-center justify-center rounded-lg text-xs shadow-sm transition-all mx-auto" title="Hapus Armada"><i class="fas fa-trash"></i></button></div></td>' +
+            '<button onclick="openDeleteArmadaModal(\'' + a.id + '\')" class="bg-red-500 hover:bg-red-600 text-white w-7 h-7 flex items-center justify-center rounded-lg text-xs shadow-sm transition-all mx-auto" title="Hapus Armada"><i class="fas fa-trash"></i></button></div></td>' +
             '</tr>'
         ).join('') : '<tr><td colspan="5" class="text-center text-sm text-slate-400 font-bold py-8 italic uppercase tracking-widest">Belum ada data armada</td></tr>';
     }
@@ -1764,19 +1788,52 @@
     // LAPORAN & EXPORT
     // ========================================
     
-    async function hapusArmada(id) {
-        if (!confirm('Yakin ingin menghapus armada ' + id + '?')) return;
+    let activeDeleteArmadaId = null;
+
+    function openDeleteArmadaModal(id) {
+        activeDeleteArmadaId = id;
+        document.getElementById('deleteArmadaId').textContent = id;
+        const modal = document.getElementById('deleteArmadaModal');
+        const inner = document.getElementById('deleteArmadaModalInner');
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+        setTimeout(() => {
+            inner.classList.remove('scale-95', 'opacity-0');
+            inner.classList.add('scale-100', 'opacity-100');
+        }, 10);
+    }
+
+    function closeDeleteArmadaModal() {
+        const modal = document.getElementById('deleteArmadaModal');
+        const inner = document.getElementById('deleteArmadaModalInner');
+        inner.classList.remove('scale-100', 'opacity-100');
+        inner.classList.add('scale-95', 'opacity-0');
+        setTimeout(() => {
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+            activeDeleteArmadaId = null;
+        }, 300);
+    }
+
+    async function executeDeleteArmada() {
+        if (!activeDeleteArmadaId) return;
+        const btn = document.getElementById('btnExecuteDeleteArmada');
+        btn.innerText = 'PROSES...'; btn.disabled = true;
+
         try {
-            const res = await postToSheets('deleteArmada', { id_armada: id });
+            const res = await postToSheets('deleteArmada', { id_armada: activeDeleteArmadaId });
             if (res.status === 'success') {
                 showMessage('Armada berhasil dihapus');
                 refreshData();
+                closeDeleteArmadaModal();
             } else {
                 showMessage('Gagal menghapus armada', true);
             }
         } catch(e) {
             showMessage('Kesalahan jaringan', true);
         }
+        
+        btn.innerText = 'HAPUS'; btn.disabled = false;
     }
     function renderLaporan() {
         // Form states can go here if needed.
