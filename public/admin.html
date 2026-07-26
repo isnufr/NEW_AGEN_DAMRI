@@ -1619,15 +1619,16 @@
                 const tujuan = armada ? armada.destination : (b.tujuan || b['Tujuan'] || '-');
                 const waktu = b.waktu || b['WAKTU'] || '-';
                 
-                const key = waktu + '___' + armadaName + '___' + tujuan;
+                const key = waktu + '___' + armadaName;
                 if(!innerGroups[key]) {
                     innerGroups[key] = {
                         waktu: waktu,
                         armadaName: armadaName,
-                        tujuan: tujuan,
+                        tujuans: new Set(),
                         bookings: []
                     };
                 }
+                innerGroups[key].tujuans.add(tujuan);
                 innerGroups[key].bookings.push(b);
             });
 
@@ -1637,6 +1638,7 @@
             sortedInnerKeys.forEach(key => {
                 const ig = innerGroups[key];
                 const innerTotalPnp = ig.bookings.reduce((sum, b) => sum + (parseInt(b.qty || b['JUMLAH PNP']) || 1), 0);
+                const combinedTujuan = Array.from(ig.tujuans).join(', ');
                 
                 html += `
                             <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
@@ -1646,7 +1648,7 @@
                                         <div class="bg-blue-600 text-white font-black text-sm px-3 py-1 rounded-lg">${ig.waktu}</div>
                                         <div>
                                             <p class="font-black text-xs text-blue-900 uppercase">${ig.armadaName}</p>
-                                            <p class="text-[10px] font-bold text-blue-600 uppercase tracking-widest">${ig.tujuan}</p>
+                                            <p class="text-[10px] font-bold text-blue-600 uppercase tracking-widest">${combinedTujuan}</p>
                                         </div>
                                     </div>
                                     <div class="text-right">
@@ -2052,7 +2054,25 @@
 
         // Get bookings for the selected date
         const allBookings = getBookings();
-        const dateBookings = allBookings.filter(b => b.dateTravel === selectedDate && (b.status === 'paid' || String(b.status).toUpperCase() === 'LUNAS' || String(b.status).toUpperCase() === 'ACC'));
+        const dateBookings = allBookings.filter(b => {
+            const isConfirmed = b.status === "paid" || 
+                                b.pembayaran === "LUNAS" || 
+                                b.pembayaran === "ACC" || 
+                                String(b.pembayaran).toUpperCase() === "ACC" ||
+                                String(b.status).toUpperCase() === "ACC" ||
+                                String(b.status).toUpperCase() === "LUNAS" ||
+                                String(b.status).toUpperCase() === "PAID";
+            
+            let bDateKey = '';
+            const bd = parseIndoDate(b.dateTravel);
+            if(bd) bDateKey = toDateKey(bd);
+            
+            let selDateKey = '';
+            const sd = parseIndoDate(selectedDate);
+            if(sd) selDateKey = toDateKey(sd);
+
+            return bDateKey === selDateKey && isConfirmed;
+        });
 
         if (dateBookings.length === 0) {
             armadaContainer.innerHTML = '<p class="text-[10px] text-slate-400 font-bold p-2 text-center uppercase tracking-widest">Tidak ada data (Lunas/ACC) di tanggal ini</p>';
@@ -2135,7 +2155,25 @@
         }
 
         const allBookings = getBookings();
-        let filteredBookings = allBookings.filter(b => b.dateTravel === selectedDate && (b.status === 'paid' || String(b.status).toUpperCase() === 'LUNAS' || String(b.status).toUpperCase() === 'ACC'));
+        let filteredBookings = allBookings.filter(b => {
+            const isConfirmed = b.status === "paid" || 
+                                b.pembayaran === "LUNAS" || 
+                                b.pembayaran === "ACC" || 
+                                String(b.pembayaran).toUpperCase() === "ACC" ||
+                                String(b.status).toUpperCase() === "ACC" ||
+                                String(b.status).toUpperCase() === "LUNAS" ||
+                                String(b.status).toUpperCase() === "PAID";
+            
+            let bDateKey = '';
+            const bd = parseIndoDate(b.dateTravel);
+            if(bd) bDateKey = toDateKey(bd);
+            
+            let selDateKey = '';
+            const sd = parseIndoDate(selectedDate);
+            if(sd) selDateKey = toDateKey(sd);
+
+            return bDateKey === selDateKey && isConfirmed;
+        });
 
         if (selectedArmadas.length > 0) {
             filteredBookings = filteredBookings.filter(b => {
