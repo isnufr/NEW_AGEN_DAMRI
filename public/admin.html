@@ -938,63 +938,57 @@
 
     <!-- E-Ticket Modal -->
     <div id="ticketModal" class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm z-[150] hidden items-center justify-center p-4">
-        <div class="bg-white rounded-[2rem] shadow-2xl w-full max-w-md transform scale-95 opacity-0 transition-all duration-300 overflow-hidden flex flex-col" id="ticketModalInner">
-            <!-- Ticket Header -->
-            <div class="bg-gradient-to-br from-blue-700 via-blue-600 to-indigo-800 p-8 text-center relative overflow-hidden">
-                <div class="absolute -right-6 -top-6 w-32 h-32 bg-white/10 rounded-full blur-2xl"></div>
-                <div class="absolute -left-6 -bottom-6 w-32 h-32 bg-white/10 rounded-full blur-2xl"></div>
-                
-                <h3 class="text-[10px] font-black text-blue-200 uppercase tracking-[0.4em] mb-2 opacity-80">E-Ticket Keberangkatan</h3>
-                <h2 class="text-3xl font-black text-white tracking-tight drop-shadow-md" id="ticketId">ID_TIKET</h2>
-                <p class="text-[10px] font-black uppercase tracking-widest mt-2" id="ticketStatus">STATUS</p>
-            </div>
-
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-sm transform scale-95 opacity-0 transition-all duration-300 flex flex-col font-mono text-sm text-gray-800 border-2 border-gray-200" id="ticketModalInner">
+            
             <!-- Ticket Body -->
-            <div class="p-8 relative bg-white">
-                <!-- Perforated Line Effect -->
-                <div class="absolute top-0 left-0 w-full h-0 border-t-2 border-dashed border-gray-300 -mt-1"></div>
-                <div class="absolute -left-4 -top-4 w-8 h-8 bg-gray-900/60 rounded-full"></div>
-                <div class="absolute -right-4 -top-4 w-8 h-8 bg-gray-900/60 rounded-full"></div>
+            <div class="p-6">
+                <!-- Header -->
+                <div class="text-center border-b-2 border-dashed border-gray-300 pb-4 mb-4">
+                    <h2 class="text-lg font-bold">AGEN DAMRI KAWUNGANTEN</h2>
+                    <p class="text-xs">Pusat Penjualan Tiket</p>
+                    <p class="text-[10px] mt-1" id="ticketTglBeli">TGL BELI: -</p>
+                </div>
                 
-                <div class="space-y-6">
-                    <div class="flex justify-between items-start">
-                        <div>
-                            <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Penumpang</p>
-                            <p class="text-lg font-black text-gray-800 uppercase leading-none" id="ticketName">-</p>
-                            <p class="text-xs font-bold text-gray-500 mt-1" id="ticketHp">-</p>
-                        </div>
-                        <div class="text-right">
-                            <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Kursi</p>
-                            <p class="text-2xl font-black text-blue-600 leading-none" id="ticketKursi">-</p>
-                            <p class="text-[10px] font-bold text-gray-400 uppercase mt-1"><span id="ticketQty"></span> Orang</p>
-                        </div>
-                    </div>
-
-                    <div class="bg-slate-50 rounded-2xl p-5 flex flex-col gap-3 border border-slate-100">
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Waktu</p>
-                                <p class="text-sm font-black text-gray-800" id="ticketDate">-</p>
-                                <p class="text-xs font-black text-blue-600 mt-1" id="ticketTime">-</p>
-                            </div>
-                            <div class="text-right">
-                                <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Armada</p>
-                                <p class="text-sm font-black text-gray-800 uppercase" id="ticketArmada">-</p>
-                                <p class="text-[10px] font-bold text-slate-500 uppercase mt-1" id="ticketTujuan">-</p>
-                            </div>
-                        </div>
-                        <div class="border-t border-slate-200 pt-3 text-center">
-                            <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Keterangan</p>
-                            <p class="text-xs font-bold text-gray-800 italic" id="ticketKeterangan">-</p>
-                        </div>
-                    </div>
+                <!-- Armada -->
+                <div class="text-center mb-4">
+                    <h1 class="text-xl font-black bg-black text-white py-1.5 px-4 inline-block uppercase tracking-widest" id="ticketArmada">-</h1>
                 </div>
 
+                <!-- ID -->
+                <div class="flex justify-between items-center border-b-2 border-dashed border-gray-300 pb-4 mb-4">
+                    <span class="font-bold">Kode Boking</span>
+                    <span class="bg-black text-white px-2 py-0.5 font-bold" id="ticketId">-</span>
+                </div>
+                
+                <!-- Details -->
+                <div class="space-y-2 border-b-2 border-dashed border-gray-300 pb-4 mb-4 text-xs">
+                    <div class="flex justify-between"><span class="text-gray-500">Tanggal</span><strong id="ticketDate">-</strong></div>
+                    <div class="flex justify-between"><span class="text-gray-500">Jam</span><strong id="ticketTime">-</strong></div>
+                    <div class="flex justify-between"><span class="text-gray-500">Asal</span><strong>Kawunganten</strong></div>
+                    <div class="flex justify-between"><span class="text-gray-500">Tujuan</span><strong id="ticketTujuan">-</strong></div>
+                    <div class="flex justify-between"><span class="text-gray-500">Nama</span><strong id="ticketName">-</strong></div>
+                    <div class="flex justify-between"><span class="text-gray-500">Jumlah Pnp</span><strong><span id="ticketQty"></span> Orang</strong></div>
+                    <div class="flex justify-between"><span class="text-gray-500">Kursi</span><strong id="ticketKursi">-</strong></div>
+                </div>
+                
+                <!-- Price -->
+                <div class="space-y-2 border-b-2 border-dashed border-gray-300 pb-4 mb-4">
+                    <div class="flex justify-between text-xs"><span class="text-gray-500">Harga/Tiket</span><strong id="ticketHargaSatuan">-</strong></div>
+                    <div class="flex justify-between text-base mt-2 items-center"><span class="font-bold">TOTAL</span><strong class="bg-black text-white px-2 py-1 text-sm" id="ticketTotal">-</strong></div>
+                </div>
+                
+                <!-- Footer -->
+                <div class="text-center text-[10px] space-y-1 text-gray-500">
+                    <p>Hadir 30 mnt sblm berangkat</p>
+                    <p>Terima Kasih</p>
+                    <p>Info: 082133607759</p>
+                </div>
+                
                 <!-- Print & Close Action -->
-                <div class="mt-8 flex gap-3">
-                    <button onclick="closeETicket()" class="flex-1 py-3.5 bg-gray-100 hover:bg-gray-200 text-gray-600 font-black text-[11px] uppercase tracking-widest rounded-xl transition-all">Tutup</button>
-                    <button onclick="printETicket()" class="flex-1 py-3.5 bg-blue-600 hover:bg-blue-700 text-white font-black text-[11px] uppercase tracking-widest rounded-xl shadow-lg shadow-blue-200 transition-all flex items-center justify-center gap-2">
-                        <i class="fas fa-print"></i> Cetak Tiket
+                <div class="mt-6 flex gap-3 no-print">
+                    <button onclick="closeETicket()" class="flex-1 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-600 font-bold text-xs uppercase tracking-widest rounded transition-all">Tutup</button>
+                    <button onclick="printETicket()" class="flex-1 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs uppercase tracking-widest rounded shadow-lg shadow-blue-200 transition-all flex items-center justify-center gap-2">
+                        <i class="fas fa-print"></i> Cetak
                     </button>
                 </div>
             </div>
@@ -1878,22 +1872,21 @@
         if (dObj) formattedDate = INDO_DAYS[dObj.getDay()] + ', ' + dObj.getDate() + ' ' + INDO_MONTHS[dObj.getMonth()] + ' ' + dObj.getFullYear();
 
         const now = new Date();
-        document.getElementById('ticketDate').innerText = formattedDate;
-        document.getElementById('ticketTime').innerText = b.waktu || '-';
-        document.getElementById('ticketArmada').innerText = armadaName;
-        document.getElementById('ticketTujuan').innerText = tujuan;
-        if(document.getElementById('ticketKeterangan')) {
-            document.getElementById('ticketKeterangan').innerText = b.keterangan || '-';
-        }
-        if(document.getElementById('ticketKursi')) {
-            document.getElementById('ticketKursi').innerText = b.kursi || '-';
-        }
-        if(document.getElementById('ticketQty')) {
-            document.getElementById('ticketQty').innerText = qty;
-        }
-
         const tglBeliObj = new Date(b.createdAt || new Date());
         const tglBeli = String(tglBeliObj.getDate()).padStart(2, '0') + '/' + String(tglBeliObj.getMonth() + 1).padStart(2, '0') + '/' + tglBeliObj.getFullYear() + ' ' + String(tglBeliObj.getHours()).padStart(2, '0') + ':' + String(tglBeliObj.getMinutes()).padStart(2, '0');
+
+        if(document.getElementById('ticketDate')) document.getElementById('ticketDate').innerText = formattedDate;
+        if(document.getElementById('ticketTime')) document.getElementById('ticketTime').innerText = b.waktu || '-';
+        if(document.getElementById('ticketArmada')) document.getElementById('ticketArmada').innerText = armadaName;
+        if(document.getElementById('ticketTujuan')) document.getElementById('ticketTujuan').innerText = tujuan;
+        if(document.getElementById('ticketKursi')) document.getElementById('ticketKursi').innerText = b.kursi || '-';
+        if(document.getElementById('ticketQty')) document.getElementById('ticketQty').innerText = qty;
+        
+        if(document.getElementById('ticketId')) document.getElementById('ticketId').innerText = b.bookingId;
+        if(document.getElementById('ticketName')) document.getElementById('ticketName').innerText = b.name;
+        if(document.getElementById('ticketTglBeli')) document.getElementById('ticketTglBeli').innerText = "TGL BELI: " + tglBeli;
+        if(document.getElementById('ticketHargaSatuan')) document.getElementById('ticketHargaSatuan').innerText = formatRupiah(harga);
+        if(document.getElementById('ticketTotal')) document.getElementById('ticketTotal').innerText = formatRupiah(total);
 
         currentTicketDataForBT = {
             idTiket: b.bookingId,
@@ -2711,8 +2704,14 @@
     }
 
     function openEticketModal() {
-        document.getElementById('eticketModal').classList.remove('hidden');
-        document.getElementById('eticketModal').classList.add('flex');
+        const modal = document.getElementById('ticketModal');
+        const inner = document.getElementById('ticketModalInner');
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+        setTimeout(() => {
+            inner.classList.remove('scale-95', 'opacity-0');
+            inner.classList.add('scale-100', 'opacity-100');
+        }, 10);
     }
     function printRawBT() {
         if(typeof currentTicketDataForBT === 'undefined' || !currentTicketDataForBT) {
@@ -2756,126 +2755,15 @@
         add(CMD.BOLD_ON);
         addLine("AGEN DAMRI KAWUNGANTEN");
         add(CMD.BOLD_OFF);
-        addLine("--------------------------------");
+        addLine("Pusat Penjualan Tiket");
+        addLine("TGL BELI: " + t.tglBeli);
+        addLine("================================");
         
         add(CMD.BOLD_ON);
+        add(CMD.INVERSE_ON);
         add(CMD.TEXT_DOUBLE_HW);
-        addLine(String(t.armada).toUpperCase());
-        add(CMD.TEXT_NORMAL);
-        add(CMD.BOLD_OFF);
-        addLine("--------------------------------");
-        
-        addStr("Kode Boking : ");
-        add(CMD.INVERSE_ON);
-        addStr(" " + t.idTiket + " ");
-        add(CMD.INVERSE_OFF);
-        add(CMD.LF);
-        add(CMD.LF);
-        
-        add(CMD.ALIGN_LEFT);
-        addLine("Keberangkatan");
-        add(CMD.BOLD_ON);
-        addLine(t.tglBerangkat);
-        add(CMD.BOLD_OFF);
-        add(CMD.LF);
-        
-        addLine("Waktu");
-        add(CMD.BOLD_ON);
-        addLine(t.jam);
-        add(CMD.BOLD_OFF);
-        add(CMD.LF);
-        
-        addLine("Asal");
-        add(CMD.BOLD_ON);
-        addLine("Kawunganten");
-        add(CMD.BOLD_OFF);
-        add(CMD.LF);
-        
-        addLine("Tujuan");
-        add(CMD.BOLD_ON);
-        addLine(t.tujuan);
-        add(CMD.BOLD_OFF);
-        add(CMD.LF);
-        
-        addLine("Nama");
-        add(CMD.BOLD_ON);
-        addLine(t.nama);
-        add(CMD.BOLD_OFF);
-        add(CMD.LF);
-        
-        addLine("Jumlah Pnp");
-        add(CMD.BOLD_ON);
-        addLine(t.jumlahPnp);
-        add(CMD.BOLD_OFF);
-        add(CMD.LF);
-        
-        addLine("Nomor Kursi");
-        add(CMD.BOLD_ON);
-        addLine(t.kursi || "-");
-        add(CMD.BOLD_OFF);
-        add(CMD.LF);
-        
-        // Harga and Total Harga side by side
-        let line1 = "Harga";
-        let right1 = "Total Harga";
-        let spaces1 = 32 - line1.length - right1.length;
-        if(spaces1 < 0) spaces1 = 0;
-        addLine(line1 + " ".repeat(spaces1) + right1);
-
-        let left2 = t.hargaSatuan;
-        let right2Text = " " + t.totalHarga + " ";
-        let spaces2 = 32 - left2.length - right2Text.length;
-        if(spaces2 < 0) spaces2 = 0;
-        
-        add(CMD.BOLD_ON);
-        addStr(left2);
-        addStr(" ".repeat(spaces2));
-        add(CMD.INVERSE_ON);
-        addStr(right2Text);
-        add(CMD.INVERSE_OFF);
-        add(CMD.BOLD_OFF);
-        add(CMD.LF);
-        add(CMD.LF);
-        
-        addLine("KWT - " + (t.tujuan || "").substring(0,3).toUpperCase());
-        add(CMD.LF);
-        
-        add(CMD.ALIGN_CENTER);
-        addLine("Dimohon untuk berkumpul di Agen");
-        addLine("setengah jam sebelum keberangkatan");
-        add(CMD.LF);
-        addLine("Terima Kasih");
-        add(CMD.LF);
-        addLine("Info Pemesanan : 082133607759");
-        addLine("Alamat : Jl.Raya Kawunganten");
-        addLine("(Depan Koramil Kawunganten)");
-        addLine("--------------------------------");
-        
-        add(CMD.BOLD_ON);
-        addLine("Arsip Agen");
-        addLine("AGEN DAMRI KAWUNGANTEN");
-        addLine(String(t.armada).toUpperCase());
-        add(CMD.BOLD_OFF);
-        add(CMD.LF);
-        
-        // 2 Columns Arsip
-        let qtyNum = (t.jumlahPnp || "").replace(/[^0-9]/g, '');
-        if(!qtyNum) qtyNum = "1";
-        
-        let rightLines = [
-            "Kawunganten",
-            t.tujuan,
-            t.nama,
-            t.tglBerangkat
-        ];
-        
-        let leftColWidth = 10;
-        function padRight(str, len) {
-            if(!str) str = "";
-            if(str.length >= len) return str.substring(0, len);
-            return str + " ".repeat(len - str.length);
-        }
-        function centerStr(str, len) {
+        let armada = String(t.armada).toUpperCase();
+        function centerInverseDouble(str, len) {
             if(!str) str = "";
             if(str.length >= len) return str.substring(0, len);
             let pad = len - str.length;
@@ -2883,15 +2771,62 @@
             let right = pad - left;
             return " ".repeat(left) + str + " ".repeat(right);
         }
-        
-        add(CMD.ALIGN_LEFT);
-        add(CMD.BOLD_ON);
-        addLine(padRight(centerStr(qtyNum, leftColWidth), leftColWidth) + (rightLines[0] || ""));
+        addLine(centerInverseDouble(armada, 16));
+        add(CMD.TEXT_NORMAL);
+        add(CMD.INVERSE_OFF);
         add(CMD.BOLD_OFF);
-        addLine(padRight(centerStr("ORANG", leftColWidth), leftColWidth) + (rightLines[1] || ""));
-        addLine(padRight("", leftColWidth) + (rightLines[2] || ""));
-        addLine(padRight("", leftColWidth) + (rightLines[3] || ""));
+        addLine("--------------------------------");
         
+        let line1 = "Kode Boking";
+        let right1Text = " " + t.idTiket + " ";
+        let spaces1 = 32 - line1.length - right1Text.length;
+        if(spaces1 < 0) spaces1 = 0;
+        add(CMD.ALIGN_LEFT);
+        addStr(line1);
+        addStr(" ".repeat(spaces1));
+        add(CMD.INVERSE_ON);
+        addStr(right1Text);
+        add(CMD.INVERSE_OFF);
+        add(CMD.LF);
+        addLine("--------------------------------");
+        
+        function addTwoColumnsLeftRight(leftStr, rightStr) {
+            if(!rightStr) rightStr = "";
+            let spaces = 32 - leftStr.length - rightStr.length;
+            if(spaces < 0) spaces = 0;
+            addLine(leftStr + " ".repeat(spaces) + rightStr);
+        }
+        
+        addTwoColumnsLeftRight("Tanggal", t.tglBerangkat);
+        addTwoColumnsLeftRight("Jam", t.jam);
+        addTwoColumnsLeftRight("Asal", "Kawunganten");
+        addTwoColumnsLeftRight("Tujuan", t.tujuan);
+        addTwoColumnsLeftRight("Nama", t.nama);
+        addTwoColumnsLeftRight("Jumlah Pnp", t.jumlahPnp);
+        addTwoColumnsLeftRight("Kursi", t.kursi || "-");
+        
+        addLine("--------------------------------");
+        addTwoColumnsLeftRight("Harga/Tiket", t.hargaSatuan);
+        
+        let lineTot = "TOTAL";
+        let rightTot = " " + t.totalHarga + " ";
+        let spacesTot = 32 - lineTot.length - rightTot.length;
+        if(spacesTot < 0) spacesTot = 0;
+        add(CMD.BOLD_ON);
+        addStr(lineTot);
+        addStr(" ".repeat(spacesTot));
+        add(CMD.INVERSE_ON);
+        addStr(rightTot);
+        add(CMD.INVERSE_OFF);
+        add(CMD.BOLD_OFF);
+        add(CMD.LF);
+        
+        addLine("================================");
+        
+        add(CMD.ALIGN_CENTER);
+        addLine("Hadir 30 mnt sblm berangkat");
+        addLine("Terima Kasih");
+        addLine("Info: 082133607759");
         add(CMD.LF);
         add(CMD.LF);
         add(CMD.LF); 
