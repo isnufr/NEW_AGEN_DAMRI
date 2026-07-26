@@ -1405,24 +1405,37 @@
     }
 
     function renderCharts(data) {
-        // Group data by date
+        // Group data by date for 16-day window (8 before, today, 7 after)
         const byDate = {};
-        data.forEach(l => {
+        const today = new Date();
+        today.setHours(0,0,0,0);
+        
+        const dates16 = [];
+        for(let i = -8; i <= 7; i++) {
+            const d = new Date(today);
+            d.setDate(today.getDate() + i);
+            dates16.push(toDateKey(d));
+        }
+        
+        dates16.forEach(k => { byDate[k] = { omset: 0, pnp: 0 }; });
+
+        const allLaporan = getLaporan();
+        allLaporan.forEach(l => {
             const d = parseIndoDate(l.tanggal);
             if (!d) return;
             const key = toDateKey(d);
-            if (!byDate[key]) byDate[key] = { omset: 0, pnp: 0 };
-            byDate[key].omset += l.totalHarga;
-            byDate[key].pnp += l.jumlahPnp;
+            if (byDate[key] !== undefined) {
+                byDate[key].omset += l.totalHarga;
+                byDate[key].pnp += (parseInt(l.jumlahPnp) || 1);
+            }
         });
 
-        const sortedDates = Object.keys(byDate).sort();
-        const labels = sortedDates.map(k => {
+        const labels = dates16.map(k => {
             const d = new Date(k + 'T00:00:00');
             return d.getDate() + '/' + (d.getMonth()+1);
         });
-        const omsetValues = sortedDates.map(k => byDate[k].omset);
-        const pnpValues = sortedDates.map(k => byDate[k].pnp);
+        const omsetValues = dates16.map(k => byDate[k].omset);
+        const pnpValues = dates16.map(k => byDate[k].pnp);
 
         // Bar Chart: Omset
         if (chartOmsetInstance) chartOmsetInstance.destroy();
@@ -1680,11 +1693,13 @@
                     
                     html += `
                                             <tr class="hover:bg-slate-50 transition-colors border-b border-slate-50 last:border-0">
-                                                <td class="py-3 px-3 font-black text-[10px] text-blue-600">${b.bookingId || b.id || '-'}</td>
+                                                <td class="py-3 px-3 font-black text-[10px] text-blue-600">
+                                                    <div>${b.bookingId || b.id || '-'}</div>
+                                                    ${b.keterangan ? `<div class="text-[9px] text-orange-500 font-bold mt-0.5">${b.keterangan}</div>` : ''}
+                                                </td>
                                                 <td class="py-3 px-3">
                                                     <p class="font-bold text-xs text-slate-800 uppercase">${b.name || b['NAMA'] || '-'}</p>
                                                     <p class="text-[10px] font-bold text-slate-400">${b.hp || b['NOMOR HP'] || '-'}</p>
-                                                    ${b.keterangan ? `<p class="text-[9px] text-orange-500 font-bold mt-0.5">${b.keterangan}</p>` : ''}
                                                 </td>
                                                 <td class="py-3 px-3 text-center font-black text-xs text-slate-700">${b.qty || b['JUMLAH PNP'] || 1}</td>
                                                 <td class="py-3 px-3 text-center font-bold text-xs text-slate-600">${b.kursi || '-'}</td>
@@ -3757,10 +3772,10 @@
 <!-- Modal Edit Booking -->
 <div id="modalEditBooking" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden items-center justify-center z-50 p-4 opacity-0 transition-opacity duration-300">
     <div class="bg-white rounded-3xl p-6 w-full max-w-lg shadow-2xl transform scale-95 transition-transform duration-300 relative max-h-[90dvh] overflow-y-auto overflow-x-hidden" id="modalEditBookingContent">
-        <div class="absolute top-2 right-2 md:-top-4 md:-right-4 w-10 h-10 md:w-12 md:h-12 bg-amber-500 rounded-full flex items-center justify-center text-white text-lg md:text-xl shadow-lg cursor-pointer hover:bg-amber-600 transition-colors z-10" onclick="closeEditBookingModal()">
+        <div class="absolute top-4 right-4 w-10 h-10 bg-amber-500 rounded-full flex items-center justify-center text-white text-lg shadow-lg cursor-pointer hover:bg-amber-600 transition-colors z-10" onclick="closeEditBookingModal()">
             <i class="fas fa-times"></i>
         </div>
-        <div class="mb-4 flex items-center gap-3">
+        <div class="mb-4 flex items-center gap-3 mt-10 md:mt-2">
             <div class="w-10 h-10 bg-amber-100 text-amber-600 rounded-xl flex items-center justify-center text-lg">
                 <i class="fas fa-edit"></i>
             </div>
@@ -3770,7 +3785,7 @@
             </div>
         </div>
         
-        <form id="formEditBooking" onsubmit="submitEditBooking(event)" class="space-y-3">
+        <form id="formEditBooking" onsubmit="submitEditBooking(event)" class="space-y-3 pb-8">
             <input type="hidden" id="editBookingId">
             <div>
                 <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Nama</label>
@@ -3835,10 +3850,10 @@
 <!-- Modal Edit Armada -->
 <div id="modalEditArmada" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden items-center justify-center z-50 p-4 opacity-0 transition-opacity duration-300">
     <div class="bg-white rounded-3xl p-6 w-full max-w-md shadow-2xl transform scale-95 transition-transform duration-300 relative max-h-[90dvh] overflow-y-auto" id="modalEditArmadaContent">
-        <div class="absolute -top-4 -right-4 w-12 h-12 bg-amber-500 rounded-full flex items-center justify-center text-white text-xl shadow-lg cursor-pointer hover:bg-amber-600 transition-colors" onclick="closeEditArmadaModal()">
+        <div class="absolute top-4 right-4 w-10 h-10 bg-amber-500 rounded-full flex items-center justify-center text-white text-lg shadow-lg cursor-pointer hover:bg-amber-600 transition-colors z-10" onclick="closeEditArmadaModal()">
             <i class="fas fa-times"></i>
         </div>
-        <div class="mb-4 flex items-center gap-3">
+        <div class="mb-4 flex items-center gap-3 mt-10 md:mt-2">
             <div class="w-10 h-10 bg-amber-100 text-amber-600 rounded-xl flex items-center justify-center text-lg">
                 <i class="fas fa-bus"></i>
             </div>
@@ -3848,7 +3863,7 @@
             </div>
         </div>
         
-        <form id="formEditArmada" onsubmit="submitEditArmada(event)" class="space-y-3">
+        <form id="formEditArmada" onsubmit="submitEditArmada(event)" class="space-y-3 pb-8">
             <input type="hidden" id="editArmadaId">
             <div>
                 <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Nama Armada</label>
