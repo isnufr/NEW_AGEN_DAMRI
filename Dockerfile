@@ -1,7 +1,7 @@
 FROM node:20-alpine
 
-# Install SQLite dependencies and openssl for Prisma
-RUN apk add --no-cache sqlite sqlite-dev openssl
+# Install openssl for Prisma
+RUN apk add --no-cache openssl
 
 WORKDIR /app
 
@@ -20,11 +20,8 @@ RUN npx prisma generate
 # Remove local .env file so it doesn't override Docker ENV
 RUN rm -f .env
 
-# Set database URL to the persistent data folder
-ENV DATABASE_URL="file:///app/data/database.sqlite"
-
 # Expose port
 EXPOSE 3000
 
-# Start command: copy database if missing in volume, then start server
-CMD ["sh", "-c", "mkdir -p /app/data && [ ! -f /app/data/database.sqlite ] && cp prisma/database.sqlite /app/data/database.sqlite || true && npm start"]
+# Start command: push schema to database, seed default data, then start server
+CMD ["sh", "-c", "npx prisma db push --accept-data-loss && node src/seed.js && npm start"]
