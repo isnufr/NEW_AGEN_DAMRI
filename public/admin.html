@@ -1567,7 +1567,7 @@
 
             let formattedDate = g.dateTravel;
             if (isToday(g.dateTravel)) {
-                formattedDate = "PEMBERANGKATAN HARI INI";
+                formattedDate = "HARI INI";
             } else {
                 const dObj = parseIndoDate(g.dateTravel);
                 if (dObj) {
@@ -2260,7 +2260,7 @@
         });
 
         if (format === 'csv') {
-            let csv = 'ID Tiket,Jam,Armada,Tujuan,Nama Penumpang,No HP,Keterangan,Jml,Kursi,Status\\n';
+            let csv = 'ID Tiket,Jam,Armada,Tujuan,Nama Penumpang,No HP,Jml,Kursi,Status\\n';
             filteredBookings.forEach(b => {
                 const armadaName = b.armadaId !== 'UNKNOWN' && getArmada(b.armadaId) ? getArmada(b.armadaId).name : (b.kendaraan || b['JENIS KENDARAAN'] || '-');
                 const tujuan = b.armadaId !== 'UNKNOWN' && getArmada(b.armadaId) ? getArmada(b.armadaId).destination : (b.tujuan || b['Tujuan'] || '-');
@@ -2271,9 +2271,8 @@
                 const jml = b.qty || b['JUMLAH PNP'] || 1;
                 const kursi = b.kursi || '-';
                 const status = b.status || '-';
-                const ket = b.keterangan || '';
                 
-                csv += `"${id}","${waktu}","${armadaName}","${tujuan}","${nama}","${hp}","${ket}","${jml}","${kursi}","${status}"\\n`;
+                csv += `"${id}","${waktu}","${armadaName}","${tujuan}","${nama}","${hp}","${jml}","${kursi}","${status}"\\n`;
             });
 
             const blob = new Blob([csv], { type: 'text/csv' });
@@ -2319,7 +2318,6 @@
                 const hp = b.hp || b['NOMOR HP'] || '-';
                 const jml = b.qty || b['JUMLAH PNP'] || 1;
                 const kursi = b.kursi || '-';
-                const ket = b.keterangan || '';
                 
                 return [
                     i + 1,
@@ -2329,14 +2327,13 @@
                     nama,
                     hp,
                     jml,
-                    kursi,
-                    ket
+                    kursi
                 ];
             });
 
             doc.autoTable({
                 startY: 42,
-                head: [['No', 'Jam', 'Armada', 'Tujuan', 'Nama Penumpang', 'No HP', 'Jml', 'Kursi', 'Keterangan']],
+                head: [['No', 'Jam', 'Armada', 'Tujuan', 'Nama Penumpang', 'No HP', 'Jml', 'Kursi']],
                 body: tableData,
                 theme: 'grid',
                 headStyles: { fillColor: [37, 99, 235], textColor: 255, fontStyle: 'bold' },
@@ -2344,13 +2341,12 @@
                 columnStyles: {
                     0: { cellWidth: 10, halign: 'center' },
                     1: { cellWidth: 15, halign: 'center' },
-                    2: { cellWidth: 35 },
-                    3: { cellWidth: 35 },
-                    4: { cellWidth: 45 },
-                    5: { cellWidth: 30 },
+                    2: { cellWidth: 40 },
+                    3: { cellWidth: 40 },
+                    4: { cellWidth: 55 },
+                    5: { cellWidth: 40 },
                     6: { cellWidth: 12, halign: 'center' },
-                    7: { cellWidth: 30, halign: 'center' },
-                    8: { cellWidth: 'auto' }
+                    7: { cellWidth: 'auto', halign: 'center' }
                 }
             });
             
