@@ -2942,9 +2942,7 @@
         add(CMD.BOLD_OFF);
         addLine("Pusat Penjualan Tiket");
         addLine("TGL BELI: " + t.tglBeli);
-        add(CMD.LF);
         addLine("================================");
-        add(CMD.LF);
         
         add(CMD.BOLD_ON);
         add(CMD.INVERSE_ON);
@@ -2962,9 +2960,7 @@
         add(CMD.TEXT_NORMAL);
         add(CMD.INVERSE_OFF);
         add(CMD.BOLD_OFF);
-        add(CMD.LF);
         addLine("--------------------------------");
-        add(CMD.LF);
         
         let line1 = "Kode Boking";
         let right1Text = t.idTiket;
@@ -2977,16 +2973,13 @@
         addStr(right1Text);
         add(CMD.BOLD_OFF);
         add(CMD.LF);
-        add(CMD.LF);
         addLine("--------------------------------");
-        add(CMD.LF);
         
         function addTwoColumnsLeftRight(leftStr, rightStr) {
             if(!rightStr) rightStr = "";
             let spaces = 32 - leftStr.length - rightStr.length;
             if(spaces < 0) spaces = 0;
             addLine(leftStr + " ".repeat(spaces) + rightStr);
-            add(CMD.LF);
         }
         
         addTwoColumnsLeftRight("Tanggal", t.tglBerangkat);
@@ -2998,7 +2991,6 @@
         addTwoColumnsLeftRight("Kursi", t.kursi || "-");
         
         addLine("--------------------------------");
-        add(CMD.LF);
         addTwoColumnsLeftRight("Harga/Tiket", t.hargaSatuan);
         
         let lineTot = "TOTAL";
@@ -3014,9 +3006,7 @@
         add(CMD.BOLD_OFF);
         add(CMD.LF);
         
-        add(CMD.LF);
         addLine("================================");
-        add(CMD.LF);
         
         add(CMD.ALIGN_CENTER);
         addLine("HADIR 30 MENIT SEBELUM");
@@ -3028,9 +3018,7 @@
         add(CMD.LF);
         addLine("Terima Kasih");
         addLine("Info: 082133607759");
-        add(CMD.LF);
         addLine("--------------------------------");
-        add(CMD.LF);
         
         add(CMD.BOLD_ON);
         addLine("ARSIP AGEN");
@@ -3045,12 +3033,10 @@
         add(CMD.INVERSE_OFF);
         add(CMD.BOLD_OFF);
         add(CMD.LF);
-        add(CMD.LF);
         
         add(CMD.BOLD_ON);
         addLine(t.nama + " (" + t.jumlahPnp + " Org) - " + t.tujuan);
         add(CMD.BOLD_OFF);
-        add(CMD.LF);
         addLine(t.tglBerangkat);
         add(CMD.LF);
         add(CMD.LF);
