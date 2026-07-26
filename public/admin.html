@@ -2095,14 +2095,68 @@
         Array.from(armadas).sort().forEach(a => {
             armadaHtml += `
                 <label class="flex items-center gap-2 p-2 hover:bg-slate-50 rounded cursor-pointer transition-colors border border-transparent hover:border-slate-200">
-                    <input type="checkbox" name="customManifestArmada" value="${a}" class="w-4 h-4 text-blue-600 rounded border-slate-300 focus:ring-blue-500">
+                    <input type="checkbox" name="customManifestArmada" value="${a}" class="w-4 h-4 text-blue-600 rounded border-slate-300 focus:ring-blue-500" onchange="updateCustomManifestTimes()">
                     <span class="text-xs font-bold text-slate-700 uppercase">${a}</span>
                 </label>
             `;
         });
         armadaContainer.innerHTML = armadaHtml;
 
-        // Render Time Checkboxes
+        updateCustomManifestTimes();
+    }
+
+    window.populateCustomManifestFilters = populateCustomManifestFilters;
+
+    function updateCustomManifestTimes() {
+        const dateType = document.getElementById('customManifestDateType').value;
+        let selectedDate = '';
+        if (dateType === 'today') {
+            selectedDate = getTodayKey();
+        } else {
+            selectedDate = document.getElementById('customManifestDateVal').value;
+        }
+
+        if (!selectedDate) return;
+
+        const allBookings = getBookings();
+        const dateBookings = allBookings.filter(b => {
+            const isConfirmed = b.status === "paid" || 
+                                b.pembayaran === "LUNAS" || 
+                                b.pembayaran === "ACC" || 
+                                String(b.pembayaran).toUpperCase() === "ACC" ||
+                                String(b.status).toUpperCase() === "ACC" ||
+                                String(b.status).toUpperCase() === "LUNAS" ||
+                                String(b.status).toUpperCase() === "PAID";
+            let bDateKey = '';
+            const bd = parseIndoDate(b.dateTravel);
+            if(bd) bDateKey = toDateKey(bd);
+            
+            let selDateKey = '';
+            const sd = parseIndoDate(selectedDate);
+            if(sd) selDateKey = toDateKey(sd);
+
+            return bDateKey === selDateKey && isConfirmed;
+        });
+
+        const armadaCheckboxes = document.querySelectorAll('input[name="customManifestArmada"]:checked');
+        const selectedArmadas = Array.from(armadaCheckboxes).map(cb => cb.value);
+
+        const times = new Set();
+        dateBookings.forEach(b => {
+            const armadaName = b.armadaId !== 'UNKNOWN' && getArmada(b.armadaId) ? getArmada(b.armadaId).name : (b.kendaraan || b['JENIS KENDARAAN'] || 'UNKNOWN');
+            const waktu = b.waktu || b['WAKTU'] || 'UNKNOWN';
+            
+            if (selectedArmadas.length === 0 || selectedArmadas.includes(armadaName)) {
+                times.add(waktu);
+            }
+        });
+
+        const timeContainer = document.getElementById('customManifestTimeContainer');
+        if (times.size === 0) {
+             timeContainer.innerHTML = '<p class="text-[10px] text-slate-400 font-bold p-2 text-center uppercase tracking-widest">Tidak ada jam</p>';
+             return;
+        }
+
         let timeHtml = '';
         Array.from(times).sort().forEach(t => {
             timeHtml += `
@@ -2115,7 +2169,7 @@
         timeContainer.innerHTML = timeHtml;
     }
 
-    window.populateCustomManifestFilters = populateCustomManifestFilters;
+    window.updateCustomManifestTimes = updateCustomManifestTimes;
 
     function downloadCustomManifest(format) {
         const dateType = document.getElementById('customManifestDateType').value;
