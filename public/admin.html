@@ -238,10 +238,6 @@
                     <i class="fas fa-clipboard-list"></i>
                     <span>MANIFEST</span>
                 </div>
-                <div class="nav-item" data-menu="request" onclick="switchMenu('request')">
-                    <i class="fas fa-inbox"></i>
-                    <span>Request Pesanan</span>
-                </div>
                 <div class="nav-item" data-menu="pesanan" onclick="switchMenu('pesanan')">
                     <i class="fas fa-list-alt"></i>
                     <span>Daftar Pesanan</span>
@@ -284,12 +280,26 @@
                     <h1 class="text-sm font-black text-blue-900 uppercase tracking-tight leading-none">Admin Panel</h1>
                     <p class="text-[8px] font-bold text-gray-400 uppercase tracking-widest">Agen Damri</p>
                 </div>
-                <button onclick="refreshData()" class="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center text-blue-600 hover:bg-blue-100 transition-colors">
-                    <i class="fas fa-sync-alt text-sm"></i>
+                <div class="flex items-center gap-2">
+                    <button onclick="openNotifModal()" class="relative w-10 h-10 rounded-xl bg-white flex items-center justify-center text-slate-600 hover:text-blue-600 border border-slate-100 transition-colors">
+                        <i class="fas fa-bell text-sm"></i>
+                        <span id="notifBadgeMobile" class="absolute -top-1 -right-1 bg-red-500 text-white text-[9px] font-black w-4 h-4 flex items-center justify-center rounded-full border border-white hidden">0</span>
+                    </button>
+                    <button onclick="refreshData()" class="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center text-blue-600 hover:bg-blue-100 transition-colors">
+                        <i class="fas fa-sync-alt text-sm"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Desktop Notification Bell -->
+            <div class="hidden lg:block fixed top-6 right-8 z-[60]">
+                <button onclick="openNotifModal()" class="relative bg-white w-12 h-12 rounded-2xl shadow-xl flex items-center justify-center text-slate-600 hover:text-blue-600 transition-all border border-slate-100 hover:scale-105">
+                    <i class="fas fa-bell text-xl"></i>
+                    <span id="notifBadgeDesktop" class="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-black w-5 h-5 flex items-center justify-center rounded-full border-2 border-white hidden">0</span>
                 </button>
             </div>
 
-            <main class="flex-1 p-4 lg:p-8 overflow-y-auto">
+            <main class="flex-1 p-4 lg:p-8 overflow-y-auto relative">
 
                 <!-- ======================= -->
                 <!-- MENU 1: DASHBOARD       -->
@@ -434,33 +444,6 @@
                     </div>
                 </section>
 
-                <!-- ======================= -->
-                <!-- MENU 2: REQUEST PESANAN -->
-                <!-- ======================= -->
-                <section id="sec-request" class="content-section">
-                    <div class="mb-6">
-                        <h2 class="text-2xl font-black text-slate-800 tracking-tight">Request Pesanan</h2>
-                        <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mt-1">Pesanan yang belum di-ACC</p>
-                    </div>
-                    <div class="chart-card overflow-hidden">
-                        <div class="overflow-x-auto">
-                            <table class="data-table">
-                                <thead>
-                                    <tr>
-                                        <th>ID / Tanggal</th>
-                                        <th>Penumpang</th>
-                                        <th>Armada / Tujuan</th>
-                                        <th class="text-right">Total / Status</th>
-                                        <th class="text-center">Aksi</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="requestTableBody">
-                                    <tr><td colspan="5" class="text-center text-sm text-slate-400 font-bold py-8 italic uppercase tracking-widest">Memuat data...</td></tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </section>
 
                 <!-- ======================= -->
                 <!-- MENU 3: DAFTAR PESANAN  -->
@@ -935,6 +918,23 @@
             </div>
         </div>
     </div>
+    <!-- Notification Modal -->
+    <div id="notifModal" class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm z-[150] hidden items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[85vh] flex flex-col transform scale-95 opacity-0 transition-all duration-300" id="notifModalInner">
+            <div class="p-6 flex items-center justify-between border-b border-slate-100">
+                <div>
+                    <h2 class="text-xl font-black text-slate-800 tracking-tight">Request Pesanan Baru</h2>
+                    <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-1">Butuh persetujuan Anda</p>
+                </div>
+                <button onclick="closeNotifModal()" class="w-8 h-8 flex items-center justify-center rounded-full bg-slate-100 text-slate-500 hover:bg-red-100 hover:text-red-500 transition-colors">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="p-4 overflow-y-auto flex-1 space-y-3 bg-slate-50" id="notifListContainer">
+                <!-- Data populated dynamically -->
+            </div>
+        </div>
+    </div>
 
     <!-- E-Ticket Modal -->
     <div id="ticketModal" class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm z-[150] hidden items-center justify-center p-4">
@@ -1207,9 +1207,9 @@
     // RENDER ALL
     // ========================================
     function renderAll() {
+        updateNotifications();
         if (currentMenu === 'dashboard') renderDashboard();
         else if (currentMenu === 'today') renderTodayTable();
-        else if (currentMenu === 'request') renderRequest();
         else if (currentMenu === 'pesanan') renderPesanan();
         else if (currentMenu === 'armada') renderArmada();
         else if (currentMenu === 'laporan') renderLaporan();
@@ -1538,14 +1538,82 @@
     // ========================================
     // REQUEST PESANAN
     // ========================================
-    function renderRequest() {
+    // ========================================
+    // NOTIFICATIONS SYSTEM
+    // ========================================
+    function updateNotifications() {
         const allBookings = getBookings().slice();
         const requests = allBookings.filter(b => b.status === 'waiting_payment' || b.status === 'Belum ACC');
-        const tbody = document.getElementById('requestTableBody');
-        if (!tbody) return;
+        
+        const badgeMobile = document.getElementById('notifBadgeMobile');
+        const badgeDesktop = document.getElementById('notifBadgeDesktop');
+        const listContainer = document.getElementById('notifListContainer');
+        
+        // Update Badges
+        if (requests.length > 0) {
+            if (badgeMobile) { badgeMobile.innerText = requests.length; badgeMobile.classList.remove('hidden'); }
+            if (badgeDesktop) { badgeDesktop.innerText = requests.length; badgeDesktop.classList.remove('hidden'); }
+        } else {
+            if (badgeMobile) badgeMobile.classList.add('hidden');
+            if (badgeDesktop) badgeDesktop.classList.add('hidden');
+        }
 
-        tbody.innerHTML = requests.length ? requests.map(b => buildBookingRow(b, true)).join('') :
-            '<tr><td colspan="5" class="text-center text-sm text-slate-400 font-bold py-8 italic uppercase tracking-widest">Tidak ada request pesanan</td></tr>';
+        // Update Modal Content
+        if (!listContainer) return;
+        
+        if (requests.length === 0) {
+            listContainer.innerHTML = '<div class="text-center text-sm text-slate-400 font-bold py-8 italic uppercase tracking-widest">Tidak ada pesanan baru</div>';
+            return;
+        }
+
+        listContainer.innerHTML = requests.map(b => {
+            const armada = b.armadaId !== 'UNKNOWN' ? getArmada(b.armadaId) : null;
+            const armadaName = armada ? armada.name : '-';
+            const tujuan = armada ? armada.destination : '-';
+            
+            return `
+            <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-100 flex flex-col sm:flex-row justify-between sm:items-center gap-3 relative">
+                <div>
+                    <div class="flex items-center gap-2 mb-1">
+                        <span class="text-[10px] bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full font-black uppercase">Belum ACC</span>
+                        <span class="text-xs font-black text-slate-500">${b.bookingId}</span>
+                    </div>
+                    <h3 class="font-bold text-sm text-slate-800 uppercase">${b.name} <span class="text-slate-400 font-normal">(${b.hp})</span></h3>
+                    <p class="text-xs text-slate-500 mt-1">
+                        <b>${armadaName}</b> &rarr; ${tujuan}
+                    </p>
+                    <p class="text-[10px] text-slate-400 font-bold mt-1">
+                        <i class="fas fa-calendar-alt mr-1"></i> ${b.dateTravel || '-'} | ${b.qty} Orang | ${formatRupiah(b.totalPrice)}
+                    </p>
+                </div>
+                <div class="flex gap-2 shrink-0">
+                    <button onclick="openConfirmModal('${b.bookingId}')" class="flex-1 sm:flex-none py-2 px-4 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs uppercase tracking-widest rounded-lg shadow-md transition-all">ACC</button>
+                    <button onclick="openDeleteModal('${b.bookingId}')" class="flex-1 sm:flex-none py-2 px-4 bg-red-100 hover:bg-red-200 text-red-600 font-bold text-xs uppercase tracking-widest rounded-lg transition-all">Tolak</button>
+                </div>
+            </div>`;
+        }).join('');
+    }
+
+    function openNotifModal() {
+        const modal = document.getElementById('notifModal');
+        const inner = document.getElementById('notifModalInner');
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+        setTimeout(() => {
+            inner.classList.remove('scale-95', 'opacity-0');
+            inner.classList.add('scale-100', 'opacity-100');
+        }, 10);
+    }
+
+    function closeNotifModal() {
+        const modal = document.getElementById('notifModal');
+        const inner = document.getElementById('notifModalInner');
+        inner.classList.remove('scale-100', 'opacity-100');
+        inner.classList.add('scale-95', 'opacity-0');
+        setTimeout(() => {
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }, 300);
     }
 
     // ========================================
