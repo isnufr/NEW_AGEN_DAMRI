@@ -70,7 +70,9 @@ app.get('/api', async (req, res) => {
         }
         
         if (action === 'getArmada') {
-            const armadas = await prisma.armada.findMany();
+            const armadas = await prisma.armada.findMany({
+                orderBy: { namaArmada: 'asc' }
+            });
             const formattedArmadas = armadas.map(a => ({
                 'id_armada': a.idArmada,
                 'nama_armada': a.namaArmada,
