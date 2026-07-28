@@ -804,7 +804,6 @@
                     <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
                         <div>
                             <h2 class="text-2xl font-black text-slate-800 tracking-tight">Pesawat & Kapal Laut</h2>
-                            <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mt-1">Kelola tiket manual selain armada bus</p>
                         </div>
                         <button onclick="openAddEkstraModal()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-2xl shadow-xl shadow-indigo-600/30 transition-all font-bold text-sm tracking-wide flex items-center gap-2">
                             <i class="fas fa-plus"></i>
@@ -814,18 +813,18 @@
 
                     <div class="bg-transparent lg:bg-white lg:rounded-[2rem] lg:shadow-xl lg:border lg:border-slate-100 overflow-hidden">
                         <div class="overflow-x-auto overflow-y-visible p-1 lg:p-0">
-                            <table class="w-full text-left border-collapse whitespace-nowrap block lg:table">
-                                <thead class="hidden lg:table-header-group">
-                                    <tr class="bg-slate-50/50">
-                                        <th class="p-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">Tipe & Vendor</th>
-                                        <th class="p-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">Waktu & Rute</th>
-                                        <th class="p-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">Penumpang</th>
-                                        <th class="p-4 text-[10px] font-black text-slate-400 uppercase tracking-widest text-right">Harga Tiket</th>
-                                        <th class="p-4 text-[10px] font-black text-slate-400 uppercase tracking-widest text-center">Status</th>
-                                        <th class="p-4 text-[10px] font-black text-slate-400 uppercase tracking-widest text-center">Aksi</th>
+                            <table class="w-full">
+                                <thead class="hidden lg:table-header-group bg-indigo-600 border-b border-indigo-700">
+                                    <tr>
+                                        <th class="text-left text-[10px] font-black text-indigo-50 uppercase tracking-widest p-4 rounded-tl-xl">Vendor</th>
+                                        <th class="text-left text-[10px] font-black text-indigo-50 uppercase tracking-widest p-4">Rute & Waktu</th>
+                                        <th class="text-left text-[10px] font-black text-indigo-50 uppercase tracking-widest p-4">Penumpang</th>
+                                        <th class="text-right text-[10px] font-black text-indigo-50 uppercase tracking-widest p-4">Total Bayar</th>
+                                        <th class="text-center text-[10px] font-black text-indigo-50 uppercase tracking-widest p-4">Status</th>
+                                        <th class="text-right text-[10px] font-black text-indigo-50 uppercase tracking-widest p-4 rounded-tr-xl">Aksi</th>
                                     </tr>
                                 </thead>
-                                <tbody id="ekstraTableBody" class="text-sm divide-y divide-transparent lg:divide-slate-50 block lg:table-row-group">
+                                <tbody id="ekstraTableBody" class="flex flex-col lg:table-row-group gap-4 lg:gap-0">
                                 </tbody>
                             </table>
                         </div>
@@ -4752,16 +4751,16 @@ function updateChartColors(isDark) {
     }
 })();
 </script>
-    <!-- MODAL EKSTRA BOOKING -->
-    <div id="ekstraModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-900/50 backdrop-blur-sm transition-opacity">
-        <div id="ekstraModalInner" class="bg-white rounded-3xl shadow-2xl w-full max-w-lg overflow-hidden transform scale-95 opacity-0 transition-all duration-300">
-            <div class="px-6 py-4 bg-slate-50 border-b border-slate-100 flex justify-between items-center">
+    <!-- Modal Tambah/Edit Ekstra -->
+    <div id="ekstraModal" class="fixed inset-0 z-50 hidden items-start pt-10 pb-10 justify-center bg-slate-900/50 backdrop-blur-sm transition-opacity overflow-y-auto">
+        <div id="ekstraModalInner" class="bg-white rounded-3xl shadow-2xl w-full max-w-lg overflow-hidden transform scale-95 opacity-0 transition-all duration-300 flex flex-col max-h-[90vh]">
+            <div class="px-6 py-4 bg-slate-50 border-b border-slate-100 flex justify-between items-center sticky top-0 z-10 shrink-0">
                 <h3 id="ekstraModalTitle" class="text-lg font-black text-slate-800">Tambah Tiket Ekstra</h3>
                 <button onclick="closeEkstraModal()" class="text-slate-400 hover:text-red-500 transition-colors">
                     <i class="fas fa-times text-xl"></i>
                 </button>
             </div>
-            <div class="p-6">
+            <div class="p-6 overflow-y-auto grow">
                 <form id="ekstraForm" onsubmit="submitEkstra(event)" class="space-y-4">
                     <input type="hidden" id="ekstraId">
                     <div class="grid grid-cols-2 gap-4">
@@ -4796,10 +4795,18 @@ function updateChartColors(isDark) {
 
                     <div class="grid grid-cols-2 gap-4">
                         <div class="col-span-2 md:col-span-1">
-                            <label class="block text-xs font-bold text-slate-500 mb-1 uppercase">Jumlah Penumpang</label>
-                            <input type="number" id="ekstraJumlahPnp" min="1" value="1" oninput="generateEkstraPnpFields()" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500/50" required>
+                            <label class="block text-xs font-bold text-slate-500 mb-1 uppercase">Nomor HP</label>
+                            <input type="tel" id="ekstraHp" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500/50" placeholder="08..." required>
                         </div>
                         <div class="col-span-2 md:col-span-1">
+                            <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Jumlah Penumpang</label>
+                            <div class="flex items-center">
+                                <button type="button" onclick="document.getElementById('ekstraJumlahPnp').stepDown(); generateEkstraPnpFields();" class="bg-slate-200 text-slate-700 font-bold px-4 py-2.5 rounded-l-xl hover:bg-slate-300 transition-colors active:scale-95">-</button>
+                                <input type="number" id="ekstraJumlahPnp" min="1" value="1" class="w-full bg-slate-50 border-y border-slate-200 px-4 py-2.5 text-sm font-bold text-slate-700 outline-none text-center focus:border-indigo-500 focus:ring-0 transition-all appearance-none" oninput="generateEkstraPnpFields()" required style="-moz-appearance: textfield;">
+                                <button type="button" onclick="document.getElementById('ekstraJumlahPnp').stepUp(); generateEkstraPnpFields();" class="bg-slate-200 text-slate-700 font-bold px-4 py-2.5 rounded-r-xl hover:bg-slate-300 transition-colors active:scale-95">+</button>
+                            </div>
+                        </div>
+                        <div class="col-span-2">
                             <label class="block text-xs font-bold text-slate-500 mb-1 uppercase">Status Pembayaran</label>
                             <select id="ekstraStatus" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500/50">
                                 <option value="LUNAS">LUNAS</option>
@@ -4843,11 +4850,22 @@ function updateChartColors(isDark) {
         function parseEkstraPnp(item) {
             try {
                 const parsed = JSON.parse(item.namaPenumpang);
+                if (parsed && parsed.pnp && Array.isArray(parsed.pnp)) return parsed.pnp;
                 if (Array.isArray(parsed)) return parsed;
             } catch (e) {
                 // Legacy
             }
             return [{ nama: item.namaPenumpang, harga: item.hargaTiket }];
+        }
+
+        function parseEkstraHp(item) {
+            try {
+                const parsed = JSON.parse(item.namaPenumpang);
+                if (parsed && parsed.hp) return parsed.hp;
+            } catch (e) {
+                // Legacy
+            }
+            return '-';
         }
 
         function renderEkstra() {
@@ -4888,7 +4906,10 @@ function updateChartColors(isDark) {
                         </td>
                         <td class="flex lg:table-cell items-center justify-between lg:justify-start p-3 lg:p-4 border-b border-dashed border-slate-100 lg:border-none">
                             <div class="lg:hidden text-[10px] font-bold text-slate-400 uppercase tracking-widest">Penumpang</div>
-                            <div class="font-black text-blue-600">${pnpList.map(p => p.nama).join(', ')} <span class="text-xs text-slate-400 font-bold ml-1">(${pnpList.length} Org)</span></div>
+                            <div>
+                                <div class="font-black text-blue-600">${pnpList.map(p => p.nama).join(', ')} <span class="text-xs text-slate-400 font-bold ml-1">(${pnpList.length} Org)</span></div>
+                                <div class="text-[10px] font-bold text-slate-400 mt-0.5"><i class="fas fa-phone mr-1"></i> ${parseEkstraHp(item)}</div>
+                            </div>
                         </td>
                         <td class="flex lg:table-cell items-center justify-between lg:text-right p-3 lg:p-4 border-b border-dashed border-slate-100 lg:border-none">
                             <div class="lg:hidden text-[10px] font-bold text-slate-400 uppercase tracking-widest">Total Bayar</div>
@@ -4973,6 +4994,7 @@ function updateChartColors(isDark) {
             document.getElementById('ekstraId').value = '';
             document.getElementById('ekstraForm').reset();
             document.getElementById('ekstraJumlahPnp').value = 1;
+            document.getElementById('ekstraHp').value = '';
             generateEkstraPnpFields();
             document.getElementById('ekstraModalTitle').innerText = 'Tambah Tiket Ekstra';
             
@@ -4994,6 +5016,7 @@ function updateChartColors(isDark) {
             document.getElementById('ekstraTanggal').value = item.tanggalBerangkat;
             document.getElementById('ekstraJam').value = item.jamBerangkat;
             document.getElementById('ekstraStatus').value = item.statusPembayaran;
+            document.getElementById('ekstraHp').value = parseEkstraHp(item) !== '-' ? parseEkstraHp(item) : '';
 
             const pnpList = parseEkstraPnp(item);
             document.getElementById('ekstraJumlahPnp').value = pnpList.length;
@@ -5049,7 +5072,10 @@ function updateChartColors(isDark) {
                 rute: document.getElementById('ekstraRute').value,
                 tanggalBerangkat: document.getElementById('ekstraTanggal').value,
                 jamBerangkat: document.getElementById('ekstraJam').value,
-                namaPenumpang: JSON.stringify(pnpArray),
+                namaPenumpang: JSON.stringify({
+                    hp: document.getElementById('ekstraHp').value,
+                    pnp: pnpArray
+                }),
                 kodeBooking: '',
                 hargaTiket: 0, // calculated backend
                 statusPembayaran: document.getElementById('ekstraStatus').value,
@@ -5148,7 +5174,15 @@ function updateChartColors(isDark) {
             addLine("--------------------------------");
             addTwoColumnsLeftRight("TIPE", item.tipe, true);
             addTwoColumnsLeftRight("VENDOR", item.vendor, true);
-            addTwoColumnsLeftRight("RUTE", item.rute, true);
+            
+            add(CMD.ALIGN_CENTER);
+            add(CMD.BOLD_ON);
+            addLine(item.rute);
+            add(CMD.BOLD_OFF);
+            add(CMD.ALIGN_LEFT);
+            addLine("--------------------------------");
+            
+            addTwoColumnsLeftRight("PEMESAN", parseEkstraHp(item), true);
             addLine("--------------------------------");
             
             const pnpList = parseEkstraPnp(item);
@@ -5178,6 +5212,11 @@ function updateChartColors(isDark) {
             addLine("Terima Kasih");
             addLine("Simpan struk ini sebagai bukti");
             addLine("pembayaran yang sah.");
+            add(CMD.LF);
+            addLine("082133607759");
+            addLine("JL.Raya Kawunganten");
+            addLine("(Depan Koramil Kawunganten)");
+            addLine("Website : agendamrikawunganten.net");
             add(CMD.LF);
             add(CMD.LF);
             add(CMD.LF); 

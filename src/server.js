@@ -263,7 +263,12 @@ app.post('/api', async (req, res) => {
             let parsedPnp = [];
             let sumHargaBase = 0;
             try {
-                parsedPnp = JSON.parse(namaPenumpang);
+                const parsed = JSON.parse(namaPenumpang);
+                if (parsed && parsed.pnp && Array.isArray(parsed.pnp)) {
+                    parsedPnp = parsed.pnp;
+                } else if (Array.isArray(parsed)) {
+                    parsedPnp = parsed;
+                }
                 parsedPnp.forEach(p => sumHargaBase += parseInt(p.harga) || 0);
             } catch (e) {
                 sumHargaBase = 0;
@@ -299,7 +304,12 @@ app.post('/api', async (req, res) => {
             let parsedPnp = [];
             let sumHargaBase = 0;
             try {
-                parsedPnp = JSON.parse(namaPenumpang);
+                const parsed = JSON.parse(namaPenumpang);
+                if (parsed && parsed.pnp && Array.isArray(parsed.pnp)) {
+                    parsedPnp = parsed.pnp;
+                } else if (Array.isArray(parsed)) {
+                    parsedPnp = parsed;
+                }
                 parsedPnp.forEach(p => sumHargaBase += parseInt(p.harga) || 0);
             } catch (e) {
                 sumHargaBase = 0;
