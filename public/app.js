@@ -13,7 +13,8 @@ let isDataLoaded = false;
 // ==========================================
 async function fetchFromSheets(action, params = "") {
     try {
-        const res = await fetch(`${SCRIPT_URL}?action=${action}${params}`);
+        const url = `${SCRIPT_URL}?action=${action}${params}&_t=${Date.now()}`;
+        const res = await fetch(url);
         if (!res.ok) throw new Error("Network response was not ok");
         const json = await res.json();
         
