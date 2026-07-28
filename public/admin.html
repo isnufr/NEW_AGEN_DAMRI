@@ -4876,7 +4876,7 @@ function updateChartColors(isDark) {
                             </span>
                         </td>
                         <td class="block lg:table-cell p-3 lg:p-4 lg:text-center">
-                            <div class="flex items-center lg:justify-center gap-2 lg:opacity-0 group-hover:opacity-100 transition-opacity justify-end">
+                            <div class="flex items-center lg:justify-center gap-2 opacity-100 lg:opacity-0 group-hover:opacity-100 transition-opacity justify-end">
                                 <button onclick='printStrukEkstra(${JSON.stringify(item)})' class="w-10 h-10 lg:w-8 lg:h-8 rounded-xl lg:rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white transition-colors flex items-center justify-center" title="Cetak Struk">
                                     <i class="fas fa-print"></i>
                                 </button>
@@ -5006,85 +5006,94 @@ function updateChartColors(isDark) {
             } catch(err) {
                 console.error(err);
                 alert('Terjadi kesalahan');
-            }
-        }
-
-        function printStrukEkstra(item) {
-            const width = 300;
-            const height = 500;
-            const left = (screen.width - width) / 2;
-            const top = (screen.height - height) / 2;
-
-            const printWindow = window.open('', '_blank', `width=${width},height=${height},left=${left},top=${top}`);
+                function printStrukEkstra(item) {
+            const CMD = {
+                INIT: [0x1B, 0x40],
+                ALIGN_LEFT: [0x1B, 0x61, 0x00],
+                ALIGN_CENTER: [0x1B, 0x61, 0x01],
+                ALIGN_RIGHT: [0x1B, 0x61, 0x02],
+                BOLD_ON: [0x1B, 0x45, 0x01],
+                BOLD_OFF: [0x1B, 0x45, 0x00],
+                TEXT_NORMAL: [0x1D, 0x21, 0x00],
+                TEXT_DOUBLE_HW: [0x1D, 0x21, 0x11],
+                INVERSE_ON: [0x1D, 0x42, 0x01],
+                INVERSE_OFF: [0x1D, 0x42, 0x00],
+                LF: [0x0A]
+            };
+    
+            let bytes = [];
             
-            const css = `
-                <style>
-                    body {
-                        font-family: 'Courier New', Courier, monospace;
-                        margin: 0;
-                        padding: 10px;
-                        background: #fff;
-                        color: #000;
-                        font-size: 12px;
-                        line-height: 1.2;
-                    }
-                    .center { text-align: center; }
-                    .bold { font-weight: bold; }
-                    .title { font-size: 16px; margin-bottom: 5px; }
-                    .subtitle { font-size: 11px; margin-bottom: 10px; border-bottom: 1px dashed #000; padding-bottom: 5px; }
-                    .row { display: flex; justify-content: space-between; margin-bottom: 3px; }
-                    .divider { border-top: 1px dashed #000; margin: 10px 0; }
-                    .footer { font-size: 10px; margin-top: 15px; }
-                    @media print {
-                        @page { margin: 0; }
-                        body { padding: 5px; }
-                    }
-                </style>
-            `;
+            function strToBytes(str) {
+                let arr = [];
+                for (let i = 0; i < str.length; i++) {
+                    arr.push(str.charCodeAt(i));
+                }
+                return arr;
+            }
+    
+            function add(cmd) { bytes.push(...cmd); }
+            function addStr(str) { bytes.push(...strToBytes(str)); }
+            function addLine(str) { addStr(str); add(CMD.LF); }
+            function addTwoColumnsLeftRight(leftStr, rightStr, extraSpacing = false) {
+                if(!rightStr) rightStr = "";
+                let spaces = 32 - leftStr.length - String(rightStr).length;
+                if(spaces < 0) spaces = 0;
+                addLine(leftStr + " ".repeat(spaces) + rightStr);
+                if(extraSpacing) add(CMD.LF);
+            }
 
-            const html = `
-                <!DOCTYPE html>
-                <html>
-                <head>
-                    <title>Print Struk</title>
-                    ${css}
-                </head>
-                <body>
-                    <div class="center bold title">AGEN DAMRI KAWUNGANTEN</div>
-                    <div class="center subtitle">AGEN TIKET & TRAVEL</div>
-                    
-                    <div class="row"><span>TGL/JAM</span> <span>: ${item.tanggalBerangkat} ${item.jamBerangkat}</span></div>
-                    
-                    <div class="divider"></div>
-                    
-                    <div class="row"><span>PENUMPANG</span> <span>: <span class="bold">${item.namaPenumpang}</span></span></div>
-                    <div class="row"><span>TIPE</span> <span>: ${item.tipe}</span></div>
-                    <div class="row"><span>MASKAPAI</span> <span>: <span class="bold">${item.vendor}</span></span></div>
-                    <div class="row"><span>RUTE</span> <span>: ${item.rute}</span></div>
-                    
-                    <div class="divider"></div>
-                    
-                    <div class="row"><span>TOTAL HARGA</span> <span>: <span class="bold">Rp ${item.totalHarga.toLocaleString('id-ID')}</span></span></div>
-                    <div class="row"><span>STATUS</span> <span>: ${item.statusPembayaran}</span></div>
-                    
-                    <div class="divider"></div>
-                    
-                    <div class="center footer">
-                        <p>Simpan struk ini sebagai bukti pembayaran yang sah.</p>
-                        <p>Terima Kasih</p>
-                    </div>
-                    <script>
-                        window.onload = function() {
-                            window.print();
-                            setTimeout(function() { window.close(); }, 500);
-                        }
-                    <\/script>
-                </body>
-                </html>
-            `;
-
-            printWindow.document.write(html);
-            printWindow.document.close();
+            // Start Document
+            add(CMD.INIT);
+            add(CMD.ALIGN_CENTER);
+            add(CMD.BOLD_ON);
+            addLine("AGEN DAMRI KAWUNGANTEN");
+            add(CMD.BOLD_OFF);
+            addLine("AGEN TIKET & TRAVEL");
+            addLine("================================");
+            
+            add(CMD.ALIGN_LEFT);
+            addTwoColumnsLeftRight("TGL/JAM", item.tanggalBerangkat + " " + item.jamBerangkat, true);
+            addLine("--------------------------------");
+            addTwoColumnsLeftRight("PENUMPANG", item.namaPenumpang, true);
+            addTwoColumnsLeftRight("TIPE", item.tipe, true);
+            addTwoColumnsLeftRight("VENDOR", item.vendor, true);
+            addTwoColumnsLeftRight("RUTE", item.rute, true);
+            addLine("--------------------------------");
+            
+            let lineTot = "TOTAL HARGA";
+            let rightTot = " " + formatRupiah(item.hargaTiket) + " ";
+            let spacesTot = 32 - lineTot.length - rightTot.length;
+            if(spacesTot < 0) spacesTot = 0;
+            add(CMD.BOLD_ON);
+            addStr(lineTot);
+            addStr(" ".repeat(spacesTot));
+            add(CMD.INVERSE_ON);
+            addStr(rightTot);
+            add(CMD.INVERSE_OFF);
+            add(CMD.BOLD_OFF);
+            add(CMD.LF);
+            
+            addTwoColumnsLeftRight("STATUS", item.statusPembayaran, false);
+            addLine("================================");
+            
+            add(CMD.ALIGN_CENTER);
+            addLine("Terima Kasih");
+            addLine("Simpan struk ini sebagai bukti");
+            addLine("pembayaran yang sah.");
+            add(CMD.LF);
+            add(CMD.LF);
+            add(CMD.LF); 
+    
+            // Convert to binary string
+            let binStr = "";
+            for (let i = 0; i < bytes.length; i++) {
+                binStr += String.fromCharCode(bytes[i]);
+            }
+            
+            // Encode Base64 & call RawBT Intent
+            const base64 = btoa(binStr);
+            const intentUrl = "intent:base64," + base64 + "#Intent;scheme=rawbt;package=ru.a402d.rawbtprinter;end;";
+            window.location.href = intentUrl;
         }
     </script>
 </body>
