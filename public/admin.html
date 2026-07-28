@@ -193,7 +193,7 @@
         }
 
         /* ============================================ */
-        /* DARK MODE — Smooth & Comprehensive            */
+        /* DARK MODE  ESmooth & Comprehensive            */
         /* ============================================ */
 
         /* Global smooth transition for ALL elements */
@@ -1941,7 +1941,7 @@
                                                 <th class="py-2 px-3 text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100">Penumpang</th>
                                                 <th class="py-2 px-3 text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100 text-center">Jml</th>
                                                 <th class="py-2 px-3 text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100 text-center">Kursi</th>
-                                                <th class="py-2 px-3 text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100 text-center">Status Pembayaran</th>
+                                                <th class="py-2 px-3 text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100 text-center">Status & Ket</th>
                                                 <th class="py-2 px-3 text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100 text-center">Aksi</th>
                                             </tr>
                                         </thead>
@@ -2555,7 +2555,7 @@
         });
 
         if (format === 'csv') {
-            let csv = 'ID Tiket,Jam,Armada,Tujuan,Nama Penumpang,No HP,Jml,Kursi,Status\\n';
+            let csv = 'ID Tiket,Jam,Armada,Tujuan,Nama Penumpang,No HP,Jml,Kursi,Status,Ket\\n';
             filteredBookings.forEach(b => {
                 const armadaName = b.armadaId !== 'UNKNOWN' && getArmada(b.armadaId) ? getArmada(b.armadaId).name : (b.kendaraan || b['JENIS KENDARAAN'] || '-');
                 const tujuan = b.armadaId !== 'UNKNOWN' && getArmada(b.armadaId) ? getArmada(b.armadaId).destination : (b.tujuan || b['Tujuan'] || '-');
@@ -2566,8 +2566,9 @@
                 const jml = b.qty || b['JUMLAH PNP'] || 1;
                 const kursi = b.kursi || '-';
                 const status = b.status || '-';
+                const ket = b.keterangan || b['Keterangan'] || b['KETERANGAN'] || '';
                 
-                csv += `"${id}","${waktu}","${armadaName}","${tujuan}","${nama}","${hp}","${jml}","${kursi}","${status}"\\n`;
+                csv += `"${id}","${waktu}","${armadaName}","${tujuan}","${nama}","${hp}","${jml}","${kursi}","${status}","${ket}"\\n`;
             });
 
             const blob = new Blob([csv], { type: 'text/csv' });
@@ -2613,6 +2614,7 @@
                 const hp = b.hp || b['NOMOR HP'] || '-';
                 const jml = b.qty || b['JUMLAH PNP'] || 1;
                 const kursi = b.kursi || '-';
+                const ket = b.keterangan || b['Keterangan'] || b['KETERANGAN'] || '';
                 
                 return [
                     i + 1,
@@ -2622,13 +2624,14 @@
                     nama,
                     hp,
                     jml,
-                    kursi
+                    kursi,
+                    ket
                 ];
             });
 
             doc.autoTable({
                 startY: 42,
-                head: [['No', 'Jam', 'Armada', 'Tujuan', 'Nama Penumpang', 'No HP', 'Jml', 'Kursi']],
+                head: [['No', 'Jam', 'Armada', 'Tujuan', 'Nama Penumpang', 'No HP', 'Jml', 'Kursi', 'Ket']],
                 body: tableData,
                 theme: 'grid',
                 headStyles: { fillColor: [37, 99, 235], textColor: 255, fontStyle: 'bold' },
@@ -2641,7 +2644,8 @@
                     4: { cellWidth: 55 },
                     5: { cellWidth: 40 },
                     6: { cellWidth: 12, halign: 'center' },
-                    7: { cellWidth: 'auto', halign: 'center' }
+                    7: { cellWidth: 20, halign: 'center' },
+                    8: { cellWidth: 'auto' }
                 }
             });
             
@@ -4462,7 +4466,7 @@ document.getElementById('btnConfirmDeleteAdmin').addEventListener('click', async
 });
 
 // ============================================
-// DARK MODE TOGGLE — Enhanced
+// DARK MODE TOGGLE  EEnhanced
 // ============================================
 function toggleDarkMode() {
     const isDark = document.body.classList.toggle('dark-mode');
