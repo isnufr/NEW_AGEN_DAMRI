@@ -2277,12 +2277,28 @@
     // ========================================
     // DAFTAR ARMADA
     // ========================================
+    window.toggleArmada = function(index) {
+        const rows = document.querySelectorAll('.armada-group-' + index);
+        rows.forEach(row => row.classList.toggle('hidden'));
+        
+        const icon = document.getElementById('icon-armada-' + index);
+        if (icon) {
+            if (rows.length > 0 && rows[0].classList.contains('hidden')) {
+                icon.style.transform = 'rotate(0deg)';
+            } else {
+                icon.style.transform = 'rotate(180deg)';
+            }
+        }
+    };
+
     function renderArmada() {
         let armadas = getArmadas();
         
         // Filter by Search
         const searchInput = document.getElementById('searchArmadaInput');
+        let isSearching = false;
         if (searchInput && searchInput.value.trim() !== '') {
+            isSearching = true;
             const query = searchInput.value.toLowerCase().trim();
             armadas = armadas.filter(a => 
                 a.name.toLowerCase().includes(query) || 
@@ -2309,20 +2325,28 @@
         const sortedKeys = Object.keys(groups).sort();
         let html = '';
 
-        sortedKeys.forEach(key => {
+        sortedKeys.forEach((key, index) => {
+            // If searching, automatically expand the results
+            const hiddenClass = isSearching ? '' : 'hidden';
+            const iconRotate = isSearching ? 'rotate(180deg)' : 'rotate(0deg)';
+
             html += `
-                <tr class="bg-blue-50 border-b border-blue-100">
+                <tr class="cursor-pointer bg-blue-50 hover:bg-blue-100 transition-colors border-b border-blue-200" onclick="toggleArmada('${index}')">
                     <td colspan="5" class="px-4 py-3">
-                        <div class="flex items-center gap-2">
-                            <i class="fas fa-bus text-blue-600"></i>
-                            <span class="font-black text-sm text-blue-900 uppercase">${key}</span>
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-2">
+                                <i class="fas fa-bus text-blue-600"></i>
+                                <span class="font-black text-sm text-blue-900 uppercase">${key}</span>
+                                <span class="text-[10px] font-bold text-blue-600 bg-blue-100 px-2 py-0.5 rounded-md ml-2">${groups[key].length} Rute</span>
+                            </div>
+                            <i class="fas fa-chevron-down text-blue-600 transition-transform duration-300" id="icon-armada-${index}" style="transform: ${iconRotate};"></i>
                         </div>
                     </td>
                 </tr>
             `;
             groups[key].forEach(a => {
                 html += `
-                    <tr class="hover:bg-slate-50 transition-colors border-b border-slate-100 last:border-0">
+                    <tr class="armada-group-${index} ${hiddenClass} hover:bg-slate-50 transition-colors border-b border-slate-100 last:border-0">
                         <td class="pl-8"><span class="font-black text-[10px] text-slate-400">${a.id}</span></td>
                         <td><span class="font-black text-sm text-slate-400 uppercase hidden">${a.name}</span></td>
                         <td><span class="font-bold text-sm text-slate-800 uppercase">${a.destination}</span></td>
