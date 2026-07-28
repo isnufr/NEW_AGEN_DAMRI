@@ -531,45 +531,57 @@
                     </div>
 
                     <!-- Modern Cards -->
-                    <div class="flex flex-col gap-4 mb-8 fade-up">
-                        <!-- Row 1: Main Stats -->
-                        <div class="w-full md:w-1/2 lg:w-1/3">
-                            <!-- Total Booking -->
-                            <div class="stat-card p-4 lg:p-5 border-l-4 border-l-blue-500">
-                                <div class="flex items-center gap-2 mb-2">
-                                    <div class="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center text-blue-600 text-xs"><i class="fas fa-ticket-alt"></i></div>
-                                    <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest leading-tight">Total Booking</p>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8 fade-up">
+                        <!-- Total Booking -->
+                        <div class="bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl p-5 text-white shadow-lg shadow-blue-500/30 transition-all hover:-translate-y-1 hover:shadow-xl hover:shadow-blue-500/40">
+                            <div class="flex flex-row items-center justify-between mb-3">
+                                <div class="flex flex-col">
+                                    <p class="text-[10px] font-bold text-blue-100 uppercase tracking-widest leading-tight">Total Booking</p>
                                 </div>
-                                <h3 class="text-xl lg:text-2xl font-black text-slate-800" id="cardTotalBooking">0</h3>
+                                <div class="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center text-white backdrop-blur-sm">
+                                    <i class="fas fa-ticket-alt text-lg"></i>
+                                </div>
                             </div>
+                            <h3 class="text-2xl font-black" id="cardTotalBooking">0</h3>
                         </div>
 
-                        <!-- Row 3: Total -->
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                            <!-- Total Omset -->
-                            <div class="stat-card p-4 lg:p-5 border-l-4 border-l-sky-500">
-                                <div class="flex items-center gap-2 mb-2">
-                                    <div class="w-8 h-8 rounded-lg bg-sky-50 flex items-center justify-center text-sky-600 text-xs"><i class="fas fa-wallet"></i></div>
-                                    <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest leading-tight">Total Omset</p>
+                        <!-- Total Setoran -->
+                        <div class="bg-gradient-to-br from-violet-500 to-violet-600 rounded-2xl p-5 text-white shadow-lg shadow-violet-500/30 transition-all hover:-translate-y-1 hover:shadow-xl hover:shadow-violet-500/40">
+                            <div class="flex flex-row items-center justify-between mb-3">
+                                <div class="flex flex-col">
+                                    <p class="text-[10px] font-bold text-violet-100 uppercase tracking-widest leading-tight">Total Setoran</p>
                                 </div>
-                                <h3 class="text-lg lg:text-xl font-black text-slate-800" id="cardTotalOmset">Rp 0</h3>
-                            </div>
-                            <!-- Total Setoran -->
-                            <div class="stat-card p-4 lg:p-5 border-l-4 border-l-indigo-500">
-                                <div class="flex items-center gap-2 mb-2">
-                                    <div class="w-8 h-8 rounded-lg bg-indigo-50 flex items-center justify-center text-indigo-600 text-xs"><i class="fas fa-file-invoice-dollar"></i></div>
-                                    <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest leading-tight">Total Setoran</p>
+                                <div class="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center text-white backdrop-blur-sm">
+                                    <i class="fas fa-file-invoice-dollar text-lg"></i>
                                 </div>
-                                <h3 class="text-lg lg:text-xl font-black text-slate-800" id="cardTotalSetoran">Rp 0</h3>
                             </div>
-                            <!-- Total Pendapatan -->
-                            <div class="stat-card p-4 lg:p-5 border-l-4 border-l-rose-500">
-                                <div class="flex items-center gap-2 mb-2">
-                                    <div class="w-8 h-8 rounded-lg bg-rose-50 flex items-center justify-center text-rose-600 text-xs"><i class="fas fa-chart-line"></i></div>
-                                    <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest leading-tight">Total Pendapatan</p>
+                            <h3 class="text-2xl font-black truncate" id="cardTotalSetoran">Rp 0</h3>
+                        </div>
+
+                        <!-- Total Pendapatan -->
+                        <div class="bg-gradient-to-br from-rose-500 to-rose-600 rounded-2xl p-5 text-white shadow-lg shadow-rose-500/30 transition-all hover:-translate-y-1 hover:shadow-xl hover:shadow-rose-500/40">
+                            <div class="flex flex-row items-center justify-between mb-3">
+                                <div class="flex flex-col">
+                                    <p class="text-[10px] font-bold text-rose-100 uppercase tracking-widest leading-tight">Total Pendapatan</p>
                                 </div>
-                                <h3 class="text-lg lg:text-xl font-black text-slate-800" id="cardTotalPendapatan">Rp 0</h3>
+                                <div class="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center text-white backdrop-blur-sm">
+                                    <i class="fas fa-chart-line text-lg"></i>
+                                </div>
                             </div>
+                            <h3 class="text-2xl font-black truncate" id="cardTotalPendapatan">Rp 0</h3>
+                        </div>
+
+                        <!-- Total Omset -->
+                        <div class="bg-gradient-to-br from-amber-500 to-amber-600 rounded-2xl p-5 text-white shadow-lg shadow-amber-500/30 transition-all hover:-translate-y-1 hover:shadow-xl hover:shadow-amber-500/40">
+                            <div class="flex flex-row items-center justify-between mb-3">
+                                <div class="flex flex-col">
+                                    <p class="text-[10px] font-bold text-amber-100 uppercase tracking-widest leading-tight">Total Omset</p>
+                                </div>
+                                <div class="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center text-white backdrop-blur-sm">
+                                    <i class="fas fa-wallet text-lg"></i>
+                                </div>
+                            </div>
+                            <h3 class="text-2xl font-black truncate" id="cardTotalOmset">Rp 0</h3>
                         </div>
                     </div>
 
@@ -664,10 +676,6 @@
                                 <span class="text-[10px] font-black text-blue-600 bg-blue-50 px-3 py-1 rounded-lg hidden sm:inline-block" id="todayDateLabel">Hari Ini & Mendatang</span>
                             </div>
                             <div class="flex flex-col sm:flex-row items-center gap-2 w-full sm:w-auto">
-                                <div class="relative w-full sm:w-64">
-                                    <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
-                                    <input type="text" id="manifestSearchInput" class="w-full bg-slate-50 border border-slate-300 text-slate-700 text-sm font-bold rounded-xl pl-8 pr-3 py-2 outline-none focus:border-blue-500 transition-colors shadow-sm" placeholder="Cari di manifest..." oninput="renderTodayTable()">
-                                </div>
                                 <div class="flex w-full sm:w-auto gap-2">
                                     <input type="date" id="manifestFilterDate" class="flex-1 sm:flex-none bg-slate-50 border border-slate-300 text-slate-700 text-sm font-bold rounded-xl px-3 py-2 outline-none focus:border-blue-500 transition-colors shadow-sm cursor-pointer" onchange="renderTodayTable()">
                                     <button onclick="resetManifestFilter()" class="bg-slate-100 text-slate-500 hover:bg-red-50 hover:text-red-500 px-3 py-2 rounded-xl text-sm font-bold transition-colors shadow-sm border border-slate-200 flex-shrink-0" title="Reset Filter">
@@ -1904,7 +1912,7 @@
                             </div>
                             <div class="flex items-center gap-4">
                                 <div class="text-right">
-                                    <p class="font-black text-sm text-blue-700">${totalPnp} PNP</p>
+                                    <p class="font-black text-sm text-orange-500">${totalPnp} PNP</p>
                                     <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">${g.bookings.length} Pesanan</p>
                                 </div>
                                 <i class="fas fa-chevron-down text-slate-400 transition-transform duration-300" id="icon-manifest-${index}"></i>
@@ -1956,8 +1964,8 @@
                                 <div class="bg-blue-50 border-b border-blue-100 px-4 py-3 flex items-start gap-3">
                                     <div class="bg-blue-600 text-white font-black text-sm px-3 py-1 rounded-lg mt-0.5">${ig.waktu}</div>
                                     <div>
-                                        <p class="font-black text-xs text-blue-900 uppercase">${ig.armadaName}</p>
-                                        <span class="inline-block mt-1 text-blue-700 text-[10px] font-black uppercase tracking-widest">${innerTotalPnp} PNP</span>
+                                        <p class="font-black text-xs text-red-600 uppercase">${ig.armadaName}</p>
+                                        <span class="inline-block mt-1 text-orange-500 text-[10px] font-black uppercase tracking-widest">${innerTotalPnp} PNP</span>
                                     </div>
                                 </div>
                                 <!-- Group Table -->
@@ -2207,7 +2215,21 @@
 
     function openDeleteModal(id) {
         activeDeleteId = id;
-        document.getElementById('deleteId').textContent = id;
+        
+        let displayName = id;
+        try {
+            const allB = getBookings();
+            const b = allB.find(x => String(x.bookingId) === String(id) || String(x.id) === String(id));
+            if (b) {
+                const pName = b.name || b.NAMA || 'Tanpa Nama';
+                const armada = b.armadaId !== 'UNKNOWN' ? getArmada(b.armadaId) : null;
+                const aName = armada ? armada.name : (b.kendaraan || b['JENIS KENDARAAN'] || '-');
+                displayName = pName.toUpperCase() + ' (' + aName.toUpperCase() + ')';
+            }
+        } catch(e) {}
+        
+        document.getElementById('deleteId').textContent = displayName;
+        
         const modal = document.getElementById('deleteModal');
         const inner = document.getElementById('deleteModalInner');
         modal.classList.remove('hidden');
@@ -2272,16 +2294,47 @@
         const tbody = document.getElementById('armadaTableBody');
         if (!tbody) return;
 
-        tbody.innerHTML = armadas.length ? armadas.map(a =>
-            '<tr>' +
-            '<td><span class="font-black text-xs text-slate-400">' + a.id + '</span></td>' +
-            '<td><span class="font-black text-sm text-blue-900 uppercase">' + a.name + '</span></td>' +
-            '<td><span class="font-bold text-sm text-slate-800 uppercase">' + a.destination + '</span></td>' +
-            '<td class="text-right"><p class="font-black text-sm text-slate-800">' + formatRupiah(a.price) + '</p><p class="text-[11px] text-blue-500 font-bold mt-1"><i class="far fa-clock mr-1"></i>' + a.time + '</p></td>' +
-            '<td class="text-center"><div class="flex gap-1 justify-center"><button onclick="openEditArmadaModal(\'' + a.id + '\')" class="bg-amber-500 hover:bg-amber-600 text-white w-7 h-7 flex items-center justify-center rounded-lg text-xs shadow-sm transition-all mx-auto" title="Edit Armada"><i class="fas fa-edit"></i></button>' +
-            '<button onclick="openDeleteArmadaModal(\'' + a.id + '\')" class="bg-red-500 hover:bg-red-600 text-white w-7 h-7 flex items-center justify-center rounded-lg text-xs shadow-sm transition-all mx-auto" title="Hapus Armada"><i class="fas fa-trash"></i></button></div></td>' +
-            '</tr>'
-        ).join('') : '<tr><td colspan="5" class="text-center text-sm text-slate-400 font-bold py-8 italic uppercase tracking-widest">Belum ada data armada</td></tr>';
+        if (!armadas.length) {
+            tbody.innerHTML = '<tr><td colspan="5" class="text-center text-sm text-slate-400 font-bold py-8 italic uppercase tracking-widest">Belum ada data armada</td></tr>';
+            return;
+        }
+
+        const groups = {};
+        armadas.forEach(a => {
+            const key = (a.name || 'UNKNOWN').toUpperCase();
+            if (!groups[key]) groups[key] = [];
+            groups[key].push(a);
+        });
+
+        const sortedKeys = Object.keys(groups).sort();
+        let html = '';
+
+        sortedKeys.forEach(key => {
+            html += `
+                <tr class="bg-blue-50 border-b border-blue-100">
+                    <td colspan="5" class="px-4 py-3">
+                        <div class="flex items-center gap-2">
+                            <i class="fas fa-bus text-blue-600"></i>
+                            <span class="font-black text-sm text-blue-900 uppercase">${key}</span>
+                        </div>
+                    </td>
+                </tr>
+            `;
+            groups[key].forEach(a => {
+                html += `
+                    <tr class="hover:bg-slate-50 transition-colors border-b border-slate-100 last:border-0">
+                        <td class="pl-8"><span class="font-black text-[10px] text-slate-400">${a.id}</span></td>
+                        <td><span class="font-black text-sm text-slate-400 uppercase hidden">${a.name}</span></td>
+                        <td><span class="font-bold text-sm text-slate-800 uppercase">${a.destination}</span></td>
+                        <td class="text-right"><p class="font-black text-sm text-slate-800">${formatRupiah(a.price)}</p><p class="text-[11px] text-blue-500 font-bold mt-1"><i class="far fa-clock mr-1"></i>${a.time}</p></td>
+                        <td class="text-center"><div class="flex gap-1 justify-center"><button onclick="openEditArmadaModal('${a.id}')" class="bg-amber-500 hover:bg-amber-600 text-white w-7 h-7 flex items-center justify-center rounded-lg text-xs shadow-sm transition-all mx-auto" title="Edit Armada"><i class="fas fa-edit"></i></button>
+                        <button onclick="openDeleteArmadaModal('${a.id}')" class="bg-red-500 hover:bg-red-600 text-white w-7 h-7 flex items-center justify-center rounded-lg text-xs shadow-sm transition-all mx-auto" title="Hapus Armada"><i class="fas fa-trash"></i></button></div></td>
+                    </tr>
+                `;
+            });
+        });
+
+        tbody.innerHTML = html;
     }
 
     // ========================================
@@ -3605,8 +3658,36 @@
     // ========================================
     // TAMBAH ARMADA
     // ========================================
+    function toggleAddArmadaNamaInput() {
+        const select = document.getElementById('addArmadaNamaSelect');
+        const input = document.getElementById('addArmadaNama');
+        if (!select || !input) return;
+        if (select.value === 'BARU') {
+            input.classList.remove('hidden');
+            input.required = true;
+            input.value = '';
+        } else {
+            input.classList.add('hidden');
+            input.required = false;
+        }
+    }
+
     function openAddArmadaModal() {
         document.getElementById('formAddArmada').reset();
+        
+        const armadas = getArmadas();
+        const uniqueNames = [...new Set(armadas.map(a => a.name.toUpperCase()))].sort();
+        const select = document.getElementById('addArmadaNamaSelect');
+        if (select) {
+            let html = '<option value="">Pilih Armada...</option>';
+            uniqueNames.forEach(name => {
+                html += `<option value="${name}">${name}</option>`;
+            });
+            html += '<option value="BARU">+ Tambah Armada Baru</option>';
+            select.innerHTML = html;
+        }
+        toggleAddArmadaNamaInput();
+
         const m = document.getElementById('modalAddArmada');
         const c = document.getElementById('modalAddArmadaContent');
         m.classList.remove('hidden'); m.classList.add('flex');
@@ -3628,11 +3709,29 @@
 
     async function submitAddArmada(e) {
         e.preventDefault();
+        
+        let armadaName = '';
+        const select = document.getElementById('addArmadaNamaSelect');
+        if (select && select.value) {
+            if (select.value === 'BARU') {
+                armadaName = document.getElementById('addArmadaNama').value;
+            } else {
+                armadaName = select.value;
+            }
+        } else {
+            armadaName = document.getElementById('addArmadaNama').value;
+        }
+        
+        if (!armadaName || armadaName.trim() === '') {
+            showMessage('Nama armada tidak boleh kosong', true);
+            return;
+        }
+
         const btn = document.getElementById('btnSubmitAddArmada');
         btn.innerText = 'Menyimpan...'; btn.disabled = true;
 
         const payload = {
-            nama_armada: document.getElementById('addArmadaNama').value,
+            nama_armada: armadaName,
             tujuan_armada: document.getElementById('addArmadaTujuan').value,
             jam: document.getElementById('addArmadaJam').value,
             harga: document.getElementById('addArmadaHarga').value,
@@ -4300,7 +4399,9 @@
         <form id="formAddArmada" onsubmit="submitAddArmada(event)" class="space-y-3 pb-8">
             <div>
                 <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Nama Armada / PO</label>
-                <input type="text" id="addArmadaNama" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-sm font-bold text-slate-700 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all" required placeholder="Contoh: ESTU TRANS">
+                <select id="addArmadaNamaSelect" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-sm font-bold text-slate-700 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all mb-2" onchange="toggleAddArmadaNamaInput()" required>
+                </select>
+                <input type="text" id="addArmadaNama" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-sm font-bold text-slate-700 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all hidden" placeholder="Masukkan nama armada baru...">
             </div>
             <div>
                 <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Tujuan</label>
