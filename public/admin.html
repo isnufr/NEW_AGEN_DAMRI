@@ -820,7 +820,7 @@
                                         <th class="p-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">Tipe & Vendor</th>
                                         <th class="p-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">Waktu & Rute</th>
                                         <th class="p-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">Penumpang & Kode</th>
-                                        <th class="p-4 text-[10px] font-black text-slate-400 uppercase tracking-widest text-right">Harga & Komisi</th>
+                                        <th class="p-4 text-[10px] font-black text-slate-400 uppercase tracking-widest text-right">Harga Tiket</th>
                                         <th class="p-4 text-[10px] font-black text-slate-400 uppercase tracking-widest text-center">Status</th>
                                         <th class="p-4 text-[10px] font-black text-slate-400 uppercase tracking-widest text-center">Aksi</th>
                                     </tr>
@@ -4806,22 +4806,17 @@ function updateChartColors(isDark) {
                     </div>
 
                     <div class="grid grid-cols-2 gap-4">
-                        <div>
-                            <label class="block text-xs font-bold text-slate-500 mb-1 uppercase">Harga Modal (Rp)</label>
+                        <div class="col-span-2 md:col-span-1">
+                            <label class="block text-xs font-bold text-slate-500 mb-1 uppercase">Harga Tiket (Rp)</label>
                             <input type="number" id="ekstraHarga" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500/50" required>
                         </div>
-                        <div>
-                            <label class="block text-xs font-bold text-slate-500 mb-1 uppercase">Harga Jual (Rp)</label>
-                            <input type="number" id="ekstraTotal" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500/50" required>
+                        <div class="col-span-2 md:col-span-1">
+                            <label class="block text-xs font-bold text-slate-500 mb-1 uppercase">Status Pembayaran</label>
+                            <select id="ekstraStatus" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500/50">
+                                <option value="LUNAS">LUNAS</option>
+                                <option value="WAITING">WAITING</option>
+                            </select>
                         </div>
-                    </div>
-
-                    <div>
-                        <label class="block text-xs font-bold text-slate-500 mb-1 uppercase">Status Pembayaran</label>
-                        <select id="ekstraStatus" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500/50">
-                            <option value="LUNAS">LUNAS</option>
-                            <option value="WAITING">WAITING</option>
-                        </select>
                     </div>
 
                     <div class="pt-4 flex justify-end gap-3">
@@ -4875,8 +4870,7 @@ function updateChartColors(isDark) {
                             <div class="text-xs font-bold text-slate-500 tracking-wider">PNR: ${item.kodeBooking}</div>
                         </td>
                         <td class="p-4 text-right">
-                            <div class="font-bold text-slate-700">${formatRupiah(item.totalHarga)}</div>
-                            <div class="text-xs font-bold text-emerald-500">+${formatRupiah(item.komisi)}</div>
+                            <div class="font-bold text-slate-700">${formatRupiah(item.hargaTiket)}</div>
                         </td>
                         <td class="p-4 text-center">
                             <span class="inline-flex px-2 py-1 text-[10px] font-black uppercase tracking-wider rounded-lg border ${statusColor}">
@@ -4927,7 +4921,6 @@ function updateChartColors(isDark) {
             document.getElementById('ekstraNama').value = item.namaPenumpang;
             document.getElementById('ekstraKode').value = item.kodeBooking;
             document.getElementById('ekstraHarga').value = item.hargaTiket;
-            document.getElementById('ekstraTotal').value = item.totalHarga;
             document.getElementById('ekstraStatus').value = item.statusPembayaran;
 
             document.getElementById('ekstraModalTitle').innerText = 'Edit Tiket Ekstra';
@@ -4973,7 +4966,6 @@ function updateChartColors(isDark) {
                 namaPenumpang: document.getElementById('ekstraNama').value,
                 kodeBooking: document.getElementById('ekstraKode').value,
                 hargaTiket: document.getElementById('ekstraHarga').value,
-                totalHarga: document.getElementById('ekstraTotal').value,
                 statusPembayaran: document.getElementById('ekstraStatus').value,
             };
 

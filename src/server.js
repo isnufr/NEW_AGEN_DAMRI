@@ -258,8 +258,9 @@ app.post('/api', async (req, res) => {
         }
 
         if (action === 'addEkstraBooking') {
-            const { tipe, vendor, rute, tanggalBerangkat, jamBerangkat, kodeBooking, namaPenumpang, hargaTiket, totalHarga, statusPembayaran } = payload;
-            const komisi = parseInt(totalHarga) - parseInt(hargaTiket);
+            const { tipe, vendor, rute, tanggalBerangkat, jamBerangkat, kodeBooking, namaPenumpang, hargaTiket, statusPembayaran } = payload;
+            const parsedHarga = parseInt(hargaTiket) || 0;
+            const komisi = parsedHarga * 0.3;
             const newBooking = await prisma.ekstraBooking.create({
                 data: {
                     tipe: tipe,
@@ -269,8 +270,8 @@ app.post('/api', async (req, res) => {
                     jamBerangkat: jamBerangkat,
                     kodeBooking: kodeBooking || '',
                     namaPenumpang: namaPenumpang,
-                    hargaTiket: parseInt(hargaTiket) || 0,
-                    totalHarga: parseInt(totalHarga) || 0,
+                    hargaTiket: parsedHarga,
+                    totalHarga: parsedHarga,
                     komisi: komisi,
                     statusPembayaran: statusPembayaran || 'LUNAS',
                     createdAt: new Date().toISOString()
@@ -280,8 +281,9 @@ app.post('/api', async (req, res) => {
         }
 
         if (action === 'editEkstraBooking') {
-            const { id, vendor, rute, tanggalBerangkat, jamBerangkat, kodeBooking, namaPenumpang, hargaTiket, totalHarga, statusPembayaran } = payload;
-            const komisi = parseInt(totalHarga) - parseInt(hargaTiket);
+            const { id, vendor, rute, tanggalBerangkat, jamBerangkat, kodeBooking, namaPenumpang, hargaTiket, statusPembayaran } = payload;
+            const parsedHarga = parseInt(hargaTiket) || 0;
+            const komisi = parsedHarga * 0.3;
             await prisma.ekstraBooking.update({
                 where: { id: id },
                 data: {
@@ -291,8 +293,8 @@ app.post('/api', async (req, res) => {
                     jamBerangkat: jamBerangkat,
                     kodeBooking: kodeBooking || '',
                     namaPenumpang: namaPenumpang,
-                    hargaTiket: parseInt(hargaTiket) || 0,
-                    totalHarga: parseInt(totalHarga) || 0,
+                    hargaTiket: parsedHarga,
+                    totalHarga: parsedHarga,
                     komisi: komisi,
                     statusPembayaran: statusPembayaran
                 }
