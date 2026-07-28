@@ -5095,7 +5095,10 @@ function updateChartColors(isDark) {
             } catch(err) {
                 console.error(err);
                 alert('Terjadi kesalahan');
-                function printStrukEkstra(item) {
+            }
+        }
+
+        function printStrukEkstra(item) {
             const CMD = {
                 INIT: [0x1B, 0x40],
                 ALIGN_LEFT: [0x1B, 0x61, 0x00],
