@@ -674,8 +674,14 @@
                     </div>
                     <div class="chart-card overflow-hidden fade-up">
                         <div class="flex items-center justify-between mb-4 flex-wrap gap-2">
-                            <h4 class="text-xs font-black text-slate-500 uppercase tracking-widest"><i class="fas fa-clipboard-list mr-2 text-amber-500"></i>Daftar Manifest</h4>
-                            <span class="text-[10px] font-black text-blue-600 bg-blue-50 px-3 py-1 rounded-lg" id="todayDateLabel">Hari Ini & Mendatang</span>
+                            <div class="flex items-center gap-3">
+                                <h4 class="text-xs font-black text-slate-500 uppercase tracking-widest"><i class="fas fa-clipboard-list mr-2 text-amber-500"></i>Daftar Manifest</h4>
+                                <span class="text-[10px] font-black text-blue-600 bg-blue-50 px-3 py-1 rounded-lg hidden sm:inline-block" id="todayDateLabel">Hari Ini & Mendatang</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <input type="date" id="manifestFilterDate" class="bg-slate-50 border border-slate-200 text-slate-700 text-xs font-bold rounded-lg px-2 py-1 outline-none focus:border-blue-500 transition-colors cursor-pointer" onchange="renderTodayTable()">
+                                <button onclick="resetManifestFilter()" class="bg-slate-100 text-slate-500 hover:bg-slate-200 hover:text-slate-700 px-2.5 py-1 rounded-lg text-xs font-bold transition-colors shadow-sm" title="Reset Filter"><i class="fas fa-sync-alt"></i></button>
+                            </div>
                         </div>
                         <div class="overflow-x-auto">
                             <table class="data-table">
@@ -1096,7 +1102,7 @@
         
         <!-- Receipt Container -->
         <div class="w-full max-w-md bg-white flex-1 overflow-y-auto flex justify-center py-8">
-            <div id="thermalReceipt" class="font-mono font-bold text-black" style="font-size: 11px; width: 58mm; margin: 0; padding: 0;">
+            <div id="thermalReceipt" class="font-sans font-bold text-black" style="font-size: 11px; width: 58mm; margin: 0; padding: 0;">
                 <div class="text-center border-b-2 border-dashed border-gray-400 pb-2 mb-2">
                     <h2 class="text-base font-bold">AGEN DAMRI KAWUNGANTEN</h2>
                     <p class="text-[10px]">Pusat Penjualan Tiket</p>
@@ -1270,7 +1276,7 @@
 
     <!-- E-Ticket Modal -->
     <div id="ticketModal" class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm z-[150] hidden items-center justify-center p-4">
-        <div class="bg-white rounded-xl shadow-2xl w-full max-w-sm max-h-[90vh] overflow-y-auto transform scale-95 opacity-0 transition-all duration-300 flex flex-col font-mono font-bold text-sm text-black border-2 border-gray-200" id="ticketModalInner">
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-sm max-h-[90vh] overflow-y-auto transform scale-95 opacity-0 transition-all duration-300 flex flex-col font-sans font-bold text-sm text-black border-2 border-gray-200" id="ticketModalInner">
             
             <!-- Ticket Body -->
             <div class="p-6">
@@ -1734,9 +1740,24 @@
         }
     }
 
+    window.resetManifestFilter = function() {
+        const el = document.getElementById('manifestFilterDate');
+        if(el) el.value = '';
+        renderTodayTable();
+    };
+
     function renderTodayTable() {
         const tbody = document.getElementById('todayTableBody');
         if (!tbody) return;
+
+        const filterDateEl = document.getElementById('manifestFilterDate');
+        const filterDate = filterDateEl ? filterDateEl.value : '';
+        let targetIndoDate = '';
+        if (filterDate) {
+            const [yyyy, mm, dd] = filterDate.split('-');
+            const dObj = new Date(parseInt(yyyy), parseInt(mm)-1, parseInt(dd));
+            targetIndoDate = INDO_DAYS[dObj.getDay()] + ', ' + dObj.getDate() + ' ' + INDO_MONTHS[dObj.getMonth()] + ' ' + dObj.getFullYear();
+        }
 
         const allBookings = getBookings();
         // filter today and future AND confirmed (ACC/LUNAS)
@@ -1748,11 +1769,14 @@
                                 String(b.status).toUpperCase() === "ACC" ||
                                 String(b.status).toUpperCase() === "LUNAS" ||
                                 String(b.status).toUpperCase() === "PAID";
+            if (targetIndoDate) {
+                return b.dateTravel === targetIndoDate && isConfirmed;
+            }
             return isTodayOrFuture(b.dateTravel) && isConfirmed;
         });
 
         // --- Summary Cards ---
-        const todayOnlyBookings = manifestBookings.filter(b => isToday(b.dateTravel));
+        const todayOnlyBookings = targetIndoDate ? manifestBookings : manifestBookings.filter(b => isToday(b.dateTravel));
         const todayPnp = todayOnlyBookings.reduce((sum, b) => sum + (parseInt(b.qty) || 1), 0);
         
         // Count unique armada berangkat hari ini
@@ -1769,9 +1793,12 @@
         const elPnp = document.getElementById('manifestTotalPnpToday');
         const elArmada = document.getElementById('manifestTotalArmada');
         const elOmset = document.getElementById('manifestOmsetToday');
+        const labelEl = document.getElementById('todayDateLabel');
+        
         if (elPnp) elPnp.textContent = todayPnp + ' Orang';
         if (elArmada) elArmada.textContent = todayArmadaSet.size + ' Armada';
         if (elOmset) elOmset.textContent = formatRupiah(todayOmset);
+        if (labelEl) labelEl.textContent = targetIndoDate ? targetIndoDate : 'Hari Ini & Mendatang';
 
         if (manifestBookings.length === 0) {
             tbody.innerHTML = '<tr><td class="text-center text-sm text-slate-400 font-bold py-8 italic uppercase tracking-widest">Tidak ada jadwal keberangkatan</td></tr>';
