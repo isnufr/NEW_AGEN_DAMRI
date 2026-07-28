@@ -258,9 +258,22 @@ app.post('/api', async (req, res) => {
         }
 
         if (action === 'addEkstraBooking') {
-            const { tipe, vendor, rute, tanggalBerangkat, jamBerangkat, kodeBooking, namaPenumpang, hargaTiket, statusPembayaran } = payload;
-            const parsedHarga = parseInt(hargaTiket) || 0;
-            const komisi = Math.floor(parsedHarga * 0.3);
+            const { tipe, vendor, rute, tanggalBerangkat, jamBerangkat, kodeBooking, namaPenumpang, statusPembayaran } = payload;
+            
+            let parsedPnp = [];
+            let sumHargaBase = 0;
+            try {
+                parsedPnp = JSON.parse(namaPenumpang);
+                parsedPnp.forEach(p => sumHargaBase += parseInt(p.harga) || 0);
+            } catch (e) {
+                sumHargaBase = 0;
+            }
+
+            const pnpCount = parsedPnp.length > 0 ? parsedPnp.length : 1;
+            const adminFee = pnpCount * 25000;
+            const komisi = Math.floor(sumHargaBase * 0.3);
+            const totalHarga = sumHargaBase + adminFee;
+
             const newBooking = await prisma.ekstraBooking.create({
                 data: {
                     tipe: tipe,
@@ -270,8 +283,8 @@ app.post('/api', async (req, res) => {
                     jamBerangkat: jamBerangkat,
                     kodeBooking: kodeBooking || '',
                     namaPenumpang: namaPenumpang,
-                    hargaTiket: parsedHarga,
-                    totalHarga: parsedHarga,
+                    hargaTiket: sumHargaBase,
+                    totalHarga: totalHarga,
                     komisi: komisi,
                     statusPembayaran: statusPembayaran || 'LUNAS',
                     createdAt: new Date().toISOString()
@@ -281,9 +294,22 @@ app.post('/api', async (req, res) => {
         }
 
         if (action === 'editEkstraBooking') {
-            const { id, vendor, rute, tanggalBerangkat, jamBerangkat, kodeBooking, namaPenumpang, hargaTiket, statusPembayaran } = payload;
-            const parsedHarga = parseInt(hargaTiket) || 0;
-            const komisi = Math.floor(parsedHarga * 0.3);
+            const { id, vendor, rute, tanggalBerangkat, jamBerangkat, kodeBooking, namaPenumpang, statusPembayaran } = payload;
+            
+            let parsedPnp = [];
+            let sumHargaBase = 0;
+            try {
+                parsedPnp = JSON.parse(namaPenumpang);
+                parsedPnp.forEach(p => sumHargaBase += parseInt(p.harga) || 0);
+            } catch (e) {
+                sumHargaBase = 0;
+            }
+
+            const pnpCount = parsedPnp.length > 0 ? parsedPnp.length : 1;
+            const adminFee = pnpCount * 25000;
+            const komisi = Math.floor(sumHargaBase * 0.3);
+            const totalHarga = sumHargaBase + adminFee;
+
             await prisma.ekstraBooking.update({
                 where: { id: id },
                 data: {
@@ -293,8 +319,8 @@ app.post('/api', async (req, res) => {
                     jamBerangkat: jamBerangkat,
                     kodeBooking: kodeBooking || '',
                     namaPenumpang: namaPenumpang,
-                    hargaTiket: parsedHarga,
-                    totalHarga: parsedHarga,
+                    hargaTiket: sumHargaBase,
+                    totalHarga: totalHarga,
                     komisi: komisi,
                     statusPembayaran: statusPembayaran
                 }
