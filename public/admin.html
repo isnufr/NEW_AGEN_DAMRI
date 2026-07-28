@@ -812,10 +812,10 @@
                         </button>
                     </div>
 
-                    <div class="bg-white rounded-[2rem] shadow-xl border border-slate-100 overflow-hidden">
-                        <div class="overflow-x-auto">
-                            <table class="w-full text-left border-collapse whitespace-nowrap">
-                                <thead>
+                    <div class="bg-transparent lg:bg-white lg:rounded-[2rem] lg:shadow-xl lg:border lg:border-slate-100 overflow-hidden">
+                        <div class="overflow-x-auto overflow-y-visible p-1 lg:p-0">
+                            <table class="w-full text-left border-collapse whitespace-nowrap block lg:table">
+                                <thead class="hidden lg:table-header-group">
                                     <tr class="bg-slate-50/50">
                                         <th class="p-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">Tipe & Vendor</th>
                                         <th class="p-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">Waktu & Rute</th>
@@ -825,7 +825,7 @@
                                         <th class="p-4 text-[10px] font-black text-slate-400 uppercase tracking-widest text-center">Aksi</th>
                                     </tr>
                                 </thead>
-                                <tbody id="ekstraTableBody" class="text-sm divide-y divide-slate-50">
+                                <tbody id="ekstraTableBody" class="text-sm divide-y divide-transparent lg:divide-slate-50 block lg:table-row-group">
                                 </tbody>
                             </table>
                         </div>
@@ -4843,42 +4843,47 @@ function updateChartColors(isDark) {
                 const icon = item.tipe === 'PESAWAT' ? 'fa-plane' : 'fa-ship';
                 
                 html += `
-                    <tr class="hover:bg-slate-50/80 transition-colors group">
-                        <td class="p-4">
+                    <tr class="block lg:table-row hover:bg-slate-50/80 transition-colors group p-4 lg:p-0 mb-4 lg:mb-0 bg-white border border-slate-100 lg:border-none rounded-2xl lg:rounded-none shadow-sm lg:shadow-none">
+                        <td class="block lg:table-cell p-3 lg:p-4 border-b border-dashed border-slate-100 lg:border-none">
                             <div class="flex items-center gap-3">
-                                <div class="w-10 h-10 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center flex-shrink-0">
-                                    <i class="fas ${icon}"></i>
+                                <div class="w-12 h-12 lg:w-10 lg:h-10 rounded-2xl lg:rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center flex-shrink-0">
+                                    <i class="fas ${icon} text-lg lg:text-base"></i>
                                 </div>
                                 <div>
-                                    <div class="font-black text-slate-800">${item.vendor}</div>
-                                    <div class="text-[10px] font-bold text-slate-400 uppercase">${item.tipe}</div>
+                                    <div class="lg:hidden text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-0.5">Maskapai/Vendor</div>
+                                    <div class="font-black text-slate-800 text-base lg:text-sm">${item.vendor}</div>
+                                    <div class="text-[11px] lg:text-[10px] font-bold text-slate-400 uppercase mt-0.5 lg:mt-0">${item.tipe}</div>
                                 </div>
                             </div>
                         </td>
-                        <td class="p-4">
+                        <td class="block lg:table-cell p-3 lg:p-4 border-b border-dashed border-slate-100 lg:border-none">
+                            <div class="lg:hidden text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Waktu & Rute</div>
                             <div class="font-bold text-slate-700">${item.rute}</div>
-                            <div class="text-xs text-slate-500"><i class="far fa-calendar-alt mr-1"></i>${item.tanggalBerangkat} | <i class="far fa-clock mr-1"></i>${item.jamBerangkat}</div>
+                            <div class="text-xs text-slate-500 mt-1"><i class="far fa-calendar-alt mr-1"></i>${item.tanggalBerangkat} | <i class="far fa-clock mr-1"></i>${item.jamBerangkat}</div>
                         </td>
-                        <td class="p-4">
+                        <td class="flex lg:table-cell items-center justify-between lg:justify-start p-3 lg:p-4 border-b border-dashed border-slate-100 lg:border-none">
+                            <div class="lg:hidden text-[10px] font-bold text-slate-400 uppercase tracking-widest">Penumpang</div>
                             <div class="font-black text-blue-600">${item.namaPenumpang}</div>
                         </td>
-                        <td class="p-4 text-right">
-                            <div class="font-bold text-slate-700">${formatRupiah(item.hargaTiket)}</div>
+                        <td class="flex lg:table-cell items-center justify-between lg:text-right p-3 lg:p-4 border-b border-dashed border-slate-100 lg:border-none">
+                            <div class="lg:hidden text-[10px] font-bold text-slate-400 uppercase tracking-widest">Harga Tiket</div>
+                            <div class="font-bold text-slate-700 text-right">${formatRupiah(item.hargaTiket)}</div>
                         </td>
-                        <td class="p-4 text-center">
+                        <td class="flex lg:table-cell items-center justify-between lg:text-center p-3 lg:p-4 border-b border-dashed border-slate-100 lg:border-none">
+                            <div class="lg:hidden text-[10px] font-bold text-slate-400 uppercase tracking-widest">Status</div>
                             <span class="inline-flex px-2 py-1 text-[10px] font-black uppercase tracking-wider rounded-lg border ${statusColor}">
                                 ${item.statusPembayaran}
                             </span>
                         </td>
-                        <td class="p-4 text-center">
-                            <div class="flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                                <button onclick='printStrukEkstra(${JSON.stringify(item)})' class="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white transition-colors flex items-center justify-center" title="Cetak Struk">
+                        <td class="block lg:table-cell p-3 lg:p-4 lg:text-center">
+                            <div class="flex items-center lg:justify-center gap-2 lg:opacity-0 group-hover:opacity-100 transition-opacity justify-end">
+                                <button onclick='printStrukEkstra(${JSON.stringify(item)})' class="w-10 h-10 lg:w-8 lg:h-8 rounded-xl lg:rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white transition-colors flex items-center justify-center" title="Cetak Struk">
                                     <i class="fas fa-print"></i>
                                 </button>
-                                <button onclick='openEditEkstraModal(${JSON.stringify(item)})' class="w-8 h-8 rounded-lg bg-amber-50 text-amber-600 hover:bg-amber-600 hover:text-white transition-colors flex items-center justify-center" title="Edit">
+                                <button onclick='openEditEkstraModal(${JSON.stringify(item)})' class="w-10 h-10 lg:w-8 lg:h-8 rounded-xl lg:rounded-lg bg-amber-50 text-amber-600 hover:bg-amber-600 hover:text-white transition-colors flex items-center justify-center" title="Edit">
                                     <i class="fas fa-edit"></i>
                                 </button>
-                                <button onclick="deleteEkstra('${item.id}')" class="w-8 h-8 rounded-lg bg-red-50 text-red-600 hover:bg-red-600 hover:text-white transition-colors flex items-center justify-center" title="Hapus">
+                                <button onclick="deleteEkstra('${item.id}')" class="w-10 h-10 lg:w-8 lg:h-8 rounded-xl lg:rounded-lg bg-red-50 text-red-600 hover:bg-red-600 hover:text-white transition-colors flex items-center justify-center" title="Hapus">
                                     <i class="fas fa-trash"></i>
                                 </button>
                             </div>
