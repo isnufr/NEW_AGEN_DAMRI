@@ -533,25 +533,17 @@
 
                     <!-- Modern Cards -->
                     <div class="flex flex-col gap-4 mb-8 fade-up">
-                        <!-- Row 1: Total Booking -->
-                        <div class="stat-card p-4 lg:p-5 border-l-4 border-l-blue-500 w-full md:w-1/3">
-                            <div class="flex items-center gap-2 mb-2">
-                                <div class="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center text-blue-600 text-xs"><i class="fas fa-ticket-alt"></i></div>
-                                <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest leading-tight">Total Booking</p>
-                            </div>
-                            <h3 class="text-xl lg:text-2xl font-black text-slate-800" id="cardTotalBooking">0</h3>
-                        </div>
-
-                        <!-- Row 2: Hari Ini -->
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                            <!-- Omset Hari Ini -->
-                            <div class="stat-card p-4 lg:p-5 border-l-4 border-l-emerald-500">
+                        <!-- Row 1: Main Stats -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 lg:w-2/3">
+                            <!-- Total Booking -->
+                            <div class="stat-card p-4 lg:p-5 border-l-4 border-l-blue-500">
                                 <div class="flex items-center gap-2 mb-2">
-                                    <div class="w-8 h-8 rounded-lg bg-emerald-50 flex items-center justify-center text-emerald-600 text-xs"><i class="fas fa-coins"></i></div>
-                                    <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest leading-tight">Omset Hari Ini</p>
+                                    <div class="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center text-blue-600 text-xs"><i class="fas fa-ticket-alt"></i></div>
+                                    <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest leading-tight">Total Booking</p>
                                 </div>
-                                <h3 class="text-lg lg:text-xl font-black text-slate-800" id="cardOmsetToday">Rp 0</h3>
+                                <h3 class="text-xl lg:text-2xl font-black text-slate-800" id="cardTotalBooking">0</h3>
                             </div>
+
                             <!-- Setoran Hari Ini -->
                             <div class="stat-card p-4 lg:p-5 border-l-4 border-l-violet-500">
                                 <div class="flex items-center gap-2 mb-2">
@@ -559,14 +551,6 @@
                                     <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest leading-tight">Setoran Hari Ini</p>
                                 </div>
                                 <h3 class="text-lg lg:text-xl font-black text-slate-800" id="cardSetoranToday">Rp 0</h3>
-                            </div>
-                            <!-- Pendapatan Hari Ini -->
-                            <div class="stat-card p-4 lg:p-5 border-l-4 border-l-amber-500">
-                                <div class="flex items-center gap-2 mb-2">
-                                    <div class="w-8 h-8 rounded-lg bg-amber-50 flex items-center justify-center text-amber-600 text-xs"><i class="fas fa-piggy-bank"></i></div>
-                                    <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest leading-tight">Pendapatan Hari Ini</p>
-                                </div>
-                                <h3 class="text-lg lg:text-xl font-black text-slate-800" id="cardPendapatanToday">Rp 0</h3>
                             </div>
                         </div>
 
@@ -1619,9 +1603,6 @@
         // Card 1: Total Booking (period)
         document.getElementById('cardTotalBooking').textContent = periodData.length;
 
-        // Card 2: Omset Hari Ini (always today)
-        const omsetToday = todayData.reduce((s, l) => s + l.totalHarga, 0);
-        document.getElementById('cardOmsetToday').textContent = formatRupiah(omsetToday);
 
         // Card 3: Total Omset (period)
         const totalOmset = periodData.reduce((s, l) => s + l.totalHarga, 0);
@@ -1635,9 +1616,6 @@
         const totalSetoran = futureData.reduce((s, l) => s + l.totalHarga, 0) - futureData.reduce((s, l) => s + l.totalKomisi, 0);
         document.getElementById('cardTotalSetoran').textContent = formatRupiah(totalSetoran);
 
-        // Card 6: Pendapatan Hari Ini (always today)
-        const pendapatanToday = todayData.reduce((s, l) => s + l.totalKomisi, 0);
-        document.getElementById('cardPendapatanToday').textContent = formatRupiah(pendapatanToday);
 
         // Card 7: Total Pendapatan (period)
         const totalPendapatan = periodData.reduce((s, l) => s + l.totalKomisi, 0);
