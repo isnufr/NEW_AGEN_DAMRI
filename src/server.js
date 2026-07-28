@@ -84,6 +84,13 @@ app.get('/api', async (req, res) => {
             return res.json({ status: 'success', data: formattedArmadas });
         }
         
+        if (action === 'getEkstraBookings') {
+            const bookings = await prisma.ekstraBooking.findMany();
+            // Sort in memory for accurate chronological order
+            bookings.sort((a, b) => parseCustomDate(b.createdAt) - parseCustomDate(a.createdAt));
+            return res.json({ status: 'success', data: bookings });
+        }
+        
         if (action === 'getLaporan') {
             const laporan = await prisma.booking.findMany();
             // Sort in memory for accurate chronological order
@@ -248,6 +255,57 @@ app.post('/api', async (req, res) => {
                 where: { idArmada: id_armada }
             });
             return res.json({ status: 'success', message: 'Data armada berhasil dihapus' });
+        }
+
+        if (action === 'addEkstraBooking') {
+            const { tipe, vendor, rute, tanggalBerangkat, jamBerangkat, kodeBooking, namaPenumpang, hargaTiket, totalHarga, statusPembayaran } = payload;
+            const komisi = parseInt(totalHarga) - parseInt(hargaTiket);
+            const newBooking = await prisma.ekstraBooking.create({
+                data: {
+                    tipe: tipe,
+                    vendor: vendor,
+                    rute: rute,
+                    tanggalBerangkat: tanggalBerangkat,
+                    jamBerangkat: jamBerangkat,
+                    kodeBooking: kodeBooking || '',
+                    namaPenumpang: namaPenumpang,
+                    hargaTiket: parseInt(hargaTiket) || 0,
+                    totalHarga: parseInt(totalHarga) || 0,
+                    komisi: komisi,
+                    statusPembayaran: statusPembayaran || 'LUNAS',
+                    createdAt: new Date().toISOString()
+                }
+            });
+            return res.json({ status: 'success', message: 'Tiket berhasil ditambahkan', data: newBooking });
+        }
+
+        if (action === 'editEkstraBooking') {
+            const { id, vendor, rute, tanggalBerangkat, jamBerangkat, kodeBooking, namaPenumpang, hargaTiket, totalHarga, statusPembayaran } = payload;
+            const komisi = parseInt(totalHarga) - parseInt(hargaTiket);
+            await prisma.ekstraBooking.update({
+                where: { id: id },
+                data: {
+                    vendor: vendor,
+                    rute: rute,
+                    tanggalBerangkat: tanggalBerangkat,
+                    jamBerangkat: jamBerangkat,
+                    kodeBooking: kodeBooking || '',
+                    namaPenumpang: namaPenumpang,
+                    hargaTiket: parseInt(hargaTiket) || 0,
+                    totalHarga: parseInt(totalHarga) || 0,
+                    komisi: komisi,
+                    statusPembayaran: statusPembayaran
+                }
+            });
+            return res.json({ status: 'success', message: 'Data tiket berhasil diperbarui' });
+        }
+
+        if (action === 'deleteEkstraBooking') {
+            const { id } = payload;
+            await prisma.ekstraBooking.delete({
+                where: { id: id }
+            });
+            return res.json({ status: 'success', message: 'Tiket berhasil dihapus' });
         }
 
         if (action === 'loginAdmin') {

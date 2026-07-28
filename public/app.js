@@ -6,6 +6,7 @@ const SCRIPT_URL = "/api";
 let cachedArmadas = [];
 let cachedBookings = [];
 let cachedLaporan = [];
+let cachedEkstraBookings = [];
 let isDataLoaded = false;
 
 // ==========================================
@@ -53,10 +54,11 @@ async function initData() {
     if (isDataLoaded) return true;
 
     try {
-        const [bData, aData, lData] = await Promise.all([
+        const [bData, aData, lData, eData] = await Promise.all([
             fetchFromSheets('getBookings'),
             fetchFromSheets('getArmada'),
-            fetchFromSheets('getLaporan')
+            fetchFromSheets('getLaporan'),
+            fetchFromSheets('getEkstraBookings')
         ]);
 
         if (aData && Array.isArray(aData)) {
@@ -164,6 +166,11 @@ async function initData() {
             localStorage.setItem('app_laporan', JSON.stringify(cachedLaporan));
         }
 
+        if (eData && Array.isArray(eData)) {
+            cachedEkstraBookings = eData;
+            localStorage.setItem("app_ekstra", JSON.stringify(cachedEkstraBookings));
+        }
+
         isDataLoaded = true;
         return true;
     } catch (error) {
@@ -173,9 +180,11 @@ async function initData() {
         const localA = localStorage.getItem("app_armadas");
         const localB = localStorage.getItem("app_bookings");
         const localL = localStorage.getItem("app_laporan");
+        const localE = localStorage.getItem("app_ekstra");
         if (localA) cachedArmadas = JSON.parse(localA);
         if (localB) cachedBookings = JSON.parse(localB);
         if (localL) cachedLaporan = JSON.parse(localL);
+        if (localE) cachedEkstraBookings = JSON.parse(localE);
         
         isDataLoaded = true;
         return false;
@@ -187,6 +196,10 @@ async function initData() {
 // ==========================================
 function getArmadas() {
     return cachedArmadas;
+}
+
+function getEkstraBookings() {
+    return cachedEkstraBookings;
 }
 
 function getBookings() {

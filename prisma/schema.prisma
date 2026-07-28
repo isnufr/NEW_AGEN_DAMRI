@@ -3,7 +3,7 @@ generator client {
 }
 
 datasource db {
-  provider = "mysql"
+  provider = "sqlite"
   url      = env("DATABASE_URL")
 }
 
@@ -40,4 +40,20 @@ model Admin {
   id       String @id @default(uuid())
   username String @unique
   password String
+}
+
+model EkstraBooking {
+  id               String   @id @default(uuid())
+  tipe             String
+  vendor           String
+  rute             String
+  tanggalBerangkat String
+  jamBerangkat     String
+  kodeBooking      String
+  namaPenumpang    String
+  hargaTiket       Int
+  komisi           Int      @default(0)
+  totalHarga       Int
+  statusPembayaran String
+  createdAt        String
 }
