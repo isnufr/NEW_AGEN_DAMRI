@@ -819,7 +819,7 @@
                                     <tr class="bg-slate-50/50">
                                         <th class="p-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">Tipe & Vendor</th>
                                         <th class="p-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">Waktu & Rute</th>
-                                        <th class="p-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">Penumpang & Kode</th>
+                                        <th class="p-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">Penumpang</th>
                                         <th class="p-4 text-[10px] font-black text-slate-400 uppercase tracking-widest text-right">Harga Tiket</th>
                                         <th class="p-4 text-[10px] font-black text-slate-400 uppercase tracking-widest text-center">Status</th>
                                         <th class="p-4 text-[10px] font-black text-slate-400 uppercase tracking-widest text-center">Aksi</th>
@@ -4794,15 +4794,9 @@ function updateChartColors(isDark) {
                         </div>
                     </div>
 
-                    <div class="grid grid-cols-2 gap-4">
-                        <div>
-                            <label class="block text-xs font-bold text-slate-500 mb-1 uppercase">Nama Penumpang</label>
-                            <input type="text" id="ekstraNama" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500/50" required>
-                        </div>
-                        <div>
-                            <label class="block text-xs font-bold text-slate-500 mb-1 uppercase">Kode Booking / PNR</label>
-                            <input type="text" id="ekstraKode" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500/50" required>
-                        </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 mb-1 uppercase">Nama Penumpang</label>
+                        <input type="text" id="ekstraNama" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500/50" required>
                     </div>
 
                     <div class="grid grid-cols-2 gap-4">
@@ -4867,7 +4861,6 @@ function updateChartColors(isDark) {
                         </td>
                         <td class="p-4">
                             <div class="font-black text-blue-600">${item.namaPenumpang}</div>
-                            <div class="text-xs font-bold text-slate-500 tracking-wider">PNR: ${item.kodeBooking}</div>
                         </td>
                         <td class="p-4 text-right">
                             <div class="font-bold text-slate-700">${formatRupiah(item.hargaTiket)}</div>
@@ -4919,7 +4912,6 @@ function updateChartColors(isDark) {
             document.getElementById('ekstraTanggal').value = item.tanggalBerangkat;
             document.getElementById('ekstraJam').value = item.jamBerangkat;
             document.getElementById('ekstraNama').value = item.namaPenumpang;
-            document.getElementById('ekstraKode').value = item.kodeBooking;
             document.getElementById('ekstraHarga').value = item.hargaTiket;
             document.getElementById('ekstraStatus').value = item.statusPembayaran;
 
@@ -4964,7 +4956,7 @@ function updateChartColors(isDark) {
                 tanggalBerangkat: document.getElementById('ekstraTanggal').value,
                 jamBerangkat: document.getElementById('ekstraJam').value,
                 namaPenumpang: document.getElementById('ekstraNama').value,
-                kodeBooking: document.getElementById('ekstraKode').value,
+                kodeBooking: '',
                 hargaTiket: document.getElementById('ekstraHarga').value,
                 statusPembayaran: document.getElementById('ekstraStatus').value,
             };
@@ -5056,7 +5048,6 @@ function updateChartColors(isDark) {
                     <div class="center bold title">AGEN DAMRI KAWUNGANTEN</div>
                     <div class="center subtitle">AGEN TIKET & TRAVEL</div>
                     
-                    <div class="row"><span>KODE</span> <span>: <span class="bold">${item.kodeBooking}</span></span></div>
                     <div class="row"><span>TGL/JAM</span> <span>: ${item.tanggalBerangkat} ${item.jamBerangkat}</span></div>
                     
                     <div class="divider"></div>
