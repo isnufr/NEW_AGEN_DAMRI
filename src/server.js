@@ -209,6 +209,21 @@ app.post('/api', async (req, res) => {
             return res.json({ status: 'success', message: 'Data pesanan berhasil diperbarui' });
         }
 
+        if (action === 'addArmada') {
+            const { nama_armada, tujuan_armada, jam, harga, seat } = payload;
+            const newArmada = await prisma.armada.create({
+                data: {
+                    idArmada: 'ARM' + Math.floor(Math.random() * 1000000).toString().padStart(6, '0'),
+                    namaArmada: nama_armada,
+                    tujuanArmada: tujuan_armada,
+                    jam: jam,
+                    harga: harga.toString(),
+                    seat: parseInt(seat) || 40
+                }
+            });
+            return res.json({ status: 'success', message: 'Armada berhasil ditambahkan', data: newArmada });
+        }
+
         if (action === 'editArmadaData') {
             const { id_armada, nama_armada, tujuan_armada, jam, harga, seat } = payload;
             await prisma.armada.update({
