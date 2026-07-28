@@ -153,7 +153,7 @@ app.post('/api', async (req, res) => {
                     jumlahPnp: parseInt(payload['JUMLAH PNP']) || 1,
                     waktu: payload['WAKTU'],
                     nomorKursi: payload['NOMOR KURSI'] || '',
-                    keterangan: payload['KETERANGAN'] || '',
+                    keterangan: payload['KETERANGAN'] || payload['Keterangan'] || payload['keterangan'] || '',
                     totalHarga: totalHarga,
                     pembayaran: payload['PEMBAYARAN'] || 'CASH',
                     status: payload['Status'] ? payload['Status'] : (payload['PEMBAYARAN'] === 'LUNAS' || payload['PEMBAYARAN'] === 'ACC' ? 'LUNAS' : 'WAITING'),
@@ -187,7 +187,7 @@ app.post('/api', async (req, res) => {
         }
 
         if (action === 'editBookingData') {
-            const { id_tiket, nama, hp, tanggalPemberangkatan, jenisKendaraan, tujuan, jumlahPnp, harga, totalHarga, waktu, nomorKursi, status } = payload;
+            const { id_tiket, nama, hp, tanggalPemberangkatan, jenisKendaraan, tujuan, jumlahPnp, harga, totalHarga, waktu, nomorKursi, status, keterangan } = payload;
             
             const updateData = {
                 nama: nama,
@@ -203,6 +203,7 @@ app.post('/api', async (req, res) => {
                 totalKomisi: parseInt(totalHarga) * 0.1
             };
             if (status) updateData.status = status;
+            if (keterangan !== undefined) updateData.keterangan = keterangan;
 
             await prisma.booking.update({
                 where: { bookingId: id_tiket },

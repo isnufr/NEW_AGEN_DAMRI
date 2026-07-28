@@ -129,7 +129,7 @@ async function initData() {
                     dateTravel: tgl,
                     waktu: b["WAKTU"] || "",
                     pembayaran: b["PEMBAYARAN"] || "",
-                    keterangan: b["KETERANGAN"] || "",
+                    keterangan: b["KETERANGAN"] || b["Keterangan"] || b["keterangan"] || "",
                     kursi: b["NOMOR KURSI"] || ""
                 };
             });
