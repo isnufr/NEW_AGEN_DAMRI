@@ -2038,7 +2038,7 @@
                 ig.bookings.forEach(b => {
                     const isPaid = (b.status === 'paid' || String(b.status).toUpperCase() === 'LUNAS' || String(b.status).toUpperCase() === 'ACC');
                     const badgeClass = isPaid ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700';
-                    const badgeText = isPaid ? 'LUNAS' : 'BELUM ACC';
+                    const badgeText = isPaid ? 'LUNAS' : 'BELUM LUNAS';
                     const ket = b.keterangan || b['Keterangan'] || b['KETERANGAN'] || '';
                     
                     html += `
@@ -2238,7 +2238,7 @@
     function buildBookingRow(b, showAccBtn) {
         const isPaid = (b.status === 'paid' || b.status === 'Lunas' || b.status === 'ACC');
         const badgeClass = isPaid ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700';
-        const badgeText = isPaid ? 'LUNAS' : 'BELUM ACC';
+        const badgeText = isPaid ? 'LUNAS' : 'BELUM LUNAS';
 
         const armada = b.armadaId !== 'UNKNOWN' ? getArmada(b.armadaId) : null;
         const armadaName = armada ? armada.name : '-';
