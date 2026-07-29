@@ -100,8 +100,12 @@ async function initData() {
                 const bStatus = b["Status"] ? String(b["Status"]).toUpperCase() : "";
                 const bPembayaran = b["PEMBAYARAN"] ? String(b["PEMBAYARAN"]).toUpperCase() : "";
                 
-                if (bStatus === "LUNAS" || bStatus === "ACC" || bPembayaran === "LUNAS" || bPembayaran === "ACC" || bStatus === "BELUM LUNAS" || bPembayaran === "BELUM LUNAS") {
+                if (bStatus === "LUNAS" || bStatus === "ACC" || bPembayaran === "LUNAS" || bPembayaran === "ACC") {
                     statusLocal = "paid";
+                } else if (bStatus === "BELUM LUNAS" || bPembayaran === "BELUM LUNAS") {
+                    statusLocal = "BELUM LUNAS";
+                } else {
+                    statusLocal = bStatus || bPembayaran || "waiting_payment";
                 }
 
                 let tgl = "";

@@ -781,16 +781,15 @@
                                 <thead>
                                     <tr>
                                         <th>ID</th>
-                                        <th>Nama Armada</th>
                                         <th>Tujuan</th>
                                         <th class="text-right">Jam &amp; Harga</th>
                                         <th class="text-center w-16">Aksi</th>
                                     </tr>
                                 </thead>
                                 <tbody id="armadaTableBody">
-                                    <tr class="animate-pulse border-b border-slate-50"><td colspan="5" class="p-4"><div class="flex items-center gap-4"><div class="w-10 h-10 bg-slate-200 rounded-xl flex-shrink-0"></div><div class="flex-1 space-y-2"><div class="h-4 bg-slate-200 rounded w-1/3"></div><div class="h-3 bg-slate-100 rounded w-1/4"></div></div><div class="w-16 h-6 bg-slate-200 rounded-lg flex-shrink-0"></div></div></td></tr>
-                                    <tr class="animate-pulse border-b border-slate-50"><td colspan="5" class="p-4"><div class="flex items-center gap-4"><div class="w-10 h-10 bg-slate-200 rounded-xl flex-shrink-0"></div><div class="flex-1 space-y-2"><div class="h-4 bg-slate-200 rounded w-1/2"></div><div class="h-3 bg-slate-100 rounded w-1/3"></div></div><div class="w-16 h-6 bg-slate-200 rounded-lg flex-shrink-0"></div></div></td></tr>
-                                    <tr class="animate-pulse border-b border-slate-50"><td colspan="5" class="p-4"><div class="flex items-center gap-4"><div class="w-10 h-10 bg-slate-200 rounded-xl flex-shrink-0"></div><div class="flex-1 space-y-2"><div class="h-4 bg-slate-200 rounded w-2/5"></div><div class="h-3 bg-slate-100 rounded w-1/5"></div></div><div class="w-16 h-6 bg-slate-200 rounded-lg flex-shrink-0"></div></div></td></tr>
+                                    <tr class="animate-pulse border-b border-slate-50"><td colspan="4" class="p-4"><div class="flex items-center gap-4"><div class="w-10 h-10 bg-slate-200 rounded-xl flex-shrink-0"></div><div class="flex-1 space-y-2"><div class="h-4 bg-slate-200 rounded w-1/3"></div><div class="h-3 bg-slate-100 rounded w-1/4"></div></div><div class="w-16 h-6 bg-slate-200 rounded-lg flex-shrink-0"></div></div></td></tr>
+                                    <tr class="animate-pulse border-b border-slate-50"><td colspan="4" class="p-4"><div class="flex items-center gap-4"><div class="w-10 h-10 bg-slate-200 rounded-xl flex-shrink-0"></div><div class="flex-1 space-y-2"><div class="h-4 bg-slate-200 rounded w-1/2"></div><div class="h-3 bg-slate-100 rounded w-1/3"></div></div><div class="w-16 h-6 bg-slate-200 rounded-lg flex-shrink-0"></div></div></td></tr>
+                                    <tr class="animate-pulse border-b border-slate-50"><td colspan="4" class="p-4"><div class="flex items-center gap-4"><div class="w-10 h-10 bg-slate-200 rounded-xl flex-shrink-0"></div><div class="flex-1 space-y-2"><div class="h-4 bg-slate-200 rounded w-2/5"></div><div class="h-3 bg-slate-100 rounded w-1/5"></div></div><div class="w-16 h-6 bg-slate-200 rounded-lg flex-shrink-0"></div></div></td></tr>
                                 </tbody>
                             </table>
                         </div>
@@ -2361,7 +2360,7 @@
         if (!tbody) return;
 
         if (!armadas.length) {
-            tbody.innerHTML = '<tr><td colspan="5" class="text-center text-sm text-slate-400 font-bold py-8 italic uppercase tracking-widest">Belum ada data armada</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="4" class="text-center text-sm text-slate-400 font-bold py-8 italic uppercase tracking-widest">Belum ada data armada</td></tr>';
             return;
         }
 
@@ -2382,7 +2381,7 @@
 
             html += `
                 <tr class="cursor-pointer bg-blue-50 hover:bg-blue-100 transition-colors border-b border-blue-200" onclick="toggleArmada('${index}')">
-                    <td colspan="5" class="px-4 py-3">
+                    <td colspan="4" class="px-4 py-3">
                         <div class="flex items-center justify-between">
                             <div class="flex items-center gap-2">
                                 <i class="fas fa-bus text-blue-600"></i>
@@ -2398,7 +2397,6 @@
                 html += `
                     <tr class="armada-group-${index} ${hiddenClass} hover:bg-slate-50 transition-colors border-b border-slate-100 last:border-0">
                         <td class="pl-8"><span class="font-black text-[10px] text-slate-400">${a.id}</span></td>
-                        <td><span class="font-black text-sm text-slate-400 uppercase hidden">${a.name}</span></td>
                         <td><span class="font-bold text-sm text-slate-800 uppercase">${a.destination}</span></td>
                         <td class="text-right"><p class="font-black text-sm text-slate-800">${formatRupiah(a.price)}</p><p class="text-[11px] text-blue-500 font-bold mt-1"><i class="far fa-clock mr-1"></i>${a.time}</p></td>
                         <td class="text-center"><div class="flex gap-1 justify-center"><button onclick="openEditArmadaModal('${a.id}')" class="bg-amber-500 hover:bg-amber-600 text-white w-7 h-7 flex items-center justify-center rounded-lg text-xs shadow-sm transition-all mx-auto" title="Edit Armada"><i class="fas fa-edit"></i></button>
@@ -3662,7 +3660,7 @@
             if(res.status === 'success') {
                 showMessage('Data pesanan berhasil diperbarui!');
                 closeEditBookingModal();
-                refreshData();
+                await refreshData();
             } else {
                 showMessage('Gagal menyimpan pesanan', true);
             }

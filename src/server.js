@@ -205,11 +205,15 @@ app.post('/api', async (req, res) => {
                 jumlahPnp: parseInt(jumlahPnp) || 1,
                 waktu: waktu,
                 nomorKursi: nomorKursi || '',
+                harga: parseInt(harga) || 0,
                 totalHarga: parseInt(totalHarga) || 0,
-                komisi: parseInt(harga) * 0.1,
-                totalKomisi: parseInt(totalHarga) * 0.1
+                komisi: (parseInt(harga) || 0) * 0.1,
+                totalKomisi: (parseInt(totalHarga) || 0) * 0.1
             };
-            if (status) updateData.status = status;
+            if (status) {
+                updateData.status = status;
+                updateData.pembayaran = status;
+            }
             if (keterangan !== undefined) updateData.keterangan = keterangan;
 
             await prisma.booking.update({
