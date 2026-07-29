@@ -2112,7 +2112,7 @@
     // ========================================
     function updateNotifications() {
         const allBookings = getBookings().slice();
-        const requests = allBookings.filter(b => b.status === 'waiting_payment' || b.status === 'Belum ACC');
+        const requests = allBookings.filter(b => b.status === 'waiting_payment' || b.status === 'Belum ACC' || b.status === 'BELUM ACC' || b.status === 'WAITING');
         
         const badgeMobile = document.getElementById('notifBadgeMobile');
         const badgeDesktop = document.getElementById('notifBadgeDesktop');
