@@ -1845,7 +1845,9 @@
                                 String(b.pembayaran).toUpperCase() === "ACC" ||
                                 String(b.status).toUpperCase() === "ACC" ||
                                 String(b.status).toUpperCase() === "LUNAS" ||
-                                String(b.status).toUpperCase() === "PAID";
+                                String(b.status).toUpperCase() === "PAID" ||
+                                String(b.status).toUpperCase() === "BELUM LUNAS" ||
+                                String(b.pembayaran).toUpperCase() === "BELUM LUNAS";
                                 
             const armada = b.armadaId !== 'UNKNOWN' ? getArmada(b.armadaId) : null;
             const armadaName = armada ? armada.name.toLowerCase() : '';
