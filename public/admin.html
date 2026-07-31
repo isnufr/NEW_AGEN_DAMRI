@@ -1478,9 +1478,10 @@
         
         // Populate static dropdowns globally
         const armadas = getArmadas();
+        const activeArmadas = armadas.filter(a => a.isActive !== false);
         const armadaNameSelect = document.getElementById('adminBookingArmadaName');
         if (armadaNameSelect) {
-            const uniqueNames = [...new Set(armadas.map(a => a.name))];
+            const uniqueNames = [...new Set(activeArmadas.map(a => a.name))];
             armadaNameSelect.innerHTML = '<option value="">-- Pilih Armada --</option>' + uniqueNames.map(n => `<option value="${n}">${n}</option>`).join('');
             
             const timeSelect = document.getElementById('adminBookingTime');
@@ -4093,7 +4094,8 @@
             ruteSelect.innerHTML = '<option value="">-- Pilih Rute --</option>';
         } else {
             const armadas = getArmadas();
-            const filteredByName = armadas.filter(a => a.name === selectedName);
+            const activeArmadas = armadas.filter(a => a.isActive !== false);
+            const filteredByName = activeArmadas.filter(a => a.name === selectedName);
             const uniqueTimes = [...new Set(filteredByName.map(a => a.time))].sort();
             
             timeSelect.innerHTML = '<option value="">-- Pilih Jam --</option>' + uniqueTimes.map(t => `<option value="${t}">${t}</option>`).join('');
@@ -4111,7 +4113,8 @@
             ruteSelect.innerHTML = '<option value="">-- Pilih Rute --</option>';
         } else {
             const armadas = getArmadas();
-            const filtered = armadas.filter(a => a.name === selectedName && a.time === selectedTime);
+            const activeArmadas = armadas.filter(a => a.isActive !== false);
+            const filtered = activeArmadas.filter(a => a.name === selectedName && a.time === selectedTime);
             ruteSelect.innerHTML = '<option value="">-- Pilih Rute --</option>' + filtered.map(a => `<option value="${a.id}">${a.destination}</option>`).join('');
         }
         recalcAdminBooking();
