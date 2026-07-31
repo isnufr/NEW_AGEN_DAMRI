@@ -521,6 +521,20 @@
 
                     <div class="grid grid-cols-1 gap-4 md:gap-5">
                         <div>
+                            <label class="input-label">Tipe Perjalanan</label>
+                            <div class="flex gap-4">
+                                <label class="flex items-center gap-2 cursor-pointer">
+                                    <input type="radio" name="bookTipePerjalanan" value="Berangkat" class="w-4 h-4 text-blue-600 focus:ring-blue-500 border-gray-300" checked>
+                                    <span class="text-xs md:text-sm font-bold text-gray-700">Berangkat (Dari Kawunganten)</span>
+                                </label>
+                                <label class="flex items-center gap-2 cursor-pointer">
+                                    <input type="radio" name="bookTipePerjalanan" value="Pulang" class="w-4 h-4 text-blue-600 focus:ring-blue-500 border-gray-300">
+                                    <span class="text-xs md:text-sm font-bold text-gray-700">Pulang (Menuju Kawunganten)</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div>
                             <label class="input-label">Pilih Armada</label>
                             <div class="relative">
                                 <select id="bookArmada" onchange="updateBookingFields()"
@@ -1388,7 +1402,7 @@
             
             const armadas = getArmadas();
             if (armadas && armadas.length > 0) {
-                // Konversi data dari Sheets ke struktur fleetData yang dibutuhkan index.html
+                // Konversi data dari database ke struktur fleetData yang dibutuhkan index.html
                 const grouped = {};
                 armadas.forEach(a => {
                     if (!grouped[a.name]) {
@@ -1587,9 +1601,15 @@
     function closeSuccessModal() { document.getElementById('successModal').classList.add('hidden'); document.body.style.overflow = 'auto'; }
 
     async function submitBooking() {
-        const a = document.getElementById('bookArmada').value, t = document.getElementById('bookTujuan').value, w = document.getElementById('bookWaktu').value, d = document.getElementById('bookTanggal').value, n = document.getElementById('bookNama').value, h = document.getElementById('bookHp').value, j = document.getElementById('bookJumlah').value, k = document.getElementById('bookKeterangan').value, tot = document.getElementById('bookTotalBayar').value, mb = document.getElementById('bookMetodeBayar').value;
+        const a = document.getElementById('bookArmada').value, w = document.getElementById('bookWaktu').value, d = document.getElementById('bookTanggal').value, n = document.getElementById('bookNama').value, h = document.getElementById('bookHp').value, j = document.getElementById('bookJumlah').value, k = document.getElementById('bookKeterangan').value, tot = document.getElementById('bookTotalBayar').value, mb = document.getElementById('bookMetodeBayar').value;
+        let t = document.getElementById('bookTujuan').value;
+        const tipePerjalanan = document.querySelector('input[name="bookTipePerjalanan"]:checked').value;
 
         if (!a || !t || !w || !d || !n || !h || !j || !mb) return showMessage("Lengkapi data boking & pilih metode bayar!");
+
+        if (tipePerjalanan === 'Pulang') {
+            t = '[PULANG] ' + t;
+        }
 
         // Generate ID 7 Karakter (Huruf + Angka)
         const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
@@ -1598,7 +1618,7 @@
             bookingId += chars.charAt(Math.floor(Math.random() * chars.length));
         }
 
-        // Konversi string harga total (Rp x.xxx) ke angka murni untuk dikirim ke sheets (opsional tapi disarankan)
+        // Konversi string harga total (Rp x.xxx) ke angka murni untuk dikirim ke database (opsional tapi disarankan)
         const numericTotal = parseInt(tot.replace(/[^0-9]/g, '')) || 0;
 
         // Tentukan data rekening berdasarkan pilihan bank
@@ -1670,7 +1690,14 @@
             // Cari nama armada dari armadaId
             const armadaInfo = tiket.armadaId !== 'UNKNOWN' ? getArmada(tiket.armadaId) : null;
             const namaKendaraan = armadaInfo ? armadaInfo.name : (String(tiket.keterangan || "").split(' - ')[0] || '-');
-            const tujuan = armadaInfo ? armadaInfo.destination : (String(tiket.keterangan || "").split(' - ')[1] || '-');
+            let tujuan = armadaInfo ? armadaInfo.destination : (String(tiket.keterangan || "").split(' - ')[1] || '-');
+
+            let asalText = 'AGEN DAMRI KAWUNGANTEN';
+            let tujuanText = tujuan;
+            if (tiket.tujuan && tiket.tujuan.startsWith('[PULANG] ')) {
+                asalText = tiket.tujuan.replace('[PULANG] ', '');
+                tujuanText = 'KAWUNGANTEN';
+            }
 
             h.innerHTML = `
             <div id="eTicketOutput" class="animate-fade-in-up bg-white rounded-[2rem] shadow-2xl border border-gray-100 text-left relative p-1 w-full mx-auto max-w-[380px] max-h-[85dvh] overflow-y-auto custom-scroll">
@@ -1709,7 +1736,7 @@
                             <div class="flex items-center justify-between w-full mb-4">
                                 <div class="text-left w-[40%]">
                                     <p class="text-[8px] font-black text-yellow-400 uppercase mb-1">Berangkat</p>
-                                    <p class="text-[9px] sm:text-[10px] font-black italic uppercase leading-tight">AGEN DAMRI KAWUNGANTEN</p>
+                                    <p class="text-[9px] sm:text-[10px] font-black italic uppercase leading-tight">${asalText}</p>
                                 </div>
                                 <div class="flex-1 flex items-center px-2">
                                     <div class="h-[1px] flex-1 bg-white/40"></div>
@@ -1718,7 +1745,7 @@
                                 </div>
                                 <div class="text-right w-[40%]">
                                     <p class="text-[8px] font-black text-yellow-400 uppercase mb-1">Tujuan</p>
-                                    <p class="text-[9px] sm:text-[10px] font-black italic uppercase leading-tight">${tujuan}</p>
+                                    <p class="text-[9px] sm:text-[10px] font-black italic uppercase leading-tight">${tujuanText}</p>
                                 </div>
                             </div>
                             <p class="text-[12px] sm:text-[14px] font-black text-yellow-400 uppercase tracking-widest text-center w-full block border-t border-white/10 pt-3">${namaKendaraan}</p>

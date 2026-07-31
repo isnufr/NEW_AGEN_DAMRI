@@ -1030,6 +1030,19 @@
                                         <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Tanggal</label>
                                         <input type="date" id="adminBookingDate" class="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm font-bold text-slate-700 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all" required>
                                     </div>
+                                    <div class="col-span-1 md:col-span-2">
+                                        <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Tipe Perjalanan</label>
+                                        <div class="flex gap-4 p-3 bg-white border border-slate-200 rounded-xl">
+                                            <label class="flex items-center gap-2 cursor-pointer">
+                                                <input type="radio" name="adminTipePerjalanan" value="Berangkat" class="w-4 h-4 text-blue-600 focus:ring-blue-500 border-gray-300" checked>
+                                                <span class="text-xs font-bold text-slate-700">Berangkat (Dari Kawunganten)</span>
+                                            </label>
+                                            <label class="flex items-center gap-2 cursor-pointer">
+                                                <input type="radio" name="adminTipePerjalanan" value="Pulang" class="w-4 h-4 text-blue-600 focus:ring-blue-500 border-gray-300">
+                                                <span class="text-xs font-bold text-slate-700">Pulang (Menuju Kawunganten)</span>
+                                            </label>
+                                        </div>
+                                    </div>
                                     <div>
                                         <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Pilih Armada</label>
                                         <select id="adminBookingArmadaName" class="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm font-bold text-slate-700 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all" onchange="updateAdminTime()" required>
@@ -1363,7 +1376,7 @@
                 <div class="space-y-2 border-b-2 border-dashed border-gray-300 pb-4 mb-4 text-xs">
                     <div class="flex justify-between"><span class="text-gray-700">Tanggal</span><strong id="ticketDate">-</strong></div>
                     <div class="flex justify-between"><span class="text-gray-700">Jam</span><strong id="ticketTime">-</strong></div>
-                    <div class="flex justify-between"><span class="text-gray-700">Asal</span><strong>Kawunganten</strong></div>
+                    <div class="flex justify-between"><span class="text-gray-700">Asal</span><strong id="ticketAsal">Kawunganten</strong></div>
                     <div class="flex justify-between"><span class="text-gray-700">Tujuan</span><strong id="ticketTujuan">-</strong></div>
                     <div class="flex justify-between"><span class="text-gray-700">Nama</span><strong id="ticketName">-</strong></div>
                     <div class="flex justify-between"><span class="text-gray-700">Jumlah Pnp</span><strong><span id="ticketQty"></span> Orang</strong></div>
@@ -1542,7 +1555,7 @@
         if (!str) return null;
         str = String(str).trim();
 
-        // 1. If it's an ISO string from Google Sheets (e.g. 2026-07-16T17:00:00.000Z), 
+        // 1. If it's an ISO string from database (e.g. 2026-07-16T17:00:00.000Z), 
         // letting new Date() parse it will correctly convert it to the local timezone.
         if (str.includes('T')) {
             const d = new Date(str);
@@ -2981,7 +2994,14 @@
         
         const armada = b.armadaId !== 'UNKNOWN' ? getArmada(b.armadaId) : null;
         const armadaName = armada ? armada.name : '-';
-        const tujuan = armada ? armada.destination : '-';
+        let tujuan = armada ? armada.destination : '-';
+        
+        let asalText = 'Kawunganten';
+        let rawTujuan = b.tujuan || b['Tujuan'] || tujuan;
+        if (rawTujuan && String(rawTujuan).startsWith('[PULANG] ')) {
+            asalText = rawTujuan.replace('[PULANG] ', '');
+            tujuan = 'KAWUNGANTEN';
+        }
 
         const isPaid = (b.status === 'paid' || b.status === 'Lunas' || b.status === 'ACC' || b.status === 'LUNAS');
         const statusPay = isPaid ? 'LUNAS' : 'BELUM LUNAS';
@@ -3008,6 +3028,7 @@
         if(document.getElementById('ticketDate')) document.getElementById('ticketDate').innerText = formattedDate;
         if(document.getElementById('ticketTime')) document.getElementById('ticketTime').innerText = b.waktu || '-';
         if(document.getElementById('ticketArmada')) document.getElementById('ticketArmada').innerText = armadaName;
+        if(document.getElementById('ticketAsal')) document.getElementById('ticketAsal').innerText = asalText;
         if(document.getElementById('ticketTujuan')) document.getElementById('ticketTujuan').innerText = tujuan;
         if(document.getElementById('ticketKursi')) document.getElementById('ticketKursi').innerText = b.kursi || '-';
         if(document.getElementById('ticketKeterangan')) document.getElementById('ticketKeterangan').innerText = b.keterangan || '-';
@@ -3891,12 +3912,18 @@
         };
         const idTiket = generateId();
 
+        const tipePerjalanan = document.querySelector('input[name="adminTipePerjalanan"]:checked').value;
+        let finalTujuan = armada ? armada.destination : '';
+        if (tipePerjalanan === 'Pulang' && finalTujuan) {
+            finalTujuan = '[PULANG] ' + finalTujuan;
+        }
+
         const payload = {
             'Timestamp': new Date().toISOString(),
             'TANGGAL PEMBERANGKATAN': formattedDate,
             'ID_TIKET': idTiket,
             'JENIS KENDARAAN': armada ? armada.name : '',
-            'Tujuan': armada ? armada.destination : '',
+            'Tujuan': finalTujuan,
             'Harga': armada ? formatRupiah(armada.price) : '0',
             'NAMA': name,
             'NOMOR HP': hp,
@@ -3951,10 +3978,18 @@
                 document.getElementById('r_tgl_arsip').innerText = formattedDate;
 
                 // Populate E-Ticket Visual Modal (ticket*)
+                let visualAsal = 'Kawunganten';
+                let visualTujuan = payload['Tujuan'];
+                if (visualTujuan && String(visualTujuan).startsWith('[PULANG] ')) {
+                    visualAsal = visualTujuan.replace('[PULANG] ', '');
+                    visualTujuan = 'KAWUNGANTEN';
+                }
+
                 if(document.getElementById('ticketDate')) document.getElementById('ticketDate').innerText = formattedDate;
                 if(document.getElementById('ticketTime')) document.getElementById('ticketTime').innerText = payload['WAKTU'] || '-';
                 if(document.getElementById('ticketArmada')) document.getElementById('ticketArmada').innerText = payload['JENIS KENDARAAN'];
-                if(document.getElementById('ticketTujuan')) document.getElementById('ticketTujuan').innerText = payload['Tujuan'];
+                if(document.getElementById('ticketAsal')) document.getElementById('ticketAsal').innerText = visualAsal;
+                if(document.getElementById('ticketTujuan')) document.getElementById('ticketTujuan').innerText = visualTujuan;
                 if(document.getElementById('ticketKursi')) document.getElementById('ticketKursi').innerText = kursiString || '-';
                 if(document.getElementById('ticketQty')) document.getElementById('ticketQty').innerText = payload['JUMLAH PNP'];
                 if(document.getElementById('ticketId')) document.getElementById('ticketId').innerText = idTiket;
@@ -4233,10 +4268,17 @@
             if(extraSpacing) add(CMD.LF);
         }
         
+        let asalThermal = "Kawunganten";
+        let tujuanThermal = t.tujuan;
+        if (t.tujuan && String(t.tujuan).startsWith('[PULANG] ')) {
+            asalThermal = t.tujuan.replace('[PULANG] ', '');
+            tujuanThermal = "KAWUNGANTEN";
+        }
+
         addTwoColumnsLeftRight("Tanggal", t.tglBerangkat, true);
         addTwoColumnsLeftRight("Jam", t.jam, true);
-        addTwoColumnsLeftRight("Asal", "Kawunganten", true);
-        addTwoColumnsLeftRight("Tujuan", t.tujuan, true);
+        addTwoColumnsLeftRight("Asal", asalThermal, true);
+        addTwoColumnsLeftRight("Tujuan", tujuanThermal, true);
         addTwoColumnsLeftRight("Nama", t.nama, true);
         addTwoColumnsLeftRight("Jumlah Pnp", t.jumlahPnp, true);
         addTwoColumnsLeftRight("Kursi", t.kursi || "-", true);

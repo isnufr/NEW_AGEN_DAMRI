@@ -19,7 +19,7 @@ async function fetchFromSheets(action, params = "") {
         if (!res.ok) throw new Error("Network response was not ok");
         const json = await res.json();
         
-        // Google Sheets API returns { status: "success", data: [...] }
+        // Database API returns { status: "success", data: [...] }
         if (json && json.status === "success" && json.data) {
             return json.data;
         }
@@ -42,7 +42,7 @@ async function postToSheets(action, payload) {
         });
         return await res.json();
     } catch (e) {
-        console.error("Error posting to sheets:", e);
+        console.error("Error posting to database:", e);
         return { status: "error", message: "Gagal menghubungi server" };
     }
 }
@@ -128,6 +128,7 @@ async function initData() {
                     name: b["NAMA"] || "Tanpa Nama",
                     hp: b["NOMOR HP"] || "-",
                     armadaId: armadaMatch ? armadaMatch.id : "UNKNOWN",
+                    tujuan: bTujuan,
                     qty: parseInt(b["JUMLAH PNP"]) || 1,
                     totalPrice: parseInt(b["Total Harga"]) || parseInt(b["Harga"]) || 0,
                     status: statusLocal,
