@@ -79,7 +79,8 @@ app.get('/api', async (req, res) => {
                 'tujuan_armada': a.tujuanArmada,
                 'jam': a.jam,
                 'harga': a.harga,
-                'Seat': a.seat
+                'Seat': a.seat,
+                'is_active': a.isActive
             }));
             return res.json({ status: 'success', data: formattedArmadas });
         }
@@ -251,6 +252,15 @@ app.post('/api', async (req, res) => {
                 }
             });
             return res.json({ status: 'success', message: 'Data armada berhasil diperbarui' });
+        }
+
+        if (action === 'toggleArmadaStatus') {
+            const { id_armada, is_active } = payload;
+            await prisma.armada.update({
+                where: { idArmada: id_armada },
+                data: { isActive: is_active }
+            });
+            return res.json({ status: 'success', message: `Status armada berhasil ${is_active ? 'diaktifkan' : 'dinonaktifkan'}` });
         }
 
         if (action === 'deleteArmada') {

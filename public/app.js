@@ -78,7 +78,8 @@ async function initData() {
                     destination: String(find(["Tujuan", "tujuan_armada", "Tujuan Armada", "TUJUAN"]) || "Unknown").trim(),
                     time: String(find(["Jam", "jam", "JAM", "Waktu"]) || "00:00").trim(),
                     price: parseInt(String(find(["Harga", "harga", "HARGA", "Price"]) || '0').replace(/[^0-9]/g, '')) || 0,
-                    capacity: parseInt(find(["Kapasitas", "Seat", "seat", "kapasitas", "KAPASITAS"])) || 40
+                    capacity: parseInt(find(["Kapasitas", "Seat", "seat", "kapasitas", "KAPASITAS"])) || 40,
+                    isActive: find(["is_active", "isActive"]) !== false // Defaults to true if undefined
                 };
             });
             localStorage.setItem("app_armadas", JSON.stringify(cachedArmadas));

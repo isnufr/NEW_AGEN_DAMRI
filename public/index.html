@@ -1405,6 +1405,7 @@
                 // Konversi data dari database ke struktur fleetData yang dibutuhkan index.html
                 const grouped = {};
                 armadas.forEach(a => {
+                    if (a.isActive === false) return; // Lewati armada yang dinonaktifkan
                     if (!grouped[a.name]) {
                         grouped[a.name] = { id: a.name.replace(/\s+/g, '-').toLowerCase(), name: a.name, routes: [], times: new Set() };
                     }

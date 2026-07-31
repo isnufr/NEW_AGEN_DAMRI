@@ -2416,8 +2416,13 @@
                         <td class="pl-8"><span class="font-black text-[10px] text-slate-400">${a.id}</span></td>
                         <td><span class="font-bold text-sm text-slate-800 uppercase">${a.destination}</span></td>
                         <td class="text-right"><p class="font-black text-sm text-slate-800">${formatRupiah(a.price)}</p><p class="text-[11px] text-blue-500 font-bold mt-1"><i class="far fa-clock mr-1"></i>${a.time}</p></td>
-                        <td class="text-center"><div class="flex gap-1 justify-center"><button onclick="openEditArmadaModal('${a.id}')" class="bg-amber-500 hover:bg-amber-600 text-white w-7 h-7 flex items-center justify-center rounded-lg text-xs shadow-sm transition-all mx-auto" title="Edit Armada"><i class="fas fa-edit"></i></button>
-                        <button onclick="openDeleteArmadaModal('${a.id}')" class="bg-red-500 hover:bg-red-600 text-white w-7 h-7 flex items-center justify-center rounded-lg text-xs shadow-sm transition-all mx-auto" title="Hapus Armada"><i class="fas fa-trash"></i></button></div></td>
+                        <td class="text-center">
+                            <div class="flex gap-1 justify-center">
+                                <button onclick="toggleArmadaStatusAPI('${a.id}', ${!a.isActive})" class="${a.isActive ? 'bg-emerald-500 hover:bg-emerald-600' : 'bg-slate-400 hover:bg-slate-500'} text-white w-7 h-7 flex items-center justify-center rounded-lg text-xs shadow-sm transition-all mx-auto" title="${a.isActive ? 'Nonaktifkan Armada' : 'Aktifkan Armada'}"><i class="fas ${a.isActive ? 'fa-check' : 'fa-times'}"></i></button>
+                                <button onclick="openEditArmadaModal('${a.id}')" class="bg-amber-500 hover:bg-amber-600 text-white w-7 h-7 flex items-center justify-center rounded-lg text-xs shadow-sm transition-all mx-auto" title="Edit Armada"><i class="fas fa-edit"></i></button>
+                                <button onclick="openDeleteArmadaModal('${a.id}')" class="bg-red-500 hover:bg-red-600 text-white w-7 h-7 flex items-center justify-center rounded-lg text-xs shadow-sm transition-all mx-auto" title="Hapus Armada"><i class="fas fa-trash"></i></button>
+                            </div>
+                        </td>
                     </tr>
                 `;
             });
@@ -2477,6 +2482,21 @@
         
         btn.innerText = 'HAPUS'; btn.disabled = false;
     }
+
+    async function toggleArmadaStatusAPI(id_armada, is_active) {
+        try {
+            const res = await postToSheets('toggleArmadaStatus', { id_armada, is_active });
+            if (res.status === 'success') {
+                showMessage(res.message || 'Status armada berhasil diubah');
+                refreshData();
+            } else {
+                showMessage('Gagal mengubah status armada', true);
+            }
+        } catch(e) {
+            showMessage('Kesalahan jaringan saat mengubah status', true);
+        }
+    }
+
     function renderLaporan() {
         populateCustomManifestFilters();
     }
