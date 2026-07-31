@@ -1453,17 +1453,31 @@
             let destTags = f.routes.map(r => `<span class="destination-tag">${r.dest}</span>`).join('');
             let timeTags = f.times.map(t => `<span class="time-badge"><i class="fas fa-clock"></i> ${t}</span>`).join('');
             
+            let bgImage = 'damri.webp';
+            let nameUpper = f.name.toUpperCase();
+            if (nameUpper.includes("77")) bgImage = "77trans.webp";
+            else if (nameUpper.includes("BEST")) bgImage = "bestpremium.webp";
+            else if (nameUpper.includes("JOGJA")) bgImage = "busjogja.webp";
+            else if (nameUpper.includes("EFISIENSI")) bgImage = "efisiensi.webp";
+            else if (nameUpper.includes("ESTU")) bgImage = "estutrans.webp";
+            else if (nameUpper.includes("QYTA")) bgImage = "qyta.webp";
+            else if (nameUpper.includes("RIYAN") || nameUpper.includes("ARDY")) bgImage = "riyan.webp";
+            else if (nameUpper.includes("SUMATRA")) bgImage = "damri2.webp";
+            else if (nameUpper.includes("JAKARTA")) bgImage = "damri.webp";
+            
             html += `
-            <div class="modern-card overflow-hidden h-fit flex flex-col text-center">
-                <button onclick="toggleRoute('${f.id}')" class="w-full px-8 py-8 flex flex-col items-center justify-center gap-4 focus:outline-none group text-center">
-                    <div class="h-20 px-6 bg-blue-50 rounded-2xl flex items-center justify-center ${bgHover} transition-all duration-300 text-center shadow-sm border border-blue-100">
-                        <span class="${spanClass}">${nameDisplay}</span>
-                    </div>
-                    <div class="flex items-center justify-center gap-2 text-xs font-bold text-gray-400 uppercase tracking-widest italic text-center">
-                        Lihat Rute <i id="icon-${f.id}" class="fas fa-chevron-down rotate-icon"></i>
-                    </div>
-                </button>
-                <div id="${f.id}" class="route-content px-8 pb-8 text-center">
+            <div class="modern-card overflow-hidden h-fit flex flex-col text-center relative group/card">
+                <div class="absolute inset-0 bg-cover bg-center opacity-[0.08] transition-opacity duration-300 group-hover/card:opacity-[0.15] pointer-events-none z-0" style="background-image: url('${bgImage}');"></div>
+                <div class="relative z-10 w-full flex flex-col">
+                    <button onclick="toggleRoute('${f.id}')" class="w-full px-8 py-8 flex flex-col items-center justify-center gap-4 focus:outline-none group text-center">
+                        <div class="h-20 px-6 bg-blue-50/90 backdrop-blur-sm rounded-2xl flex items-center justify-center ${bgHover} transition-all duration-300 text-center shadow-sm border border-blue-100">
+                            <span class="${spanClass}">${nameDisplay}</span>
+                        </div>
+                        <div class="flex items-center justify-center gap-2 text-xs font-bold text-gray-400 uppercase tracking-widest italic text-center">
+                            Lihat Rute <i id="icon-${f.id}" class="fas fa-chevron-down rotate-icon"></i>
+                        </div>
+                    </button>
+                    <div id="${f.id}" class="route-content px-8 pb-8 text-center bg-white/40 backdrop-blur-sm">
                     <div class="mb-4">
                         <button onclick="togglePrice('price-${f.id}')" class="btn-price mb-4">
                             <i class="fas fa-tag"></i> KLIK CEK HARGA
