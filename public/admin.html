@@ -532,6 +532,9 @@
                                 <input type="date" id="filterFrom" class="w-full md:w-auto text-xs font-bold border border-slate-200 rounded-lg px-3 py-2 focus:outline-none focus:border-blue-500" onchange="setFilter('range')">
                                 <span class="text-xs font-bold text-slate-400 shrink-0">s/d</span>
                                 <input type="date" id="filterTo" class="w-full md:w-auto text-xs font-bold border border-slate-200 rounded-lg px-3 py-2 focus:outline-none focus:border-blue-500" onchange="setFilter('range')">
+                                <button onclick="resetDashboardDateFilter()" class="bg-slate-100 text-slate-500 hover:bg-red-50 hover:text-red-500 px-3 py-2 rounded-lg text-sm font-bold transition-colors shadow-sm border border-slate-200 flex-shrink-0" title="Reset Filter">
+                                    <i class="fas fa-sync-alt"></i>
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -1826,6 +1829,14 @@
                 }
             });
         }
+    }
+
+    window.resetDashboardDateFilter = function() {
+        const fromEl = document.getElementById('filterFrom');
+        const toEl = document.getElementById('filterTo');
+        if (fromEl) fromEl.value = '';
+        if (toEl) toEl.value = '';
+        setFilter('all');
     }
 
     window.resetManifestFilter = function() {
