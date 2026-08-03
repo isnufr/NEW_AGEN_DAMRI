@@ -3,6 +3,9 @@ const express = require('express');
 const cors = require('cors');
 const path = require('path');
 const { PrismaClient } = require('@prisma/client');
+const jwt = require('jsonwebtoken');
+
+const JWT_SECRET = process.env.JWT_SECRET || 'super-secret-key';
 
 const app = express();
 const prisma = new PrismaClient();
@@ -12,6 +15,18 @@ const PORT = process.env.PORT || 3000;
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// Token parsing middleware
+app.use((req, res, next) => {
+    const authHeader = req.headers['authorization'];
+    const token = authHeader && authHeader.split(' ')[1];
+    if (token) {
+        jwt.verify(token, JWT_SECRET, (err, user) => {
+            if (!err) req.user = user;
+        });
+    }
+    next();
+});
 
 // Serve frontend build from /public
 app.use(express.static(path.join(__dirname, '../public')));
@@ -44,6 +59,11 @@ app.get('/api', async (req, res) => {
     const action = req.query.action;
 
     try {
+        const publicActions = ['getArmada'];
+        if (!publicActions.includes(action) && !req.user) {
+            return res.status(401).json({ status: 'error', message: 'Unauthorized' });
+        }
+
         if (action === 'getBookings') {
             const bookings = await prisma.booking.findMany();
             // Sort in memory for accurate chronological order regardless of string format
@@ -143,6 +163,11 @@ app.post('/api', async (req, res) => {
         }
         
         const { action, payload } = data;
+
+        const publicActions = ['addBooking', 'loginAdmin'];
+        if (!publicActions.includes(action) && !req.user) {
+            return res.status(401).json({ status: 'error', message: 'Unauthorized' });
+        }
 
         if (action === 'addBooking') {
             const harga = payload['Harga'] ? parseInt(payload['Harga'].toString().replace(/\D/g,'')) || 0 : 0;
@@ -365,7 +390,8 @@ app.post('/api', async (req, res) => {
             const { username, password } = payload;
             const admin = await prisma.admin.findUnique({ where: { username } });
             if (admin && admin.password === password) {
-                return res.json({ status: 'success', message: 'Login berhasil' });
+                const token = jwt.sign({ username: admin.username, id: admin.id }, JWT_SECRET, { expiresIn: '1d' });
+                return res.json({ status: 'success', message: 'Login berhasil', token });
             }
             return res.json({ status: 'error', message: 'Username atau password salah' });
         }

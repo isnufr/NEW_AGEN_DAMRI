@@ -95,6 +95,7 @@
 
                 if (json.status === 'success') {
                     localStorage.setItem('isAdminLoggedIn', 'true');
+                    if (json.token) localStorage.setItem('adminToken', json.token);
                     alertBox.innerText = "Login Berhasil! Mengalihkan...";
                     alertBox.className = "mt-4 p-4 rounded-xl text-center text-xs font-bold uppercase tracking-widest bg-green-100 text-green-700 block animate-fade-in-up";
                     setTimeout(() => window.location.href = 'admin.html', 1000);

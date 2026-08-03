@@ -15,7 +15,11 @@ let isDataLoaded = false;
 async function fetchFromSheets(action, params = "") {
     try {
         const url = `${SCRIPT_URL}?action=${action}${params}&_t=${Date.now()}`;
-        const res = await fetch(url);
+        const headers = {};
+        const token = localStorage.getItem('adminToken');
+        if (token) headers['Authorization'] = `Bearer ${token}`;
+        
+        const res = await fetch(url, { headers });
         if (!res.ok) throw new Error("Network response was not ok");
         const json = await res.json();
         
@@ -33,11 +37,13 @@ async function fetchFromSheets(action, params = "") {
 
 async function postToSheets(action, payload) {
     try {
-        const res = await fetch(SCRIPT_URL, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
+            const headers = { 'Content-Type': 'application/json' };
+            const token = localStorage.getItem('adminToken');
+            if (token) headers['Authorization'] = `Bearer ${token}`;
+
+            const res = await fetch(SCRIPT_URL, {
+                method: 'POST',
+                headers: headers,
             body: JSON.stringify({ action: action, payload: payload })
         });
         return await res.json();
@@ -54,12 +60,30 @@ async function initData() {
     if (isDataLoaded) return true;
 
     try {
-        const [bData, aData, lData, eData] = await Promise.all([
-            fetchFromSheets('getBookings'),
-            fetchFromSheets('getArmada'),
-            fetchFromSheets('getLaporan'),
-            fetchFromSheets('getEkstraBookings')
-        ]);
+        const isAdmin = localStorage.getItem('isAdminLoggedIn') === 'true';
+        
+        const promises = [
+            fetchFromSheets('getArmada')
+        ];
+        
+        if (isAdmin) {
+            promises.push(
+                fetchFromSheets('getBookings'),
+                fetchFromSheets('getLaporan'),
+                fetchFromSheets('getEkstraBookings')
+            );
+        }
+        
+        const results = await Promise.all(promises);
+        
+        const aData = results[0];
+        let bData = [], lData = [], eData = [];
+        
+        if (isAdmin) {
+            bData = results[1];
+            lData = results[2];
+            eData = results[3];
+        }
 
         if (aData && Array.isArray(aData)) {
             cachedArmadas = aData.map(a => {
