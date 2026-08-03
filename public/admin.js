@@ -620,12 +620,12 @@
                                     <table class="w-full text-left border-collapse">
                                         <thead>
                                             <tr>
-                                                <th class="py-2 px-3 text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100">ID Tiket</th>
+                                                <th class="py-2 px-3 text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100 w-24">ID Tiket</th>
                                                 <th class="py-2 px-3 text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100">Penumpang</th>
-                                                <th class="py-2 px-3 text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100 text-center">Aksi</th>
-                                                <th class="py-2 px-3 text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100 text-center">Jml</th>
-                                                <th class="py-2 px-3 text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100 text-center">Kursi</th>
-                                                <th class="py-2 px-3 text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100 text-center">Status & Ket</th>
+                                                <th class="py-2 px-3 text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100 text-center w-28">Aksi</th>
+                                                <th class="py-2 px-3 text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100 text-center w-16">Jml</th>
+                                                <th class="py-2 px-3 text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100 text-center w-16">Kursi</th>
+                                                <th class="py-2 px-3 text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100 text-center w-32">Status & Ket</th>
                                             </tr>
                                         </thead>
                                         <tbody>
