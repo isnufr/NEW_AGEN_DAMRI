@@ -786,6 +786,7 @@
     // ========================================
     let currentPagePesanan = 1;
     const itemsPerPagePesanan = 50;
+    let filteredPesanan = [];
 
     function renderPesanan(resetPage = false) {
         if (resetPage) currentPagePesanan = 1;
@@ -800,6 +801,8 @@
                        String(b.dateTravel).toLowerCase().includes(query);
             });
         }
+
+        filteredPesanan = allBookings;
 
         const totalPages = Math.ceil(allBookings.length / itemsPerPagePesanan) || 1;
         if (currentPagePesanan > totalPages) currentPagePesanan = totalPages;
