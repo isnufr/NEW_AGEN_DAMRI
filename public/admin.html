@@ -94,7 +94,7 @@
 
                 <div class="h-px bg-white/10 my-4"></div>
                 <div class="text-[9px] font-black text-slate-600 uppercase tracking-[0.2em] px-4 mb-2">Aksi</div>
-                <div class="nav-item" onclick="if(confirm('Yakin ingin memuat ulang data? Data yang belum tersimpan mungkin hilang.')) refreshData()">
+                <div class="nav-item" onclick="promptRefresh()">
                     <i class="fas fa-sync-alt"></i>
                     <span>Segarkan Data</span>
                 </div>
@@ -1396,10 +1396,220 @@
                     </div>
                 </form>
             </div>
+            
+            <button type="submit" id="btnSubmitEditArmada" class="w-full bg-amber-500 hover:bg-amber-600 text-white font-black text-sm uppercase tracking-widest py-3 rounded-xl shadow-lg shadow-amber-500/30 transition-all mt-4">
+                Simpan Perubahan
+            </button>
+        </form>
+    </div>
+</div>
+
+<!-- Modal Tambah Armada -->
+<div id="modalAddArmada" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden items-center justify-center z-50 p-4 opacity-0 transition-opacity duration-300">
+    <div class="bg-white rounded-3xl p-6 w-full max-w-md shadow-2xl transform scale-95 transition-transform duration-300 relative max-h-[90dvh] overflow-y-auto" id="modalAddArmadaContent">
+        <div class="absolute top-4 right-4 w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center text-white text-lg shadow-lg cursor-pointer hover:bg-blue-600 transition-colors z-10" onclick="closeAddArmadaModal()">
+            <i class="fas fa-times"></i>
+        </div>
+        <div class="mb-4 flex items-center gap-3 mt-10 md:mt-2">
+            <div class="w-10 h-10 bg-blue-100 text-blue-600 rounded-xl flex items-center justify-center text-lg">
+                <i class="fas fa-plus-circle"></i>
+            </div>
+            <div>
+                <h3 class="text-xl font-black text-slate-800 tracking-tight">Tambah Armada</h3>
+                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-0.5">Tambah data armada / PO baru</p>
+            </div>
+        </div>
+        
+        <form id="formAddArmada" onsubmit="submitAddArmada(event)" class="space-y-3 pb-8">
+            <div>
+                <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Nama Armada / PO</label>
+                <select id="addArmadaNamaSelect" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-sm font-bold text-slate-700 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all mb-2" onchange="toggleAddArmadaNamaInput()" required>
+                </select>
+                <input type="text" id="addArmadaNama" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-sm font-bold text-slate-700 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all hidden" placeholder="Masukkan nama armada baru...">
+            </div>
+            <div>
+                <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Tujuan</label>
+                <input type="text" id="addArmadaTujuan" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-sm font-bold text-slate-700 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all" required placeholder="Contoh: Kawunganten - Jogja">
+            </div>
+            <div class="grid grid-cols-2 gap-3">
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Jam Berangkat</label>
+                    <input type="text" id="addArmadaJam" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-sm font-bold text-slate-700 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all" required placeholder="Contoh: 19:30">
+                </div>
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Harga (Angka Murni)</label>
+                    <input type="number" id="addArmadaHarga" min="0" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-sm font-bold text-slate-700 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all" required placeholder="150000">
+                </div>
+            </div>
+            <div>
+                <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Kapasitas Kursi</label>
+                <input type="number" id="addArmadaSeat" min="1" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-sm font-bold text-slate-700 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all" required placeholder="14">
+            </div>
+            
+            <button type="submit" id="btnSubmitAddArmada" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-black text-sm uppercase tracking-widest py-3 rounded-xl shadow-lg shadow-blue-500/30 transition-all mt-4">
+                Simpan Armada Baru
+            </button>
+        </form>
+    </div>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
+<script src="bluetooth-printer.js"></script>
+
+<!-- MODALS UNTUK ADMIN AKUN -->
+<div id="adminModal" class="fixed inset-0 bg-gray-900/40 backdrop-blur-sm z-[150] hidden items-center justify-center p-4">
+    <div class="bg-white rounded-[2rem] shadow-2xl w-full max-w-md animate-fade-in-up max-h-[90dvh] overflow-y-auto">
+        <div class="p-6 border-b border-gray-100 flex justify-between items-center bg-blue-50/50">
+            <div>
+                <h3 class="text-lg font-black text-slate-800 tracking-tight">Form Akun Admin</h3>
+                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-0.5">Tambah / Edit Data</p>
+            </div>
+            <button onclick="document.getElementById('adminModal').classList.add('hidden')" class="w-8 h-8 flex items-center justify-center rounded-xl bg-white text-gray-400 hover:text-red-500 hover:bg-red-50 shadow-sm transition-all">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <form id="adminForm" onsubmit="saveAdmin(event)" class="p-6 space-y-4">
+            <input type="hidden" id="adminId">
+            <div>
+                <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1.5 ml-1">Username</label>
+                <input type="text" id="adminUsername" required class="w-full bg-slate-50 border border-slate-200 text-slate-800 text-sm rounded-xl focus:ring-4 focus:ring-blue-100 focus:border-blue-500 block p-3 font-semibold transition-all">
+            </div>
+            <div>
+                <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1.5 ml-1">Password</label>
+                <input type="text" id="adminPassword" class="w-full bg-slate-50 border border-slate-200 text-slate-800 text-sm rounded-xl focus:ring-4 focus:ring-blue-100 focus:border-blue-500 block p-3 font-semibold transition-all" placeholder="(Kosongkan jika tidak ingin diubah)">
+            </div>
+            <div class="pt-4 flex gap-3">
+                <button type="button" onclick="document.getElementById('adminModal').classList.add('hidden')" class="flex-1 px-4 py-3 rounded-xl text-xs font-black uppercase tracking-widest text-slate-500 bg-slate-100 hover:bg-slate-200 transition-all">Batal</button>
+                <button type="submit" id="adminSaveBtn" class="flex-1 px-4 py-3 rounded-xl text-xs font-black uppercase tracking-widest text-white bg-blue-600 hover:bg-blue-700 shadow-lg shadow-blue-600/30 transition-all">Simpan</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div id="deleteAdminModal" class="fixed inset-0 bg-gray-900/40 backdrop-blur-sm z-[160] hidden items-center justify-center p-4">
+    <div class="bg-white rounded-[2rem] shadow-2xl w-full max-w-sm overflow-hidden animate-fade-in-up p-6 text-center">
+        <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <i class="fas fa-exclamation-triangle text-2xl text-red-500"></i>
+        </div>
+        <h3 class="text-xl font-black text-slate-800 tracking-tight mb-2">Hapus Akun?</h3>
+        <p class="text-xs font-semibold text-slate-500 mb-6">Akun yang dihapus tidak dapat dipulihkan kembali.</p>
+        <div class="flex gap-3">
+            <button onclick="document.getElementById('deleteAdminModal').classList.add('hidden')" class="flex-1 px-4 py-3 rounded-xl text-xs font-black uppercase tracking-widest text-slate-500 bg-slate-100 hover:bg-slate-200 transition-all">Batal</button>
+            <button id="btnConfirmDeleteAdmin" class="flex-1 px-4 py-3 rounded-xl text-xs font-black uppercase tracking-widest text-white bg-red-500 hover:bg-red-600 shadow-lg shadow-red-500/30 transition-all">Ya, Hapus</button>
+        </div>
+    </div>
+</div>
+
+    <!-- Modal Tambah/Edit Ekstra -->
+    <div id="ekstraModal" class="fixed inset-0 z-50 hidden items-start pt-10 pb-10 justify-center bg-slate-900/50 backdrop-blur-sm transition-opacity overflow-y-auto">
+        <div id="ekstraModalInner" class="bg-white rounded-3xl shadow-2xl w-full max-w-lg overflow-hidden transform scale-95 opacity-0 transition-all duration-300 flex flex-col max-h-[90vh]">
+            <div class="px-6 py-4 bg-slate-50 border-b border-slate-100 flex justify-between items-center sticky top-0 z-10 shrink-0">
+                <h3 id="ekstraModalTitle" class="text-lg font-black text-slate-800">Tambah Tiket Ekstra</h3>
+                <button onclick="closeEkstraModal()" class="text-slate-400 hover:text-red-500 transition-colors">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+            <div class="p-6 overflow-y-auto grow">
+                <form id="ekstraForm" onsubmit="submitEkstra(event)" class="space-y-4">
+                    <input type="hidden" id="ekstraId">
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-500 mb-1 uppercase">Tipe Tiket</label>
+                            <select id="ekstraTipe" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500/50" required>
+                                <option value="PESAWAT">Pesawat</option>
+                                <option value="KAPAL">Kapal Laut</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-500 mb-1 uppercase">Maskapai / Kapal</label>
+                            <input type="text" id="ekstraVendor" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500/50" placeholder="Cth: Garuda / Pelni" required>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 mb-1 uppercase">Rute (Asal - Tujuan)</label>
+                        <input type="text" id="ekstraRute" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500/50" placeholder="Cth: CGK - YIA" required>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-500 mb-1 uppercase">Tgl Berangkat</label>
+                            <input type="date" id="ekstraTanggal" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500/50" required>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-500 mb-1 uppercase">Jam Berangkat</label>
+                            <input type="time" id="ekstraJam" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500/50" required>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="col-span-2 md:col-span-1">
+                            <label class="block text-xs font-bold text-slate-500 mb-1 uppercase">Nomor HP</label>
+                            <input type="tel" id="ekstraHp" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500/50" placeholder="08..." required>
+                        </div>
+                        <div class="col-span-2 md:col-span-1">
+                            <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Jumlah Penumpang</label>
+                            <div class="flex items-center">
+                                <button type="button" onclick="document.getElementById('ekstraJumlahPnp').stepDown(); generateEkstraPnpFields();" class="bg-slate-200 text-slate-700 font-bold px-4 py-2.5 rounded-l-xl hover:bg-slate-300 transition-colors active:scale-95">-</button>
+                                <input type="number" id="ekstraJumlahPnp" min="1" value="1" class="w-full bg-slate-50 border-y border-slate-200 px-4 py-2.5 text-sm font-bold text-slate-700 outline-none text-center focus:border-indigo-500 focus:ring-0 transition-all appearance-none" oninput="generateEkstraPnpFields()" required style="-moz-appearance: textfield;">
+                                <button type="button" onclick="document.getElementById('ekstraJumlahPnp').stepUp(); generateEkstraPnpFields();" class="bg-slate-200 text-slate-700 font-bold px-4 py-2.5 rounded-r-xl hover:bg-slate-300 transition-colors active:scale-95">+</button>
+                            </div>
+                        </div>
+                        <div class="col-span-2">
+                            <label class="block text-xs font-bold text-slate-500 mb-1 uppercase">Status Pembayaran</label>
+                            <select id="ekstraStatus" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500/50">
+                                <option value="LUNAS">LUNAS</option>
+                                <option value="WAITING">WAITING</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div id="ekstraPnpContainer" class="space-y-4 bg-transparent mt-2">
+                        <!-- Dynamic fields here -->
+                    </div>
+                    
+                    <div class="bg-indigo-50 p-4 rounded-xl border border-indigo-100 mt-2">
+                        <div class="flex justify-between items-center mb-1">
+                            <span class="text-xs font-bold text-indigo-400 uppercase tracking-widest">Total Harga Tiket</span>
+                            <span id="ekstraSumHarga" class="text-sm font-bold text-indigo-700">Rp 0</span>
+                        </div>
+                        <div class="flex justify-between items-center mb-2 pb-2 border-b border-indigo-100">
+                            <span class="text-xs font-bold text-indigo-400 uppercase tracking-widest">Biaya Admin (25rb/Org)</span>
+                            <span id="ekstraSumAdmin" class="text-sm font-bold text-indigo-700">Rp 0</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm font-black text-indigo-900 uppercase tracking-widest">TOTAL BAYAR</span>
+                            <span id="ekstraGrandTotal" class="text-lg font-black text-indigo-700">Rp 0</span>
+                        </div>
+                    </div>              
+
+                    <div class="pt-4 flex justify-end gap-3">
+                        <button type="button" onclick="closeEkstraModal()" class="px-5 py-2.5 text-sm font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-xl transition-colors">Batal</button>
+                        <button type="submit" id="ekstraSubmitBtn" class="px-5 py-2.5 text-sm font-bold text-white bg-indigo-600 hover:bg-indigo-700 rounded-xl shadow-lg shadow-indigo-600/30 transition-all flex items-center gap-2">
+                            <i class="fas fa-save"></i> Simpan
+                        </button>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
     
     <!-- Script Logic Ekstra Booking -->
     <script src="admin.js"></script>
+
+<!-- Modal Confirm Refresh -->
+<div id="modalConfirmRefresh" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden items-center justify-center z-[60] p-4 opacity-0 transition-opacity duration-300">
+    <div class="bg-white rounded-3xl p-6 w-full max-w-sm shadow-2xl transform scale-95 transition-transform duration-300 text-center" id="modalConfirmRefreshContent">
+        <div class="w-16 h-16 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-3xl mx-auto mb-4">
+            <i class="fas fa-sync-alt"></i>
+        </div>
+        <h3 class="text-lg font-black text-slate-800 mb-2">Segarkan Data?</h3>
+        <p class="text-xs font-bold text-slate-500 mb-6">Yakin ingin memuat ulang data? Data yang belum tersimpan mungkin hilang.</p>
+        <div class="flex gap-3">
+            <button onclick="closePromptRefresh()" class="flex-1 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 font-black text-xs uppercase tracking-widest rounded-xl transition-colors">Batal</button>
+            <button onclick="executeRefresh()" class="flex-1 py-3 bg-blue-600 hover:bg-blue-700 text-white font-black text-xs uppercase tracking-widest rounded-xl shadow-lg shadow-blue-500/30 transition-all" id="btnExecuteRefresh">Segarkan</button>
+        </div>
+    </div>
+</div>
 </body>
 </html>

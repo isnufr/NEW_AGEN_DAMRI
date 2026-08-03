@@ -622,10 +622,10 @@
                                             <tr>
                                                 <th class="py-2 px-3 text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100">ID Tiket</th>
                                                 <th class="py-2 px-3 text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100">Penumpang</th>
+                                                <th class="py-2 px-3 text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100 text-center">Aksi</th>
                                                 <th class="py-2 px-3 text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100 text-center">Jml</th>
                                                 <th class="py-2 px-3 text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100 text-center">Kursi</th>
                                                 <th class="py-2 px-3 text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100 text-center">Status & Ket</th>
-                                                <th class="py-2 px-3 text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100 text-center">Aksi</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -647,12 +647,6 @@
                                                     <p class="font-bold text-xs text-slate-800 uppercase">${b.name || b['NAMA'] || '-'}</p>
                                                     <p class="text-[10px] font-bold text-slate-400">${b.hp || b['NOMOR HP'] || '-'}</p>
                                                 </td>
-                                                <td class="py-3 px-3 text-center font-black text-xs text-slate-700">${b.qty || b['JUMLAH PNP'] || 1}</td>
-                                                <td class="py-3 px-3 text-center font-bold text-xs text-slate-600">${b.kursi || '-'}</td>
-                                                <td class="py-3 px-3 text-center">
-                                                    <span class="inline-block px-2 py-1 rounded text-[9px] font-black ${badgeClass}">${badgeText}</span>
-                                                    ${ket ? `<p class="text-[9px] text-slate-500 font-bold mt-1">${ket}</p>` : ''}
-                                                </td>
                                                 <td class="py-3 px-3 text-center">
                                                     <div class="flex gap-1 justify-center">
                                                         <button onclick="openETicket('${b.bookingId || b.id}')" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-600 px-2 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-wider transition-colors" title="E-Tiket">
@@ -665,6 +659,12 @@
                                                             <i class="fas fa-trash"></i>
                                                         </button>
                                                     </div>
+                                                </td>
+                                                <td class="py-3 px-3 text-center font-black text-xs text-slate-700">${b.qty || b['JUMLAH PNP'] || 1}</td>
+                                                <td class="py-3 px-3 text-center font-bold text-xs text-slate-600">${b.kursi || '-'}</td>
+                                                <td class="py-3 px-3 text-center">
+                                                    <span class="inline-block px-2 py-1 rounded text-[9px] font-black ${badgeClass}">${badgeText}</span>
+                                                    ${ket ? `<p class="text-[9px] text-slate-500 font-bold mt-1">${ket}</p>` : ''}
                                                 </td>
                                             </tr>
                     `;
@@ -3618,3 +3618,45 @@ function exportPesanan(format) {
         doc.save(`Export_Pesanan_${new Date().getTime()}.pdf`);
     }
 }
+
+    function promptRefresh() {
+        const modal = document.getElementById('modalConfirmRefresh');
+        const content = document.getElementById('modalConfirmRefreshContent');
+        if(!modal) return;
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+        setTimeout(() => {
+            modal.classList.remove('opacity-0');
+            content.classList.remove('scale-95');
+        }, 10);
+    }
+
+    function closePromptRefresh() {
+        const modal = document.getElementById('modalConfirmRefresh');
+        const content = document.getElementById('modalConfirmRefreshContent');
+        if(!modal) return;
+        modal.classList.add('opacity-0');
+        content.classList.add('scale-95');
+        setTimeout(() => {
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }, 300);
+    }
+
+    async function executeRefresh() {
+        const btn = document.getElementById('btnExecuteRefresh');
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> SEGARKAN...'; 
+        btn.disabled = true;
+        
+        await refreshData();
+        
+        btn.innerHTML = 'Segarkan'; 
+        btn.disabled = false;
+        closePromptRefresh();
+    }
+    
+    // Export globally
+    window.promptRefresh = promptRefresh;
+    window.closePromptRefresh = closePromptRefresh;
+    window.executeRefresh = executeRefresh;
+
