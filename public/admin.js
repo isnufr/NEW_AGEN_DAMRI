@@ -1,7 +1,8 @@
-﻿    // ========================================
+    // ========================================
     // AUTH CHECK
     // ========================================
-    if (localStorage.getItem('isAdminLoggedIn') !== 'true') {
+    if (localStorage.getItem('isAdminLoggedIn') !== 'true' || !localStorage.getItem('adminToken')) {
+        localStorage.removeItem('isAdminLoggedIn');
         window.location.href = 'login.html';
     }
 
