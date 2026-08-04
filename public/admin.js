@@ -785,7 +785,7 @@
     // DAFTAR PESANAN (with search and pagination)
     // ========================================
     let currentPagePesanan = 1;
-    const itemsPerPagePesanan = 50;
+    const itemsPerPagePesanan = 10;
     let filteredPesanan = [];
 
     function renderPesanan(resetPage = false) {
