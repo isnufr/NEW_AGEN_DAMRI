@@ -153,6 +153,64 @@ app.get('/api', async (req, res) => {
     }
 });
 
+app.get('/api/export', async (req, res) => {
+    try {
+        const token = req.query.token;
+        if (!token) return res.status(401).send('Unauthorized');
+        
+        try {
+            jwt.verify(token, JWT_SECRET);
+        } catch(err) {
+            return res.status(401).send('Invalid token');
+        }
+
+        const xlsx = require('xlsx');
+        const bookings = await prisma.booking.findMany();
+        const armadas = await prisma.armada.findMany();
+        const ekstraBookings = await prisma.ekstraBooking.findMany();
+
+        // Format bookings for better readability in Excel
+        const formattedBookings = bookings.map(l => ({
+            'Timestamp': l.createdAt,
+            'ID_TIKET': l.bookingId,
+            'TANGGAL PEMBERANGKATAN': l.tanggalPemberangkatan,
+            'NAMA': l.nama,
+            'NOMOR HP': l.nomorHp,
+            'JENIS KENDARAAN': l.jenisKendaraan,
+            'Tujuan': l.tujuan,
+            'JUMLAH PNP': l.jumlahPnp,
+            'WAKTU': l.waktu,
+            'NOMOR KURSI': l.nomorKursi,
+            'Harga': l.harga,
+            'Total Harga': l.totalHarga,
+            'Komisi': l.komisi,
+            'Total Komisi': l.totalKomisi,
+            'PEMBAYARAN': l.pembayaran,
+            'KETERANGAN': l.keterangan
+        }));
+
+        const wb = xlsx.utils.book_new();
+        
+        const wsBookings = xlsx.utils.json_to_sheet(formattedBookings);
+        xlsx.utils.book_append_sheet(wb, wsBookings, 'Daftar Pesanan');
+        
+        const wsArmada = xlsx.utils.json_to_sheet(armadas);
+        xlsx.utils.book_append_sheet(wb, wsArmada, 'Data Armada');
+
+        const wsEkstra = xlsx.utils.json_to_sheet(ekstraBookings);
+        xlsx.utils.book_append_sheet(wb, wsEkstra, 'Pesanan Ekstra');
+
+        const buffer = xlsx.write(wb, { type: 'buffer', bookType: 'xlsx' });
+        
+        res.setHeader('Content-Disposition', 'attachment; filename="Backup_Database_Damri.xlsx"');
+        res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        res.send(buffer);
+    } catch (err) {
+        console.error('Export Error:', err);
+        res.status(500).send('Failed to export database');
+    }
+});
+
 app.post('/api', async (req, res) => {
     try {
         const body = req.body;
