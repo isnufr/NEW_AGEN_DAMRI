@@ -1590,7 +1590,7 @@
     </div>
     
     <!-- Script Logic Ekstra Booking -->
-    <script src="admin.js?v=2.2"></script>
+    <script src="admin.js?v=2.3"></script>
 
 <!-- Modal Confirm Refresh -->
 <div id="modalConfirmRefresh" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden items-center justify-center z-[60] p-4 opacity-0 transition-opacity duration-300">
@@ -1606,5 +1606,11 @@
         </div>
     </div>
 </div>
+<!-- Floating Booking Button -->
+<button onclick="openBookingModal()" class="fixed bottom-6 right-6 sm:bottom-8 sm:right-8 z-40 bg-gradient-to-r from-red-600 to-rose-500 hover:from-red-700 hover:to-rose-600 text-white rounded-full p-4 sm:px-6 shadow-2xl shadow-red-500/40 transition-all hover:-translate-y-1 hover:scale-105 flex items-center justify-center gap-3 group" title="Booking Tiket Baru">
+    <i class="fas fa-ticket-alt text-xl sm:text-lg group-hover:rotate-12 transition-transform"></i>
+    <span class="hidden sm:inline-block font-black text-xs uppercase tracking-widest">Booking</span>
+</button>
+
 </body>
 </html>
