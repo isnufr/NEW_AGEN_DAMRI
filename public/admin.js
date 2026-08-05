@@ -2983,7 +2983,7 @@ async function renderAkun() {
     `;
     
     try {
-        const res = await fetch('/api?action=getAdmin');
+        const res = await fetch('/api?action=getAdmin', { headers: { 'Authorization': 'Bearer ' + localStorage.getItem('adminToken') } });
         const json = await res.json();
         if(json.status === 'success') {
             adminsData = json.data;
@@ -3045,7 +3045,7 @@ async function saveAdmin(e) {
     try {
         const res = await fetch('/api', {
             method: 'POST',
-            headers: {'Content-Type': 'application/json'},
+            headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + localStorage.getItem('adminToken') },
             body: JSON.stringify({ action, payload })
         });
         const json = await res.json();
@@ -3080,7 +3080,7 @@ document.getElementById('btnConfirmDeleteAdmin').addEventListener('click', async
     try {
         const res = await fetch('/api', {
             method: 'POST',
-            headers: {'Content-Type': 'application/json'},
+            headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + localStorage.getItem('adminToken') },
             body: JSON.stringify({ action: 'deleteAdmin', payload: { id: deleteAdminId } })
         });
         const json = await res.json();
@@ -3408,7 +3408,7 @@ function updateChartColors(isDark) {
             try {
                 const res = await fetch('/api', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + localStorage.getItem('adminToken') },
                     body: JSON.stringify({ action: action, payload: payload })
                 });
                 const result = await res.json();
@@ -3433,7 +3433,7 @@ function updateChartColors(isDark) {
             try {
                 const res = await fetch('/api', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + localStorage.getItem('adminToken') },
                     body: JSON.stringify({ action: 'deleteEkstraBooking', payload: { id: id } })
                 });
                 const result = await res.json();
@@ -3603,7 +3603,7 @@ function updateChartColors(isDark) {
             try {
                 const res = await fetch('/api', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + localStorage.getItem('adminToken') },
                     body: JSON.stringify({ action: action, payload: payload })
                 });
                 const result = await res.json();
@@ -3628,7 +3628,7 @@ function updateChartColors(isDark) {
             try {
                 const res = await fetch('/api', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + localStorage.getItem('adminToken') },
                     body: JSON.stringify({ action: 'deleteEkstraBooking', payload: { id: id } })
                 });
                 const result = await res.json();
