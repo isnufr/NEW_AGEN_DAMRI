@@ -417,6 +417,13 @@
     };
 
     function renderTodayTable() {
+        // Record open manifests before re-render
+        const openManifestIds = [];
+        const currentRows = document.querySelectorAll('tr[id^="manifest-"]:not(.hidden)');
+        if (currentRows) {
+            currentRows.forEach(row => openManifestIds.push(row.id));
+        }
+
         const tbody = document.getElementById('todayTableBody');
         if (!tbody) return;
 
@@ -527,7 +534,7 @@
         });
 
         let html = '';
-        sortedGroups.forEach((g, index) => {
+        sortedGroups.forEach((g) => {
             const totalPnp = g.bookings.reduce((sum, b) => sum + (parseInt(b.qty) || 1), 0);
 
             let formattedDate = g.dateTravel;
@@ -543,9 +550,15 @@
             // Sort inner bookings by time (jam pemberangkatan)
             g.bookings.sort((a, b) => (a.waktu || '').localeCompare(b.waktu || ''));
 
+            const safeIdStr = (g.dateTravel || 'unknown').replace(/[^a-zA-Z0-9]/g, '_');
+            const safeId = 'manifest-' + safeIdStr;
+            const isOpen = openManifestIds.includes(safeId);
+            const rowClass = isOpen ? 'bg-white' : 'hidden bg-white';
+            const iconTransform = isOpen ? 'rotate(180deg)' : 'rotate(0deg)';
+
             // Header Row (Clickable)
             html += `
-                <tr class="cursor-pointer bg-slate-50 hover:bg-blue-50 transition-colors border-b border-slate-200" onclick="toggleManifest('manifest-${index}')">
+                <tr class="cursor-pointer bg-slate-50 hover:bg-blue-50 transition-colors border-b border-slate-200" onclick="toggleManifest('${safeId}')">
                     <td class="p-4">
                         <div class="flex items-center justify-between">
                             <div class="flex items-center gap-4">
@@ -562,16 +575,16 @@
                                     <p class="font-black text-sm text-orange-500">${totalPnp} PNP</p>
                                     <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">${g.bookings.length} Pesanan</p>
                                 </div>
-                                <i class="fas fa-chevron-down text-slate-400 transition-transform duration-300" id="icon-manifest-${index}"></i>
+                                <i class="fas fa-chevron-down text-slate-400 transition-transform duration-300" id="icon-${safeId}" style="transform: ${iconTransform}"></i>
                             </div>
                         </div>
                     </td>
                 </tr>
             `;
 
-            // Expanded Row (Hidden by default)
+            // Expanded Row (Hidden by default unless previously open)
             html += `
-                <tr id="manifest-${index}" class="hidden bg-white">
+                <tr id="${safeId}" class="${rowClass}">
                     <td class="p-0">
                         <div class="px-4 py-4 bg-slate-100 shadow-inner flex flex-col gap-4">
             `;
