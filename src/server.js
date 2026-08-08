@@ -2,12 +2,16 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
+const http = require('http');
+const { Server } = require('socket.io');
 const { PrismaClient } = require('@prisma/client');
 const jwt = require('jsonwebtoken');
 
 const JWT_SECRET = process.env.JWT_SECRET || 'super-secret-key';
 
 const app = express();
+const server = http.createServer(app);
+const io = new Server(server, { cors: { origin: '*' } });
 const prisma = new PrismaClient();
 const PORT = process.env.PORT || 3000;
 
@@ -15,6 +19,26 @@ const PORT = process.env.PORT || 3000;
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// Socket.io Broadcaster for modifying actions
+app.use('/api', (req, res, next) => {
+    if (req.method === 'POST') {
+        const originalJson = res.json;
+        res.json = function(body) {
+            if (body && body.status === 'success') {
+                let action = req.body?.action;
+                if (typeof req.body === 'string') {
+                    try { action = JSON.parse(req.body).action; } catch(e) {}
+                }
+                if (action && action !== 'loginAdmin') {
+                    io.emit('data_updated');
+                }
+            }
+            return originalJson.call(this, body);
+        };
+    }
+    next();
+});
 
 // Token parsing middleware
 app.use((req, res, next) => {
@@ -502,6 +526,6 @@ app.use((req, res) => {
     res.sendFile(path.join(__dirname, '../public/index.html'));
 });
 
-app.listen(PORT, () => {
+server.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
 });

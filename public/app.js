@@ -280,3 +280,20 @@ function showMessage(msg, isError = false) {
         alert(msg);
     }
 }
+
+// ==========================================
+// 7. REAL-TIME SYNC (SOCKET.IO)
+// ==========================================
+if (typeof io !== 'undefined') {
+    const socket = io();
+    socket.on('data_updated', async () => {
+        isDataLoaded = false;
+        await initData();
+        // Cek jika sedang di halaman admin
+        if (typeof renderAll === 'function') {
+            renderAll();
+        } else if (typeof window.reloadPublicUI === 'function') {
+            window.reloadPublicUI();
+        }
+    });
+}
