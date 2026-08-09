@@ -862,7 +862,7 @@
         // Gunakan ID saja untuk onclick agar terhindar dari error parsing string
         const safeId = String(b.bookingId || '').replace(/'/g, "\\'");
 
-        return `<tr onclick="openBookingDetailModal('${safeId}', ${showAccBtn})" class="cursor-pointer hover:bg-blue-50 transition-colors border-b border-slate-50 group">
+        return `<tr class="border-b border-slate-50 group hover:bg-blue-50 transition-colors">
             <td class="py-3 px-4 font-black text-xs text-blue-900 whitespace-nowrap">${b.bookingId}</td>
             <td class="py-3 px-4 font-bold text-xs text-slate-800 uppercase truncate max-w-[120px]">${b.name}</td>
             <td class="py-3 px-4 font-bold text-xs text-slate-600 truncate max-w-[120px]">${tujuan}</td>
