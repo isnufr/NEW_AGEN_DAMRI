@@ -586,7 +586,7 @@
             html += `
                 <tr id="${safeId}" class="${rowClass}">
                     <td class="p-0">
-                        <div class="px-4 py-4 bg-slate-100 shadow-inner flex flex-col gap-4">
+                        <div class="px-2 py-3 bg-slate-50 border-t border-slate-100 flex flex-col gap-3">
             `;
 
             // Group inner bookings by Waktu & Armada
@@ -619,29 +619,17 @@
                 const combinedTujuan = Array.from(ig.tujuans).join(', ');
                 
                 html += `
-                            <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+                            <div class="bg-white rounded-xl border border-slate-200 overflow-hidden">
                                 <!-- Group Header -->
-                                <div class="bg-blue-50 border-b border-blue-100 px-4 py-3 flex items-start gap-3">
-                                    <div class="bg-blue-600 text-white font-black text-sm px-3 py-1 rounded-lg mt-0.5">${ig.waktu}</div>
+                                <div class="bg-slate-50 border-b border-slate-100 px-3 py-2 flex items-start gap-2">
+                                    <div class="bg-blue-600 text-white font-black text-xs px-2 py-1 rounded mt-0.5">${ig.waktu}</div>
                                     <div>
                                         <p class="font-black text-xs text-red-600 uppercase">${ig.armadaName}</p>
-                                        <span class="inline-block mt-1 text-orange-500 text-[10px] font-black uppercase tracking-widest">${innerTotalPnp} PNP</span>
+                                        <span class="inline-block mt-0.5 text-orange-500 text-[10px] font-black uppercase tracking-widest">${innerTotalPnp} PNP</span>
                                     </div>
                                 </div>
-                                <!-- Group Table -->
-                                <div class="overflow-x-auto">
-                                    <table class="w-full text-left border-collapse">
-                                        <thead>
-                                            <tr>
-                                                <th class="py-2 px-3 text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100 w-24">ID Tiket</th>
-                                                <th class="py-2 px-3 text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100">Penumpang</th>
-                                                <th class="py-2 px-3 text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100 text-center w-28">Aksi</th>
-                                                <th class="py-2 px-3 text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100 text-center w-16">Jml</th>
-                                                <th class="py-2 px-3 text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100 text-center w-16">Kursi</th>
-                                                <th class="py-2 px-3 text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100 text-center w-32">Status & Ket</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
+                                <!-- Group List -->
+                                <div class="flex flex-col">
                 `;
 
                 ig.bookings.forEach(b => {
@@ -650,42 +638,58 @@
                     const badgeText = isPaid ? 'LUNAS' : 'BELUM LUNAS';
                     const ket = b.keterangan || b['Keterangan'] || b['KETERANGAN'] || '';
                     
+                    const bId = b.bookingId || b.id || '-';
+                    const bTujuan = b.armadaId !== 'UNKNOWN' && getArmada(b.armadaId) ? getArmada(b.armadaId).destination : (b.tujuan || b['Tujuan'] || '-');
+                    const bName = b.name || b['NAMA'] || '-';
+                    const bHp = b.hp || b['NOMOR HP'] || '-';
+                    const bQty = b.qty || b['JUMLAH PNP'] || 1;
+                    const bKursi = b.kursi || '-';
+
                     html += `
-                                            <tr class="hover:bg-slate-50 transition-colors border-b border-slate-50 last:border-0">
-                                                <td class="py-3 px-3 font-black text-[10px] text-blue-600">
-                                                    <div>${b.bookingId || b.id || '-'}</div>
-                                                    <div class="text-[9px] text-orange-500 font-bold mt-0.5">${b.armadaId !== 'UNKNOWN' && getArmada(b.armadaId) ? getArmada(b.armadaId).destination : (b.tujuan || b['Tujuan'] || '-')}</div>
-                                                </td>
-                                                <td class="py-3 px-3">
-                                                    <p class="font-bold text-xs text-slate-800 uppercase">${b.name || b['NAMA'] || '-'}</p>
-                                                    <p class="text-[10px] font-bold text-slate-400">${b.hp || b['NOMOR HP'] || '-'}</p>
-                                                </td>
-                                                <td class="py-3 px-3 text-center">
-                                                    <div class="flex gap-1 justify-center">
-                                                        <button onclick="openETicket('${b.bookingId || b.id}')" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-600 px-2 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-wider transition-colors" title="E-Tiket">
-                                                            <i class="fas fa-ticket-alt"></i>
-                                                        </button>
-                                                        <button onclick="openEditBookingModal('${b.bookingId || b.id}')" class="bg-amber-50 hover:bg-amber-100 text-amber-600 px-2 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-wider transition-colors" title="Edit">
-                                                            <i class="fas fa-edit"></i>
-                                                        </button>
-                                                        <button onclick="openDeleteModal('${b.bookingId || b.id}')" class="bg-red-50 hover:bg-red-100 text-red-600 px-2 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-wider transition-colors" title="Hapus">
-                                                            <i class="fas fa-trash"></i>
-                                                        </button>
-                                                    </div>
-                                                </td>
-                                                <td class="py-3 px-3 text-center font-black text-xs text-slate-700">${b.qty || b['JUMLAH PNP'] || 1}</td>
-                                                <td class="py-3 px-3 text-center font-bold text-xs text-slate-600">${b.kursi || '-'}</td>
-                                                <td class="py-3 px-3 text-center">
-                                                    <span class="inline-block px-2 py-1 rounded text-[9px] font-black ${badgeClass}">${badgeText}</span>
-                                                    ${ket ? `<p class="text-[9px] text-slate-500 font-bold mt-1">${ket}</p>` : ''}
-                                                </td>
-                                            </tr>
+                                    <div class="flex flex-col sm:flex-row sm:items-center justify-between p-3 border-b border-slate-100 last:border-0 hover:bg-slate-50 transition-colors gap-3 sm:gap-4">
+                                        <!-- Info Passanger -->
+                                        <div class="flex flex-col sm:w-1/3">
+                                            <span class="text-[10px] font-black text-blue-600 mb-0.5">${bId} - ${bTujuan}</span>
+                                            <span class="font-bold text-sm text-slate-800 uppercase">${bName}</span>
+                                            <span class="text-[10px] font-bold text-slate-400 mt-0.5">${bHp}</span>
+                                        </div>
+                                        
+                                        <!-- Qty & Kursi & Status (Mobile Flex) -->
+                                        <div class="flex items-center justify-between sm:w-1/3">
+                                            <div class="flex gap-4">
+                                                <div>
+                                                    <span class="text-[9px] text-slate-400 font-bold uppercase block">Jumlah</span>
+                                                    <span class="text-xs font-black text-slate-700">${bQty} PNP</span>
+                                                </div>
+                                                <div>
+                                                    <span class="text-[9px] text-slate-400 font-bold uppercase block">Kursi</span>
+                                                    <span class="text-xs font-black text-slate-700">${bKursi}</span>
+                                                </div>
+                                            </div>
+                                            <!-- Status -->
+                                            <div class="text-right sm:text-left">
+                                                <span class="inline-block px-2 py-1 rounded text-[9px] font-black ${badgeClass}">${badgeText}</span>
+                                                ${ket ? `<span class="block text-[9px] text-slate-500 font-bold mt-1">${ket}</span>` : ''}
+                                            </div>
+                                        </div>
+                                        
+                                        <!-- Actions -->
+                                        <div class="flex gap-1 sm:w-auto mt-2 sm:mt-0 pt-2 sm:pt-0 border-t border-slate-100 sm:border-0 justify-end">
+                                            <button onclick="openETicket('${bId}')" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-600 px-3 py-2 sm:px-2 sm:py-1.5 rounded-lg text-xs sm:text-[10px] font-black uppercase tracking-wider transition-colors" title="E-Tiket">
+                                                <i class="fas fa-ticket-alt"></i>
+                                            </button>
+                                            <button onclick="openEditBookingModal('${bId}')" class="bg-amber-50 hover:bg-amber-100 text-amber-600 px-3 py-2 sm:px-2 sm:py-1.5 rounded-lg text-xs sm:text-[10px] font-black uppercase tracking-wider transition-colors" title="Edit">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button onclick="openDeleteModal('${bId}')" class="bg-red-50 hover:bg-red-100 text-red-600 px-3 py-2 sm:px-2 sm:py-1.5 rounded-lg text-xs sm:text-[10px] font-black uppercase tracking-wider transition-colors" title="Hapus">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </div>
                     `;
                 });
 
                 html += `
-                                        </tbody>
-                                    </table>
                                 </div>
                             </div>
                 `;
