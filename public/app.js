@@ -1,6 +1,29 @@
 const SCRIPT_URL = "/api";
 
 // ==========================================
+// 0. GLOBAL FETCH INTERCEPTOR (AUTO LOGOUT)
+// ==========================================
+const originalFetch = window.fetch;
+window.fetch = async function() {
+    const response = await originalFetch.apply(this, arguments);
+    if (response.status === 401 || response.status === 403) {
+        // Jika token tidak valid / habis, bersihkan sesi
+        if (localStorage.getItem('isAdminLoggedIn') === 'true' || localStorage.getItem('adminToken')) {
+            console.warn('Sesi login telah habis. Auto-logout...');
+            localStorage.removeItem('isAdminLoggedIn');
+            localStorage.removeItem('adminToken');
+            
+            // Redirect ke halaman login jika sedang di halaman admin
+            if (window.location.pathname.includes('admin.html')) {
+                alert('Sesi login Anda telah berakhir. Silakan login kembali.');
+                window.location.replace('login.html');
+            }
+        }
+    }
+    return response;
+};
+
+// ==========================================
 // 1. DATA CACHE & STATE
 // ==========================================
 let cachedArmadas = [];

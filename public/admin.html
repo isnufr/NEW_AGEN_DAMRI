@@ -277,41 +277,60 @@
                         <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mt-1">JADWAL KEBERANGKATAN</p>
                     </div>
                     <!-- Summary Cards -->
-                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3 mb-5">
-                        <div class="bg-blue-50 border border-blue-100 rounded-xl p-3 fade-up">
-                            <div class="flex flex-col">
-                                <div class="flex items-center justify-between mb-1">
-                                    <p class="text-[10px] font-bold uppercase tracking-widest text-blue-600">Penumpang</p>
-                                    <i class="fas fa-users text-blue-400"></i>
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 mb-6">
+                        <!-- Penumpang -->
+                        <div class="bg-white rounded-xl sm:rounded-2xl p-3.5 sm:p-5 border border-slate-100 shadow-[0_2px_10px_-3px_rgba(6,81,237,0.1)] fade-up relative overflow-hidden group hover:border-blue-200 transition-all duration-300">
+                            <div class="absolute top-0 right-0 -mt-4 -mr-4 w-16 h-16 bg-gradient-to-br from-blue-50 to-blue-100 rounded-full opacity-50 group-hover:scale-[2] transition-transform duration-500"></div>
+                            <div class="relative z-10 flex flex-col gap-3">
+                                <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center text-sm sm:text-base shadow-sm border border-blue-100/50">
+                                    <i class="fas fa-users"></i>
                                 </div>
-                                <p class="text-xl sm:text-2xl font-black text-blue-700" id="manifestTotalPnpToday">0</p>
+                                <div>
+                                    <p class="text-[9px] sm:text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-0.5">Penumpang</p>
+                                    <p class="text-lg sm:text-2xl font-black text-slate-800" id="manifestTotalPnpToday">0</p>
+                                </div>
                             </div>
                         </div>
-                        <div class="bg-emerald-50 border border-emerald-100 rounded-xl p-3 fade-up">
-                            <div class="flex flex-col">
-                                <div class="flex items-center justify-between mb-1">
-                                    <p class="text-[10px] font-bold uppercase tracking-widest text-emerald-600">Armada</p>
-                                    <i class="fas fa-bus text-emerald-400"></i>
+
+                        <!-- Armada -->
+                        <div class="bg-white rounded-xl sm:rounded-2xl p-3.5 sm:p-5 border border-slate-100 shadow-[0_2px_10px_-3px_rgba(16,185,129,0.1)] fade-up relative overflow-hidden group hover:border-emerald-200 transition-all duration-300">
+                            <div class="absolute top-0 right-0 -mt-4 -mr-4 w-16 h-16 bg-gradient-to-br from-emerald-50 to-emerald-100 rounded-full opacity-50 group-hover:scale-[2] transition-transform duration-500"></div>
+                            <div class="relative z-10 flex flex-col gap-3">
+                                <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-sm sm:text-base shadow-sm border border-emerald-100/50">
+                                    <i class="fas fa-bus"></i>
                                 </div>
-                                <p class="text-xl sm:text-2xl font-black text-emerald-700" id="manifestTotalArmada">0</p>
+                                <div>
+                                    <p class="text-[9px] sm:text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-0.5">Armada</p>
+                                    <p class="text-lg sm:text-2xl font-black text-slate-800" id="manifestTotalArmada">0</p>
+                                </div>
                             </div>
                         </div>
-                        <div class="bg-amber-50 border border-amber-100 rounded-xl p-3 fade-up">
-                            <div class="flex flex-col">
-                                <div class="flex items-center justify-between mb-1">
-                                    <p class="text-[10px] font-bold uppercase tracking-widest text-amber-600">Omset</p>
-                                    <i class="fas fa-coins text-amber-400"></i>
+
+                        <!-- Omset -->
+                        <div class="bg-white rounded-xl sm:rounded-2xl p-3.5 sm:p-5 border border-slate-100 shadow-[0_2px_10px_-3px_rgba(245,158,11,0.1)] fade-up relative overflow-hidden group hover:border-amber-200 transition-all duration-300">
+                            <div class="absolute top-0 right-0 -mt-4 -mr-4 w-16 h-16 bg-gradient-to-br from-amber-50 to-amber-100 rounded-full opacity-50 group-hover:scale-[2] transition-transform duration-500"></div>
+                            <div class="relative z-10 flex flex-col gap-3">
+                                <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center text-sm sm:text-base shadow-sm border border-amber-100/50">
+                                    <i class="fas fa-coins"></i>
                                 </div>
-                                <p class="text-sm sm:text-xl font-black text-amber-700 truncate w-full" id="manifestOmsetToday">Rp 0</p>
+                                <div>
+                                    <p class="text-[9px] sm:text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-0.5">Omset</p>
+                                    <p class="text-sm sm:text-xl font-black text-slate-800 truncate w-full" id="manifestOmsetToday">Rp 0</p>
+                                </div>
                             </div>
                         </div>
-                        <div class="bg-violet-50 border border-violet-100 rounded-xl p-3 fade-up">
-                            <div class="flex flex-col">
-                                <div class="flex items-center justify-between mb-1">
-                                    <p class="text-[10px] font-bold uppercase tracking-widest text-violet-600">Setoran</p>
-                                    <i class="fas fa-hand-holding-usd text-violet-400"></i>
+
+                        <!-- Setoran -->
+                        <div class="bg-white rounded-xl sm:rounded-2xl p-3.5 sm:p-5 border border-slate-100 shadow-[0_2px_10px_-3px_rgba(139,92,246,0.1)] fade-up relative overflow-hidden group hover:border-violet-200 transition-all duration-300">
+                            <div class="absolute top-0 right-0 -mt-4 -mr-4 w-16 h-16 bg-gradient-to-br from-violet-50 to-violet-100 rounded-full opacity-50 group-hover:scale-[2] transition-transform duration-500"></div>
+                            <div class="relative z-10 flex flex-col gap-3">
+                                <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-violet-50 text-violet-600 flex items-center justify-center text-sm sm:text-base shadow-sm border border-violet-100/50">
+                                    <i class="fas fa-hand-holding-usd"></i>
                                 </div>
-                                <p class="text-sm sm:text-xl font-black text-violet-700 truncate w-full" id="manifestSetoranToday">Rp 0</p>
+                                <div>
+                                    <p class="text-[9px] sm:text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-0.5">Setoran</p>
+                                    <p class="text-sm sm:text-xl font-black text-slate-800 truncate w-full" id="manifestSetoranToday">Rp 0</p>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -369,11 +388,11 @@
                             <table class="data-table">
                                 <thead>
                                     <tr>
-                                        <th>ID / Tanggal</th>
-                                        <th>Penumpang</th>
-                                        <th>Armada / Tujuan</th>
-                                        <th class="text-right">Total / Status</th>
-                                        <th class="text-center">Aksi</th>
+                                        <th class="py-3 px-4 text-left font-black text-[10px] text-slate-400 uppercase tracking-widest border-b border-slate-100">ID Tiket</th>
+                                        <th class="py-3 px-4 text-left font-black text-[10px] text-slate-400 uppercase tracking-widest border-b border-slate-100">Penumpang</th>
+                                        <th class="py-3 px-4 text-left font-black text-[10px] text-slate-400 uppercase tracking-widest border-b border-slate-100">Tujuan</th>
+                                        <th class="py-3 px-4 text-right font-black text-[10px] text-slate-400 uppercase tracking-widest border-b border-slate-100">Total</th>
+                                        <th class="py-3 px-4 text-center font-black text-[10px] text-slate-400 uppercase tracking-widest border-b border-slate-100">Status</th>
                                     </tr>
                                 </thead>
                                 <tbody id="pesananTableBody">
@@ -1592,13 +1611,42 @@
                             <i class="fas fa-save"></i> Simpan
                         </button>
                     </div>
-                </form>
+    
+    <!-- Script Logic Ekstra Booking -->    <!-- ======================================= -->
+    <!-- BOOKING DETAIL MODAL -->
+    <!-- ======================================= -->
+    <div id="bookingDetailModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
+        <div id="bookingDetailModalInner" class="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden transform scale-95 opacity-0 transition-all duration-300 flex flex-col max-h-[90vh]">
+            <div class="bg-blue-600 p-4 flex items-center justify-between shrink-0">
+                <h3 class="text-white font-black uppercase tracking-widest text-sm flex items-center gap-2">
+                    <i class="fas fa-ticket-alt"></i> Detail Pesanan
+                </h3>
+                <button onclick="closeBookingDetailModal()" class="w-8 h-8 rounded-lg bg-white/20 text-white hover:bg-white hover:text-red-500 flex items-center justify-center transition-colors">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="p-5 overflow-y-auto flex flex-col gap-4">
+                <div id="bookingDetailContent" class="text-sm text-slate-700 space-y-3">
+                    <!-- content generated dynamically -->
+                </div>
+            </div>
+            <div class="border-t border-slate-100 p-4 flex gap-2 justify-end shrink-0 bg-slate-50" id="bookingDetailActions">
+                <!-- buttons generated dynamically -->
             </div>
         </div>
     </div>
-    
-    <!-- Script Logic Ekstra Booking -->
-    <script src="admin.js?v=2.5"></script>
+
+    <!-- ======================================= -->
+    <!-- TOAST NOTIFICATION -->
+    <!-- ======================================= -->
+    <div id="toast" class="fixed bottom-4 right-4 sm:bottom-8 sm:right-8 transform translate-y-24 opacity-0 transition-all duration-300 z-50 flex items-center gap-3 bg-slate-800 text-white px-4 sm:px-6 py-3 sm:py-4 rounded-xl sm:rounded-2xl shadow-2xl">
+        <div id="toastIcon" class="w-8 h-8 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0">
+            <i class="fas fa-check"></i>
+        </div>
+        <p id="toastMessage" class="font-bold text-xs sm:text-sm uppercase tracking-wider pr-2">Aksi Berhasil!</p>
+    </div>
+
+    <script src="admin.js?v=2.6"></script>
 
 <!-- Modal Confirm Refresh -->
 <div id="modalConfirmRefresh" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden items-center justify-center z-[60] p-4 opacity-0 transition-opacity duration-300">

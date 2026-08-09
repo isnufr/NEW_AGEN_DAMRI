@@ -852,31 +852,123 @@
     // BOOKING ROW BUILDER
     // ========================================
     function buildBookingRow(b, showAccBtn) {
-        const isPaid = (b.status === 'paid' || b.status === 'Lunas' || b.status === 'ACC');
+        const isPaid = (b.status === 'paid' || String(b.status).toUpperCase() === 'LUNAS' || String(b.status).toUpperCase() === 'ACC');
         const badgeClass = isPaid ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700';
         const badgeText = isPaid ? 'LUNAS' : 'BELUM LUNAS';
 
         const armada = b.armadaId !== 'UNKNOWN' ? getArmada(b.armadaId) : null;
-        const armadaName = armada ? armada.name : '-';
-        const tujuan = armada ? armada.destination : '-';
-        const ket = b.keterangan || b['Keterangan'] || b['KETERANGAN'] || '';
+        const tujuan = armada ? armada.destination : (b.tujuan || '-');
+
+        // Escape for string injection
+        const safeData = encodeURIComponent(JSON.stringify(b));
+
+        return `<tr onclick="openBookingDetailModal('${safeData}', ${showAccBtn})" class="cursor-pointer hover:bg-blue-50 transition-colors border-b border-slate-50 group">
+            <td class="py-3 px-4 font-black text-xs text-blue-900 whitespace-nowrap">${b.bookingId}</td>
+            <td class="py-3 px-4 font-bold text-xs text-slate-800 uppercase truncate max-w-[120px]">${b.name}</td>
+            <td class="py-3 px-4 font-bold text-xs text-slate-600 truncate max-w-[120px]">${tujuan}</td>
+            <td class="py-3 px-4 font-black text-xs text-slate-800 text-right whitespace-nowrap">${formatRupiah(b.totalPrice)}</td>
+            <td class="py-3 px-4 text-center"><span class="inline-block px-2 py-1 rounded text-[9px] font-black ${badgeClass}">${badgeText}</span></td>
+        </tr>`;
+    }
+
+    // ========================================
+    // BOOKING DETAIL MODAL
+    // ========================================
+    window.openBookingDetailModal = function(encodedData, showAccBtn) {
+        const b = JSON.parse(decodeURIComponent(encodedData));
+        const modal = document.getElementById('bookingDetailModal');
+        const inner = document.getElementById('bookingDetailModalInner');
+        const content = document.getElementById('bookingDetailContent');
+        const actions = document.getElementById('bookingDetailActions');
+
+        const isPaid = (b.status === 'paid' || String(b.status).toUpperCase() === 'LUNAS' || String(b.status).toUpperCase() === 'ACC');
+        const badgeClass = isPaid ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700';
+        const badgeText = isPaid ? 'LUNAS' : 'BELUM LUNAS';
+
+        const armada = b.armadaId !== 'UNKNOWN' ? getArmada(b.armadaId) : null;
+        const armadaName = armada ? armada.name : (b.kendaraan || b['JENIS KENDARAAN'] || '-');
+        const tujuan = armada ? armada.destination : (b.tujuan || '-');
+        const ket = b.keterangan || b['Keterangan'] || b['KETERANGAN'] || '-';
 
         const formatHp = String(b.hp || "").replace(/[^0-9]/g, '').replace(/^0/, '62');
         const waLink = `https://wa.me/${formatHp}?text=${encodeURIComponent('Halo ' + b.name + ', ')}`;
-        const btnWa = '<a href="' + waLink + '" target="_blank" class="bg-emerald-500 hover:bg-emerald-600 text-white w-7 h-7 flex items-center justify-center rounded-lg text-xs shadow-sm transition-all" title="WhatsApp"><i class="fab fa-whatsapp"></i></a>';
-        const btnEdit = '<button onclick="openEditBookingModal(\'' + b.bookingId + '\')" class="bg-amber-500 hover:bg-amber-600 text-white w-7 h-7 flex items-center justify-center rounded-lg text-xs shadow-sm transition-all" title="Edit"><i class="fas fa-edit"></i></button>';
-        const btnAcc = (!isPaid && showAccBtn) ? '<button onclick="openConfirmModal(\'' + b.bookingId + '\')" class="bg-blue-600 hover:bg-blue-700 text-white w-7 h-7 flex items-center justify-center rounded-lg text-xs shadow-sm transition-all" title="ACC"><i class="fas fa-check"></i></button>' : '';
-        const btnHapus = '<button onclick="openDeleteModal(\'' + b.bookingId + '\')" class="bg-red-500 hover:bg-red-600 text-white w-7 h-7 flex items-center justify-center rounded-lg text-xs shadow-sm transition-all" title="Hapus"><i class="fas fa-trash"></i></button>';
 
-        return '<tr>' +
-            '<td><p class="font-black text-sm text-blue-900">' + b.bookingId + '</p><p class="text-[11px] text-slate-400 font-bold mt-1">' + (b.dateTravel || '-') + '</p></td>' +
-            '<td><p class="font-bold text-sm text-slate-800 uppercase">' + b.name + '</p><p class="text-[11px] text-slate-400 font-bold mt-1"><i class="fas fa-phone-alt text-[9px] mr-1"></i>' + b.hp + '</p><p class="text-[10px] text-slate-400 font-bold">' + b.qty + ' Orang</p></td>' +
-            '<td><p class="font-bold text-sm text-slate-800 uppercase">' + armadaName + '</p><p class="text-[11px] text-blue-500 font-bold mt-1"><i class="fas fa-map-marker-alt text-[9px] mr-1"></i>' + tujuan + '</p></td>' +
-            '<td class="text-right"><p class="font-black text-sm text-slate-800">' + formatRupiah(b.totalPrice) + '</p><span class="inline-block mt-2 px-2 py-1 rounded-md text-[9px] font-black tracking-widest ' + badgeClass + '">' + badgeText + '</span>' +
-            (ket ? '<p class="text-[9px] text-slate-500 font-bold mt-1">' + ket + '</p>' : '') + '</td>' +
-            '<td class="text-center"><div class="flex gap-1 justify-center whitespace-nowrap min-w-max">' + btnWa + btnEdit + btnAcc + btnHapus + '</div></td>' +
-            '</tr>';
+        content.innerHTML = `
+            <div class="grid grid-cols-2 gap-y-3 gap-x-4">
+                <div class="col-span-2 flex justify-between items-center pb-2 border-b border-slate-100">
+                    <div>
+                        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">ID Tiket</p>
+                        <p class="font-black text-blue-600 text-lg">${b.bookingId || '-'}</p>
+                    </div>
+                    <span class="px-3 py-1.5 rounded-lg text-[10px] font-black ${badgeClass}">${badgeText}</span>
+                </div>
+                <div class="col-span-2 sm:col-span-1">
+                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Nama Penumpang</p>
+                    <p class="font-bold text-slate-800 uppercase text-sm">${b.name || '-'}</p>
+                </div>
+                <div class="col-span-2 sm:col-span-1">
+                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Nomor HP</p>
+                    <p class="font-bold text-slate-800 text-sm">${b.hp || '-'}</p>
+                </div>
+                <div class="col-span-2">
+                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Armada & Tujuan</p>
+                    <p class="font-bold text-slate-800 uppercase text-sm">${armadaName} &rarr; ${tujuan}</p>
+                </div>
+                <div class="col-span-2 sm:col-span-1">
+                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Tanggal & Waktu</p>
+                    <p class="font-bold text-slate-800 text-sm">${b.dateTravel || '-'} <span class="text-blue-500 ml-1">(${b.waktu || '-'})</span></p>
+                </div>
+                <div class="col-span-2 sm:col-span-1">
+                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Jumlah / Kursi</p>
+                    <p class="font-bold text-slate-800 text-sm">${b.qty || 1} Orang <span class="text-slate-400 mx-1">|</span> Kursi: ${b.kursi || '-'}</p>
+                </div>
+                <div class="col-span-2 sm:col-span-1">
+                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Total Bayar</p>
+                    <p class="font-black text-orange-600 text-base">${formatRupiah(b.totalPrice)}</p>
+                </div>
+                <div class="col-span-2 sm:col-span-1">
+                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Metode Bayar</p>
+                    <p class="font-bold text-slate-800 text-sm uppercase">${b.pembayaran || '-'}</p>
+                </div>
+                <div class="col-span-2 bg-slate-50 p-3 rounded-lg border border-slate-100 mt-2">
+                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Keterangan</p>
+                    <p class="font-bold text-slate-700 text-xs">${ket}</p>
+                </div>
+            </div>
+        `;
+
+        actions.innerHTML = `
+            <a href="${waLink}" target="_blank" class="px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg text-xs font-black uppercase tracking-widest shadow-md transition-colors flex items-center gap-2">
+                <i class="fab fa-whatsapp"></i> Hubungi
+            </a>
+            ${(!isPaid && showAccBtn) ? `<button onclick="closeBookingDetailModal(); openConfirmModal('${b.bookingId}')" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-black uppercase tracking-widest shadow-md transition-colors flex items-center gap-2"><i class="fas fa-check"></i> ACC</button>` : ''}
+            <button onclick="closeBookingDetailModal(); openEditBookingModal('${b.bookingId}')" class="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white rounded-lg text-xs font-black uppercase tracking-widest shadow-md transition-colors flex items-center gap-2">
+                <i class="fas fa-edit"></i> Edit
+            </button>
+            <button onclick="closeBookingDetailModal(); openDeleteModal('${b.bookingId}')" class="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg text-xs font-black uppercase tracking-widest shadow-md transition-colors flex items-center gap-2">
+                <i class="fas fa-trash"></i> Hapus
+            </button>
+        `;
+
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+        setTimeout(() => {
+            inner.classList.remove('scale-95', 'opacity-0');
+            inner.classList.add('scale-100', 'opacity-100');
+        }, 10);
     }
+
+    window.closeBookingDetailModal = function() {
+        const modal = document.getElementById('bookingDetailModal');
+        const inner = document.getElementById('bookingDetailModalInner');
+        inner.classList.remove('scale-100', 'opacity-100');
+        inner.classList.add('scale-95', 'opacity-0');
+        setTimeout(() => {
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }, 300);
+    }
+
 
     let activeDeleteId = null;
 
