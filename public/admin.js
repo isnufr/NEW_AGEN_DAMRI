@@ -859,10 +859,10 @@
         const armada = b.armadaId !== 'UNKNOWN' ? getArmada(b.armadaId) : null;
         const tujuan = armada ? armada.destination : (b.tujuan || '-');
 
-        // Escape for string injection
-        const safeData = encodeURIComponent(JSON.stringify(b));
+        // Gunakan ID saja untuk onclick agar terhindar dari error parsing string
+        const safeId = String(b.bookingId || '').replace(/'/g, "\\'");
 
-        return `<tr onclick="openBookingDetailModal('${safeData}', ${showAccBtn})" class="cursor-pointer hover:bg-blue-50 transition-colors border-b border-slate-50 group">
+        return `<tr onclick="openBookingDetailModal('${safeId}', ${showAccBtn})" class="cursor-pointer hover:bg-blue-50 transition-colors border-b border-slate-50 group">
             <td class="py-3 px-4 font-black text-xs text-blue-900 whitespace-nowrap">${b.bookingId}</td>
             <td class="py-3 px-4 font-bold text-xs text-slate-800 uppercase truncate max-w-[120px]">${b.name}</td>
             <td class="py-3 px-4 font-bold text-xs text-slate-600 truncate max-w-[120px]">${tujuan}</td>
@@ -874,8 +874,13 @@
     // ========================================
     // BOOKING DETAIL MODAL
     // ========================================
-    window.openBookingDetailModal = function(encodedData, showAccBtn) {
-        const b = JSON.parse(decodeURIComponent(encodedData));
+    window.openBookingDetailModal = function(id, showAccBtn) {
+        const allBookings = getBookings();
+        const b = allBookings.find(x => String(x.bookingId) === String(id) || String(x.id) === String(id));
+        if (!b) {
+            console.error("Booking data not found for ID:", id);
+            return;
+        }
         const modal = document.getElementById('bookingDetailModal');
         const inner = document.getElementById('bookingDetailModalInner');
         const content = document.getElementById('bookingDetailContent');
