@@ -1704,8 +1704,8 @@
                         img.onload = () => resolve(img);
                         img.onerror = reject;
                     });
-                    doc.addImage(img, 'PNG', 14, 15, 22, 22);
-                    titleX = 40;
+                    // Posisi pojok kanan (A4 width 210 - 14 margin - 22 width = 174)
+                    doc.addImage(img, 'PNG', 174, 15, 22, 22);
                 } catch(e) {
                     console.log("Logo error", e);
                 }
