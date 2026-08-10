@@ -1358,9 +1358,15 @@
                         </div>
                     </div>
                     
-                    <div>
-                        <label class="block text-xs font-bold text-slate-500 mb-1 uppercase">Rute (Asal - Tujuan)</label>
-                        <input type="text" id="ekstraRute" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500/50" placeholder="Cth: CGK - YIA" required>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-500 mb-1 uppercase">Asal</label>
+                            <input type="text" id="ekstraAsal" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500/50" placeholder="Cth: CGK" required>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-500 mb-1 uppercase">Tujuan</label>
+                            <input type="text" id="ekstraTujuan" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500/50" placeholder="Cth: YIA" required>
+                        </div>
                     </div>
 
                     <div class="grid grid-cols-2 gap-4">
@@ -1374,11 +1380,6 @@
                         </div>
                     </div>
 
-                    <div class="grid grid-cols-2 gap-4">
-                        <div class="col-span-2 md:col-span-1">
-                            <label class="block text-xs font-bold text-slate-500 mb-1 uppercase">Nomor HP</label>
-                            <input type="tel" id="ekstraHp" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500/50" placeholder="08..." required>
-                        </div>
                         <div class="col-span-2 md:col-span-1">
                             <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Jumlah Penumpang</label>
                             <div class="flex items-center">
@@ -1387,7 +1388,7 @@
                                 <button type="button" onclick="document.getElementById('ekstraJumlahPnp').stepUp(); generateEkstraPnpFields();" class="bg-slate-200 text-slate-700 font-bold px-4 py-2.5 rounded-r-xl hover:bg-slate-300 transition-colors active:scale-95">+</button>
                             </div>
                         </div>
-                        <div class="col-span-2">
+                        <div class="col-span-2 md:col-span-1">
                             <label class="block text-xs font-bold text-slate-500 mb-1 uppercase">Status Pembayaran</label>
                             <select id="ekstraStatus" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500/50">
                                 <option value="LUNAS">LUNAS</option>
@@ -1398,6 +1399,11 @@
 
                     <div id="ekstraPnpContainer" class="space-y-4 bg-transparent mt-2">
                         <!-- Dynamic fields here -->
+                    </div>
+                    
+                    <div class="mt-4">
+                        <label class="block text-xs font-bold text-slate-500 mb-1 uppercase">Nomor HP</label>
+                        <input type="tel" id="ekstraHp" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500/50" placeholder="08..." required>
                     </div>
                     
                     <div class="bg-indigo-50 p-4 rounded-xl border border-indigo-100 mt-2">
@@ -1651,8 +1657,8 @@
     </div>
 
     <!-- Custom script for admin dashboard -->
-    <script src="admin.js?v=2.11"></script>
-
+    <script src="admin.js?v=2.12"></script>
+</body>
 <!-- Modal Confirm Refresh -->
 <div id="modalConfirmRefresh" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden items-center justify-center z-[60] p-4 opacity-0 transition-opacity duration-300">
     <div class="bg-white rounded-3xl p-6 w-full max-w-sm shadow-2xl transform scale-95 transition-transform duration-300 text-center" id="modalConfirmRefreshContent">

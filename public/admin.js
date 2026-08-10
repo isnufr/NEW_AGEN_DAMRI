@@ -3570,6 +3570,8 @@ function updateChartColors(isDark) {
         function openAddEkstraModal() {
             document.getElementById('ekstraId').value = '';
             document.getElementById('ekstraForm').reset();
+            document.getElementById('ekstraAsal').value = '';
+            document.getElementById('ekstraTujuan').value = '';
             document.getElementById('ekstraJumlahPnp').value = 1;
             document.getElementById('ekstraHp').value = '';
             generateEkstraPnpFields();
@@ -3589,7 +3591,9 @@ function updateChartColors(isDark) {
             document.getElementById('ekstraId').value = item.id;
             document.getElementById('ekstraTipe').value = item.tipe;
             document.getElementById('ekstraVendor').value = item.vendor;
-            document.getElementById('ekstraRute').value = item.rute;
+            const ruteParts = (item.rute || '').split(' - ');
+            document.getElementById('ekstraAsal').value = (ruteParts[0] || '').trim();
+            document.getElementById('ekstraTujuan').value = (ruteParts.slice(1).join(' - ') || '').trim();
             document.getElementById('ekstraTanggal').value = item.tanggalBerangkat;
             document.getElementById('ekstraJam').value = item.jamBerangkat;
             document.getElementById('ekstraStatus').value = item.statusPembayaran;
@@ -3642,11 +3646,15 @@ function updateChartColors(isDark) {
                 });
             }
 
+            const ruteAsal = document.getElementById('ekstraAsal').value.trim();
+            const ruteTujuan = document.getElementById('ekstraTujuan').value.trim();
+            const ruteFinal = (ruteAsal && ruteTujuan) ? ruteAsal + ' - ' + ruteTujuan : (ruteAsal || ruteTujuan);
+
             const payload = {
                 id: id,
                 tipe: document.getElementById('ekstraTipe').value,
                 vendor: document.getElementById('ekstraVendor').value,
-                rute: document.getElementById('ekstraRute').value,
+                rute: ruteFinal,
                 tanggalBerangkat: document.getElementById('ekstraTanggal').value,
                 jamBerangkat: document.getElementById('ekstraJam').value,
                 namaPenumpang: JSON.stringify({

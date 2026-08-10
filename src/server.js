@@ -397,7 +397,7 @@ app.post('/api', async (req, res) => {
 
             const pnpCount = parsedPnp.length > 0 ? parsedPnp.length : 1;
             const adminFee = pnpCount * 25000;
-            const komisi = tipe === 'PESAWAT' ? Math.floor(sumHargaBase * 0.15) : Math.floor(sumHargaBase * 0.25);
+            const komisi = tipe === 'PESAWAT' ? Math.floor(sumHargaBase * 0.10) : Math.floor(sumHargaBase * 0.25);
             const totalHarga = sumHargaBase + adminFee;
 
             const newBooking = await prisma.ekstraBooking.create({
@@ -438,7 +438,7 @@ app.post('/api', async (req, res) => {
 
             const pnpCount = parsedPnp.length > 0 ? parsedPnp.length : 1;
             const adminFee = pnpCount * 25000;
-            const komisi = tipe === 'PESAWAT' ? Math.floor(sumHargaBase * 0.15) : Math.floor(sumHargaBase * 0.25);
+            const komisi = tipe === 'PESAWAT' ? Math.floor(sumHargaBase * 0.10) : Math.floor(sumHargaBase * 0.25);
             const totalHarga = sumHargaBase + adminFee;
 
             await prisma.ekstraBooking.update({
