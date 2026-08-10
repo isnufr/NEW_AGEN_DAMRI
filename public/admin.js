@@ -1786,6 +1786,23 @@
                 }
             });
 
+            let finalY = doc.lastAutoTable.finalY || 60;
+            finalY += 20;
+            
+            // Check if it fits on the page, if not add new page
+            if (finalY > 260) {
+                doc.addPage();
+                finalY = 30;
+            }
+
+            doc.setFontSize(10);
+            doc.setFont("helvetica", "normal");
+            doc.text("Kawunganten, .............................", 140, finalY);
+            doc.text("Pemilik Usaha", 140, finalY + 6);
+            
+            doc.setFont("helvetica", "bold");
+            doc.text("ISNU FADKHUL ROIS", 140, finalY + 30);
+
             doc.save(title + '.pdf');
             };
             generateReportPdf();
