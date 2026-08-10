@@ -1582,6 +1582,8 @@
         
         const ekstraFormatted = ekstra.map(e => ({
             tanggal: formatTanggal(e.tanggalBerangkat),
+            jenisKendaraan: (e.vendor || e.tipe || 'Ekstra') + (e.rute ? ' ' + e.rute : ''),
+            jumlahPnp: (e.hargaTiket && e.totalHarga) ? Math.round(e.totalHarga / e.hargaTiket) : 1,
             totalHarga: Number(e.totalHarga) || 0,
             totalKomisi: Number(e.komisi) || 0
         }));
@@ -1630,11 +1632,20 @@
                 groupedData[l.tanggal] = {
                     tanggal: l.tanggal,
                     totalHarga: 0,
-                    totalKomisi: 0
+                    totalKomisi: 0,
+                    details: {}
                 };
             }
             groupedData[l.tanggal].totalHarga += (Number(l.totalHarga) || 0);
             groupedData[l.tanggal].totalKomisi += (Number(l.totalKomisi) || 0);
+
+            const vkName = (l.jenisKendaraan || 'Lainnya').trim();
+            if(!groupedData[l.tanggal].details[vkName]) {
+                groupedData[l.tanggal].details[vkName] = { pnp: 0, omset: 0, komisi: 0 };
+            }
+            groupedData[l.tanggal].details[vkName].pnp += (Number(l.jumlahPnp) || 1);
+            groupedData[l.tanggal].details[vkName].omset += (Number(l.totalHarga) || 0);
+            groupedData[l.tanggal].details[vkName].komisi += (Number(l.totalKomisi) || 0);
         });
         filteredData = Object.values(groupedData);
 
@@ -1646,9 +1657,13 @@
         });
         
         if (format === 'csv') {
-            let csv = 'Tanggal,Total Omset,Komisi (Pendapatan Kotor)\n';
+            let csv = 'Tanggal / Rincian,Total Omset,Komisi (Pendapatan Kotor)\n';
             filteredData.forEach(l => {
                 csv += `"${l.tanggal}",${l.totalHarga},${l.totalKomisi}\n`;
+                for(const vk in l.details) {
+                    const detail = l.details[vk];
+                    csv += `"   - ${vk} (${detail.pnp})",${detail.omset},${detail.komisi}\n`;
+                }
             });
             let totalOmset = filteredData.reduce((s,l) => s + l.totalHarga, 0);
             let totalPendapatan = filteredData.reduce((s,l) => s + l.totalKomisi, 0);
@@ -1716,11 +1731,23 @@
             let totalOmset = filteredData.reduce((s,l) => s + l.totalHarga, 0);
             let totalPendapatan = filteredData.reduce((s,l) => s + l.totalKomisi, 0);
             
-            let tableData = filteredData.map(l => [
-                l.tanggal, 
-                formatRupiah(l.totalHarga), 
-                formatRupiah(l.totalKomisi)
-            ]);
+            let tableData = [];
+            filteredData.forEach(l => {
+                tableData.push([
+                    l.tanggal, 
+                    formatRupiah(l.totalHarga), 
+                    formatRupiah(l.totalKomisi)
+                ]);
+                for(const vk in l.details) {
+                    const detail = l.details[vk];
+                    tableData.push([
+                        `   - ${vk} (${detail.pnp})`, 
+                        formatRupiah(detail.omset), 
+                        formatRupiah(detail.komisi)
+                    ]);
+                }
+            });
+            
             tableData.push([
                 "TOTAL", 
                 formatRupiah(totalOmset), 
@@ -1734,7 +1761,7 @@
 
             doc.autoTable({
                 startY: 60,
-                head: [['Tanggal', 'Total Omset', 'Komisi (Pendapatan Kotor)']],
+                head: [['Tanggal / Rincian', 'Total Omset', 'Komisi (Pendapatan Kotor)']],
                 body: tableData,
                 theme: 'striped',
                 headStyles: { fillColor: [37, 99, 235] },
@@ -1747,6 +1774,14 @@
                     if (data.row.index >= tableData.length - (type==='pajak'?2:1)) {
                         data.cell.styles.fontStyle = 'bold';
                         if(data.column.index === 0) data.cell.styles.textColor = [220, 38, 38];
+                    } else if (data.column.index === 0) {
+                        const cellText = data.cell.text[0];
+                        if (cellText && cellText.startsWith('   - ')) {
+                            data.cell.styles.fontStyle = 'normal';
+                            data.cell.styles.textColor = [80, 80, 80];
+                        } else {
+                            data.cell.styles.fontStyle = 'bold';
+                        }
                     }
                 }
             });
