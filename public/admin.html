@@ -505,16 +505,16 @@
 
                     <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
                         <!-- Bulanan -->
-                        <div class="bg-white rounded-[2rem] p-6 shadow-xl border border-slate-100 relative overflow-hidden group">
+                        <div class="bg-white rounded-[2rem] p-6 shadow-xl border border-slate-100 relative overflow-hidden group flex flex-col">
                             <div class="absolute -right-6 -top-6 w-24 h-24 bg-blue-50 rounded-full group-hover:scale-150 transition-transform duration-500"></div>
-                            <div class="relative z-10">
+                            <div class="relative z-10 flex flex-col flex-1">
                                 <div class="w-12 h-12 bg-blue-100 text-blue-600 rounded-2xl flex items-center justify-center text-xl mb-4 shadow-sm">
                                     <i class="fas fa-calendar-alt"></i>
                                 </div>
                                 <h3 class="text-lg font-black text-slate-800">Laporan Bulanan</h3>
                                 <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1 mb-4">Penghasilan & Statistik Bulanan</p>
                                 <input type="month" id="laporanBulanInput" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm font-bold text-slate-700 outline-none focus:border-blue-500 transition-colors shadow-sm mb-4">
-                                <div class="flex gap-2">
+                                <div class="flex gap-2 mt-auto">
                                     <button onclick="downloadReport('bulanan', 'pdf')" class="flex-1 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-[10px] font-black uppercase tracking-widest transition-colors flex items-center justify-center gap-1 shadow-md shadow-blue-200">
                                         <i class="fas fa-file-pdf"></i> PDF
                                     </button>
@@ -526,16 +526,16 @@
                         </div>
 
                         <!-- Tahunan -->
-                        <div class="bg-white rounded-[2rem] p-6 shadow-xl border border-slate-100 relative overflow-hidden group">
+                        <div class="bg-white rounded-[2rem] p-6 shadow-xl border border-slate-100 relative overflow-hidden group flex flex-col">
                             <div class="absolute -right-6 -top-6 w-24 h-24 bg-indigo-50 rounded-full group-hover:scale-150 transition-transform duration-500"></div>
-                            <div class="relative z-10">
+                            <div class="relative z-10 flex flex-col flex-1">
                                 <div class="w-12 h-12 bg-indigo-100 text-indigo-600 rounded-2xl flex items-center justify-center text-xl mb-4 shadow-sm">
                                     <i class="fas fa-calendar-check"></i>
                                 </div>
                                 <h3 class="text-lg font-black text-slate-800">Laporan Tahunan</h3>
                                 <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1 mb-6">Ringkasan Penghasilan Tahun Ini</p>
                                 
-                                <div class="flex gap-2">
+                                <div class="flex gap-2 mt-auto">
                                     <button onclick="downloadReport('tahunan', 'pdf')" class="flex-1 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-[10px] font-black uppercase tracking-widest transition-colors flex items-center justify-center gap-1 shadow-md shadow-indigo-200">
                                         <i class="fas fa-file-pdf"></i> PDF
                                     </button>
@@ -547,16 +547,16 @@
                         </div>
 
                         <!-- Pajak -->
-                        <div class="bg-white rounded-[2rem] p-6 shadow-xl border border-slate-100 relative overflow-hidden group">
+                        <div class="bg-white rounded-[2rem] p-6 shadow-xl border border-slate-100 relative overflow-hidden group flex flex-col">
                             <div class="absolute -right-6 -top-6 w-24 h-24 bg-rose-50 rounded-full group-hover:scale-150 transition-transform duration-500"></div>
-                            <div class="relative z-10">
+                            <div class="relative z-10 flex flex-col flex-1">
                                 <div class="w-12 h-12 bg-rose-100 text-rose-600 rounded-2xl flex items-center justify-center text-xl mb-4 shadow-sm">
                                     <i class="fas fa-file-invoice-dollar"></i>
                                 </div>
                                 <h3 class="text-lg font-black text-slate-800">Laporan Pajak</h3>
                                 <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1 mb-6">Estimasi Kewajiban Pajak Tahunan</p>
                                 
-                                <div class="flex gap-2">
+                                <div class="flex gap-2 mt-auto">
                                     <button onclick="downloadReport('pajak', 'pdf')" class="flex-1 py-2.5 bg-rose-600 hover:bg-rose-700 text-white rounded-xl text-[10px] font-black uppercase tracking-widest transition-colors flex items-center justify-center gap-1 shadow-md shadow-rose-200">
                                         <i class="fas fa-file-pdf"></i> PDF
                                     </button>
@@ -568,16 +568,16 @@
                         </div>
 
                         <!-- Backup Database -->
-                        <div class="bg-white rounded-[2rem] p-6 shadow-xl border border-slate-100 relative overflow-hidden group">
+                        <div class="bg-white rounded-[2rem] p-6 shadow-xl border border-slate-100 relative overflow-hidden group flex flex-col">
                             <div class="absolute -right-6 -top-6 w-24 h-24 bg-teal-50 rounded-full group-hover:scale-150 transition-transform duration-500"></div>
-                            <div class="relative z-10">
+                            <div class="relative z-10 flex flex-col flex-1">
                                 <div class="w-12 h-12 bg-teal-100 text-teal-600 rounded-2xl flex items-center justify-center text-xl mb-4 shadow-sm">
                                     <i class="fas fa-database"></i>
                                 </div>
                                 <h3 class="text-lg font-black text-slate-800">Backup DB</h3>
                                 <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1 mb-6">Unduh Seluruh Data (.xlsx)</p>
                                 
-                                <div class="flex gap-2">
+                                <div class="flex gap-2 mt-auto">
                                     <button onclick="window.location.href='/api/export?token=' + localStorage.getItem('adminToken')" class="flex-1 py-2.5 bg-teal-600 hover:bg-teal-700 text-white rounded-xl text-[10px] font-black uppercase tracking-widest transition-colors flex items-center justify-center gap-2 shadow-md shadow-teal-200">
                                         <i class="fas fa-download"></i> EXCEL (.xlsx)
                                     </button>
@@ -605,7 +605,7 @@
                         </div>
 
                         <!-- Custom Manifest -->
-                        <div class="bg-white rounded-[2rem] p-6 shadow-xl border border-slate-100 relative group md:col-span-3 mt-6 lg:mt-0">
+                        <div class="bg-white rounded-[2rem] p-6 shadow-xl border border-slate-100 relative group md:col-span-2 xl:col-span-4 mt-6 xl:mt-0">
                             <div class="flex items-center gap-4 mb-6">
                                 <div class="w-12 h-12 bg-teal-100 text-teal-600 rounded-2xl flex items-center justify-center text-xl shadow-sm shrink-0">
                                     <i class="fas fa-filter"></i>

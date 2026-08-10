@@ -1476,23 +1476,43 @@
                 showMessage("Library PDF belum termuat, mohon tunggu beberapa saat.");
                 return;
             }
-            const { jsPDF } = window.jspdf;
-            const doc = new jsPDF('l', 'mm', 'a4'); // Landscape A4
-            
-            doc.setFontSize(22);
-            doc.setFont("helvetica", "bold");
-            doc.text("AGEN DAMRI KAWUNGANTEN", 14, 22);
-            
-            doc.setFontSize(12);
-            doc.setFont("helvetica", "normal");
-            doc.text(`Data Penumpang (${displayDate})`, 14, 30);
-            
-            let filterText = [];
-            if(selectedArmadas.length > 0) filterText.push(`Armada: ${selectedArmadas.join(', ')}`);
-            if(selectedTimes.length > 0) filterText.push(`Jam: ${selectedTimes.join(', ')}`);
-            doc.setFontSize(10);
-            doc.setFont("helvetica", "italic");
-            doc.text(filterText.join(' | '), 14, 36);
+
+            const generateManifestPdf = async () => {
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF('l', 'mm', 'a4'); // Landscape A4
+                
+                let titleX = 14;
+                try {
+                    const img = new Image();
+                    img.src = '/logo.png';
+                    await new Promise((resolve, reject) => {
+                        img.onload = () => resolve(img);
+                        img.onerror = reject;
+                    });
+                    doc.addImage(img, 'PNG', 14, 12, 18, 18);
+                    titleX = 36;
+                } catch(e) {
+                    console.log("Logo error", e);
+                }
+                
+                doc.setFontSize(22);
+                doc.setFont("helvetica", "bold");
+                doc.text("AGEN DAMRI KAWUNGANTEN", titleX, 22);
+                
+                doc.setFontSize(12);
+                doc.setFont("helvetica", "normal");
+                doc.text(`Data Penumpang (${displayDate})`, titleX, 30);
+                
+                let filterText = [];
+                if(selectedArmadas.length > 0) filterText.push(`Armada: ${selectedArmadas.join(', ')}`);
+                if(selectedTimes.length > 0) filterText.push(`Jam: ${selectedTimes.join(', ')}`);
+                doc.setFontSize(10);
+                doc.setFont("helvetica", "italic");
+                doc.text(filterText.join(' | '), titleX, 36);
+
+                doc.setLineWidth(0.5);
+                doc.setDrawColor(200, 200, 200);
+                doc.line(14, 40, 283, 40);
             
             const tableData = filteredBookings.map((b, i) => {
                 const armadaName = b.armadaId !== 'UNKNOWN' && getArmada(b.armadaId) ? getArmada(b.armadaId).name : (b.kendaraan || b['JENIS KENDARAAN'] || '-');
@@ -1518,7 +1538,7 @@
             });
 
             doc.autoTable({
-                startY: 42,
+                startY: 45,
                 head: [['No', 'Jam', 'Armada', 'Tujuan', 'Nama Penumpang', 'No HP', 'Jml', 'Kursi', 'Ket']],
                 body: tableData,
                 theme: 'grid',
@@ -1543,6 +1563,8 @@
             doc.text(`Total Penumpang: ${totalPnp} Orang`, 14, doc.lastAutoTable.finalY + 10);
 
             doc.save(`Manifest_${selectedDate}.pdf`);
+            };
+            generateManifestPdf();
         }
     }
 
@@ -1584,6 +1606,28 @@
             });
             title = 'Laporan Pajak Tahunan (' + today.getFullYear() + ')';
         }
+
+        // Group by Date
+        const groupedData = {};
+        filteredData.forEach(l => {
+            if (!groupedData[l.tanggal]) {
+                groupedData[l.tanggal] = {
+                    tanggal: l.tanggal,
+                    totalHarga: 0,
+                    totalKomisi: 0
+                };
+            }
+            groupedData[l.tanggal].totalHarga += (Number(l.totalHarga) || 0);
+            groupedData[l.tanggal].totalKomisi += (Number(l.totalKomisi) || 0);
+        });
+        filteredData = Object.values(groupedData);
+
+        // Sort from oldest to newest
+        filteredData.sort((a, b) => {
+            const dateA = parseIndoDate(a.tanggal);
+            const dateB = parseIndoDate(b.tanggal);
+            return (dateA ? dateA.getTime() : 0) - (dateB ? dateB.getTime() : 0);
+        });
         
         if (format === 'csv') {
             let csv = 'Tanggal,Total Omset,Komisi (Pendapatan Kotor)\n';
@@ -1616,22 +1660,42 @@
                 showMessage("Library PDF belum termuat, mohon tunggu beberapa saat.");
                 return;
             }
-            const { jsPDF } = window.jspdf;
-            const doc = new jsPDF();
-            
-            doc.setFontSize(22);
-            doc.setFont("helvetica", "bold");
-            doc.text("AGEN DAMRI KAWUNGANTEN", 14, 22);
-            
-            doc.setFontSize(10);
-            doc.setFont("helvetica", "normal");
-            doc.text("Pemilik: ISNU FADKHUL ROIS", 14, 30);
-            doc.text("NIK: 3301092802990006", 14, 35);
-            doc.text("No HP: 0821-3360-7759", 14, 40);
-            
-            doc.setFontSize(14);
-            doc.setFont("helvetica", "bold");
-            doc.text(title, 14, 55);
+
+            const generateReportPdf = async () => {
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF();
+                
+                let titleX = 14;
+                try {
+                    const img = new Image();
+                    img.src = '/logo.png';
+                    await new Promise((resolve, reject) => {
+                        img.onload = () => resolve(img);
+                        img.onerror = reject;
+                    });
+                    doc.addImage(img, 'PNG', 14, 15, 22, 22);
+                    titleX = 40;
+                } catch(e) {
+                    console.log("Logo error", e);
+                }
+                
+                doc.setFontSize(22);
+                doc.setFont("helvetica", "bold");
+                doc.text("AGEN DAMRI KAWUNGANTEN", titleX, 22);
+                
+                doc.setFontSize(10);
+                doc.setFont("helvetica", "normal");
+                doc.text("Pemilik: ISNU FADKHUL ROIS", titleX, 30);
+                doc.text("NIK: 3301092802990006", titleX, 35);
+                doc.text("No HP: 0821-3360-7759", titleX, 40);
+                
+                doc.setLineWidth(0.5);
+                doc.setDrawColor(200, 200, 200);
+                doc.line(14, 45, 196, 45);
+
+                doc.setFontSize(14);
+                doc.setFont("helvetica", "bold");
+                doc.text(title, 14, 55);
             
             let totalOmset = filteredData.reduce((s,l) => s + l.totalHarga, 0);
             let totalPendapatan = filteredData.reduce((s,l) => s + l.totalKomisi, 0);
@@ -1672,6 +1736,8 @@
             });
 
             doc.save(title + '.pdf');
+            };
+            generateReportPdf();
         }
     }
 
