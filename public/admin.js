@@ -1571,7 +1571,23 @@
     window.downloadCustomManifest = downloadCustomManifest;
 
     function downloadReport(type, format) {
-        const allLaporan = getLaporan(); 
+        let allLaporan = getLaporan() || [];
+        const ekstra = getEkstraBookings() || [];
+        
+        const formatTanggal = (dStr) => {
+            const d = new Date(dStr);
+            if(isNaN(d)) return dStr;
+            return INDO_DAYS[d.getDay()] + ', ' + d.getDate() + ' ' + INDO_MONTHS[d.getMonth()] + ' ' + d.getFullYear();
+        };
+        
+        const ekstraFormatted = ekstra.map(e => ({
+            tanggal: formatTanggal(e.tanggalBerangkat),
+            totalHarga: Number(e.totalHarga) || 0,
+            totalKomisi: Number(e.komisi) || 0
+        }));
+        
+        allLaporan = [...allLaporan, ...ekstraFormatted];
+
         const today = new Date();
         let filteredData = [];
         let title = '';
