@@ -83,9 +83,39 @@ app.get('/api', async (req, res) => {
     const action = req.query.action;
 
     try {
-        const publicActions = ['getArmada'];
+        const publicActions = ['getArmada', 'getBookingById'];
         if (!publicActions.includes(action) && !req.user) {
             return res.status(401).json({ status: 'error', message: 'Unauthorized' });
+        }
+
+        if (action === 'getBookingById') {
+            const id = req.query.id;
+            if (!id) return res.status(400).json({ status: 'error', message: 'ID_TIKET is required' });
+            
+            const booking = await prisma.booking.findFirst({
+                where: { bookingId: id }
+            });
+            
+            if (!booking) return res.json({ status: 'success', data: null });
+            
+            const formattedBooking = {
+                'Timestamp': booking.createdAt,
+                'TANGGAL PEMBERANGKATAN': booking.tanggalPemberangkatan,
+                'ID_TIKET': booking.bookingId,
+                'JENIS KENDARAAN': booking.jenisKendaraan,
+                'Tujuan': booking.tujuan,
+                'Harga': booking.harga,
+                'NAMA': booking.nama,
+                'NOMOR HP': booking.nomorHp,
+                'JUMLAH PNP': booking.jumlahPnp,
+                'WAKTU': booking.waktu,
+                'NOMOR KURSI': booking.nomorKursi,
+                'KETERANGAN': booking.keterangan,
+                'Total Harga': booking.totalHarga,
+                'PEMBAYARAN': booking.pembayaran,
+                'Status': booking.status
+            };
+            return res.json({ status: 'success', data: formattedBooking });
         }
 
         if (action === 'getBookings') {

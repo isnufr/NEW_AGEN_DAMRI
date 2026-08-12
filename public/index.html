@@ -1699,7 +1699,69 @@
         }
 
         // Cari di cachedBookings berdasarkan ID_TIKET
-        const tiket = cachedBookings.find(b => String(b.bookingId).toUpperCase() === id);
+        let tiket = cachedBookings.find(b => String(b.bookingId).toUpperCase() === id);
+
+        // Jika tidak ketemu di cache (karena bukan admin), ambil dari server
+        if (!tiket) {
+            try {
+                const res = await fetchFromSheets('getBookingById', `&id=${encodeURIComponent(id)}`);
+                if (res && res.ID_TIKET) {
+                    const bArmada = res["JENIS KENDARAAN"] ? String(res["JENIS KENDARAAN"]).trim() : "";
+                    const bTujuan = res["Tujuan"] ? String(res["Tujuan"]).trim() : "";
+                    
+                    const armadaMatch = getArmadas().find(a => 
+                        (a.name === bArmada || bArmada.includes(a.name) || a.name.includes(bArmada)) && 
+                        (a.destination === bTujuan || bTujuan.includes(a.destination) || a.destination.includes(bTujuan))
+                    );
+                    
+                    let statusLocal = "waiting_payment";
+                    const bStatus = res["Status"] ? String(res["Status"]).toUpperCase() : "";
+                    const bPembayaran = res["PEMBAYARAN"] ? String(res["PEMBAYARAN"]).toUpperCase() : "";
+                    
+                    if (bStatus === "LUNAS" || bStatus === "ACC" || bPembayaran === "LUNAS" || bPembayaran === "ACC") {
+                        statusLocal = "paid";
+                    } else if (bStatus === "BELUM LUNAS" || bPembayaran === "BELUM LUNAS") {
+                        statusLocal = "BELUM LUNAS";
+                    } else {
+                        statusLocal = bStatus || bPembayaran || "waiting_payment";
+                    }
+
+                    let tgl = "";
+                    if (res["TANGGAL PEMBERANGKATAN"]) {
+                        const rawDate = String(res["TANGGAL PEMBERANGKATAN"]);
+                        if (rawDate.includes('T')) {
+                            const d = new Date(rawDate);
+                            if (!isNaN(d.getTime())) {
+                                tgl = String(d.getDate()).padStart(2,'0') + '/' + String(d.getMonth()+1).padStart(2,'0') + '/' + d.getFullYear();
+                            } else {
+                                tgl = rawDate.split('T')[0];
+                            }
+                        } else {
+                            tgl = rawDate;
+                        }
+                    }
+
+                    tiket = {
+                        bookingId: res["ID_TIKET"] || "UNKNOWN",
+                        name: res["NAMA"] || "Tanpa Nama",
+                        hp: res["NOMOR HP"] || "-",
+                        armadaId: armadaMatch ? armadaMatch.id : "UNKNOWN",
+                        tujuan: bTujuan,
+                        qty: parseInt(res["JUMLAH PNP"]) || 1,
+                        totalPrice: parseInt(res["Total Harga"]) || parseInt(res["Harga"]) || 0,
+                        status: statusLocal,
+                        dateCreated: res["Timestamp"] || "",
+                        dateTravel: tgl,
+                        waktu: res["WAKTU"] || "",
+                        pembayaran: res["PEMBAYARAN"] || "",
+                        keterangan: res["KETERANGAN"] || res["Keterangan"] || res["keterangan"] || "",
+                        kursi: res["NOMOR KURSI"] || ""
+                    };
+                }
+            } catch (err) {
+                console.error("Gagal mengambil tiket:", err);
+            }
+        }
 
         if (tiket) {
             // Format tanggal
