@@ -428,8 +428,8 @@ app.post('/api', async (req, res) => {
                 // Cari semua armada lain dengan nama dan tujuan yang sama
                 const relatedArmadas = await prisma.armada.findMany({
                     where: {
-                        name: targetArmada.name,
-                        destination: targetArmada.destination
+                        namaArmada: targetArmada.namaArmada,
+                        tujuanArmada: targetArmada.tujuanArmada
                     },
                     select: { idArmada: true }
                 });
