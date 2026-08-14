@@ -657,8 +657,12 @@
                             // Cari aturan HK yang aktif untuk armada & tanggal ini
                             const matchingRule = allHk.find(h => {
                                 if (String(h.idArmada) !== String(b.armadaId)) return false;
-                                const start = new Date(h.tanggalAwal).getTime();
-                                const end = new Date(h.tanggalAkhir).getTime();
+                                
+                                const [sY, sM, sD] = h.tanggalAwal.split('-');
+                                const [eY, eM, eD] = h.tanggalAkhir.split('-');
+                                const start = new Date(sY, parseInt(sM)-1, sD).getTime();
+                                const end = new Date(eY, parseInt(eM)-1, eD).getTime();
+                                
                                 return bTime >= start && bTime <= end;
                             });
 
@@ -2283,6 +2287,8 @@
             keterangan: b.keterangan || '-'
         };
 
+        const ruteFullText = asalText + ' ➔ ' + tujuan;
+
         // Populate Thermal Receipt
         if(document.getElementById('r_tgl_beli')) document.getElementById('r_tgl_beli').innerText = 'TGL BELI: ' + tglBeli;
         document.getElementById('r_id').innerText = b.bookingId;
@@ -2293,21 +2299,26 @@
         document.getElementById('r_kursi').innerText = b.kursi || '-';
         if(document.getElementById('r_keterangan')) document.getElementById('r_keterangan').innerText = b.keterangan || '-';
         document.getElementById('r_bus').innerText = armadaName;
-        document.getElementById('r_rute').innerText = tujuan;
+        document.getElementById('r_rute').innerText = ruteFullText;
+
+        const ruteShortText = (b.tujuan && String(b.tujuan).startsWith('[PULANG] ')) 
+            ? String(asalText).substring(0,3).toUpperCase() + ' - KWT' 
+            : 'KWT - ' + String(tujuan).substring(0,3).toUpperCase();
+
         document.getElementById('r_harga').innerText = formatRupiah(harga);
         document.getElementById('r_total').innerText = formatRupiah(total);
-        if(document.getElementById('r_rute_short')) document.getElementById('r_rute_short').innerText = 'KWT - ' + String(tujuan).substring(0,3).toUpperCase();
+        if(document.getElementById('r_rute_short')) document.getElementById('r_rute_short').innerText = ruteShortText;
         
         document.getElementById('r_bus_arsip').innerText = armadaName;
         document.getElementById('r_pnp_arsip_num').innerText = qty + ' Org';
-        document.getElementById('r_rute_arsip').innerText = tujuan;
+        document.getElementById('r_rute_arsip').innerText = ruteFullText;
         document.getElementById('r_nama_arsip').innerText = b.name;
         document.getElementById('r_tgl_arsip').innerText = formattedDate;
 
         // Prepare WA Link
         const hp = b.hp || '';
         const waNum = String(hp).replace(/[^0-9]/g, '').replace(/^0/, '62');
-        const textWa = `*AGEN DAMRI KAWUNGANTEN*\n\nHalo ${b.name}, ini adalah rincian E-Ticketing Anda:\n\n*ID Tiket:* ${b.bookingId}\n*Armada:* ${armadaName}\n*Tujuan:* ${tujuan}\n*Tanggal:* ${formattedDate}\n*Jam:* ${b.waktu || '-'}\n*Jml Penumpang:* ${qty} Orang\n*Total Harga:* ${formatRupiah(total)}\n*Status:* ${statusPay}\n\nTerima kasih telah menggunakan jasa kami!\nWebsite: agendamrikawunganten.net`;
+        const textWa = `*AGEN DAMRI KAWUNGANTEN*\n\nHalo ${b.name}, ini adalah rincian E-Ticketing Anda:\n\n*ID Tiket:* ${b.bookingId}\n*Armada:* ${armadaName}\n*Rute:* ${ruteFullText}\n*Tanggal:* ${formattedDate}\n*Jam:* ${b.waktu || '-'}\n*Jml Penumpang:* ${qty} Orang\n*Total Harga:* ${formatRupiah(total)}\n*Status:* ${statusPay}\n\nTerima kasih telah menggunakan jasa kami!\nWebsite: agendamrikawunganten.net`;
         currentTicketWaText = `https://wa.me/${waNum}?text=${encodeURIComponent(textWa)}`;
 
         openEticketModal();

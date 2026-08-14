@@ -530,13 +530,23 @@
                             <label class="input-label">Tipe Perjalanan</label>
                             <div class="flex gap-4">
                                 <label class="flex items-center gap-2 cursor-pointer">
-                                    <input type="radio" name="bookTipePerjalanan" value="Berangkat" class="w-4 h-4 text-blue-600 focus:ring-blue-500 border-gray-300" checked>
+                                    <input type="radio" name="bookTipePerjalanan" value="Berangkat" class="w-4 h-4 text-blue-600 focus:ring-blue-500 border-gray-300" checked onchange="document.getElementById('labelKotaTujuan').innerText = 'Kota Tujuan';">
                                     <span class="text-xs md:text-sm font-bold text-gray-700">Berangkat (Dari Kawunganten)</span>
                                 </label>
                                 <label class="flex items-center gap-2 cursor-pointer">
-                                    <input type="radio" name="bookTipePerjalanan" value="Pulang" class="w-4 h-4 text-blue-600 focus:ring-blue-500 border-gray-300">
+                                    <input type="radio" name="bookTipePerjalanan" value="Pulang" class="w-4 h-4 text-blue-600 focus:ring-blue-500 border-gray-300" onchange="document.getElementById('labelKotaTujuan').innerText = 'Kota Asal';">
                                     <span class="text-xs md:text-sm font-bold text-gray-700">Pulang (Menuju Kawunganten)</span>
                                 </label>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="input-label">Tanggal Pemberangkatan</label>
+                            <div class="relative">
+                                <input type="date" id="bookTanggal" onchange="calculateBookingTotal()"
+                                    class="w-full p-3 md:p-4 pl-10 md:pl-12 bg-gray-50 rounded-xl md:rounded-2xl font-bold text-gray-700 focus:outline-none form-input-focus text-xs md:text-sm">
+                                <i
+                                    class="fas fa-calendar-alt absolute left-4 md:left-5 top-1/2 -translate-y-1/2 text-gray-400 text-xs md:text-base"></i>
                             </div>
                         </div>
 
@@ -554,7 +564,7 @@
 
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5">
                             <div>
-                                <label class="input-label">Kota Tujuan</label>
+                                <label class="input-label" id="labelKotaTujuan">Kota Tujuan</label>
                                 <div class="relative">
                                     <select id="bookTujuan" onchange="calculateBookingTotal()"
                                         class="w-full p-3 md:p-4 pl-10 md:pl-12 bg-gray-50 rounded-xl md:rounded-2xl font-bold text-gray-700 focus:outline-none form-input-focus appearance-none text-xs md:text-sm">
@@ -574,16 +584,6 @@
                                     <i
                                         class="fas fa-clock absolute left-4 md:left-5 top-1/2 -translate-y-1/2 text-gray-400 text-xs md:text-base"></i>
                                 </div>
-                            </div>
-                        </div>
-
-                        <div>
-                            <label class="input-label">Tanggal Pemberangkatan</label>
-                            <div class="relative">
-                                <input type="date" id="bookTanggal" onchange="calculateBookingTotal()"
-                                    class="w-full p-3 md:p-4 pl-10 md:pl-12 bg-gray-50 rounded-xl md:rounded-2xl font-bold text-gray-700 focus:outline-none form-input-focus text-xs md:text-sm">
-                                <i
-                                    class="fas fa-calendar-alt absolute left-4 md:left-5 top-1/2 -translate-y-1/2 text-gray-400 text-xs md:text-base"></i>
                             </div>
                         </div>
                     </div>
