@@ -658,8 +658,8 @@
                             const matchingRule = allHk.find(h => {
                                 if (String(h.idArmada) !== String(b.armadaId)) return false;
                                 
-                                const [sY, sM, sD] = h.tanggalAwal.split('-');
-                                const [eY, eM, eD] = h.tanggalAkhir.split('-');
+                                const [sY, sM, sD] = String(h.tanggalAwal).split('T')[0].split('-');
+                                const [eY, eM, eD] = String(h.tanggalAkhir).split('T')[0].split('-');
                                 const start = new Date(sY, parseInt(sM)-1, sD).getTime();
                                 const end = new Date(eY, parseInt(eM)-1, eD).getTime();
                                 
