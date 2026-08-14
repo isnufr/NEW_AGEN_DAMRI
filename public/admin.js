@@ -655,8 +655,16 @@
                             const bTime = bDate.getTime();
                             
                             // Cari aturan HK yang aktif untuk armada & tanggal ini
+                            const bArmada = getArmada(b.armadaId);
+                            let matchingArmadaIds = [];
+                            if (bArmada) {
+                                matchingArmadaIds = getArmadas()
+                                    .filter(a => a.name === bArmada.name && a.destination === bArmada.destination)
+                                    .map(a => a.id);
+                            }
+
                             const matchingRule = allHk.find(h => {
-                                if (String(h.idArmada) !== String(b.armadaId)) return false;
+                                if (!matchingArmadaIds.includes(h.idArmada)) return false;
                                 
                                 const [sY, sM, sD] = String(h.tanggalAwal).split('T')[0].split('-');
                                 const [eY, eM, eD] = String(h.tanggalAkhir).split('T')[0].split('-');
