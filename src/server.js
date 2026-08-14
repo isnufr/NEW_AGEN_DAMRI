@@ -484,6 +484,19 @@ app.post('/api', async (req, res) => {
             return res.json({ status: 'success', message: 'Harga Khusus berhasil dihapus' });
         }
 
+        if (action === 'deleteHargaKhususMassal') {
+            const { ids } = payload;
+            if (!Array.isArray(ids) || ids.length === 0) {
+                return res.json({ status: 'error', message: 'Tidak ada data yang dihapus' });
+            }
+            
+            const result = await prisma.hargaKhusus.deleteMany({
+                where: { id: { in: ids } }
+            });
+            
+            return res.json({ status: 'success', message: 'Harga Khusus berhasil dihapus', count: result.count });
+        }
+
         if (action === 'addEkstraBooking') {
             const { tipe, vendor, rute, tanggalBerangkat, jamBerangkat, kodeBooking, namaPenumpang, statusPembayaran } = payload;
             

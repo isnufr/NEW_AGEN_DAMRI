@@ -1249,39 +1249,107 @@
         return [];
     }
 
+    window.toggleHkGroup = function(index) {
+        const rows = document.querySelectorAll(`.hk-group-${index}`);
+        const icon = document.getElementById(`icon-hk-${index}`);
+        if(rows.length === 0) return;
+        
+        let isHidden = rows[0].classList.contains('hidden');
+        rows.forEach(r => {
+            if(isHidden) r.classList.remove('hidden');
+            else r.classList.add('hidden');
+        });
+        if(isHidden) icon.style.transform = 'rotate(180deg)';
+        else icon.style.transform = 'rotate(0deg)';
+    };
+
+    window.hkToggleGroupCheckbox = function(groupKey, isChecked) {
+        const checkboxes = document.querySelectorAll(`.hk-del-cb[data-group="${groupKey}"]`);
+        checkboxes.forEach(cb => cb.checked = isChecked);
+    };
+
+    window.hkCheckGroupState = function(groupKey) {
+        const checkboxes = document.querySelectorAll(`.hk-del-cb[data-group="${groupKey}"]`);
+        const allChecked = Array.from(checkboxes).every(cb => cb.checked);
+        const groupCb = document.getElementById(`hkGroupCb_${groupKey}`);
+        if(groupCb) groupCb.checked = allChecked;
+    };
+
     async function renderHargaKhususTable() {
-        const tbody = document.getElementById('hkTableBody');
-        if(!tbody) return;
-        tbody.innerHTML = '<tr><td colspan="4" class="text-center py-4 text-xs italic text-slate-400">Loading...</td></tr>';
+        const container = document.getElementById('hkAturanAktifContainer');
+        if(!container) return;
+        container.innerHTML = '<p class="text-center py-4 text-xs italic text-slate-400">Loading...</p>';
         
         const hkList = await fetchAllHargaKhusus();
         
         if (hkList.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="4" class="text-center py-4 text-xs italic text-slate-400">Belum ada harga khusus aktif</td></tr>';
+            container.innerHTML = '<p class="text-center py-4 text-xs italic text-slate-400">Belum ada harga khusus aktif</p>';
             return;
         }
         
         const armadas = getArmadas();
-        let html = '';
+        
+        // Group by Armada Name
+        const groups = {};
         hkList.forEach(h => {
             const armadaInfo = armadas.find(a => String(a.id) === String(h.idArmada)) || { name: 'UNKNOWN', destination: 'UNKNOWN' };
-            const isSatuHari = h.tanggalAwal === h.tanggalAkhir;
-            const periodeStr = isSatuHari ? h.tanggalAwal : `${h.tanggalAwal} <br/>s/d<br/> ${h.tanggalAkhir}`;
+            const key = armadaInfo.name;
+            if(!groups[key]) groups[key] = [];
+            groups[key].push({ ...h, armadaInfo });
+        });
+        
+        let html = '';
+        const sortedKeys = Object.keys(groups).sort();
+        
+        sortedKeys.forEach((key, index) => {
+            const groupKey = key.replace(/\s+/g, '_');
             html += `
-                <tr class="border-b border-slate-100 last:border-0 hover:bg-slate-50 transition-colors">
-                    <td class="py-2 px-3">
-                        <span class="block text-[10px] font-black text-blue-700 uppercase">${armadaInfo.name}</span>
-                        <span class="block text-[9px] font-bold text-slate-500 uppercase mt-0.5">${armadaInfo.destination}</span>
-                    </td>
-                    <td class="py-2 px-3 text-[10px] font-bold text-slate-600 text-center leading-tight">${periodeStr}</td>
-                    <td class="py-2 px-3 text-[11px] font-black text-emerald-600">${formatRupiah(parseInt(h.hargaBaru))}</td>
-                    <td class="py-2 px-3 text-center">
-                        <button onclick="deleteHargaKhusus('${h.id}')" class="text-red-500 hover:text-red-700 hover:bg-red-100 bg-red-50 p-1.5 w-7 h-7 rounded-lg transition-colors flex items-center justify-center mx-auto shadow-sm"><i class="fas fa-trash text-[10px]"></i></button>
-                    </td>
-                </tr>
+                <div class="border border-slate-200 rounded-xl overflow-hidden bg-white mb-3">
+                    <!-- Header Group -->
+                    <div class="bg-slate-50 px-4 py-3 flex items-center justify-between border-b border-slate-200">
+                        <div class="flex items-center gap-3">
+                            <input type="checkbox" id="hkGroupCb_${groupKey}" class="w-4 h-4 text-red-600 bg-white border-gray-300 rounded focus:ring-red-500" onchange="hkToggleGroupCheckbox('${groupKey}', this.checked)">
+                            <div class="cursor-pointer flex items-center gap-2" onclick="toggleHkGroup('${index}')">
+                                <i class="fas fa-bus text-blue-600"></i>
+                                <span class="font-black text-[11px] text-blue-900 uppercase">${key}</span>
+                                <span class="text-[9px] font-bold text-blue-600 bg-blue-100 px-2 py-0.5 rounded-md">${groups[key].length} Aturan</span>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <button onclick="deleteHargaKhususMassal('${groupKey}')" class="text-[9px] font-black uppercase tracking-widest text-red-500 hover:text-red-700 bg-red-50 hover:bg-red-100 px-2 py-1 rounded transition-colors flex items-center gap-1">
+                                <i class="fas fa-trash"></i> Hapus Terpilih
+                            </button>
+                            <i class="fas fa-chevron-down text-blue-600 transition-transform duration-300 cursor-pointer" id="icon-hk-${index}" onclick="toggleHkGroup('${index}')"></i>
+                        </div>
+                    </div>
+                    <!-- Body Group -->
+                    <table class="w-full text-left border-collapse">
+                        <tbody class="divide-y divide-slate-100">
+            `;
+            groups[key].forEach(h => {
+                const isSatuHari = h.tanggalAwal === h.tanggalAkhir;
+                const periodeStr = isSatuHari ? h.tanggalAwal : `${h.tanggalAwal} <br/>s/d<br/> ${h.tanggalAkhir}`;
+                html += `
+                            <tr class="hk-group-${index} hidden hover:bg-slate-50 transition-colors">
+                                <td class="py-2 px-4 w-10 text-center">
+                                    <input type="checkbox" value="${h.id}" data-group="${groupKey}" class="hk-del-cb w-3.5 h-3.5 text-red-600 bg-gray-100 border-gray-300 rounded focus:ring-red-500" onchange="hkCheckGroupState('${groupKey}')">
+                                </td>
+                                <td class="py-2 px-2">
+                                    <span class="block text-[9px] font-black text-slate-700 uppercase">${h.armadaInfo.destination}</span>
+                                </td>
+                                <td class="py-2 px-2 text-[9px] font-bold text-slate-500 leading-tight">${periodeStr}</td>
+                                <td class="py-2 px-3 text-[10px] font-black text-emerald-600 text-right">${formatRupiah(parseInt(h.hargaBaru))}</td>
+                            </tr>
+                `;
+            });
+            html += `
+                        </tbody>
+                    </table>
+                </div>
             `;
         });
-        tbody.innerHTML = html;
+        
+        container.innerHTML = html;
     }
 
     window.saveHargaKhusus = async function() {
@@ -1347,6 +1415,32 @@
             const data = await res.json();
             if (data.status === 'success') {
                 showMessage('Harga khusus dihapus');
+                renderHargaKhususTable();
+            } else {
+                showMessage('Gagal menghapus', true);
+            }
+        } catch (error) {
+            showMessage('Kesalahan server', true);
+        }
+    };
+
+    window.deleteHargaKhususMassal = async function(groupKey) {
+        const checkboxes = document.querySelectorAll(`.hk-del-cb[data-group="${groupKey}"]:checked`);
+        if(checkboxes.length === 0) return showMessage('Silakan pilih minimal satu aturan untuk dihapus', true);
+        
+        if(!confirm(`Yakin ingin menghapus ${checkboxes.length} aturan terpilih?`)) return;
+        
+        const ids = Array.from(checkboxes).map(cb => cb.value);
+        
+        try {
+            const res = await fetch('/api', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('adminToken')}` },
+                body: JSON.stringify({ action: 'deleteHargaKhususMassal', payload: { ids } })
+            });
+            const data = await res.json();
+            if (data.status === 'success') {
+                showMessage(`Berhasil menghapus ${checkboxes.length} harga khusus`);
                 renderHargaKhususTable();
             } else {
                 showMessage('Gagal menghapus', true);
