@@ -1117,6 +1117,7 @@
                         <td class="text-center">
                             <div class="flex gap-1 justify-center">
                                 <button onclick="toggleArmadaStatusAPI('${a.id}', ${!a.isActive})" class="${a.isActive ? 'bg-emerald-500 hover:bg-emerald-600' : 'bg-slate-400 hover:bg-slate-500'} text-white w-7 h-7 flex items-center justify-center rounded-lg text-xs shadow-sm transition-all mx-auto" title="${a.isActive ? 'Nonaktifkan Armada' : 'Aktifkan Armada'}"><i class="fas ${a.isActive ? 'fa-check' : 'fa-times'}"></i></button>
+                                <button onclick="openHargaKhususModal('${a.id}', '${a.name} - ${a.destination}')" class="bg-blue-500 hover:bg-blue-600 text-white w-7 h-7 flex items-center justify-center rounded-lg text-xs shadow-sm transition-all mx-auto" title="Harga Khusus (Kalender)"><i class="far fa-calendar-alt"></i></button>
                                 <button onclick="openEditArmadaModal('${a.id}')" class="bg-amber-500 hover:bg-amber-600 text-white w-7 h-7 flex items-center justify-center rounded-lg text-xs shadow-sm transition-all mx-auto" title="Edit Armada"><i class="fas fa-edit"></i></button>
                                 <button onclick="openDeleteArmadaModal('${a.id}')" class="bg-red-500 hover:bg-red-600 text-white w-7 h-7 flex items-center justify-center rounded-lg text-xs shadow-sm transition-all mx-auto" title="Hapus Armada"><i class="fas fa-trash"></i></button>
                             </div>
@@ -1146,6 +1147,159 @@
             inner.classList.remove('scale-95', 'opacity-0');
             inner.classList.add('scale-100', 'opacity-100');
         }, 10);
+    }
+
+    // ========================================
+    // HARGA KHUSUS
+    // ========================================
+    
+    function openHargaKhususModal(idArmada, namaArmada) {
+        document.getElementById('hkIdArmada').value = idArmada;
+        document.getElementById('hkArmadaName').textContent = namaArmada;
+        
+        // Reset inputs
+        document.getElementById('hkTanggalAwal').value = '';
+        document.getElementById('hkTanggalAkhir').value = '';
+        document.getElementById('hkHargaBaru').value = '';
+        
+        renderHargaKhususTable(idArmada);
+        
+        const modal = document.getElementById('hargaKhususModal');
+        const inner = document.getElementById('hargaKhususModalInner');
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+        setTimeout(() => {
+            inner.classList.remove('scale-95', 'opacity-0');
+            inner.classList.add('scale-100', 'opacity-100');
+        }, 10);
+    }
+
+    function closeHargaKhususModal() {
+        const modal = document.getElementById('hargaKhususModal');
+        const inner = document.getElementById('hargaKhususModalInner');
+        inner.classList.remove('scale-100', 'opacity-100');
+        inner.classList.add('scale-95', 'opacity-0');
+        setTimeout(() => {
+            modal.classList.remove('flex');
+            modal.classList.add('hidden');
+        }, 300);
+    }
+
+    async function fetchAllHargaKhusus() {
+        try {
+            const res = await fetch('/api?action=getHargaKhusus', {
+                headers: { 'Authorization': `Bearer ${localStorage.getItem('adminToken')}` }
+            });
+            const data = await res.json();
+            if (data.status === 'success') {
+                return data.data;
+            }
+        } catch(e) {}
+        return [];
+    }
+
+    async function renderHargaKhususTable(idArmada) {
+        const tbody = document.getElementById('hkTableBody');
+        tbody.innerHTML = '<tr><td colspan="3" class="text-center py-4 text-xs italic text-slate-400">Loading...</td></tr>';
+        
+        const hkList = await fetchAllHargaKhusus();
+        const armadaHk = hkList.filter(h => h.idArmada === idArmada);
+        
+        if (armadaHk.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="3" class="text-center py-4 text-xs italic text-slate-400">Belum ada harga khusus</td></tr>';
+            return;
+        }
+        
+        let html = '';
+        armadaHk.forEach(h => {
+            const isSatuHari = h.tanggalAwal === h.tanggalAkhir;
+            const periodeStr = isSatuHari ? h.tanggalAwal : `${h.tanggalAwal} s/d ${h.tanggalAkhir}`;
+            html += `
+                <tr class="border-b border-slate-100 last:border-0">
+                    <td class="py-2 px-3 text-xs">${periodeStr}</td>
+                    <td class="py-2 px-3 text-xs text-blue-600">${formatRupiah(parseInt(h.hargaBaru))}</td>
+                    <td class="py-2 px-3 text-center">
+                        <button onclick="deleteHargaKhusus('${h.id}', '${idArmada}')" class="text-red-500 hover:text-red-700 bg-red-50 p-1.5 rounded-lg transition-colors"><i class="fas fa-trash"></i></button>
+                    </td>
+                </tr>
+            `;
+        });
+        tbody.innerHTML = html;
+    }
+
+    async function saveHargaKhusus() {
+        const idArmada = document.getElementById('hkIdArmada').value;
+        const tglAwal = document.getElementById('hkTanggalAwal').value;
+        const tglAkhir = document.getElementById('hkTanggalAkhir').value;
+        const hargaBaru = document.getElementById('hkHargaBaru').value.replace(/\\D/g, '');
+        
+        if (!tglAwal || !tglAkhir || !hargaBaru) {
+            showToast('Silakan lengkapi rentang tanggal dan harga baru', 'error');
+            return;
+        }
+        if (new Date(tglAwal) > new Date(tglAkhir)) {
+            showToast('Tanggal awal tidak boleh lebih besar dari tanggal akhir', 'error');
+            return;
+        }
+        
+        const btn = document.getElementById('btnSaveHargaKhusus');
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+        btn.disabled = true;
+        
+        try {
+            const res = await fetch('/api', {
+                method: 'POST',
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
+                },
+                body: JSON.stringify({
+                    action: 'addHargaKhusus',
+                    payload: { idArmada, tanggalAwal: tglAwal, tanggalAkhir: tglAkhir, hargaBaru: parseInt(hargaBaru) }
+                })
+            });
+            const data = await res.json();
+            if (data.status === 'success') {
+                showToast('Harga khusus berhasil disimpan', 'success');
+                // Reset form
+                document.getElementById('hkTanggalAwal').value = '';
+                document.getElementById('hkTanggalAkhir').value = '';
+                document.getElementById('hkHargaBaru').value = '';
+                renderHargaKhususTable(idArmada);
+            } else {
+                showToast(data.message || 'Gagal menyimpan', 'error');
+            }
+        } catch (error) {
+            showToast('Terjadi kesalahan server', 'error');
+        }
+        btn.innerHTML = 'SIMPAN HARGA';
+        btn.disabled = false;
+    }
+
+    async function deleteHargaKhusus(id, idArmada) {
+        if(!confirm('Yakin ingin menghapus harga khusus ini?')) return;
+        try {
+            const res = await fetch('/api', {
+                method: 'POST',
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
+                },
+                body: JSON.stringify({
+                    action: 'deleteHargaKhusus',
+                    payload: { id }
+                })
+            });
+            const data = await res.json();
+            if (data.status === 'success') {
+                showToast('Harga khusus dihapus', 'success');
+                renderHargaKhususTable(idArmada);
+            } else {
+                showToast('Gagal menghapus', 'error');
+            }
+        } catch (error) {
+            showToast('Kesalahan server', 'error');
+        }
     }
 
     function closeDeleteArmadaModal() {
@@ -2744,7 +2898,30 @@
             finalKet = finalKet ? `${finalKet}, ${ketTambahanText}` : ketTambahanText;
         }
 
-        const total = armada ? (armada.price * qty) + nominalBiayaTambahan : 0;
+        let finalHargaSatuan = armada ? armada.price : 0;
+        
+        if (armada && rawDate && typeof fetchAllHargaKhusus === 'function') {
+            const hkList = cachedHargaKhusus || [];
+            const selectedDate = new Date(rawDate).getTime();
+            
+            const allArmadas = getArmadas();
+            const matchingArmadaIds = allArmadas
+                .filter(arm => arm.name === armada.name && arm.destination === armada.destination)
+                .map(arm => arm.id);
+                
+            const activeHk = hkList.find(hk => {
+                if (!matchingArmadaIds.includes(hk.idArmada)) return false;
+                const start = new Date(hk.tanggalAwal).getTime();
+                const end = new Date(hk.tanggalAkhir).getTime();
+                return selectedDate >= start && selectedDate <= end;
+            });
+            
+            if (activeHk) {
+                finalHargaSatuan = parseInt(activeHk.hargaBaru) || armada.price;
+            }
+        }
+        
+        const total = armada ? (finalHargaSatuan * qty) + nominalBiayaTambahan : 0;
         
         let filledKursiCount = 0;
         let kursiValues = [];
@@ -2996,6 +3173,7 @@
     function recalcAdminBooking() {
         renderAdminBookingKursi();
         const armadaId = document.getElementById('adminBookingArmada').value;
+        const d = document.getElementById('adminBookingDate').value;
         const qty = parseInt(document.getElementById('adminBookingPnp').value) || 1;
         const armada = getArmada(armadaId);
         
@@ -3003,7 +3181,35 @@
         const nominalBiayaTambahan = hasBiayaTambahan ? (parseInt(document.getElementById('adminBookingBiayaTambahanNominal').value) || 0) : 0;
 
         if(armada) {
-            document.getElementById('adminBookingTotalDisplay').innerText = formatRupiah((armada.price * qty) + nominalBiayaTambahan);
+            let finalHarga = armada.price;
+            
+            // Cek harga khusus
+            if (d && typeof fetchAllHargaKhusus === 'function') {
+                const hkList = cachedHargaKhusus || []; // Admin app needs a cached array
+                const selectedDate = new Date(d).getTime();
+                
+                // Cari apakah ada harga khusus
+                // Because Admin selects a specific armadaId (route + time), we check matching name & destination
+                const allArmadas = getArmadas();
+                const matchingArmadaIds = allArmadas
+                    .filter(arm => arm.name === armada.name && arm.destination === armada.destination)
+                    .map(arm => arm.id);
+                    
+                const activeHk = hkList.find(hk => {
+                    if (!matchingArmadaIds.includes(hk.idArmada)) return false;
+                    const start = new Date(hk.tanggalAwal).getTime();
+                    const end = new Date(hk.tanggalAkhir).getTime();
+                    return selectedDate >= start && selectedDate <= end;
+                });
+                
+                if (activeHk) {
+                    finalHarga = parseInt(activeHk.hargaBaru) || armada.price;
+                }
+            }
+            
+            document.getElementById('adminBookingTotalDisplay').innerText = formatRupiah((finalHarga * qty) + nominalBiayaTambahan);
+            // Simpan harga satuan untuk submit form (jika ada hidden field, atau submit form hitung ulang)
+            // Di admin.js, submitAdminBooking biasanya menghitung ulang dari elemen total
         } else {
             document.getElementById('adminBookingTotalDisplay').innerText = 'Rp0';
         }

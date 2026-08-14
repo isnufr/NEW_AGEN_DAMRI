@@ -27,6 +27,7 @@ window.fetch = async function() {
 // 1. DATA CACHE & STATE
 // ==========================================
 let cachedArmadas = [];
+let cachedHargaKhusus = [];
 let cachedBookings = [];
 let cachedLaporan = [];
 let cachedEkstraBookings = [];
@@ -86,7 +87,8 @@ async function initData() {
         const isAdmin = localStorage.getItem('isAdminLoggedIn') === 'true';
         
         const promises = [
-            fetchFromSheets('getArmada')
+            fetchFromSheets('getArmada'),
+            fetchFromSheets('getHargaKhusus')
         ];
         
         if (isAdmin) {
@@ -100,12 +102,13 @@ async function initData() {
         const results = await Promise.all(promises);
         
         const aData = results[0];
+        const hData = results[1];
         let bData = [], lData = [], eData = [];
         
         if (isAdmin) {
-            bData = results[1];
-            lData = results[2];
-            eData = results[3];
+            bData = results[2];
+            lData = results[3];
+            eData = results[4];
         }
 
         if (aData && Array.isArray(aData)) {
@@ -130,6 +133,11 @@ async function initData() {
                 };
             });
             localStorage.setItem("app_armadas", JSON.stringify(cachedArmadas));
+        }
+
+        if (hData && Array.isArray(hData)) {
+            cachedHargaKhusus = hData;
+            localStorage.setItem("app_harga_khusus", JSON.stringify(cachedHargaKhusus));
         }
 
         if (bData && Array.isArray(bData)) {
@@ -231,10 +239,12 @@ async function initData() {
         
         // Fallback to localStorage if fetch fails
         const localA = localStorage.getItem("app_armadas");
+        const localH = localStorage.getItem("app_harga_khusus");
         const localB = localStorage.getItem("app_bookings");
         const localL = localStorage.getItem("app_laporan");
         const localE = localStorage.getItem("app_ekstra");
         if (localA) cachedArmadas = JSON.parse(localA);
+        if (localH) cachedHargaKhusus = JSON.parse(localH);
         if (localB) cachedBookings = JSON.parse(localB);
         if (localL) cachedLaporan = JSON.parse(localL);
         if (localE) cachedEkstraBookings = JSON.parse(localE);
@@ -249,6 +259,10 @@ async function initData() {
 // ==========================================
 function getArmadas() {
     return cachedArmadas;
+}
+
+function getHargaKhususList() {
+    return cachedHargaKhusus;
 }
 
 function getEkstraBookings() {

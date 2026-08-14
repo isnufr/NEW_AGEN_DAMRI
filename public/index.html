@@ -580,7 +580,7 @@
                         <div>
                             <label class="input-label">Tanggal Pemberangkatan</label>
                             <div class="relative">
-                                <input type="date" id="bookTanggal"
+                                <input type="date" id="bookTanggal" onchange="calculateBookingTotal()"
                                     class="w-full p-3 md:p-4 pl-10 md:pl-12 bg-gray-50 rounded-xl md:rounded-2xl font-bold text-gray-700 focus:outline-none form-input-focus text-xs md:text-sm">
                                 <i
                                     class="fas fa-calendar-alt absolute left-4 md:left-5 top-1/2 -translate-y-1/2 text-gray-400 text-xs md:text-base"></i>
@@ -1610,12 +1610,44 @@
 
     function calculateBookingTotal() {
         const a = document.getElementById('bookArmada').value, t = document.getElementById('bookTujuan').value, j = parseInt(document.getElementById('bookJumlah').value) || 0;
+        const d = document.getElementById('bookTanggal').value;
         const hDisplay = document.getElementById('bookHargaSatuan'), totDisplay = document.getElementById('bookTotalBayar');
-        if (!a || !t) { hDisplay.value = "Rp 0"; totDisplay.value = "Rp 0"; return; }
+        if (!a || !t || !d) { hDisplay.value = "Rp 0"; totDisplay.value = "Rp 0"; return; }
+        
         const armada = fleetData.find(f => f.name === a);
         if (armada) {
             const rute = armada.routes.find(r => r.dest === t);
-            if (rute) { const harga = rute.price; const total = harga * j; hDisplay.value = formatRupiah(harga); totDisplay.value = formatRupiah(total); }
+            if (rute) { 
+                let finalHarga = rute.price;
+                
+                // Cek harga khusus
+                if (typeof getHargaKhususList === 'function' && typeof getArmadas === 'function') {
+                    const hkList = getHargaKhususList();
+                    const allArmadas = getArmadas();
+                    
+                    // Cari idArmada yang cocok dengan Nama & Tujuan (mengabaikan jam)
+                    const matchingArmadaIds = allArmadas
+                        .filter(arm => arm.name === a && arm.destination === t)
+                        .map(arm => arm.id);
+                        
+                    // Cari apakah ada harga khusus yang aktif untuk salah satu idArmada tersebut pada tanggal yang dipilih
+                    const selectedDate = new Date(d).getTime();
+                    const activeHk = hkList.find(hk => {
+                        if (!matchingArmadaIds.includes(hk.idArmada)) return false;
+                        const start = new Date(hk.tanggalAwal).getTime();
+                        const end = new Date(hk.tanggalAkhir).getTime();
+                        return selectedDate >= start && selectedDate <= end;
+                    });
+                    
+                    if (activeHk) {
+                        finalHarga = parseInt(activeHk.hargaBaru) || rute.price;
+                    }
+                }
+                
+                const total = finalHarga * j; 
+                hDisplay.value = formatRupiah(finalHarga); 
+                totDisplay.value = formatRupiah(total); 
+            }
         }
     }
 

@@ -159,6 +159,13 @@ app.get('/api', async (req, res) => {
             return res.json({ status: 'success', data: formattedArmadas });
         }
         
+        if (action === 'getHargaKhusus') {
+            const hargaKhusus = await prisma.hargaKhusus.findMany({
+                orderBy: { tanggalAwal: 'desc' }
+            });
+            return res.json({ status: 'success', data: hargaKhusus });
+        }
+        
         if (action === 'getEkstraBookings') {
             const bookings = await prisma.ekstraBooking.findMany();
             // Sort in memory for accurate chronological order
@@ -406,6 +413,68 @@ app.post('/api', async (req, res) => {
                 where: { idArmada: id_armada }
             });
             return res.json({ status: 'success', message: 'Data armada berhasil dihapus' });
+        }
+
+        if (action === 'addHargaKhusus') {
+            const { idArmada, tanggalAwal, tanggalAkhir, hargaBaru } = payload;
+            
+            // Dapatkan info Armada yang sedang ditambahkan
+            const targetArmada = await prisma.armada.findUnique({
+                where: { idArmada: idArmada }
+            });
+
+            let idList = [idArmada];
+            if (targetArmada) {
+                // Cari semua armada lain dengan nama dan tujuan yang sama
+                const relatedArmadas = await prisma.armada.findMany({
+                    where: {
+                        name: targetArmada.name,
+                        destination: targetArmada.destination
+                    },
+                    select: { idArmada: true }
+                });
+                idList = relatedArmadas.map(r => r.idArmada);
+            }
+            
+            // Cek apakah ada yang overlap untuk semua armada tersebut
+            const existing = await prisma.hargaKhusus.findMany({
+                where: { idArmada: { in: idList } }
+            });
+            
+            const startNew = new Date(tanggalAwal).getTime();
+            const endNew = new Date(tanggalAkhir).getTime();
+            
+            let isOverlap = false;
+            for (let e of existing) {
+                let startE = new Date(e.tanggalAwal).getTime();
+                let endE = new Date(e.tanggalAkhir).getTime();
+                if (startNew <= endE && endNew >= startE) {
+                    isOverlap = true;
+                    break;
+                }
+            }
+            
+            if (isOverlap) {
+                return res.json({ status: 'error', message: 'Rentang tanggal bertabrakan dengan harga khusus yang sudah ada untuk armada ini (berlaku untuk semua jam).' });
+            }
+
+            const baru = await prisma.hargaKhusus.create({
+                data: {
+                    idArmada,
+                    tanggalAwal,
+                    tanggalAkhir,
+                    hargaBaru: hargaBaru.toString()
+                }
+            });
+            return res.json({ status: 'success', message: 'Harga Khusus berhasil ditambahkan', data: baru });
+        }
+
+        if (action === 'deleteHargaKhusus') {
+            const { id } = payload;
+            await prisma.hargaKhusus.delete({
+                where: { id: id }
+            });
+            return res.json({ status: 'success', message: 'Harga Khusus berhasil dihapus' });
         }
 
         if (action === 'addEkstraBooking') {

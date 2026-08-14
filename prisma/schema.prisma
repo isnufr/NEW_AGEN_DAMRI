@@ -15,6 +15,7 @@ model Armada {
   harga        String
   seat         Int
   isActive     Boolean @default(true)
+  hargaKhusus  HargaKhusus[]
 }
 
 model Booking {
@@ -57,4 +58,13 @@ model EkstraBooking {
   totalHarga       Int
   statusPembayaran String
   createdAt        String
+}
+
+model HargaKhusus {
+  id           String   @id @default(uuid())
+  idArmada     String
+  tanggalAwal  String
+  tanggalAkhir String
+  hargaBaru    String
+  armada       Armada   @relation(fields: [idArmada], references: [idArmada], onDelete: Cascade)
 }
