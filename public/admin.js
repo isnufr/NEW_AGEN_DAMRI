@@ -1290,12 +1290,12 @@
         const tglAkhir = document.getElementById('hkTanggalAkhir').value;
         const hargaBaru = document.getElementById('hkHargaBaru').value.replace(/\D/g, '');
         
-        if (!armadaName) return showToast('Silakan pilih armada', 'error');
-        if (!tglAwal || !tglAkhir || !hargaBaru) return showToast('Lengkapi rentang tanggal & harga baru', 'error');
-        if (new Date(tglAwal) > new Date(tglAkhir)) return showToast('Tanggal awal tidak boleh lebih besar dari akhir', 'error');
+        if (!armadaName) return showMessage('Silakan pilih armada', true);
+        if (!tglAwal || !tglAkhir || !hargaBaru) return showMessage('Lengkapi rentang tanggal & harga baru', true);
+        if (new Date(tglAwal) > new Date(tglAkhir)) return showMessage('Tanggal awal tidak boleh lebih besar dari akhir', true);
         
         const checkboxes = document.querySelectorAll('.hk-rute-checkbox:checked');
-        if (checkboxes.length === 0) return showToast('Silakan pilih minimal satu rute/tujuan', 'error');
+        if (checkboxes.length === 0) return showMessage('Silakan pilih minimal satu rute/tujuan', true);
         
         const ruteTerpilih = Array.from(checkboxes).map(cb => cb.value);
         
@@ -1321,16 +1321,16 @@
             });
             const data = await res.json();
             if (data.status === 'success') {
-                showToast('Harga khusus massal berhasil disimpan', 'success');
+                showMessage('Harga khusus massal berhasil disimpan');
                 document.getElementById('hkTanggalAwal').value = '';
                 document.getElementById('hkTanggalAkhir').value = '';
                 document.getElementById('hkHargaBaru').value = '';
                 hkToggleAllRute(false);
                 renderHargaKhususTable();
             } else {
-                showToast(data.message || 'Gagal menyimpan', 'error');
+                showMessage(data.message || 'Gagal menyimpan', true);
             }
-        } catch (error) { showToast('Terjadi kesalahan server', 'error'); }
+        } catch (error) { showMessage('Terjadi kesalahan server', true); }
         
         btn.innerHTML = 'SIMPAN HARGA';
         btn.disabled = false;
@@ -1346,13 +1346,13 @@
             });
             const data = await res.json();
             if (data.status === 'success') {
-                showToast('Harga khusus dihapus', 'success');
+                showMessage('Harga khusus dihapus');
                 renderHargaKhususTable();
             } else {
-                showToast('Gagal menghapus', 'error');
+                showMessage('Gagal menghapus', true);
             }
         } catch (error) {
-            showToast('Kesalahan server', 'error');
+            showMessage('Kesalahan server', true);
         }
     };
 
