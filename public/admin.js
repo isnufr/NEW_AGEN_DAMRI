@@ -1117,7 +1117,6 @@
                         <td class="text-center">
                             <div class="flex gap-1 justify-center">
                                 <button onclick="toggleArmadaStatusAPI('${a.id}', ${!a.isActive})" class="${a.isActive ? 'bg-emerald-500 hover:bg-emerald-600' : 'bg-slate-400 hover:bg-slate-500'} text-white w-7 h-7 flex items-center justify-center rounded-lg text-xs shadow-sm transition-all mx-auto" title="${a.isActive ? 'Nonaktifkan Armada' : 'Aktifkan Armada'}"><i class="fas ${a.isActive ? 'fa-check' : 'fa-times'}"></i></button>
-                                <button onclick="openHargaKhususModal('${a.id}', '${a.name} - ${a.destination}')" class="bg-blue-500 hover:bg-blue-600 text-white w-7 h-7 flex items-center justify-center rounded-lg text-xs shadow-sm transition-all mx-auto" title="Harga Khusus (Kalender)"><i class="far fa-calendar-alt"></i></button>
                                 <button onclick="openEditArmadaModal('${a.id}')" class="bg-amber-500 hover:bg-amber-600 text-white w-7 h-7 flex items-center justify-center rounded-lg text-xs shadow-sm transition-all mx-auto" title="Edit Armada"><i class="fas fa-edit"></i></button>
                                 <button onclick="openDeleteArmadaModal('${a.id}')" class="bg-red-500 hover:bg-red-600 text-white w-7 h-7 flex items-center justify-center rounded-lg text-xs shadow-sm transition-all mx-auto" title="Hapus Armada"><i class="fas fa-trash"></i></button>
                             </div>
@@ -1153,16 +1152,22 @@
     // HARGA KHUSUS
     // ========================================
     
-    function openHargaKhususModal(idArmada, namaArmada) {
-        document.getElementById('hkIdArmada').value = idArmada;
-        document.getElementById('hkArmadaName').textContent = namaArmada;
+    window.openHargaKhususModal = function() {
+        const armadas = getArmadas();
+        const names = [...new Set(armadas.map(a => a.name))].sort();
         
-        // Reset inputs
+        const sel = document.getElementById('hkPilihArmada');
+        sel.innerHTML = '<option value="">-- Pilih Armada --</option>';
+        names.forEach(n => {
+            sel.innerHTML += `<option value="${n}">${n}</option>`;
+        });
+        
+        document.getElementById('hkRuteContainer').innerHTML = '<p class="text-xs text-slate-400 font-bold italic text-center py-2">Silakan pilih armada terlebih dahulu</p>';
         document.getElementById('hkTanggalAwal').value = '';
         document.getElementById('hkTanggalAkhir').value = '';
         document.getElementById('hkHargaBaru').value = '';
         
-        renderHargaKhususTable(idArmada);
+        renderHargaKhususTable();
         
         const modal = document.getElementById('hargaKhususModal');
         const inner = document.getElementById('hargaKhususModalInner');
@@ -1172,9 +1177,9 @@
             inner.classList.remove('scale-95', 'opacity-0');
             inner.classList.add('scale-100', 'opacity-100');
         }, 10);
-    }
+    };
 
-    function closeHargaKhususModal() {
+    window.closeHargaKhususModal = function() {
         const modal = document.getElementById('hargaKhususModal');
         const inner = document.getElementById('hargaKhususModalInner');
         inner.classList.remove('scale-100', 'opacity-100');
@@ -1183,7 +1188,53 @@
             modal.classList.remove('flex');
             modal.classList.add('hidden');
         }, 300);
-    }
+    };
+
+    window.hkOnArmadaChange = function() {
+        const armadaName = document.getElementById('hkPilihArmada').value;
+        const container = document.getElementById('hkRuteContainer');
+        if (!armadaName) {
+            container.innerHTML = '<p class="text-xs text-slate-400 font-bold italic text-center py-2">Silakan pilih armada terlebih dahulu</p>';
+            return;
+        }
+        
+        const armadas = getArmadas();
+        const dests = [...new Set(armadas.filter(a => a.name === armadaName).map(a => a.destination))].sort();
+        
+        if (dests.length === 0) {
+            container.innerHTML = '<p class="text-xs text-slate-400 font-bold italic text-center py-2">Tidak ada rute ditemukan</p>';
+            return;
+        }
+        
+        let html = `
+            <div class="flex items-center mb-2 pb-2 border-b border-slate-100">
+                <input type="checkbox" id="hkCheckAll" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500" onchange="hkToggleAllRute(this.checked)">
+                <label for="hkCheckAll" class="ml-2 text-xs font-black text-slate-700 uppercase cursor-pointer">Pilih Semua Rute</label>
+            </div>
+            <div class="space-y-2 pl-1">
+        `;
+        dests.forEach((d, idx) => {
+            html += `
+                <div class="flex items-center">
+                    <input type="checkbox" id="hkRute_${idx}" value="${d}" class="hk-rute-checkbox w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500" onchange="hkCheckRuteState()">
+                    <label for="hkRute_${idx}" class="ml-2 text-[10px] font-bold text-slate-600 uppercase cursor-pointer">${d}</label>
+                </div>
+            `;
+        });
+        html += `</div>`;
+        container.innerHTML = html;
+    };
+
+    window.hkToggleAllRute = function(isChecked) {
+        const checkboxes = document.querySelectorAll('.hk-rute-checkbox');
+        checkboxes.forEach(cb => cb.checked = isChecked);
+    };
+
+    window.hkCheckRuteState = function() {
+        const checkboxes = document.querySelectorAll('.hk-rute-checkbox');
+        const allChecked = Array.from(checkboxes).every(cb => cb.checked);
+        document.getElementById('hkCheckAll').checked = allChecked;
+    };
 
     async function fetchAllHargaKhusus() {
         try {
@@ -1198,28 +1249,34 @@
         return [];
     }
 
-    async function renderHargaKhususTable(idArmada) {
+    async function renderHargaKhususTable() {
         const tbody = document.getElementById('hkTableBody');
-        tbody.innerHTML = '<tr><td colspan="3" class="text-center py-4 text-xs italic text-slate-400">Loading...</td></tr>';
+        if(!tbody) return;
+        tbody.innerHTML = '<tr><td colspan="4" class="text-center py-4 text-xs italic text-slate-400">Loading...</td></tr>';
         
         const hkList = await fetchAllHargaKhusus();
-        const armadaHk = hkList.filter(h => h.idArmada === idArmada);
         
-        if (armadaHk.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="3" class="text-center py-4 text-xs italic text-slate-400">Belum ada harga khusus</td></tr>';
+        if (hkList.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="4" class="text-center py-4 text-xs italic text-slate-400">Belum ada harga khusus aktif</td></tr>';
             return;
         }
         
+        const armadas = getArmadas();
         let html = '';
-        armadaHk.forEach(h => {
+        hkList.forEach(h => {
+            const armadaInfo = armadas.find(a => String(a.id) === String(h.idArmada)) || { name: 'UNKNOWN', destination: 'UNKNOWN' };
             const isSatuHari = h.tanggalAwal === h.tanggalAkhir;
-            const periodeStr = isSatuHari ? h.tanggalAwal : `${h.tanggalAwal} s/d ${h.tanggalAkhir}`;
+            const periodeStr = isSatuHari ? h.tanggalAwal : `${h.tanggalAwal} <br/>s/d<br/> ${h.tanggalAkhir}`;
             html += `
-                <tr class="border-b border-slate-100 last:border-0">
-                    <td class="py-2 px-3 text-xs">${periodeStr}</td>
-                    <td class="py-2 px-3 text-xs text-blue-600">${formatRupiah(parseInt(h.hargaBaru))}</td>
+                <tr class="border-b border-slate-100 last:border-0 hover:bg-slate-50 transition-colors">
+                    <td class="py-2 px-3">
+                        <span class="block text-[10px] font-black text-blue-700 uppercase">${armadaInfo.name}</span>
+                        <span class="block text-[9px] font-bold text-slate-500 uppercase mt-0.5">${armadaInfo.destination}</span>
+                    </td>
+                    <td class="py-2 px-3 text-[10px] font-bold text-slate-600 text-center leading-tight">${periodeStr}</td>
+                    <td class="py-2 px-3 text-[11px] font-black text-emerald-600">${formatRupiah(parseInt(h.hargaBaru))}</td>
                     <td class="py-2 px-3 text-center">
-                        <button onclick="deleteHargaKhusus('${h.id}', '${idArmada}')" class="text-red-500 hover:text-red-700 bg-red-50 p-1.5 rounded-lg transition-colors"><i class="fas fa-trash"></i></button>
+                        <button onclick="deleteHargaKhusus('${h.id}')" class="text-red-500 hover:text-red-700 hover:bg-red-100 bg-red-50 p-1.5 w-7 h-7 rounded-lg transition-colors flex items-center justify-center mx-auto shadow-sm"><i class="fas fa-trash text-[10px]"></i></button>
                     </td>
                 </tr>
             `;
@@ -1227,80 +1284,77 @@
         tbody.innerHTML = html;
     }
 
-    async function saveHargaKhusus() {
-        const idArmada = document.getElementById('hkIdArmada').value;
+    window.saveHargaKhusus = async function() {
+        const armadaName = document.getElementById('hkPilihArmada').value;
         const tglAwal = document.getElementById('hkTanggalAwal').value;
         const tglAkhir = document.getElementById('hkTanggalAkhir').value;
-        const hargaBaru = document.getElementById('hkHargaBaru').value.replace(/\\D/g, '');
+        const hargaBaru = document.getElementById('hkHargaBaru').value.replace(/\D/g, '');
         
-        if (!tglAwal || !tglAkhir || !hargaBaru) {
-            showToast('Silakan lengkapi rentang tanggal dan harga baru', 'error');
-            return;
-        }
-        if (new Date(tglAwal) > new Date(tglAkhir)) {
-            showToast('Tanggal awal tidak boleh lebih besar dari tanggal akhir', 'error');
-            return;
-        }
+        if (!armadaName) return showToast('Silakan pilih armada', 'error');
+        if (!tglAwal || !tglAkhir || !hargaBaru) return showToast('Lengkapi rentang tanggal & harga baru', 'error');
+        if (new Date(tglAwal) > new Date(tglAkhir)) return showToast('Tanggal awal tidak boleh lebih besar dari akhir', 'error');
+        
+        const checkboxes = document.querySelectorAll('.hk-rute-checkbox:checked');
+        if (checkboxes.length === 0) return showToast('Silakan pilih minimal satu rute/tujuan', 'error');
+        
+        const ruteTerpilih = Array.from(checkboxes).map(cb => cb.value);
+        
+        // Find one representative idArmada for each chosen route
+        const armadas = getArmadas();
+        const idArmadaList = [];
+        ruteTerpilih.forEach(r => {
+            const match = armadas.find(a => a.name === armadaName && a.destination === r);
+            if (match) idArmadaList.push(match.id);
+        });
         
         const btn = document.getElementById('btnSaveHargaKhusus');
-        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
-        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>'; btn.disabled = true;
         
         try {
             const res = await fetch('/api', {
                 method: 'POST',
-                headers: { 
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
-                },
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('adminToken')}` },
                 body: JSON.stringify({
-                    action: 'addHargaKhusus',
-                    payload: { idArmada, tanggalAwal: tglAwal, tanggalAkhir: tglAkhir, hargaBaru: parseInt(hargaBaru) }
+                    action: 'addHargaKhususMassal',
+                    payload: { idArmadaList, tanggalAwal: tglAwal, tanggalAkhir: tglAkhir, hargaBaru: parseInt(hargaBaru) }
                 })
             });
             const data = await res.json();
             if (data.status === 'success') {
-                showToast('Harga khusus berhasil disimpan', 'success');
-                // Reset form
+                showToast('Harga khusus massal berhasil disimpan', 'success');
                 document.getElementById('hkTanggalAwal').value = '';
                 document.getElementById('hkTanggalAkhir').value = '';
                 document.getElementById('hkHargaBaru').value = '';
-                renderHargaKhususTable(idArmada);
+                hkToggleAllRute(false);
+                renderHargaKhususTable();
             } else {
                 showToast(data.message || 'Gagal menyimpan', 'error');
             }
-        } catch (error) {
-            showToast('Terjadi kesalahan server', 'error');
-        }
+        } catch (error) { showToast('Terjadi kesalahan server', 'error'); }
+        
         btn.innerHTML = 'SIMPAN HARGA';
         btn.disabled = false;
-    }
+    };
 
-    async function deleteHargaKhusus(id, idArmada) {
-        if(!confirm('Yakin ingin menghapus harga khusus ini?')) return;
+    window.deleteHargaKhusus = async function(id) {
+        if(!confirm('Yakin ingin menghapus aturan harga khusus ini?')) return;
         try {
             const res = await fetch('/api', {
                 method: 'POST',
-                headers: { 
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
-                },
-                body: JSON.stringify({
-                    action: 'deleteHargaKhusus',
-                    payload: { id }
-                })
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('adminToken')}` },
+                body: JSON.stringify({ action: 'deleteHargaKhusus', payload: { id } })
             });
             const data = await res.json();
             if (data.status === 'success') {
                 showToast('Harga khusus dihapus', 'success');
-                renderHargaKhususTable(idArmada);
+                renderHargaKhususTable();
             } else {
                 showToast('Gagal menghapus', 'error');
             }
         } catch (error) {
             showToast('Kesalahan server', 'error');
         }
-    }
+    };
 
     function closeDeleteArmadaModal() {
         const modal = document.getElementById('deleteArmadaModal');

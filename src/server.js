@@ -415,34 +415,37 @@ app.post('/api', async (req, res) => {
             return res.json({ status: 'success', message: 'Data armada berhasil dihapus' });
         }
 
-        if (action === 'addHargaKhusus') {
-            const { idArmada, tanggalAwal, tanggalAkhir, hargaBaru } = payload;
+        if (action === 'addHargaKhususMassal') {
+            const { idArmadaList, tanggalAwal, tanggalAkhir, hargaBaru } = payload;
             
-            // Dapatkan info Armada yang sedang ditambahkan
-            const targetArmada = await prisma.armada.findUnique({
-                where: { idArmada: idArmada }
-            });
-
-            let idList = [idArmada];
-            if (targetArmada) {
-                // Cari semua armada lain dengan nama dan tujuan yang sama
-                const relatedArmadas = await prisma.armada.findMany({
-                    where: {
-                        namaArmada: targetArmada.namaArmada,
-                        tujuanArmada: targetArmada.tujuanArmada
-                    },
-                    select: { idArmada: true }
-                });
-                idList = relatedArmadas.map(r => r.idArmada);
+            if (!Array.isArray(idArmadaList) || idArmadaList.length === 0) {
+                return res.json({ status: 'error', message: 'Tidak ada armada yang dipilih.' });
             }
-            
-            // Cek apakah ada yang overlap untuk semua armada tersebut
-            const existing = await prisma.hargaKhusus.findMany({
-                where: { idArmada: { in: idList } }
-            });
-            
+
             const startNew = new Date(tanggalAwal).getTime();
             const endNew = new Date(tanggalAkhir).getTime();
+            
+            let idListToCheck = [];
+            // Untuk tiap rute (idArmada), kita harus kumpulkan semua jamnya (armada lain dengan nama & tujuan sama)
+            // agar pengecekan overlap mencakup semuanya.
+            for (let id of idArmadaList) {
+                const targetArmada = await prisma.armada.findUnique({ where: { idArmada: id } });
+                if (targetArmada) {
+                    const relatedArmadas = await prisma.armada.findMany({
+                        where: { namaArmada: targetArmada.namaArmada, tujuanArmada: targetArmada.tujuanArmada },
+                        select: { idArmada: true }
+                    });
+                    relatedArmadas.forEach(r => idListToCheck.push(r.idArmada));
+                }
+            }
+
+            // Hapus duplikat ID
+            idListToCheck = [...new Set(idListToCheck)];
+            
+            // Cek apakah ada yang overlap untuk rute-rute tersebut
+            const existing = await prisma.hargaKhusus.findMany({
+                where: { idArmada: { in: idListToCheck } }
+            });
             
             let isOverlap = false;
             for (let e of existing) {
@@ -455,18 +458,22 @@ app.post('/api', async (req, res) => {
             }
             
             if (isOverlap) {
-                return res.json({ status: 'error', message: 'Rentang tanggal bertabrakan dengan harga khusus yang sudah ada untuk armada ini (berlaku untuk semua jam).' });
+                return res.json({ status: 'error', message: 'Rentang tanggal bertabrakan dengan harga khusus yang sudah ada untuk armada/rute yang dipilih.' });
             }
 
-            const baru = await prisma.hargaKhusus.create({
-                data: {
-                    idArmada,
-                    tanggalAwal,
-                    tanggalAkhir,
-                    hargaBaru: hargaBaru.toString()
-                }
+            // Insert massal
+            const dataToInsert = idArmadaList.map(id => ({
+                idArmada: id,
+                tanggalAwal,
+                tanggalAkhir,
+                hargaBaru: hargaBaru.toString()
+            }));
+
+            const baru = await prisma.hargaKhusus.createMany({
+                data: dataToInsert
             });
-            return res.json({ status: 'success', message: 'Harga Khusus berhasil ditambahkan', data: baru });
+            
+            return res.json({ status: 'success', message: 'Harga Khusus Massal berhasil ditambahkan', count: baru.count });
         }
 
         if (action === 'deleteHargaKhusus') {
