@@ -644,14 +644,51 @@
                     const bHp = b.hp || b['NOMOR HP'] || '-';
                     const bQty = b.qty || b['JUMLAH PNP'] || 1;
                     const bKursi = b.kursi || '-';
+                    
+                    // --- Cek Harga Khusus Mismatch ---
+                    let warningHtml = '';
+                    if (b.dateTravel && b.armadaId !== 'UNKNOWN') {
+                        const bDate = parseIndoDate(b.dateTravel);
+                        const allHk = getHargaKhususList();
+                        
+                        if (bDate && allHk && allHk.length > 0) {
+                            const bTime = bDate.getTime();
+                            
+                            // Cari aturan HK yang aktif untuk armada & tanggal ini
+                            const matchingRule = allHk.find(h => {
+                                if (String(h.idArmada) !== String(b.armadaId)) return false;
+                                const start = new Date(h.tanggalAwal).getTime();
+                                const end = new Date(h.tanggalAkhir).getTime();
+                                return bTime >= start && bTime <= end;
+                            });
+
+                            if (matchingRule) {
+                                // Bandingkan harga pesanan (hargaSatuan) dengan hargaBaru
+                                const currentPrice = parseInt(String(b.hargaSatuan || b['HARGA TIKET'] || b.price || '0').replace(/\D/g, ''));
+                                const hkPrice = parseInt(matchingRule.hargaBaru);
+                                
+                                if (currentPrice !== hkPrice && currentPrice > 0) {
+                                    warningHtml = `
+                                        <div class="mt-1 flex items-center gap-1 text-[9px] font-bold text-orange-600 bg-orange-50 px-2 py-1 rounded w-fit border border-orange-100" title="Pesanan ini belum menggunakan Harga Khusus. Harga aturan saat ini adalah Rp ${formatRupiah(hkPrice)}. Silakan konfirmasi dan edit.">
+                                            <i class="fas fa-exclamation-triangle"></i> Harga belum update
+                                        </div>
+                                    `;
+                                }
+                            }
+                        }
+                    }
+                    // ---------------------------------
 
                     html += `
-                                    <div class="flex flex-col sm:flex-row sm:items-center justify-between p-3 border-b border-slate-100 last:border-0 hover:bg-slate-50 transition-colors gap-3 sm:gap-4">
+                                    <div class="flex flex-col sm:flex-row sm:items-center justify-between p-3 border-b border-slate-100 last:border-0 hover:bg-slate-50 transition-colors gap-3 sm:gap-4 relative group">
                                         <!-- Info Passanger -->
                                         <div class="flex flex-col sm:w-1/3">
                                             <span class="text-[10px] font-black text-blue-600 mb-0.5">${bId} - ${bTujuan}</span>
-                                            <span class="font-bold text-sm text-slate-800 uppercase">${bName}</span>
+                                            <span class="font-bold text-sm text-slate-800 uppercase flex items-center gap-2">
+                                                ${bName}
+                                            </span>
                                             <span class="text-[10px] font-bold text-slate-400 mt-0.5">${bHp}</span>
+                                            ${warningHtml}
                                         </div>
                                         
                                         <!-- Qty & Kursi & Status (Mobile Flex) -->
