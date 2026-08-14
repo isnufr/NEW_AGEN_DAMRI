@@ -10,19 +10,31 @@ async function main() {
     console.log('Bookings on 2026-08-17:', bookings.length);
 
     for (const b of bookings) {
-        console.log('\n--- Booking:', b.name, '| ArmadaId:', b.armadaId, '| Date:', b.dateTravel, '| HargaSatuan:', b.hargaSatuan, '| Harga Total DB:', b.totalHarga, '| Harga (fallback):', b.harga);
+        console.log('\n--- Booking:', b.nama, '| ArmadaId:', b.jenisKendaraan, '| Date:', b.tanggalPemberangkatan, '| Harga:', b.harga);
         
-        const bDateStr = b.dateTravel; 
-        const bDateSplit = bDateStr.split('-');
+        const bDateStr = b.tanggalPemberangkatan; 
+        
+        // This is exactly how parseIndoDate works in frontend for "17 AGUSTUS 2026"
+        const INDO_MONTHS = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
+        const parts = bDateStr.split(' ');
         let bTime = 0;
-        if (bDateSplit.length === 3) {
-            bTime = new Date(bDateSplit[0], parseInt(bDateSplit[1])-1, bDateSplit[2]).getTime();
-        } else {
-            console.log('Cant split bDateStr:', bDateStr);
+        if (parts.length === 3) {
+            const day = parseInt(parts[0]);
+            const month = INDO_MONTHS.indexOf(parts[1].toUpperCase());
+            const year = parseInt(parts[2]);
+            bTime = new Date(year, month, day).getTime();
+        }
+
+        const bArmada = armadas.find(a => a.idArmada === b.jenisKendaraan);
+        let matchingArmadaIds = [];
+        if (bArmada) {
+            matchingArmadaIds = armadas
+                .filter(a => a.namaArmada === bArmada.namaArmada && a.tujuanArmada === bArmada.tujuanArmada)
+                .map(a => a.idArmada);
         }
 
         const matchingRule = hk.find(h => {
-            if (String(h.idArmada) !== String(b.armadaId)) return false;
+            if (!matchingArmadaIds.includes(h.idArmada)) return false;
             
             const [sY, sM, sD] = String(h.tanggalAwal).split('T')[0].split('-');
             const [eY, eM, eD] = String(h.tanggalAkhir).split('T')[0].split('-');
@@ -34,7 +46,7 @@ async function main() {
 
         if (matchingRule) {
             console.log('MATCH FOUND:', matchingRule.idArmada, matchingRule.tanggalAwal, matchingRule.hargaBaru);
-            const currentPrice = parseInt(String(b.hargaSatuan || b.harga || b.price || '0').replace(/\D/g, ''));
+            const currentPrice = b.harga;
             const hkPrice = parseInt(matchingRule.hargaBaru);
             console.log('currentPrice:', currentPrice, 'hkPrice:', hkPrice);
             if (currentPrice !== hkPrice && currentPrice > 0) {

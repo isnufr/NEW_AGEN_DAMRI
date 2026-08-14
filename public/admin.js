@@ -676,7 +676,7 @@
 
                             if (matchingRule) {
                                 // Bandingkan harga pesanan (hargaSatuan) dengan hargaBaru
-                                const currentPrice = parseInt(String(b.hargaSatuan || b['HARGA TIKET'] || b.price || '0').replace(/\D/g, ''));
+                                const currentPrice = Math.floor((parseInt(b.totalPrice) || 0) / (parseInt(b.qty) || 1));
                                 const hkPrice = parseInt(matchingRule.hargaBaru);
                                 
                                 if (currentPrice !== hkPrice && currentPrice > 0) {
