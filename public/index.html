@@ -54,11 +54,15 @@
         }
 
         .bg-tertiary {
-            background-color: #1e40af;
+            background-color: #f59e0b; /* Gold/Amber */
         }
 
         .text-tertiary {
-            color: #1e40af;
+            color: #f59e0b;
+        }
+        
+        .border-tertiary {
+            border-color: #f59e0b;
         }
 
         .transition-all {
@@ -66,7 +70,7 @@
         }
 
         .hero-pattern {
-            background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 50%, #172554 100%);
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #020617 100%);
             position: relative;
             overflow: hidden;
         }
@@ -77,7 +81,7 @@
             height: 60vw;
             max-width: 800px;
             max-height: 800px;
-            background: radial-gradient(circle, rgba(59, 130, 246, 0.15) 0%, rgba(0,0,0,0) 70%);
+            background: radial-gradient(circle, rgba(245, 158, 11, 0.15) 0%, rgba(0,0,0,0) 70%);
             top: -20%;
             left: -10%;
             border-radius: 50%;
@@ -92,7 +96,7 @@
             height: 70vw;
             max-width: 900px;
             max-height: 900px;
-            background: radial-gradient(circle, rgba(147, 197, 253, 0.1) 0%, rgba(0,0,0,0) 70%);
+            background: radial-gradient(circle, rgba(253, 230, 138, 0.1) 0%, rgba(0,0,0,0) 70%);
             bottom: -30%;
             right: -10%;
             border-radius: 50%;
@@ -107,20 +111,22 @@
         }
 
         .glass-badge {
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.05);
             backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            color: #fde047;
+            border: 1px solid rgba(245, 158, 11, 0.4);
+            color: #fcd34d;
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
         }
 
         .glass-search {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.4);
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid rgba(245, 158, 11, 0.2);
+            border-top: 4px solid #f59e0b;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
+            border-radius: 1.5rem;
         }
 
         .route-content,
@@ -706,14 +712,14 @@
                 </div>
             </a>
         </div>
-        <div class="hidden lg:flex items-center space-x-1 font-bold text-gray-600 text-sm text-center">
-            <a href="#home" class="px-4 py-2 rounded-full hover:bg-blue-50 hover:text-blue-700 transition-all text-center">Beranda</a>
-            <a href="#cek-tiket" class="px-4 py-2 rounded-full hover:bg-blue-50 hover:text-blue-700 transition-all text-center">Cek Tiket</a>
-            <a href="#produk" class="px-4 py-2 rounded-full hover:bg-blue-50 hover:text-blue-700 transition-all text-center">Layanan</a>
-            <a href="#jadwal" class="px-4 py-2 rounded-full hover:bg-blue-50 hover:text-blue-700 transition-all text-center">Jadwal</a>
-            <a href="#kontak" class="px-4 py-2 rounded-full hover:bg-blue-50 hover:text-blue-700 transition-all text-center">Kontak</a>
+        <div class="hidden lg:flex items-center space-x-1 font-bold text-slate-700 text-sm text-center">
+            <a href="#home" class="px-4 py-2 rounded-full hover:bg-amber-50 hover:text-amber-600 transition-all text-center">Beranda</a>
+            <a href="#cek-tiket" class="px-4 py-2 rounded-full hover:bg-amber-50 hover:text-amber-600 transition-all text-center">Cek Tiket</a>
+            <a href="#produk" class="px-4 py-2 rounded-full hover:bg-amber-50 hover:text-amber-600 transition-all text-center">Layanan</a>
+            <a href="#jadwal" class="px-4 py-2 rounded-full hover:bg-amber-50 hover:text-amber-600 transition-all text-center">Jadwal</a>
+            <a href="#kontak" class="px-4 py-2 rounded-full hover:bg-amber-50 hover:text-amber-600 transition-all text-center">Kontak</a>
         </div>
-        <button onclick="toggleMobileMenu()" class="lg:hidden text-blue-900 text-2xl focus:outline-none text-center hover:scale-110 transition-transform"><i
+        <button onclick="toggleMobileMenu()" class="lg:hidden text-amber-600 text-2xl focus:outline-none text-center hover:scale-110 transition-transform"><i
                 class="fas fa-bars"></i></button>
     </div>
 </nav>
@@ -753,9 +759,9 @@
         <span
             class="inline-block glass-badge px-5 py-2 rounded-full text-xs font-black mb-6 uppercase tracking-[0.2em] italic text-center">AGEN
             BUS KAWUNGANTEN</span>
-        <h2 class="text-4xl md:text-6xl font-black mb-5 leading-[1.1] text-center tracking-tight">Perjalanan <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-200 to-white">Nyaman</span><br><span
-                class="text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 to-yellow-500">Pesan Tiket Aman</span></h2>
-        <p class="text-blue-100 text-sm md:text-lg mb-10 font-medium uppercase tracking-wide text-center max-w-2xl mx-auto leading-relaxed">
+        <h2 class="text-4xl md:text-5xl lg:text-6xl font-black mb-5 leading-[1.15] text-center tracking-tight text-white">Perjalanan <span class="text-transparent bg-clip-text bg-gradient-to-r from-amber-200 to-white">Nyaman</span><br><span
+                class="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-amber-600">Pesan Tiket Aman</span></h2>
+        <p class="text-slate-300 text-sm md:text-lg mb-10 font-medium uppercase tracking-wide text-center max-w-2xl mx-auto leading-relaxed">
             Pusat Penjualan Tiket Bus, Travel, Pesawat & Kapal Laut <br>
             Resmi dan Terpercaya di Kawunganten Cilacap</p>
 
@@ -763,13 +769,13 @@
             <div
                 class="glass-search p-2 rounded-full flex flex-col md:flex-row gap-2 text-center">
                 <div class="flex-1 flex items-center px-6 text-left">
-                    <i class="fas fa-search text-blue-500 mr-4 shrink-0 text-lg"></i>
+                    <i class="fas fa-search text-amber-500 mr-4 shrink-0 text-lg"></i>
                     <input type="text" id="destSearch" oninput="liveSearch()"
                         placeholder="Cari tujuan (Contoh: Jakarta)..."
-                        class="w-full py-3 bg-transparent text-gray-800 font-bold focus:outline-none placeholder:text-gray-400 text-center md:text-left text-sm md:text-base">
+                        class="w-full py-3 bg-transparent text-slate-800 font-bold focus:outline-none placeholder:text-slate-400 text-center md:text-left text-sm md:text-base">
                 </div>
                 <button onclick="triggerSearch()"
-                    class="w-full md:w-auto bg-gradient-to-r from-blue-600 to-blue-800 hover:from-blue-700 hover:to-blue-900 text-white px-10 py-3.5 rounded-full font-black transition-all shadow-lg hover:shadow-xl uppercase text-center text-sm md:text-base">Cari
+                    class="w-full md:w-auto bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white px-10 py-3.5 rounded-full font-black transition-all shadow-lg shadow-amber-500/30 hover:shadow-xl uppercase text-center text-sm md:text-base">Cari
                     Armada</button>
             </div>
 
@@ -840,32 +846,32 @@
         <div class="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-8 items-stretch text-center">
             <div
                 class="bg-white rounded-[2.5rem] shadow-2xl border border-gray-100 overflow-hidden text-center flex flex-col h-full">
-                <div class="bg-yellow-400 p-6 text-center shrink-0">
-                    <h3 class="text-blue-900 font-black uppercase tracking-widest text-lg italic text-center">Booking
+                <div class="bg-gradient-to-r from-amber-400 to-amber-500 p-6 text-center shrink-0">
+                    <h3 class="text-slate-900 font-black uppercase tracking-widest text-lg text-center">Booking
                         Tiket Cepat</h3>
                 </div>
                 <div class="p-8 text-center flex flex-col items-center justify-center flex-1">
-                    <p class="text-gray-500 font-bold text-sm mb-6 uppercase italic text-center">Pesan tiket Anda
+                    <p class="text-gray-500 font-bold text-sm mb-6 uppercase text-center">Pesan tiket Anda
                         sekarang </p>
                     <button onclick="openBookingModal()"
-                        class="w-full bg-yellow-400 hover:bg-yellow-500 text-blue-900 py-5 rounded-[2rem] font-black shadow-xl transition-all uppercase tracking-widest flex items-center justify-center gap-3 active:scale-95 text-center">
+                        class="w-full bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-500 hover:to-amber-600 text-slate-900 py-5 rounded-[2rem] font-black shadow-lg shadow-amber-500/20 transition-all uppercase tracking-widest flex items-center justify-center gap-3 active:scale-95 text-center">
                         <i class="fas fa-plus-circle text-xl"></i> Boking Tiket
                     </button>
                 </div>
             </div>
             <div
                 class="bg-white rounded-[2.5rem] shadow-2xl border border-gray-100 overflow-hidden text-center flex flex-col h-full">
-                <div class="bg-tertiary p-6 text-center shrink-0">
-                    <h3 class="text-white font-black uppercase tracking-widest text-lg italic text-center">Status Tiket
+                <div class="bg-slate-900 p-6 text-center shrink-0">
+                    <h3 class="text-amber-400 font-black uppercase tracking-widest text-lg text-center">Status Tiket
                         Anda</h3>
                 </div>
                 <div class="p-8 text-center flex flex-col justify-center flex-1">
                     <div class="flex flex-col md:flex-row gap-3 justify-center mb-6 text-center">
                         <input type="text" id="inputTiket" placeholder="Masukkan ID Tiket..."
-                            class="flex-1 p-4 bg-gray-50 border border-gray-200 rounded-2xl font-bold text-gray-700 focus:outline-none text-center">
+                            class="flex-1 p-4 bg-gray-50 border border-gray-200 rounded-2xl font-bold text-gray-700 focus:outline-none focus:ring-2 focus:ring-amber-500/50 text-center">
                         <button onclick="cariTiket()"
-                            class="bg-blue-700 hover:bg-blue-800 text-white px-8 py-4 rounded-2xl font-black transition-all shadow-lg flex items-center justify-center gap-2 active:scale-95 uppercase text-center">
-                            <i class="fas fa-search"></i> Cek Tiket
+                            class="bg-slate-800 hover:bg-slate-900 text-white px-8 py-4 rounded-2xl font-black transition-all shadow-lg flex items-center justify-center gap-2 active:scale-95 uppercase text-center">
+                            <i class="fas fa-search text-amber-400"></i> Cek Tiket
                         </button>
                     </div>
                     <div id="hasil" class="mt-4 flex flex-col items-center gap-6 text-center"></div>
@@ -879,9 +885,9 @@
 <section id="produk" class="py-20 bg-gray-50 text-center">
     <div class="container mx-auto px-4 text-center">
         <h2
-            class="text-tertiary font-extrabold text-3xl md:text-4xl mb-4 uppercase tracking-tighter italic text-center">
+            class="text-slate-800 font-extrabold text-3xl md:text-4xl mb-4 uppercase tracking-tighter text-center">
             Armada Bus & Travel</h2>
-        <div class="w-20 h-1.5 bg-yellow-400 mx-auto rounded-full mb-4 text-center"></div>
+        <div class="w-20 h-1.5 bg-gradient-to-r from-amber-400 to-amber-500 mx-auto rounded-full mb-4 text-center"></div>
         <!-- Peringatan Harga -->
         <p
             class="text-[10px] font-black text-red-500/80 uppercase tracking-[0.2em] mb-12 italic flex items-center justify-center gap-2">
@@ -908,17 +914,17 @@
         <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-20 max-w-4xl mx-auto text-center">
             <div class="modern-card p-10 flex flex-col items-center text-center">
                 <div
-                    class="w-20 h-20 bg-blue-50 text-blue-600 rounded-3xl flex items-center justify-center mb-6 text-center">
+                    class="w-20 h-20 bg-amber-50 text-amber-600 rounded-3xl flex items-center justify-center mb-6 text-center">
                     <i class="fas fa-plane-departure text-4xl"></i></div>
-                <h3 class="text-2xl font-black uppercase mb-4 text-blue-900 italic text-center">TIKET PESAWAT</h3>
+                <h3 class="text-2xl font-black uppercase mb-4 text-slate-900 italic text-center">TIKET PESAWAT</h3>
                 <p class="text-gray-500 text-sm font-bold italic leading-relaxed text-center">Melayani rute Domestik dan
                     Internasional dengan berbagai maskapai pilihan. Harga kompetitif dan proses cepat di tempat.</p>
             </div>
             <div class="modern-card p-10 flex flex-col items-center text-center">
                 <div
-                    class="w-20 h-20 bg-blue-50 text-blue-600 rounded-3xl flex items-center justify-center mb-6 text-center">
+                    class="w-20 h-20 bg-amber-50 text-amber-600 rounded-3xl flex items-center justify-center mb-6 text-center">
                     <i class="fas fa-ship text-4xl"></i></div>
-                <h3 class="text-2xl font-black uppercase mb-4 text-blue-900 italic text-center">TIKET KAPAL LAUT</h3>
+                <h3 class="text-2xl font-black uppercase mb-4 text-slate-900 italic text-center">TIKET KAPAL LAUT</h3>
                 <p class="text-gray-500 text-sm font-bold italic leading-relaxed text-center">Pemesanan tiket Kapal Laut
                     resmi (PELNI, DLU, ASDP) untuk semua rute antar pulau di Indonesia.</p>
             </div>
@@ -929,9 +935,9 @@
 <!-- Galeri Foto Armada -->
 <section id="galeri" class="py-24 bg-white overflow-hidden">
     <div class="container mx-auto px-4 text-center">
-        <h2 class="text-tertiary font-extrabold text-3xl md:text-4xl mb-4 uppercase tracking-tighter italic">Galeri
+        <h2 class="text-slate-800 font-extrabold text-3xl md:text-4xl mb-4 uppercase tracking-tighter text-center">Galeri
             Armada</h2>
-        <div class="w-20 h-1.5 bg-yellow-400 mx-auto rounded-full mb-12"></div>
+        <div class="w-20 h-1.5 bg-gradient-to-r from-amber-400 to-amber-500 mx-auto rounded-full mb-12"></div>
 
         <div class="relative group max-w-6xl mx-auto">
             <div id="slider" class="slider-container flex overflow-x-auto gap-6 pb-12 snap-x snap-mandatory">
@@ -1079,9 +1085,9 @@
 </section>
 
 <!-- Wilayah Jangkauan Layanan -->
-<section id="jangkauan" class="py-20 bg-blue-50/50 border-y border-blue-100">
+<section id="jangkauan" class="py-20 bg-slate-50 border-y border-slate-100">
     <div class="container mx-auto px-4 text-center">
-        <h2 class="text-tertiary font-extrabold text-2xl md:text-3xl mb-4 uppercase tracking-tighter italic">Wilayah
+        <h2 class="text-slate-800 font-extrabold text-2xl md:text-3xl mb-4 uppercase tracking-tighter text-center">Wilayah
             Jangkauan Kami</h2>
         <p class="text-gray-500 font-bold text-xs uppercase mb-10 italic tracking-widest">Melayani pemesanan tiket untuk
             Kawunganten & sekitarnya</p>
@@ -1303,18 +1309,18 @@
 </a>
 
 <!-- Footer -->
-<footer class="bg-blue-900 py-12 text-center text-white border-t-4 border-yellow-400 text-center">
+<footer class="bg-slate-900 py-12 text-center text-white border-t-4 border-amber-500 text-center">
     <div class="container mx-auto px-4 text-center">
-        <h2 class="font-black uppercase tracking-tighter text-3xl mb-4 text-yellow-400 italic text-center">AGEN DAMRI
+        <h2 class="font-black uppercase tracking-tighter text-3xl mb-4 text-amber-500 text-center">AGEN DAMRI
             KAWUNGANTEN</h2>
         <p class="text-xs font-bold text-white/80 uppercase italic px-4 mb-8 text-center">Jalan Raya Kawunganten, Desa
             Kawunganten, Cilacap - Jawa Tengah.</p>
         <div class="hidden justify-center gap-6 text-xl mb-8 text-center">
-            <a href="#" class="text-white/60 hover:text-yellow-400 transition-all text-center"><i
+            <a href="#" class="text-white/60 hover:text-amber-500 transition-all text-center"><i
                     class="fab fa-facebook text-center"></i></a>
-            <a href="#" class="text-white/60 hover:text-yellow-400 transition-all text-center"><i
+            <a href="#" class="text-white/60 hover:text-amber-500 transition-all text-center"><i
                     class="fab fa-instagram text-center"></i></a>
-            <a href="#" class="text-white/60 hover:text-yellow-400 transition-all text-center"><i
+            <a href="#" class="text-white/60 hover:text-amber-500 transition-all text-center"><i
                     class="fab fa-tiktok text-center"></i></a>
         </div>
         <p class="text-[10px] font-bold text-white/40 uppercase tracking-widest text-center">© <span id="currentYear"></span> AGEN DAMRI
@@ -1415,7 +1421,7 @@
                 <div class="absolute inset-0 bg-cover bg-center opacity-[0.08] transition-opacity duration-300 group-hover/card:opacity-[0.15] pointer-events-none z-0" style="background-image: url('${bgImage}');"></div>
                 <div class="relative z-10 w-full flex flex-col">
                     <button onclick="toggleRoute('${f.id}')" class="w-full px-8 py-8 flex flex-col items-center justify-center gap-4 focus:outline-none group text-center">
-                        <div class="h-20 px-6 bg-blue-50/90 backdrop-blur-sm rounded-2xl flex items-center justify-center ${bgHover} transition-all duration-300 text-center shadow-sm border border-blue-100">
+                        <div class="h-20 px-6 bg-slate-50/90 backdrop-blur-sm rounded-2xl flex items-center justify-center ${bgHover} transition-all duration-300 text-center shadow-sm border border-slate-200">
                             <span class="${spanClass}">${nameDisplay}</span>
                         </div>
                         <div class="flex items-center justify-center gap-2 text-xs font-bold text-gray-400 uppercase tracking-widest italic text-center">
