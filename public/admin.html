@@ -34,15 +34,14 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
     <script src="/socket.io/socket.io.js"></script>
-    <script src="app.js?v=4"></script>
-    <link rel="stylesheet" href="admin.css">
+    <script src="app.js?v=5"></script>
+    <link rel="stylesheet" href="admin.css?v=2">
 </head>
 <body class="bg-[#f1f5f9] text-gray-800">
 
-    <!-- Loading Overlay -->
     <div id="loadingOverlay" class="fixed inset-0 bg-white/90 backdrop-blur-sm z-[100] flex flex-col items-center justify-center transition-all duration-500">
-        <div class="w-20 h-20 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin mb-4"></div>
-        <h2 class="text-xl font-black text-blue-900 tracking-tighter uppercase italic">MENSINKRONISASI DATA...</h2>
+        <div class="w-20 h-20 border-4 border-amber-200 border-t-amber-600 rounded-full animate-spin mb-4"></div>
+        <h2 class="text-xl font-black text-slate-900 tracking-tighter uppercase italic">MENSINKRONISASI DATA...</h2>
         <p class="text-sm font-bold text-gray-500 mt-2 animate-pulse">Menghubungkan ke Server Database</p>
     </div>
 
@@ -56,7 +55,7 @@
         <aside id="sidebar" class="sidebar flex flex-col shrink-0">
             <div class="px-6 pt-6 pb-4">
                 <div class="flex items-center gap-3 mb-1">
-                    <img src="logo.png" alt="Logo" class="w-10 h-10 object-contain rounded-xl shadow-lg shadow-blue-600/30 bg-white p-1">
+                    <img src="logo.png" alt="Logo" class="w-10 h-10 object-contain rounded-xl shadow-[0_0_15px_rgba(245,158,11,0.5)] bg-white p-1 ring-2 ring-amber-500/50">
                     <div>
                         <h1 class="text-sm font-black text-white tracking-tight uppercase leading-none">AGEN DAMRI</h1>
                         <p class="text-[9px] font-bold text-slate-500 uppercase tracking-widest mt-0.5">KAWUNGANTEN</p>
@@ -118,24 +117,23 @@
 
         <!-- Main Content -->
         <div class="flex-1 min-w-0 flex flex-col">
-            <!-- Mobile Topbar -->
             <div class="mobile-topbar items-center justify-between">
                 <button onclick="toggleSidebar()" class="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center text-slate-600 hover:bg-slate-200 transition-colors">
                     <i class="fas fa-bars"></i>
                 </button>
                 <div class="text-center">
-                    <h1 class="text-sm font-black text-blue-900 uppercase tracking-tight leading-none">AGEN DAMRI</h1>
-                    <p class="text-[8px] font-bold text-gray-400 uppercase tracking-widest">KAWUNGANTEN</p>
+                    <h1 class="text-sm font-black text-slate-900 uppercase tracking-tight leading-none">AGEN DAMRI</h1>
+                    <p class="text-[8px] font-bold text-amber-500 uppercase tracking-widest">KAWUNGANTEN</p>
                 </div>
                 <div class="flex items-center gap-2">
                     <button onclick="toggleDarkMode()" class="w-10 h-10 rounded-xl bg-white flex items-center justify-center text-slate-600 hover:text-amber-500 border border-slate-100 transition-colors dark-mode-btn">
                         <i class="fas fa-moon text-sm"></i>
                     </button>
-                    <button onclick="openNotifModal()" class="relative w-10 h-10 rounded-xl bg-white flex items-center justify-center text-slate-600 hover:text-blue-600 border border-slate-100 transition-colors">
+                    <button onclick="openNotifModal()" class="relative w-10 h-10 rounded-xl bg-white flex items-center justify-center text-slate-600 hover:text-amber-600 border border-slate-100 transition-colors">
                         <i class="fas fa-bell text-sm"></i>
-                        <span id="notifBadgeMobile" class="absolute -top-1 -right-1 bg-red-500 text-white text-[9px] font-black w-4 h-4 flex items-center justify-center rounded-full border border-white hidden">0</span>
+                        <span id="notifBadgeMobile" class="absolute -top-1 -right-1 bg-amber-500 text-white text-[9px] font-black w-4 h-4 flex items-center justify-center rounded-full border border-white hidden">0</span>
                     </button>
-                    <button onclick="refreshData()" class="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center text-blue-600 hover:bg-blue-100 transition-colors">
+                    <button onclick="refreshData()" class="w-10 h-10 rounded-xl bg-amber-50 flex items-center justify-center text-amber-600 hover:bg-amber-100 transition-colors">
                         <i class="fas fa-sync-alt text-sm"></i>
                     </button>
                 </div>
@@ -187,55 +185,55 @@
                     <!-- Modern Cards -->
                     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8 fade-up">
                         <!-- Total Booking -->
-                        <div class="bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl p-5 text-white shadow-lg shadow-blue-500/30 transition-all hover:-translate-y-1 hover:shadow-xl hover:shadow-blue-500/40">
+                        <div class="bg-gradient-to-br from-slate-800 to-slate-900 rounded-[1.5rem] p-5 text-white shadow-xl shadow-slate-900/20 border border-slate-700 transition-all hover:-translate-y-1 hover:shadow-2xl hover:border-amber-500/50">
                             <div class="flex flex-row items-center justify-between mb-3">
                                 <div class="flex flex-col">
-                                    <p class="text-[10px] font-bold text-blue-100 uppercase tracking-widest leading-tight">Total Booking</p>
+                                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest leading-tight">Total Booking</p>
                                 </div>
-                                <div class="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center text-white backdrop-blur-sm">
+                                <div class="w-10 h-10 rounded-xl bg-slate-700 flex items-center justify-center text-amber-500 shadow-inner">
                                     <i class="fas fa-ticket-alt text-lg"></i>
                                 </div>
                             </div>
-                            <h3 class="text-2xl font-black" id="cardTotalBooking">0</h3>
+                            <h3 class="text-2xl font-black text-white" id="cardTotalBooking">0</h3>
                         </div>
 
                         <!-- Total Setoran -->
-                        <div class="bg-gradient-to-br from-violet-500 to-violet-600 rounded-2xl p-5 text-white shadow-lg shadow-violet-500/30 transition-all hover:-translate-y-1 hover:shadow-xl hover:shadow-violet-500/40">
+                        <div class="bg-gradient-to-br from-slate-800 to-slate-900 rounded-[1.5rem] p-5 text-white shadow-xl shadow-slate-900/20 border border-slate-700 transition-all hover:-translate-y-1 hover:shadow-2xl hover:border-amber-500/50">
                             <div class="flex flex-row items-center justify-between mb-3">
                                 <div class="flex flex-col">
-                                    <p class="text-[10px] font-bold text-violet-100 uppercase tracking-widest leading-tight">Total Setoran</p>
+                                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest leading-tight">Total Setoran</p>
                                 </div>
-                                <div class="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center text-white backdrop-blur-sm">
+                                <div class="w-10 h-10 rounded-xl bg-slate-700 flex items-center justify-center text-amber-500 shadow-inner">
                                     <i class="fas fa-file-invoice-dollar text-lg"></i>
                                 </div>
                             </div>
-                            <h3 class="text-2xl font-black truncate" id="cardTotalSetoran">Rp 0</h3>
+                            <h3 class="text-2xl font-black truncate text-white" id="cardTotalSetoran">Rp 0</h3>
                         </div>
 
                         <!-- Total Pendapatan -->
-                        <div class="bg-gradient-to-br from-rose-500 to-rose-600 rounded-2xl p-5 text-white shadow-lg shadow-rose-500/30 transition-all hover:-translate-y-1 hover:shadow-xl hover:shadow-rose-500/40">
+                        <div class="bg-gradient-to-br from-slate-800 to-slate-900 rounded-[1.5rem] p-5 text-white shadow-xl shadow-slate-900/20 border border-slate-700 transition-all hover:-translate-y-1 hover:shadow-2xl hover:border-amber-500/50">
                             <div class="flex flex-row items-center justify-between mb-3">
                                 <div class="flex flex-col">
-                                    <p class="text-[10px] font-bold text-rose-100 uppercase tracking-widest leading-tight">Total Pendapatan</p>
+                                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest leading-tight">Total Pendapatan</p>
                                 </div>
-                                <div class="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center text-white backdrop-blur-sm">
+                                <div class="w-10 h-10 rounded-xl bg-slate-700 flex items-center justify-center text-amber-500 shadow-inner">
                                     <i class="fas fa-chart-line text-lg"></i>
                                 </div>
                             </div>
-                            <h3 class="text-2xl font-black truncate" id="cardTotalPendapatan">Rp 0</h3>
+                            <h3 class="text-2xl font-black truncate text-white" id="cardTotalPendapatan">Rp 0</h3>
                         </div>
 
                         <!-- Total Omset -->
-                        <div class="bg-gradient-to-br from-amber-500 to-amber-600 rounded-2xl p-5 text-white shadow-lg shadow-amber-500/30 transition-all hover:-translate-y-1 hover:shadow-xl hover:shadow-amber-500/40">
+                        <div class="bg-gradient-to-br from-slate-800 to-slate-900 rounded-[1.5rem] p-5 text-white shadow-xl shadow-slate-900/20 border border-slate-700 transition-all hover:-translate-y-1 hover:shadow-2xl hover:border-amber-500/50">
                             <div class="flex flex-row items-center justify-between mb-3">
                                 <div class="flex flex-col">
-                                    <p class="text-[10px] font-bold text-amber-100 uppercase tracking-widest leading-tight">Total Omset</p>
+                                    <p class="text-[10px] font-bold text-amber-500 uppercase tracking-widest leading-tight">Total Omset</p>
                                 </div>
-                                <div class="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center text-white backdrop-blur-sm">
+                                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center text-slate-900 shadow-lg shadow-amber-500/30">
                                     <i class="fas fa-wallet text-lg"></i>
                                 </div>
                             </div>
-                            <h3 class="text-2xl font-black truncate" id="cardTotalOmset">Rp 0</h3>
+                            <h3 class="text-2xl font-black truncate text-transparent bg-clip-text bg-gradient-to-r from-amber-200 to-amber-500" id="cardTotalOmset">Rp 0</h3>
                         </div>
                     </div>
 
@@ -424,10 +422,10 @@
                             <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mt-1">Semua kendaraan yang tersedia</p>
                         </div>
                         <div class="flex gap-2">
-                            <button onclick="openHargaKhususModal()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-xl text-sm font-black uppercase tracking-widest shadow-lg shadow-indigo-500/30 transition-all flex items-center justify-center gap-2">
+                            <button onclick="openHargaKhususModal()" class="bg-slate-800 hover:bg-slate-900 text-amber-500 px-4 py-2 rounded-xl text-sm font-black uppercase tracking-widest shadow-lg shadow-slate-900/20 transition-all flex items-center justify-center gap-2 border border-slate-700">
                                 <i class="fas fa-tags"></i> HARGA KHUSUS
                             </button>
-                            <button onclick="openAddArmadaModal()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-xl text-sm font-black uppercase tracking-widest shadow-lg shadow-blue-500/30 transition-all flex items-center justify-center gap-2">
+                            <button onclick="openAddArmadaModal()" class="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-slate-900 px-4 py-2 rounded-xl text-sm font-black uppercase tracking-widest shadow-lg shadow-amber-500/30 transition-all flex items-center justify-center gap-2">
                                 <i class="fas fa-plus"></i> Tambah Armada
                             </button>
                         </div>
@@ -473,7 +471,7 @@
                         <div>
                             <h2 class="text-2xl font-black text-slate-800 tracking-tight">Pesawat & Kapal Laut</h2>
                         </div>
-                        <button onclick="openAddEkstraModal()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-2xl shadow-xl shadow-indigo-600/30 transition-all font-bold text-sm tracking-wide flex items-center gap-2">
+                        <button onclick="openAddEkstraModal()" class="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-slate-900 px-6 py-3 rounded-2xl shadow-xl shadow-amber-500/30 transition-all font-bold text-sm tracking-wide flex items-center gap-2">
                             <i class="fas fa-plus"></i>
                             Tambah Tiket Baru
                         </button>
@@ -482,14 +480,14 @@
                     <div class="bg-transparent lg:bg-white lg:rounded-[2rem] lg:shadow-xl lg:border lg:border-slate-100 overflow-hidden">
                         <div class="overflow-x-auto overflow-y-visible p-1 lg:p-0">
                             <table class="w-full">
-                                <thead class="hidden lg:table-header-group bg-indigo-600 border-b border-indigo-700">
+                                <thead class="hidden lg:table-header-group bg-slate-800 border-b border-slate-700">
                                     <tr>
-                                        <th class="text-left text-[10px] font-black text-indigo-50 uppercase tracking-widest p-4 rounded-tl-xl">Vendor</th>
-                                        <th class="text-left text-[10px] font-black text-indigo-50 uppercase tracking-widest p-4">Rute & Waktu</th>
-                                        <th class="text-left text-[10px] font-black text-indigo-50 uppercase tracking-widest p-4">Penumpang</th>
-                                        <th class="text-right text-[10px] font-black text-indigo-50 uppercase tracking-widest p-4">Total Bayar</th>
-                                        <th class="text-center text-[10px] font-black text-indigo-50 uppercase tracking-widest p-4">Status</th>
-                                        <th class="text-right text-[10px] font-black text-indigo-50 uppercase tracking-widest p-4 rounded-tr-xl">Aksi</th>
+                                        <th class="text-left text-[10px] font-black text-amber-500 uppercase tracking-widest p-4 rounded-tl-xl">Vendor</th>
+                                        <th class="text-left text-[10px] font-black text-amber-500 uppercase tracking-widest p-4">Rute & Waktu</th>
+                                        <th class="text-left text-[10px] font-black text-amber-500 uppercase tracking-widest p-4">Penumpang</th>
+                                        <th class="text-right text-[10px] font-black text-amber-500 uppercase tracking-widest p-4">Total Bayar</th>
+                                        <th class="text-center text-[10px] font-black text-amber-500 uppercase tracking-widest p-4">Status</th>
+                                        <th class="text-right text-[10px] font-black text-amber-500 uppercase tracking-widest p-4 rounded-tr-xl">Aksi</th>
                                     </tr>
                                 </thead>
                                 <tbody id="ekstraTableBody" class="flex flex-col lg:table-row-group gap-4 lg:gap-0">
