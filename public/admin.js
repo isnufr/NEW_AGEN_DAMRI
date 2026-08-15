@@ -169,7 +169,7 @@
         
         if (dateObj && typeof fetchAllHargaKhusus === 'function') {
             const hkList = typeof cachedHargaKhusus !== 'undefined' ? cachedHargaKhusus : [];
-            const selectedDate = dateObj.getTime();
+            const selectedDate = new Date(dateObj.getFullYear(), dateObj.getMonth(), dateObj.getDate()).getTime();
             
             const allArmadas = getArmadas();
             const matchingArmadaIds = allArmadas
@@ -178,8 +178,13 @@
                 
             const activeHk = hkList.find(hk => {
                 if (!matchingArmadaIds.includes(hk.idArmada)) return false;
-                const start = new Date(hk.tanggalAwal).getTime();
-                const end = new Date(hk.tanggalAkhir).getTime();
+                
+                const [sY, sM, sD] = String(hk.tanggalAwal).split('T')[0].split('-');
+                const [eY, eM, eD] = String(hk.tanggalAkhir).split('T')[0].split('-');
+                
+                const start = new Date(sY, parseInt(sM)-1, sD).getTime();
+                const end = new Date(eY, parseInt(eM)-1, eD).getTime();
+                
                 return selectedDate >= start && selectedDate <= end;
             });
             
