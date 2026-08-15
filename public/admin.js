@@ -946,12 +946,20 @@
 
         // Gunakan ID saja untuk onclick agar terhindar dari error parsing string
         const safeId = String(b.bookingId || '').replace(/'/g, "\\'");
+        
+        const rawKet = String(b.keterangan || b['Keterangan'] || b['KETERANGAN'] || '-');
+        const mKet = rawKet.match(/Biaya Tambahan: (.*?) \((Rp[ \d.,]+)\)/);
+        let nominalBiayaTambahan = 0;
+        if (mKet) nominalBiayaTambahan = parseInt(mKet[2].replace(/[^\d]/g, '')) || 0;
+        
+        const expectedTotal = armada ? parseInt(armada.price) * (parseInt(b.qty) || 1) : 0;
+        const total = Math.max(parseInt(b.totalPrice) || 0, expectedTotal + nominalBiayaTambahan);
 
         return `<tr class="border-b border-slate-50 group hover:bg-blue-50 transition-colors cursor-pointer" onclick="openBookingDetailModal('${safeId}', ${showAccBtn})">
             <td class="py-3 px-4 font-black text-xs text-blue-900 whitespace-nowrap">${b.bookingId}</td>
             <td class="py-3 px-4 font-bold text-xs text-slate-800 uppercase truncate max-w-[120px]">${b.name}</td>
             <td class="py-3 px-4 font-bold text-xs text-slate-600 truncate max-w-[120px]">${tujuan}</td>
-            <td class="py-3 px-4 font-black text-xs text-slate-800 text-right whitespace-nowrap">${formatRupiah(b.totalPrice)}</td>
+            <td class="py-3 px-4 font-black text-xs text-slate-800 text-right whitespace-nowrap">${formatRupiah(total)}</td>
             <td class="py-3 px-4 text-center"><span class="inline-block px-2 py-1 rounded text-[9px] font-black ${badgeClass}">${badgeText}</span></td>
         </tr>`;
     }
@@ -989,6 +997,9 @@
             rawKet = rawKet.replace(/,?\s*Biaya Tambahan:.*?$/, '').trim();
             if (!rawKet) rawKet = '-';
         }
+        
+        const expectedTotal = armada ? parseInt(armada.price) * (parseInt(b.qty) || 1) : 0;
+        const total = Math.max(parseInt(b.totalPrice) || 0, expectedTotal + nominalBiayaTambahan);
 
         const formatHp = String(b.hp || "").replace(/[^0-9]/g, '').replace(/^0/, '62');
         const waLink = `https://wa.me/${formatHp}?text=${encodeURIComponent('Halo ' + b.name + ', ')}`;
@@ -1034,7 +1045,7 @@
                 </div>
                 <div class="col-span-2 sm:col-span-1">
                     <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Total Bayar</p>
-                    <p class="font-black text-orange-600 text-base">${formatRupiah(b.totalPrice)}</p>
+                    <p class="font-black text-orange-600 text-base">${formatRupiah(total)}</p>
                 </div>
                 <div class="col-span-2 sm:col-span-1">
                     <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Metode Bayar</p>
@@ -2289,7 +2300,7 @@
         }
         const hasBiayaTambahan = nominalBiayaTambahan > 0;
         
-        const total = totalHargaData > 0 ? totalHargaData : expectedTotal;
+        const total = Math.max(totalHargaData || 0, expectedTotal + nominalBiayaTambahan);
 
         if (dObj) formattedDate = INDO_DAYS[dObj.getDay()] + ', ' + dObj.getDate() + ' ' + INDO_MONTHS[dObj.getMonth()] + ' ' + dObj.getFullYear();
 

@@ -1858,7 +1858,7 @@
                         <div class="flex justify-between items-center mb-4 px-3 py-3 bg-white/95 backdrop-blur-sm rounded-2xl shadow-sm border border-gray-100">
                             <div class="text-left">
                                 <p class="text-[9px] font-black text-gray-400 uppercase mb-1 tracking-widest">Total Bayar</p>
-                                <p class="text-xl sm:text-2xl font-black text-blue-900 tracking-tighter italic leading-none">${formatRupiah(tiket.totalPrice)}</p>
+                                <p class="text-xl sm:text-2xl font-black text-blue-900 tracking-tighter italic leading-none">${formatRupiah(Math.max(tiket.totalPrice || 0, (armadaInfo ? parseInt(armadaInfo.price) * (parseInt(tiket.qty) || 1) : 0) + extractedBiayaTambahanNominal))}</p>
                             </div>
                             <img src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=ID:${tiket.bookingId}" alt="QR" class="w-12 h-12 sm:w-16 sm:h-16 border rounded-xl p-1 bg-white relative z-20">
                         </div>
