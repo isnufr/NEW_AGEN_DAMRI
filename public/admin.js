@@ -652,12 +652,12 @@
                 
                 html += `
                             <div class="bg-white rounded-xl border border-slate-200 overflow-hidden">
-                                <div class="bg-slate-200/80 border-b-2 border-slate-300 px-3 py-2 flex items-center justify-between">
-                                    <div class="flex items-center gap-2">
-                                        <div class="bg-blue-600 text-white font-black text-[10px] sm:text-xs px-2 py-1 rounded shadow-sm leading-none">${ig.waktu}</div>
-                                        <p class="font-black text-xs sm:text-sm text-slate-700 uppercase tracking-wide truncate max-w-[150px] sm:max-w-xs">${ig.armadaName}</p>
+                                <div class="bg-slate-200/80 border-b-2 border-slate-300 px-3 py-2 flex items-center justify-between gap-2">
+                                    <div class="flex items-center gap-2 min-w-0 flex-1">
+                                        <div class="bg-blue-600 text-white font-black text-[10px] sm:text-xs px-2 py-1 rounded shadow-sm leading-none shrink-0">${ig.waktu}</div>
+                                        <p class="font-black text-xs sm:text-sm text-slate-700 uppercase tracking-wide truncate">${ig.armadaName}</p>
                                     </div>
-                                    <span class="inline-block bg-white text-orange-600 border border-orange-200 px-2 py-1 rounded text-[9px] sm:text-[10px] font-black uppercase shadow-sm whitespace-nowrap">${innerTotalPnp} PNP</span>
+                                    <span class="inline-block bg-white text-orange-600 border border-orange-200 px-2 py-1 rounded text-[9px] sm:text-[10px] font-black uppercase shadow-sm whitespace-nowrap shrink-0">${innerTotalPnp} PNP</span>
                                 </div>
                                 <!-- Group List -->
                                 <div class="flex flex-col">
@@ -725,16 +725,16 @@
                     html += `
                                     <div class="flex items-center justify-between p-3 border-b border-slate-100 last:border-0 hover:bg-slate-50 transition-colors gap-3">
                                         <!-- Left: Data -->
-                                        <div class="flex-1 min-w-0 flex flex-col">
+                                        <div class="flex-1 min-w-0 flex flex-col pr-1">
                                             <!-- Row 1: ID, Tujuan & Status (Mobile) -->
-                                            <div class="flex items-center justify-between mb-1">
-                                                <span class="text-[10px] font-black text-blue-600 truncate mr-2">${bId} - ${bTujuan}</span>
-                                                <span class="sm:hidden inline-block px-1.5 py-0.5 rounded text-[8px] font-black ${badgeClass}">${badgeText}</span>
+                                            <div class="flex items-center justify-between mb-1 gap-2">
+                                                <span class="text-[10px] font-black text-blue-600 truncate flex-1 min-w-0">${bId} - ${bTujuan}</span>
+                                                <span class="sm:hidden inline-block px-1.5 py-0.5 rounded text-[8px] font-black shrink-0 ${badgeClass}">${badgeText}</span>
                                             </div>
                                             
                                             <!-- Row 2: Name & WA -->
-                                            <div class="flex items-center gap-2 mb-1.5">
-                                                <span class="font-bold text-sm text-slate-800 uppercase truncate">${bName}</span>
+                                            <div class="flex items-center gap-2 mb-1.5 w-full">
+                                                <span class="font-bold text-sm text-slate-800 uppercase truncate flex-1 min-w-0">${bName}</span>
                                                 <a href="https://wa.me/${waNumber}" target="_blank" class="shrink-0 bg-green-100 text-green-600 hover:bg-green-200 w-6 h-6 rounded flex items-center justify-center transition-colors" title="Hubungi via WhatsApp">
                                                     <i class="fab fa-whatsapp"></i>
                                                 </a>
