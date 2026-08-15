@@ -4297,3 +4297,15 @@ function updateChartColors(isDark) {
     window.closePromptRefresh = closePromptRefresh;
     window.executeRefresh = executeRefresh;
 
+    // Export modals globally to ensure HTML onclick can access them
+    if (typeof openETicket !== 'undefined') window.openETicket = openETicket;
+    if (typeof closeETicket !== 'undefined') window.closeETicket = closeETicket;
+    if (typeof openEticketModal !== 'undefined') window.openEticketModal = openEticketModal;
+    if (typeof closeEticketModal !== 'undefined') window.closeEticketModal = closeEticketModal;
+    if (typeof openEditBookingModal !== 'undefined') window.openEditBookingModal = openEditBookingModal;
+    if (typeof closeEditBookingModal !== 'undefined') window.closeEditBookingModal = closeEditBookingModal;
+    if (typeof openAddArmadaModal !== 'undefined') window.openAddArmadaModal = openAddArmadaModal;
+    if (typeof closeAddArmadaModal !== 'undefined') window.closeAddArmadaModal = closeAddArmadaModal;
+    if (typeof openHargaKhususModal !== 'undefined') window.openHargaKhususModal = openHargaKhususModal;
+    if (typeof closeHargaKhususModal !== 'undefined') window.closeHargaKhususModal = closeHargaKhususModal;
+    if (typeof toggleHkGroup !== 'undefined') window.toggleHkGroup = toggleHkGroup;
