@@ -590,24 +590,26 @@
 
             // Header Row (Clickable)
             html += `
-                <tr class="cursor-pointer bg-slate-50 hover:bg-blue-50 transition-colors border-b border-slate-200" onclick="toggleManifest('${safeId}')">
-                    <td class="p-4">
-                        <div class="flex items-center justify-between">
-                            <div class="flex items-center gap-4">
-                                <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center text-blue-600">
-                                    <i class="fas fa-calendar-alt"></i>
+                <tr class="cursor-pointer group" onclick="toggleManifest('${safeId}')">
+                    <td class="p-2 sm:p-4 border-b-8 border-transparent">
+                        <div class="bg-gradient-to-br from-slate-800 to-slate-900 rounded-3xl p-4 sm:p-5 text-white shadow-xl shadow-slate-900/20 border border-slate-700 transition-all group-hover:-translate-y-1 group-hover:shadow-2xl group-hover:border-amber-500/50 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                            <div class="flex items-center gap-4 w-full sm:w-auto">
+                                <div class="w-12 h-12 rounded-xl bg-slate-700 flex items-center justify-center text-amber-500 shadow-inner shrink-0">
+                                    <i class="fas fa-calendar-alt text-xl"></i>
                                 </div>
-                                <div>
-                                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-0.5">Waktu Pemberangkatan</p>
-                                    <p class="font-black text-sm text-slate-800 uppercase">${formattedDate}</p>
+                                <div class="min-w-0 flex-1">
+                                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest leading-tight mb-1">Waktu Pemberangkatan</p>
+                                    <p class="font-black text-sm sm:text-base text-white uppercase truncate">${formattedDate}</p>
                                 </div>
                             </div>
-                            <div class="flex items-center gap-4">
-                                <div class="text-right">
-                                    <p class="font-black text-sm text-orange-500">${totalPnp} PNP</p>
-                                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">${g.bookings.length} Pesanan</p>
+                            <div class="flex items-center justify-between sm:justify-end w-full sm:w-auto gap-4 border-t border-slate-700 sm:border-0 pt-3 sm:pt-0">
+                                <div class="text-left sm:text-right flex-1 sm:flex-none">
+                                    <p class="font-black text-lg sm:text-xl text-transparent bg-clip-text bg-gradient-to-r from-amber-200 to-amber-500">${totalPnp} PNP</p>
+                                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest leading-tight">${g.bookings.length} Pesanan</p>
                                 </div>
-                                <i class="fas fa-chevron-down text-slate-400 transition-transform duration-300" id="icon-${safeId}" style="transform: ${iconTransform}"></i>
+                                <div class="w-8 h-8 rounded-full bg-slate-700 flex items-center justify-center text-slate-300 group-hover:bg-amber-500 group-hover:text-slate-900 transition-colors shrink-0">
+                                    <i class="fas fa-chevron-down transition-transform duration-300" id="icon-${safeId}" style="transform: ${iconTransform}"></i>
+                                </div>
                             </div>
                         </div>
                     </td>
@@ -723,7 +725,7 @@
                     const waNumber = String(bHp).replace(/\D/g, '').replace(/^0/, '62');
 
                     html += `
-                                    <div class="flex items-center justify-between p-3 border-b border-slate-100 last:border-0 hover:bg-slate-50 transition-colors gap-3">
+                                    <div class="flex items-center justify-between p-3 border-b border-slate-100 last:border-0 hover:bg-slate-50 transition-colors gap-3 w-full overflow-hidden">
                                         <!-- Left: Data -->
                                         <div class="flex-1 min-w-0 flex flex-col pr-1">
                                             <!-- Row 1: ID, Tujuan & Status (Mobile) -->
