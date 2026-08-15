@@ -163,6 +163,33 @@
         return isNaN(dFallback.getTime()) ? null : dFallback;
     }
 
+    function getEffectiveHarga(armada, dateObj) {
+        if (!armada) return 0;
+        let finalHarga = armada.price;
+        
+        if (dateObj && typeof fetchAllHargaKhusus === 'function') {
+            const hkList = typeof cachedHargaKhusus !== 'undefined' ? cachedHargaKhusus : [];
+            const selectedDate = dateObj.getTime();
+            
+            const allArmadas = getArmadas();
+            const matchingArmadaIds = allArmadas
+                .filter(arm => arm.name === armada.name && arm.destination === armada.destination)
+                .map(arm => arm.id);
+                
+            const activeHk = hkList.find(hk => {
+                if (!matchingArmadaIds.includes(hk.idArmada)) return false;
+                const start = new Date(hk.tanggalAwal).getTime();
+                const end = new Date(hk.tanggalAkhir).getTime();
+                return selectedDate >= start && selectedDate <= end;
+            });
+            
+            if (activeHk) {
+                finalHarga = parseInt(activeHk.hargaBaru) || armada.price;
+            }
+        }
+        return finalHarga;
+    }
+
     function toDateKey(d) {
         if (!d) return '';
         return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
@@ -2211,8 +2238,11 @@
         const isPaid = (b.status === 'paid' || b.status === 'Lunas' || b.status === 'ACC' || b.status === 'LUNAS');
         const statusPay = isPaid ? 'LUNAS' : 'BELUM LUNAS';
         
+        let formattedDate = b.dateTravel || '-';
+        const dObj = parseIndoDate(formattedDate);
+        
         const qty = parseInt(b.qty) || 1;
-        const harga = armada ? armada.price : 0;
+        const harga = getEffectiveHarga(armada, dObj);
         
         const totalHargaData = (b.totalHarga !== undefined && b.totalHarga !== null) ? parseInt(String(b.totalHarga).replace(/[^0-9]/g, '')) : (b.total !== undefined && b.total !== null ? parseInt(String(b.total).replace(/[^0-9]/g, '')) : (harga * qty));
         const expectedTotal = harga * qty;
@@ -2222,8 +2252,6 @@
         
         const total = totalHargaData > 0 ? totalHargaData : expectedTotal;
 
-        let formattedDate = b.dateTravel || '-';
-        const dObj = parseIndoDate(formattedDate);
         if (dObj) formattedDate = INDO_DAYS[dObj.getDay()] + ', ' + dObj.getDate() + ' ' + INDO_MONTHS[dObj.getMonth()] + ' ' + dObj.getFullYear();
 
         const now = new Date();
@@ -2830,8 +2858,19 @@
         const qty = parseInt(document.getElementById('editBookingPnp').value) || 1;
         const armada = getArmada(armadaId);
         
+        const rawDate = document.getElementById('editBookingDate').value;
+        let dObjForHarga = null;
+        if (rawDate) {
+            dObjForHarga = new Date(rawDate);
+        } else {
+            const id = document.getElementById('editBookingId').value;
+            const b = cachedBookings.find(bk => bk.bookingId === id);
+            if (b) dObjForHarga = parseIndoDate(b.dateTravel);
+        }
+        
         if(armada) {
-            const total = armada.price * qty;
+            const harga = getEffectiveHarga(armada, dObjForHarga);
+            const total = harga * qty;
             document.getElementById('editBookingTotalDisplay').innerText = formatRupiah(total);
         } else {
             document.getElementById('editBookingTotalDisplay').innerText = 'Rp 0';
@@ -2879,6 +2918,9 @@
         }
         const kursiString = filledKursiCount === qty ? kursiValues.join(', ') : '';
 
+        const dObjForHarga = parseIndoDate(formattedDate);
+        const hargaEff = getEffectiveHarga(armada, dObjForHarga);
+
         const payload = {
             id_tiket: id,
             nama: document.getElementById('editBookingNama').value,
@@ -2889,8 +2931,8 @@
             tujuan: armada ? armada.destination : '',
             jumlahPnp: qty,
             nomorKursi: kursiString,
-            harga: armada ? armada.price : 0,
-            totalHarga: armada ? (armada.price * qty) : 0,
+            harga: hargaEff,
+            totalHarga: hargaEff * qty,
             waktu: armada ? armada.time : ''
         };
         const statusSelect = document.getElementById('editBookingStatus');
@@ -3385,31 +3427,8 @@
         const nominalBiayaTambahan = hasBiayaTambahan ? (parseInt(document.getElementById('adminBookingBiayaTambahanNominal').value) || 0) : 0;
 
         if(armada) {
-            let finalHarga = armada.price;
-            
-            // Cek harga khusus
-            if (d && typeof fetchAllHargaKhusus === 'function') {
-                const hkList = cachedHargaKhusus || []; // Admin app needs a cached array
-                const selectedDate = new Date(d).getTime();
-                
-                // Cari apakah ada harga khusus
-                // Because Admin selects a specific armadaId (route + time), we check matching name & destination
-                const allArmadas = getArmadas();
-                const matchingArmadaIds = allArmadas
-                    .filter(arm => arm.name === armada.name && arm.destination === armada.destination)
-                    .map(arm => arm.id);
-                    
-                const activeHk = hkList.find(hk => {
-                    if (!matchingArmadaIds.includes(hk.idArmada)) return false;
-                    const start = new Date(hk.tanggalAwal).getTime();
-                    const end = new Date(hk.tanggalAkhir).getTime();
-                    return selectedDate >= start && selectedDate <= end;
-                });
-                
-                if (activeHk) {
-                    finalHarga = parseInt(activeHk.hargaBaru) || armada.price;
-                }
-            }
+            const dObj = d ? new Date(d) : null;
+            const finalHarga = getEffectiveHarga(armada, dObj);
             
             document.getElementById('adminBookingTotalDisplay').innerText = formatRupiah((finalHarga * qty) + nominalBiayaTambahan);
             // Simpan harga satuan untuk submit form (jika ada hidden field, atau submit form hitung ulang)
