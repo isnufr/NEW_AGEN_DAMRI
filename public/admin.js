@@ -4213,6 +4213,43 @@ function updateChartColors(isDark) {
                 addTwoColumnsLeftRight(`PNP ${idx+1}: ${p.nama}`, formatRupiah(p.harga), false);
             });
             addLine("--------------------------------");
+            addTwoColumnsLeftRight("BIAYA ADMIN", formatRupiah(25000 * pnpList.length), true);
+            
+            let lineTot = "TOTAL BAYAR";
+            let rightTot = " " + formatRupiah(item.totalHarga) + " ";
+            let spacesTot = 32 - lineTot.length - rightTot.length;
+            if(spacesTot < 0) spacesTot = 0;
+            add(CMD.BOLD_ON);
+            addStr(lineTot);
+            addStr(" ".repeat(spacesTot));
+            add(CMD.INVERSE_ON);
+            addStr(rightTot);
+            add(CMD.INVERSE_OFF);
+            add(CMD.BOLD_OFF);
+            add(CMD.LF);
+            
+            addTwoColumnsLeftRight("STATUS", item.statusPembayaran, false);
+            addLine("================================");
+            
+            add(CMD.ALIGN_CENTER);
+            addLine("Terima Kasih");
+            addLine("Simpan struk ini sebagai bukti");
+            addLine("pembayaran yang sah.");
+            add(CMD.LF);
+            addLine("082133607759");
+            addLine("JL.Raya Kawunganten");
+            addLine("(Depan Koramil Kawunganten)");
+            addLine("Website : agendamrikawunganten.net");
+            add(CMD.LF);
+            add(CMD.LF);
+            add(CMD.LF); 
+    
+            // Convert to binary string
+            let binStr = "";
+            for (let i = 0; i < bytes.length; i++) {
+                binStr += String.fromCharCode(bytes[i]);
+            }
+            
             // Encode Base64 & call RawBT Intent
             const base64 = btoa(binStr);
             const intentUrl = "intent:base64," + base64 + "#Intent;scheme=rawbt;package=ru.a402d.rawbtprinter;end;";
