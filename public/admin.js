@@ -720,44 +720,51 @@
                             }
                         }
                     }
+                    const waNumber = String(bHp).replace(/\D/g, '').replace(/^0/, '62');
+
                     html += `
-                                    <div class="flex items-center justify-between p-2 sm:p-3 border-b border-slate-100 last:border-0 hover:bg-slate-50 transition-colors gap-2 relative group">
-                                        <!-- Left Side: Info -->
-                                        <div class="flex-1 flex flex-col min-w-0">
-                                            <div class="flex items-center gap-2">
-                                                <span class="text-[9px] sm:text-[10px] font-black text-blue-600 truncate">${bId} - ${bTujuan}</span>
-                                                <span class="inline-block sm:hidden px-1.5 py-0.5 rounded text-[8px] font-black ${badgeClass}">${badgeText}</span>
+                                    <div class="flex items-center justify-between p-3 border-b border-slate-100 last:border-0 hover:bg-slate-50 transition-colors gap-3">
+                                        <!-- Left: Data -->
+                                        <div class="flex-1 min-w-0 flex flex-col">
+                                            <!-- Row 1: ID, Tujuan & Status (Mobile) -->
+                                            <div class="flex items-center justify-between mb-1">
+                                                <span class="text-[10px] font-black text-blue-600 truncate mr-2">${bId} - ${bTujuan}</span>
+                                                <span class="sm:hidden inline-block px-1.5 py-0.5 rounded text-[8px] font-black ${badgeClass}">${badgeText}</span>
                                             </div>
-                                            <span class="font-bold text-xs sm:text-sm text-slate-800 uppercase truncate">
-                                                ${bName}
-                                            </span>
-                                            <div class="flex flex-wrap items-center gap-x-2 gap-y-0.5 mt-0.5 text-[9px] sm:text-[10px] font-bold text-slate-500">
-                                                <span>${bHp}</span>
-                                                <span class="text-slate-300">|</span>
-                                                <span class="text-slate-700">${bQty} PNP</span>
-                                                <span class="text-slate-300">|</span>
-                                                <span class="text-slate-700">Kursi: ${bKursi}</span>
+                                            
+                                            <!-- Row 2: Name & WA -->
+                                            <div class="flex items-center gap-2 mb-1.5">
+                                                <span class="font-bold text-sm text-slate-800 uppercase truncate">${bName}</span>
+                                                <a href="https://wa.me/${waNumber}" target="_blank" class="shrink-0 bg-green-100 text-green-600 hover:bg-green-200 w-6 h-6 rounded flex items-center justify-center transition-colors" title="Hubungi via WhatsApp">
+                                                    <i class="fab fa-whatsapp"></i>
+                                                </a>
                                             </div>
-                                            ${ket ? `<span class="inline-block text-[9px] text-amber-600 font-bold mt-1 bg-amber-50 px-1 py-0.5 rounded border border-amber-100 max-w-full truncate"><i class="fas fa-sticky-note mr-1"></i> ${ket}</span>` : ''}
-                                            ${warningHtml}
+                                            
+                                            <!-- Row 3: Qty & Kursi -->
+                                            <div class="flex items-center gap-3 text-[10px] font-bold text-slate-600">
+                                                <span class="flex items-center gap-1"><i class="fas fa-users text-slate-400"></i> ${bQty} PNP</span>
+                                                <span class="flex items-center gap-1"><i class="fas fa-chair text-slate-400"></i> ${bKursi}</span>
+                                            </div>
+
+                                            <!-- Row 4: Keterangan & Warning (if any) -->
+                                            ${ket ? `<div class="mt-2 text-[9px] text-amber-700 bg-amber-50 px-2 py-1 rounded border border-amber-100 max-w-full truncate inline-block w-fit"><i class="fas fa-info-circle mr-1"></i>${ket}</div>` : ''}
+                                            ${warningHtml ? `<div class="mt-1">${warningHtml}</div>` : ''}
                                         </div>
 
-                                        <!-- Right Side (Desktop Only Details) -->
-                                        <div class="hidden sm:flex items-center justify-end w-1/4 px-4 shrink-0">
-                                            <span class="inline-block px-2 py-1 rounded text-[9px] font-black ${badgeClass}">${badgeText}</span>
-                                        </div>
-                                        
-                                        <!-- Right Side: Actions -->
-                                        <div class="flex shrink-0">
-                                            <div class="flex gap-1.5">
-                                                <button onclick="openETicket('${bId}')" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-600 w-8 h-8 sm:w-auto sm:h-auto sm:px-2.5 sm:py-1.5 rounded-lg flex items-center justify-center text-xs sm:text-[10px] font-black transition-colors" title="E-Tiket">
+                                        <!-- Right: Actions (Desktop Status & Buttons) -->
+                                        <div class="flex flex-col sm:flex-row items-end sm:items-center gap-3 shrink-0">
+                                            <!-- Desktop Status -->
+                                            <div class="hidden sm:block">
+                                                <span class="inline-block px-2 py-1 rounded text-[10px] font-black ${badgeClass}">${badgeText}</span>
+                                            </div>
+                                            
+                                            <!-- Actions -->
+                                            <div class="flex gap-2">
+                                                <button onclick="openETicket('${bId}')" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-600 w-8 h-8 rounded-lg flex items-center justify-center transition-colors shadow-sm" title="E-Tiket">
                                                     <i class="fas fa-ticket-alt"></i>
                                                 </button>
-                                                <button onclick="openEditBookingModal('${bId}')" class="bg-amber-50 hover:bg-amber-100 text-amber-600 w-8 h-8 sm:w-auto sm:h-auto sm:px-2.5 sm:py-1.5 rounded-lg flex items-center justify-center text-xs sm:text-[10px] font-black transition-colors" title="Edit">
+                                                <button onclick="openEditBookingModal('${bId}')" class="bg-slate-100 hover:bg-slate-200 text-slate-700 w-8 h-8 rounded-lg flex items-center justify-center transition-colors shadow-sm" title="Edit">
                                                     <i class="fas fa-edit"></i>
-                                                </button>
-                                                <button onclick="openDeleteModal('${bId}')" class="bg-red-50 hover:bg-red-100 text-red-600 w-8 h-8 sm:w-auto sm:h-auto sm:px-2.5 sm:py-1.5 rounded-lg flex items-center justify-center text-xs sm:text-[10px] font-black transition-colors" title="Hapus">
-                                                    <i class="fas fa-trash"></i>
                                                 </button>
                                             </div>
                                         </div>

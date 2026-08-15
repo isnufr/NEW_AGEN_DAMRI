@@ -1243,9 +1243,14 @@
                 <span class="text-[10px] font-bold text-amber-700 uppercase tracking-widest">Total Harga Baru</span>
                 <span class="font-black text-lg text-amber-600" id="editBookingTotalDisplay">Rp0</span>
             </div>
-            <button type="submit" id="btnSubmitEditBooking" class="w-full bg-amber-500 hover:bg-amber-600 text-white font-black text-sm uppercase tracking-widest py-3 rounded-xl shadow-lg shadow-amber-500/30 transition-all mt-4">
-                Simpan Perubahan
-            </button>
+            <div class="flex gap-3 mt-4">
+                <button type="button" onclick="openDeleteModal(document.getElementById('editBookingId').value); closeEditBookingModal();" class="w-1/3 bg-red-50 hover:bg-red-100 text-red-600 font-black text-sm uppercase tracking-widest py-3 rounded-xl transition-all border border-red-100 flex items-center justify-center gap-2">
+                    <i class="fas fa-trash"></i> Hapus
+                </button>
+                <button type="submit" id="btnSubmitEditBooking" class="w-2/3 bg-amber-500 hover:bg-amber-600 text-white font-black text-sm uppercase tracking-widest py-3 rounded-xl shadow-lg shadow-amber-500/30 transition-all flex items-center justify-center gap-2">
+                    <i class="fas fa-save"></i> Simpan
+                </button>
+            </div>
         </form>
     </div>
 </div>
@@ -1719,7 +1724,7 @@
     </div>
 
     <!-- Custom script for admin dashboard -->
-    <script src="admin.js?v=2.15"></script>
+    <script src="admin.js?v=2.16"></script>
 </body>
 <!-- Modal Confirm Refresh -->
 <div id="modalConfirmRefresh" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden items-center justify-center z-[60] p-4 opacity-0 transition-opacity duration-300">
