@@ -652,13 +652,12 @@
                 
                 html += `
                             <div class="bg-white rounded-xl border border-slate-200 overflow-hidden">
-                                <!-- Group Header -->
-                                <div class="bg-slate-50 border-b border-slate-100 px-3 py-2 flex items-start gap-2">
-                                    <div class="bg-blue-600 text-white font-black text-xs px-2 py-1 rounded mt-0.5">${ig.waktu}</div>
-                                    <div>
-                                        <p class="font-black text-xs text-red-600 uppercase">${ig.armadaName}</p>
-                                        <span class="inline-block mt-0.5 text-orange-500 text-[10px] font-black uppercase tracking-widest">${innerTotalPnp} PNP</span>
+                                <div class="bg-slate-200/80 border-b-2 border-slate-300 px-3 py-2 flex items-center justify-between">
+                                    <div class="flex items-center gap-2">
+                                        <div class="bg-blue-600 text-white font-black text-[10px] sm:text-xs px-2 py-1 rounded shadow-sm leading-none">${ig.waktu}</div>
+                                        <p class="font-black text-xs sm:text-sm text-slate-700 uppercase tracking-wide truncate max-w-[150px] sm:max-w-xs">${ig.armadaName}</p>
                                     </div>
+                                    <span class="inline-block bg-white text-orange-600 border border-orange-200 px-2 py-1 rounded text-[9px] sm:text-[10px] font-black uppercase shadow-sm whitespace-nowrap">${innerTotalPnp} PNP</span>
                                 </div>
                                 <!-- Group List -->
                                 <div class="flex flex-col">
@@ -723,51 +722,48 @@
                     }
                     // ---------------------------------
 
-                    html += `
-                                    <div class="flex flex-col sm:flex-row sm:items-center justify-between p-3 border-b border-slate-100 last:border-0 hover:bg-slate-50 transition-colors gap-3 sm:gap-4 relative group">
-                                        <!-- Info Passanger -->
-                                        <div class="flex flex-col sm:w-1/3">
-                                            <span class="text-[10px] font-black text-blue-600 mb-0.5">${bId} - ${bTujuan}</span>
-                                            <span class="font-bold text-sm text-slate-800 uppercase flex items-center gap-2">
+                                    <div class="flex items-center justify-between p-2 sm:p-3 border-b border-slate-100 last:border-0 hover:bg-slate-50 transition-colors gap-2 relative group">
+                                        <!-- Left Side: Info -->
+                                        <div class="flex-1 flex flex-col min-w-0">
+                                            <div class="flex items-center gap-2">
+                                                <span class="text-[9px] sm:text-[10px] font-black text-blue-600 truncate">${bId} - ${bTujuan}</span>
+                                                <span class="inline-block sm:hidden px-1.5 py-0.5 rounded text-[8px] font-black ${badgeClass}">${badgeText}</span>
+                                            </div>
+                                            <span class="font-bold text-xs sm:text-sm text-slate-800 uppercase truncate">
                                                 ${bName}
                                             </span>
-                                            <span class="text-[10px] font-bold text-slate-400 mt-0.5">${bHp}</span>
+                                            <div class="flex flex-wrap items-center gap-x-2 gap-y-0.5 mt-0.5 text-[9px] sm:text-[10px] font-bold text-slate-500">
+                                                <span>${bHp}</span>
+                                                <span class="text-slate-300">|</span>
+                                                <span class="text-slate-700">${bQty} PNP</span>
+                                                <span class="text-slate-300">|</span>
+                                                <span class="text-slate-700">Kursi: ${bKursi}</span>
+                                            </div>
+                                            ${ket ? `<span class="inline-block text-[9px] text-amber-600 font-bold mt-1 bg-amber-50 px-1 py-0.5 rounded border border-amber-100 max-w-full truncate"><i class="fas fa-sticky-note mr-1"></i> ${ket}</span>` : ''}
                                             ${warningHtml}
                                         </div>
-                                        
-                                        <!-- Qty & Kursi & Status (Mobile Flex) -->
-                                        <div class="flex items-center justify-between sm:w-1/3">
-                                            <div class="flex gap-4">
-                                                <div>
-                                                    <span class="text-[9px] text-slate-400 font-bold uppercase block">Jumlah</span>
-                                                    <span class="text-xs font-black text-slate-700">${bQty} PNP</span>
-                                                </div>
-                                                <div>
-                                                    <span class="text-[9px] text-slate-400 font-bold uppercase block">Kursi</span>
-                                                    <span class="text-xs font-black text-slate-700">${bKursi}</span>
-                                                </div>
-                                            </div>
-                                            <!-- Status -->
-                                            <div class="text-right sm:text-left">
-                                                <span class="inline-block px-2 py-1 rounded text-[9px] font-black ${badgeClass}">${badgeText}</span>
-                                                ${ket ? `<span class="block text-[9px] text-slate-500 font-bold mt-1">${ket}</span>` : ''}
-                                            </div>
+
+                                        <!-- Right Side (Desktop Only Details) -->
+                                        <div class="hidden sm:flex items-center justify-end w-1/4 px-4 shrink-0">
+                                            <span class="inline-block px-2 py-1 rounded text-[9px] font-black ${badgeClass}">${badgeText}</span>
                                         </div>
                                         
-                                        <!-- Actions -->
-                                        <div class="flex gap-1 sm:w-auto mt-2 sm:mt-0 pt-2 sm:pt-0 border-t border-slate-100 sm:border-0 justify-end">
-                                            <button onclick="openETicket('${bId}')" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-600 px-3 py-2 sm:px-2 sm:py-1.5 rounded-lg text-xs sm:text-[10px] font-black uppercase tracking-wider transition-colors" title="E-Tiket">
-                                                <i class="fas fa-ticket-alt"></i>
-                                            </button>
-                                            <button onclick="openEditBookingModal('${bId}')" class="bg-amber-50 hover:bg-amber-100 text-amber-600 px-3 py-2 sm:px-2 sm:py-1.5 rounded-lg text-xs sm:text-[10px] font-black uppercase tracking-wider transition-colors" title="Edit">
-                                                <i class="fas fa-edit"></i>
-                                            </button>
-                                            <button onclick="openDeleteModal('${bId}')" class="bg-red-50 hover:bg-red-100 text-red-600 px-3 py-2 sm:px-2 sm:py-1.5 rounded-lg text-xs sm:text-[10px] font-black uppercase tracking-wider transition-colors" title="Hapus">
-                                                <i class="fas fa-trash"></i>
-                                            </button>
+                                        <!-- Right Side: Actions -->
+                                        <div class="flex shrink-0">
+                                            <div class="flex gap-1.5">
+                                                <button onclick="openETicket('${bId}')" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-600 w-8 h-8 sm:w-auto sm:h-auto sm:px-2.5 sm:py-1.5 rounded-lg flex items-center justify-center text-xs sm:text-[10px] font-black transition-colors" title="E-Tiket">
+                                                    <i class="fas fa-ticket-alt"></i>
+                                                </button>
+                                                <button onclick="openEditBookingModal('${bId}')" class="bg-amber-50 hover:bg-amber-100 text-amber-600 w-8 h-8 sm:w-auto sm:h-auto sm:px-2.5 sm:py-1.5 rounded-lg flex items-center justify-center text-xs sm:text-[10px] font-black transition-colors" title="Edit">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+                                                <button onclick="openDeleteModal('${bId}')" class="bg-red-50 hover:bg-red-100 text-red-600 w-8 h-8 sm:w-auto sm:h-auto sm:px-2.5 sm:py-1.5 rounded-lg flex items-center justify-center text-xs sm:text-[10px] font-black transition-colors" title="Hapus">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </div>
                                         </div>
                                     </div>
-                    `;
+
                 });
 
                 html += `
