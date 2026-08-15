@@ -1193,10 +1193,38 @@
                 <input type="text" id="editBookingHp" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-sm font-bold text-slate-700 outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-200 transition-all" required>
             </div>
             <div>
-                <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Keterangan</label>
-                <input type="text" id="editBookingKeterangan" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-sm font-bold text-slate-700 outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-200 transition-all" placeholder="Contoh: Dekat kursi depan (Opsional)">
-            </div>
-            <div class="grid grid-cols-2 gap-3">
+              <div>
+                  <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Keterangan</label>
+                  <input type="text" id="editBookingKeterangan" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-sm font-bold text-slate-700 outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-200 transition-all" placeholder="Contoh: Dekat kursi depan (Opsional)">
+              </div>
+              
+              <!-- Biaya Tambahan Toggle -->
+              <div class="pt-2 border-t border-slate-100">
+                  <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">Ada Biaya Tambahan?</label>
+                  <div class="flex gap-2 w-full max-w-[200px]">
+                      <label class="flex-1 cursor-pointer">
+                          <input type="radio" name="editBookingHasBiayaTambahan" value="no" class="peer hidden" checked onchange="toggleEditBiayaTambahan()">
+                          <div class="text-center py-2 px-2 rounded-lg border border-slate-200 peer-checked:bg-amber-500 peer-checked:text-white peer-checked:border-amber-500 font-bold text-xs text-slate-500 transition-all shadow-sm">TIDAK</div>
+                      </label>
+                      <label class="flex-1 cursor-pointer">
+                          <input type="radio" name="editBookingHasBiayaTambahan" value="yes" class="peer hidden" onchange="toggleEditBiayaTambahan()">
+                          <div class="text-center py-2 px-2 rounded-lg border border-slate-200 peer-checked:bg-amber-500 peer-checked:text-white peer-checked:border-amber-500 font-bold text-xs text-slate-500 transition-all shadow-sm">YA</div>
+                      </label>
+                  </div>
+              </div>
+
+              <div id="editBookingBiayaTambahanContainer" class="hidden grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                      <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Nominal Tambahan</label>
+                      <input type="number" id="editBookingBiayaTambahanNominal" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-sm font-bold text-slate-700 outline-none focus:border-amber-500 transition-all" value="0" oninput="recalcEditBooking()">
+                  </div>
+                  <div>
+                      <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Ket. Tambahan</label>
+                      <input type="text" id="editBookingBiayaTambahanKet" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-sm font-bold text-slate-700 outline-none focus:border-amber-500 transition-all" placeholder="Contoh: Bagasi">
+                  </div>
+              </div>
+
+              <div class="grid grid-cols-2 gap-3">
                 <div>
                     <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Tanggal</label>
                     <input type="date" id="editBookingDate" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-sm font-bold text-slate-700 outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-200 transition-all" required>
@@ -1536,7 +1564,7 @@
     </div>
 
     <!-- Custom script for admin dashboard -->
-    <script src="admin.js?v=2.22"></script>
+    <script src="admin.js?v=2.23"></script>
 </body>
 <!-- Modal Confirm Refresh -->
 <div id="modalConfirmRefresh" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden items-center justify-center z-[60] p-4 opacity-0 transition-opacity duration-300">

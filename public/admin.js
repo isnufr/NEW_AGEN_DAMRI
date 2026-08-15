@@ -978,10 +978,30 @@
         const armada = b.armadaId !== 'UNKNOWN' ? getArmada(b.armadaId) : null;
         const armadaName = armada ? armada.name : (b.kendaraan || b['JENIS KENDARAAN'] || '-');
         const tujuan = armada ? armada.destination : (b.tujuan || '-');
-        const ket = b.keterangan || b['Keterangan'] || b['KETERANGAN'] || '-';
+        
+        let rawKet = String(b.keterangan || b['Keterangan'] || b['KETERANGAN'] || '-');
+        const mKet = rawKet.match(/Biaya Tambahan: (.*?) \((Rp[ \d.,]+)\)/);
+        let ketTambahan = '';
+        let nominalBiayaTambahan = 0;
+        if (mKet) {
+            ketTambahan = mKet[1].trim();
+            nominalBiayaTambahan = parseInt(mKet[2].replace(/[^\d]/g, '')) || 0;
+            rawKet = rawKet.replace(/,?\s*Biaya Tambahan:.*?$/, '').trim();
+            if (!rawKet) rawKet = '-';
+        }
 
         const formatHp = String(b.hp || "").replace(/[^0-9]/g, '').replace(/^0/, '62');
         const waLink = `https://wa.me/${formatHp}?text=${encodeURIComponent('Halo ' + b.name + ', ')}`;
+        
+        let biayaTambahanHtml = '';
+        if (nominalBiayaTambahan > 0) {
+            biayaTambahanHtml = `
+                <div class="col-span-2 bg-amber-50 p-3 rounded-lg border border-amber-100 mt-2">
+                    <p class="text-[10px] font-bold text-amber-500 uppercase tracking-widest mb-1">Biaya Tambahan</p>
+                    <p class="font-bold text-amber-700 text-xs">${formatRupiah(nominalBiayaTambahan)} <span class="font-normal text-amber-600">(${ketTambahan})</span></p>
+                </div>
+            `;
+        }
 
         content.innerHTML = `
             <div class="grid grid-cols-2 gap-y-3 gap-x-4">
@@ -1022,8 +1042,9 @@
                 </div>
                 <div class="col-span-2 bg-slate-50 p-3 rounded-lg border border-slate-100 mt-2">
                     <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Keterangan</p>
-                    <p class="font-bold text-slate-700 text-xs">${ket}</p>
+                    <p class="font-bold text-slate-700 text-xs">${rawKet}</p>
                 </div>
+                ${biayaTambahanHtml}
             </div>
         `;
 
@@ -2256,8 +2277,17 @@
         const totalHargaData = (b.totalHarga !== undefined && b.totalHarga !== null) ? parseInt(String(b.totalHarga).replace(/[^0-9]/g, '')) : (b.total !== undefined && b.total !== null ? parseInt(String(b.total).replace(/[^0-9]/g, '')) : (harga * qty));
         const expectedTotal = harga * qty;
         
-        const hasBiayaTambahan = totalHargaData > expectedTotal;
-        const nominalBiayaTambahan = hasBiayaTambahan ? (totalHargaData - expectedTotal) : 0;
+        let rawKet = String(b.keterangan || b.ket || '-');
+        const mKet = rawKet.match(/Biaya Tambahan: (.*?) \((Rp[ \d.,]+)\)/);
+        let ketTambahan = '';
+        let nominalBiayaTambahan = 0;
+        if (mKet) {
+            ketTambahan = mKet[1].trim();
+            nominalBiayaTambahan = parseInt(mKet[2].replace(/[^\d]/g, '')) || 0;
+            rawKet = rawKet.replace(/,?\s*Biaya Tambahan:.*?$/, '').trim();
+            if (!rawKet) rawKet = '-';
+        }
+        const hasBiayaTambahan = nominalBiayaTambahan > 0;
         
         const total = totalHargaData > 0 ? totalHargaData : expectedTotal;
 
@@ -2273,7 +2303,7 @@
         if(document.getElementById('ticketAsal')) document.getElementById('ticketAsal').innerText = asalText;
         if(document.getElementById('ticketTujuan')) document.getElementById('ticketTujuan').innerText = tujuan;
         if(document.getElementById('ticketKursi')) document.getElementById('ticketKursi').innerText = b.kursi || '-';
-        if(document.getElementById('ticketKeterangan')) document.getElementById('ticketKeterangan').innerText = b.keterangan || '-';
+        if(document.getElementById('ticketKeterangan')) document.getElementById('ticketKeterangan').innerText = rawKet;
         if(document.getElementById('ticketQty')) document.getElementById('ticketQty').innerText = qty;
         
         if(document.getElementById('ticketId')) document.getElementById('ticketId').innerText = b.bookingId;
@@ -2281,12 +2311,7 @@
         if(document.getElementById('ticketTglBeli')) document.getElementById('ticketTglBeli').innerText = "TGL BELI: " + tglBeli;
         if(document.getElementById('ticketHargaSatuan')) document.getElementById('ticketHargaSatuan').innerText = formatRupiah(harga);
         
-        let ketTambahan = '';
         if (hasBiayaTambahan) {
-            const ketStr = b.keterangan || b.ket || '';
-            const m = ketStr.match(/Biaya Tambahan: (.*?) \(/);
-            ketTambahan = m ? m[1] : '';
-            
             if(document.getElementById('ticketBiayaTambahanContainer')) {
                 document.getElementById('ticketBiayaTambahanContainer').classList.remove('hidden');
                 document.getElementById('ticketBiayaTambahan').innerText = formatRupiah(nominalBiayaTambahan);
@@ -2329,7 +2354,7 @@
             biayaTambahan: hasBiayaTambahan ? nominalBiayaTambahan : 0,
             biayaTambahanKet: ketTambahan,
             status: statusPay,
-            keterangan: b.keterangan || '-'
+            keterangan: rawKet
         };
 
         const ruteFullText = asalText + ' ➔ ' + tujuan;
@@ -2342,7 +2367,7 @@
         document.getElementById('r_nama').innerText = b.name;
         document.getElementById('r_pnp').innerText = qty + ' Orang';
         document.getElementById('r_kursi').innerText = b.kursi || '-';
-        if(document.getElementById('r_keterangan')) document.getElementById('r_keterangan').innerText = b.keterangan || '-';
+        if(document.getElementById('r_keterangan')) document.getElementById('r_keterangan').innerText = rawKet;
         document.getElementById('r_bus').innerText = armadaName;
         document.getElementById('r_rute').innerText = ruteFullText;
 
@@ -2712,7 +2737,22 @@
         document.getElementById('editBookingIdDisplay').innerText = b.bookingId;
         document.getElementById('editBookingNama').value = b.name;
         document.getElementById('editBookingHp').value = b.hp;
-        if(document.getElementById('editBookingKeterangan')) document.getElementById('editBookingKeterangan').value = b.keterangan || '';
+        
+        let rawKet = String(b.keterangan || b.ket || '');
+        const mKet = rawKet.match(/Biaya Tambahan: (.*?) \((Rp[ \d.,]+)\)/);
+        if (mKet) {
+            document.getElementById('editBookingBiayaTambahanKet').value = mKet[1].trim();
+            document.getElementById('editBookingBiayaTambahanNominal').value = parseInt(mKet[2].replace(/[^\d]/g, '')) || 0;
+            document.querySelector('input[name="editBookingHasBiayaTambahan"][value="yes"]').checked = true;
+            
+            rawKet = rawKet.replace(/,?\s*Biaya Tambahan:.*?$/, '').trim();
+        } else {
+            document.getElementById('editBookingBiayaTambahanKet').value = '';
+            document.getElementById('editBookingBiayaTambahanNominal').value = 0;
+            document.querySelector('input[name="editBookingHasBiayaTambahan"][value="no"]').checked = true;
+        }
+        if(document.getElementById('editBookingKeterangan')) document.getElementById('editBookingKeterangan').value = rawKet;
+        toggleEditBiayaTambahan();
         document.getElementById('editBookingPnp').value = b.qty;
         const prefillKursi = b.kursi && b.kursi !== '-' ? b.kursi.split(',') : [];
         renderEditBookingKursi(prefillKursi);
@@ -2861,11 +2901,26 @@
         container.appendChild(grid);
     }
 
+    function toggleEditBiayaTambahan() {
+        const hasBiayaTambahan = document.querySelector('input[name="editBookingHasBiayaTambahan"]:checked').value === 'yes';
+        const container = document.getElementById('editBookingBiayaTambahanContainer');
+        if (hasBiayaTambahan) {
+            container.classList.remove('hidden');
+        } else {
+            container.classList.add('hidden');
+            document.getElementById('editBookingBiayaTambahanNominal').value = 0;
+        }
+        recalcEditBooking();
+    }
+
     function recalcEditBooking() {
         renderEditBookingKursi();
         const armadaId = document.getElementById('editBookingArmada').value;
         const qty = parseInt(document.getElementById('editBookingPnp').value) || 1;
         const armada = getArmada(armadaId);
+        
+        const hasBiayaTambahan = document.querySelector('input[name="editBookingHasBiayaTambahan"]:checked').value === 'yes';
+        const nominalBiayaTambahan = hasBiayaTambahan ? (parseInt(document.getElementById('editBookingBiayaTambahanNominal').value) || 0) : 0;
         
         const rawDate = document.getElementById('editBookingDate').value;
         let dObjForHarga = null;
@@ -2879,7 +2934,7 @@
         
         if(armada) {
             const harga = getEffectiveHarga(armada, dObjForHarga);
-            const total = harga * qty;
+            const total = (harga * qty) + nominalBiayaTambahan;
             document.getElementById('editBookingTotalDisplay').innerText = formatRupiah(total);
         } else {
             document.getElementById('editBookingTotalDisplay').innerText = 'Rp 0';
@@ -2929,19 +2984,29 @@
 
         const dObjForHarga = parseIndoDate(formattedDate);
         const hargaEff = getEffectiveHarga(armada, dObjForHarga);
+        
+        let finalKet = document.getElementById('editBookingKeterangan') ? document.getElementById('editBookingKeterangan').value : '';
+        const hasBiayaTambahan = document.querySelector('input[name="editBookingHasBiayaTambahan"]:checked').value === 'yes';
+        const nominalBiayaTambahan = hasBiayaTambahan ? (parseInt(document.getElementById('editBookingBiayaTambahanNominal').value) || 0) : 0;
+        const ketBiayaTambahan = hasBiayaTambahan ? document.getElementById('editBookingBiayaTambahanKet').value : '';
+        
+        if (hasBiayaTambahan && nominalBiayaTambahan > 0) {
+            const ketTambahanText = `Biaya Tambahan: ${ketBiayaTambahan} (${formatRupiah(nominalBiayaTambahan)})`;
+            finalKet = finalKet ? `${finalKet}, ${ketTambahanText}` : ketTambahanText;
+        }
 
         const payload = {
             id_tiket: id,
             nama: document.getElementById('editBookingNama').value,
             hp: document.getElementById('editBookingHp').value,
-            keterangan: document.getElementById('editBookingKeterangan') ? document.getElementById('editBookingKeterangan').value : '',
+            keterangan: finalKet,
             tanggalPemberangkatan: formattedDate,
             jenisKendaraan: armada ? armada.name : '',
             tujuan: armada ? armada.destination : '',
             jumlahPnp: qty,
             nomorKursi: kursiString,
             harga: hargaEff,
-            totalHarga: hargaEff * qty,
+            totalHarga: (hargaEff * qty) + nominalBiayaTambahan,
             waktu: armada ? armada.time : ''
         };
         const statusSelect = document.getElementById('editBookingStatus');
@@ -4309,3 +4374,4 @@ function updateChartColors(isDark) {
     if (typeof openHargaKhususModal !== 'undefined') window.openHargaKhususModal = openHargaKhususModal;
     if (typeof closeHargaKhususModal !== 'undefined') window.closeHargaKhususModal = closeHargaKhususModal;
     if (typeof toggleHkGroup !== 'undefined') window.toggleHkGroup = toggleHkGroup;
+    if (typeof toggleEditBiayaTambahan !== 'undefined') window.toggleEditBiayaTambahan = toggleEditBiayaTambahan;

@@ -1765,15 +1765,30 @@
             }
             
             let extraInfoHTML = '';
-            if (tiket.keterangan && tiket.keterangan !== '-') {
+            
+            let extractedBiayaTambahanNominal = 0;
+            let extractedBiayaTambahanKet = '';
+            let rawKet = String(tiket.keterangan || '-');
+
+            const m = rawKet.match(/Biaya Tambahan: (.*?) \((Rp[ \d.,]+)\)/);
+            if (m) {
+                extractedBiayaTambahanKet = m[1].trim();
+                const nominalStr = m[2].replace(/[^\d]/g, '');
+                extractedBiayaTambahanNominal = parseInt(nominalStr) || 0;
+                
+                rawKet = rawKet.replace(/,?\s*Biaya Tambahan:.*?$/, '').trim();
+                if (!rawKet) rawKet = '-';
+            }
+            
+            if (rawKet !== '-') {
                 // Jangan tampilkan keterangan harga khusus massal di e-ticket
-                if (!String(tiket.keterangan).includes('Harga Khusus Massal')) {
-                    extraInfoHTML += `<div class="mb-1.5"><p class="text-[8px] font-black text-gray-400 uppercase mb-0.5 leading-none">Keterangan</p><p class="text-[9px] sm:text-[10px] font-bold text-gray-800 leading-tight">${tiket.keterangan}</p></div>`;
+                if (!rawKet.includes('Harga Khusus Massal')) {
+                    extraInfoHTML += `<div class="mb-1.5"><p class="text-[8px] font-black text-gray-400 uppercase mb-0.5 leading-none">Keterangan</p><p class="text-[9px] sm:text-[10px] font-bold text-gray-800 leading-tight">${rawKet}</p></div>`;
                 }
             }
-            if (tiket.biayaTambahan && tiket.biayaTambahan > 0) {
-                const ketBiaya = tiket.biayaTambahanKet ? ` (${tiket.biayaTambahanKet})` : '';
-                extraInfoHTML += `<div class="mb-0"><p class="text-[8px] font-black text-gray-400 uppercase mb-0.5 leading-none">Biaya Tambahan${ketBiaya}</p><p class="text-[9px] sm:text-[10px] font-bold text-gray-800 leading-tight">${formatRupiah(tiket.biayaTambahan)}</p></div>`;
+            if (extractedBiayaTambahanNominal > 0) {
+                const ketBiaya = extractedBiayaTambahanKet ? ` (${extractedBiayaTambahanKet})` : '';
+                extraInfoHTML += `<div class="mb-0"><p class="text-[8px] font-black text-gray-400 uppercase mb-0.5 leading-none">Biaya Tambahan${ketBiaya}</p><p class="text-[9px] sm:text-[10px] font-bold text-gray-800 leading-tight">${formatRupiah(extractedBiayaTambahanNominal)}</p></div>`;
             }
             
             let extraInfoContainer = '';
