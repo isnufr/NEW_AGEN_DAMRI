@@ -720,8 +720,7 @@
                             }
                         }
                     }
-                    // ---------------------------------
-
+                    html += `
                                     <div class="flex items-center justify-between p-2 sm:p-3 border-b border-slate-100 last:border-0 hover:bg-slate-50 transition-colors gap-2 relative group">
                                         <!-- Left Side: Info -->
                                         <div class="flex-1 flex flex-col min-w-0">
@@ -763,7 +762,7 @@
                                             </div>
                                         </div>
                                     </div>
-
+                    `;
                 });
 
                 html += `
