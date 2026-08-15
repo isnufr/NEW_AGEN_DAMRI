@@ -1763,6 +1763,23 @@
                 asalText = tiket.tujuan.replace('[PULANG] ', '');
                 tujuanText = 'KAWUNGANTEN';
             }
+            
+            let extraInfoHTML = '';
+            if (tiket.keterangan && tiket.keterangan !== '-') {
+                // Jangan tampilkan keterangan harga khusus massal di e-ticket
+                if (!String(tiket.keterangan).includes('Harga Khusus Massal')) {
+                    extraInfoHTML += `<div class="mb-1.5"><p class="text-[8px] font-black text-gray-400 uppercase mb-0.5 leading-none">Keterangan</p><p class="text-[9px] sm:text-[10px] font-bold text-gray-800 leading-tight">${tiket.keterangan}</p></div>`;
+                }
+            }
+            if (tiket.biayaTambahan && tiket.biayaTambahan > 0) {
+                const ketBiaya = tiket.biayaTambahanKet ? ` (${tiket.biayaTambahanKet})` : '';
+                extraInfoHTML += `<div class="mb-0"><p class="text-[8px] font-black text-gray-400 uppercase mb-0.5 leading-none">Biaya Tambahan${ketBiaya}</p><p class="text-[9px] sm:text-[10px] font-bold text-gray-800 leading-tight">${formatRupiah(tiket.biayaTambahan)}</p></div>`;
+            }
+            
+            let extraInfoContainer = '';
+            if (extraInfoHTML !== '') {
+                extraInfoContainer = `<div class="bg-blue-50/30 p-2.5 rounded-xl border border-blue-100 mb-3 px-3 text-left w-full">${extraInfoHTML}</div>`;
+            }
 
             h.innerHTML = `
             <div id="eTicketOutput" class="animate-fade-in-up bg-white rounded-[2rem] shadow-2xl border border-gray-100 text-left relative p-1 w-full mx-auto max-w-[380px] max-h-[85dvh] overflow-y-auto custom-scroll">
@@ -1820,6 +1837,9 @@
                             <div class="text-center bg-white/95 backdrop-blur-sm p-2 rounded-xl shadow-sm border border-gray-100"><p class="text-[8px] font-black text-gray-400 uppercase mb-1">Waktu</p><p class="text-[9px] sm:text-[10px] font-bold text-gray-800">${tiket.waktu || '-'}</p></div>
                             <div class="text-center bg-white/95 backdrop-blur-sm p-2 rounded-xl shadow-sm border border-gray-100"><p class="text-[8px] font-black text-gray-400 uppercase mb-1">No. Kursi</p><p class="text-[10px] sm:text-[12px] font-extrabold text-blue-900">${tiket.kursi || '-'}</p></div>
                         </div>
+                        
+                        ${extraInfoContainer}
+
                         <div class="flex justify-between items-center mb-4 px-3 py-3 bg-white/95 backdrop-blur-sm rounded-2xl shadow-sm border border-gray-100">
                             <div class="text-left">
                                 <p class="text-[9px] font-black text-gray-400 uppercase mb-1 tracking-widest">Total Bayar</p>
