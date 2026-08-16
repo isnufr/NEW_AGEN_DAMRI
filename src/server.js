@@ -467,6 +467,7 @@ app.post('/api', async (req, res) => {
                 jumlahPnp: parseInt(jumlahPnp) || 1,
                 waktu: waktu,
                 nomorKursi: nomorKursi || '',
+                alamat: alamat || '-',
                 harga: parseInt(harga) || 0,
                 totalHarga: parseInt(totalHarga) || 0,
                 komisi: (parseInt(harga) || 0) * 0.1,
