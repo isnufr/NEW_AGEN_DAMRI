@@ -4450,6 +4450,7 @@ async function searchPelanggan(query, formType, targetField) {
                         if (formType === 'booking') {
                             document.getElementById('adminBookingNama').value = p.nama;
                             document.getElementById('adminBookingHp').value = p.nomorHp;
+                            if (p.alamat && p.alamat !== '-') { document.getElementById('adminBookingAlamat').value = p.alamat; }
                             document.getElementById('autocompleteNamaBooking').classList.add('hidden');
                             document.getElementById('autocompleteHpBooking').classList.add('hidden');
                         } else {

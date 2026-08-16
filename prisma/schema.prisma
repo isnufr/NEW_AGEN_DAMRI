@@ -34,8 +34,9 @@ model Booking {
   totalHarga            Int
   pembayaran            String
   status                String
-  komisi                Int      @default(0)
-  totalKomisi           Int      @default(0)
+  komisi           Int      @default(0)
+  totalKomisi      Int      @default(0)
+  alamat           String   @default("-")
 }
 
 model Admin {
@@ -75,5 +76,6 @@ model Pelanggan {
   nama         String
   totalBooking Int      @default(1)
   catatan      String?
+  alamat       String   @default("-")
   createdAt    DateTime @default(now())
 }

@@ -88,15 +88,16 @@ function normalizeHp(hp) {
     return norm;
 }
 
-async function upsertPelanggan(hp, nama) {
+async function upsertPelanggan(hp, nama, alamat) {
     if (!hp || hp.trim() === '' || hp.trim() === '-') return;
     try {
         const hpTrim = normalizeHp(hp);
         const namaTrim = nama ? nama.trim() : 'Tanpa Nama';
+        const alamatTrim = alamat ? alamat.trim() : '-';
         await prisma.pelanggan.upsert({
             where: { nomorHp: hpTrim },
-            update: { totalBooking: { increment: 1 } },
-            create: { nomorHp: hpTrim, nama: namaTrim, totalBooking: 1 }
+            update: { totalBooking: { increment: 1 }, alamat: alamatTrim !== '-' ? alamatTrim : undefined },
+            create: { nomorHp: hpTrim, nama: namaTrim, alamat: alamatTrim, totalBooking: 1 }
         });
     } catch (e) {
         console.error('Failed to upsert pelanggan:', e);
@@ -454,7 +455,7 @@ app.post('/api', async (req, res) => {
         }
 
         if (action === 'editBookingData') {
-            const { id_tiket, nama, hp, tanggalPemberangkatan, jenisKendaraan, tujuan, jumlahPnp, harga, totalHarga, waktu, nomorKursi, status, keterangan } = payload;
+            const { id_tiket, nama, hp, tanggalPemberangkatan, jenisKendaraan, tujuan, jumlahPnp, harga, totalHarga, waktu, nomorKursi, status, keterangan, alamat } = payload;
             
             const updateData = {
                 nama: nama,
@@ -751,10 +752,10 @@ app.post('/api', async (req, res) => {
 
         
         if (action === 'editPelanggan') {
-            const { nomorHp, namaBaru } = payload;
+            const { nomorHp, namaBaru, alamatBaru } = payload;
             await prisma.pelanggan.update({
                 where: { nomorHp: nomorHp },
-                data: { nama: namaBaru }
+                data: { nama: namaBaru, alamat: alamatBaru || "-" }
             });
             return res.json({ status: 'success', message: 'Nama pelanggan berhasil diubah' });
         }
