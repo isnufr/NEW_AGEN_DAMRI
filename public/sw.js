@@ -1,4 +1,4 @@
-const CACHE_NAME = 'agen-damri-cache-v23';
+const CACHE_NAME = 'agen-damri-cache-v24';
 const urlsToCache = [
   '/',
   '/index.html',
@@ -39,30 +39,20 @@ self.addEventListener('fetch', event => {
       return;
   }
   
+  // Gunakan strategi "Network First, fallback to Cache" agar selalu mendapat update terbaru
   event.respondWith(
-    caches.match(event.request)
-      .then(cachedResponse => {
-        if (cachedResponse) {
-          return cachedResponse;
-        }
-        
-        return fetch(event.request).then(networkResponse => {
-          // Jangan cache response yang tidak valid
-          if (!networkResponse || networkResponse.status !== 200 || (networkResponse.type !== 'basic' && networkResponse.type !== 'cors' && networkResponse.type !== 'opaque')) {
-            return networkResponse;
-          }
-          
-          let responseToCache = networkResponse.clone();
-          caches.open(CACHE_NAME)
-            .then(cache => {
-              cache.put(event.request, responseToCache);
-            });
-            
-          return networkResponse;
-        }).catch(() => {
-          // Jika gagal fetch (misal offline), kita bisa mengembalikan fallback
-          // karena ini asset/cdn, biarkan saja
+    fetch(event.request).then(networkResponse => {
+      // Simpan ke cache jika response valid
+      if (networkResponse && networkResponse.status === 200 && (networkResponse.type === 'basic' || networkResponse.type === 'cors' || networkResponse.type === 'opaque')) {
+        let responseToCache = networkResponse.clone();
+        caches.open(CACHE_NAME).then(cache => {
+          cache.put(event.request, responseToCache);
         });
-      })
+      }
+      return networkResponse;
+    }).catch(() => {
+      // Jika offline atau gagal fetch, ambil dari cache
+      return caches.match(event.request);
+    })
   );
 });
