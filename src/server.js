@@ -78,6 +78,22 @@ function parseCustomDate(dateStr) {
     return new Date(dateStr);
 }
 
+// Helper untuk menyimpan data pelanggan secara otomatis
+async function upsertPelanggan(hp, nama) {
+    if (!hp || hp.trim() === '' || hp.trim() === '-') return;
+    try {
+        const hpTrim = hp.trim();
+        const namaTrim = nama ? nama.trim() : 'Tanpa Nama';
+        await prisma.pelanggan.upsert({
+            where: { nomorHp: hpTrim },
+            update: { totalBooking: { increment: 1 } },
+            create: { nomorHp: hpTrim, nama: namaTrim, totalBooking: 1 }
+        });
+    } catch (e) {
+        console.error('Failed to upsert pelanggan:', e);
+    }
+}
+
 // API Endpoints
 app.get('/api', async (req, res) => {
     const action = req.query.action;
@@ -207,6 +223,30 @@ app.get('/api', async (req, res) => {
             return res.json({ status: 'success', data: formattedAdmins });
         }
 
+        if (action === 'getPelanggan') {
+            const pelanggan = await prisma.pelanggan.findMany({
+                orderBy: { totalBooking: 'desc' }
+            });
+            return res.json({ status: 'success', data: pelanggan });
+        }
+        
+        if (action === 'cariPelanggan') {
+            const q = req.query.q;
+            if (!q || q.length < 2) return res.json({ status: 'success', data: [] });
+            
+            const results = await prisma.pelanggan.findMany({
+                where: {
+                    OR: [
+                        { nama: { contains: q } },
+                        { nomorHp: { contains: q } }
+                    ]
+                },
+                take: 10,
+                orderBy: { totalBooking: 'desc' }
+            });
+            return res.json({ status: 'success', data: results });
+        }
+
         return res.status(400).json({ status: 'error', message: 'Action not found' });
     } catch (error) {
         console.error(error);
@@ -313,6 +353,10 @@ app.post('/api', async (req, res) => {
                     totalKomisi: totalHarga * 0.1,
                 }
             });
+            
+            // Upsert pelanggan
+            await upsertPelanggan(payload['NOMOR HP'], payload['NAMA']);
+            
             return res.json({ status: 'success', message: 'Booking berhasil', data: newBooking });
         }
 
@@ -632,6 +676,36 @@ app.post('/api', async (req, res) => {
             }
             await prisma.admin.delete({ where: { id } });
             return res.json({ status: 'success', message: 'Admin berhasil dihapus' });
+        }
+
+        if (action === 'migratePelanggan') {
+            const bookings = await prisma.booking.findMany({
+                orderBy: { createdAt: 'desc' }
+            });
+            const pelangganMap = new Map();
+            for (const b of bookings) {
+                if (!b.nomorHp || b.nomorHp.trim() === '' || b.nomorHp.trim() === '-') continue;
+                const hp = b.nomorHp.trim();
+                const nama = b.nama ? b.nama.trim() : 'Tanpa Nama';
+                if (!pelangganMap.has(hp)) {
+                    pelangganMap.set(hp, { nomorHp: hp, nama: nama, totalBooking: 1 });
+                } else {
+                    pelangganMap.get(hp).totalBooking += 1;
+                }
+            }
+            const pelangganList = Array.from(pelangganMap.values());
+            let inserted = 0;
+            for (const p of pelangganList) {
+                try {
+                    await prisma.pelanggan.upsert({
+                        where: { nomorHp: p.nomorHp },
+                        update: { totalBooking: p.totalBooking },
+                        create: p
+                    });
+                    inserted++;
+                } catch(e){}
+            }
+            return res.json({ status: 'success', message: `Migrasi selesai. ${inserted} pelanggan diproses.` });
         }
 
         return res.status(400).json({ status: 'error', message: 'Action not found' });

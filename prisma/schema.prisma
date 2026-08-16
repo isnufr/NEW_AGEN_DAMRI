@@ -68,3 +68,12 @@ model HargaKhusus {
   hargaBaru    String
   armada       Armada   @relation(fields: [idArmada], references: [idArmada], onDelete: Cascade)
 }
+
+model Pelanggan {
+  id           String   @id @default(uuid())
+  nomorHp      String   @unique
+  nama         String
+  totalBooking Int      @default(1)
+  catatan      String?
+  createdAt    DateTime @default(now())
+}

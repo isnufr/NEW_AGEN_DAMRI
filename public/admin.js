@@ -4386,3 +4386,4 @@ function updateChartColors(isDark) {
     if (typeof closeHargaKhususModal !== 'undefined') window.closeHargaKhususModal = closeHargaKhususModal;
     if (typeof toggleHkGroup !== 'undefined') window.toggleHkGroup = toggleHkGroup;
     if (typeof toggleEditBiayaTambahan !== 'undefined') window.toggleEditBiayaTambahan = toggleEditBiayaTambahan;
+\

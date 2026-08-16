@@ -749,13 +749,15 @@
                             <div class="space-y-4">
                                 <h3 class="text-xs font-black text-slate-400 uppercase tracking-widest border-b border-slate-100 pb-2">2. Data Penumpang</h3>
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    <div>
+                                    <div class="relative">
                                         <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Nama Penumpang</label>
-                                        <input type="text" id="adminBookingNama" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-bold text-slate-700 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all" required>
+                                        <input type="text" id="adminBookingNama" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-bold text-slate-700 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all" oninput="searchPelanggan(this.value, 'booking', 'nama')" autocomplete="off" required>
+                                        <div id="autocompleteNamaBooking" class="absolute z-50 w-full bg-white border border-slate-200 rounded-xl shadow-lg mt-1 hidden max-h-48 overflow-y-auto"></div>
                                     </div>
-                                    <div>
+                                    <div class="relative">
                                         <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">No HP / WA</label>
-                                        <input type="tel" id="adminBookingHp" inputmode="numeric" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-bold text-slate-700 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all" required>
+                                        <input type="tel" id="adminBookingHp" inputmode="numeric" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-bold text-slate-700 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all" oninput="searchPelanggan(this.value, 'booking', 'hp')" autocomplete="off" required>
+                                        <div id="autocompleteHpBooking" class="absolute z-50 w-full bg-white border border-slate-200 rounded-xl shadow-lg mt-1 hidden max-h-48 overflow-y-auto"></div>
                                     </div>
                                 </div>
                                 <div>
