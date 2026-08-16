@@ -4405,7 +4405,7 @@ async function searchPelanggan(query, formType, targetField) {
     clearTimeout(searchTimeout);
     searchTimeout = setTimeout(async () => {
         try {
-            const res = await fetch('/api?action=cariPelanggan&q=' + encodeURIComponent(query));
+            const res = await fetch('/api?action=cariPelanggan&q=' + encodeURIComponent(query), { headers: { 'Authorization': 'Bearer ' + localStorage.getItem('adminToken') } });
             const data = await res.json();
             
             if (data.status === 'success' && data.data.length > 0) {
