@@ -79,10 +79,19 @@ function parseCustomDate(dateStr) {
 }
 
 // Helper untuk menyimpan data pelanggan secara otomatis
+function normalizeHp(hp) {
+    if (!hp) return hp;
+    let norm = hp.replace(/[-\s]/g, '');
+    if (norm.startsWith('+62')) norm = '0' + norm.substring(3);
+    else if (norm.startsWith('62') && norm.length > 3) norm = '0' + norm.substring(2);
+    else if (norm.startsWith('+')) norm = norm.replace(/^\+(\d{1,3})/, '0');
+    return norm;
+}
+
 async function upsertPelanggan(hp, nama) {
     if (!hp || hp.trim() === '' || hp.trim() === '-') return;
     try {
-        const hpTrim = hp.trim();
+        const hpTrim = normalizeHp(hp);
         const namaTrim = nama ? nama.trim() : 'Tanpa Nama';
         await prisma.pelanggan.upsert({
             where: { nomorHp: hpTrim },
@@ -355,6 +364,7 @@ app.post('/api', async (req, res) => {
             });
             
             // Upsert pelanggan
+            payload['NOMOR HP'] = normalizeHp(payload['NOMOR HP']);
             await upsertPelanggan(payload['NOMOR HP'], payload['NAMA']);
             
             return res.json({ status: 'success', message: 'Booking berhasil', data: newBooking });
@@ -719,15 +729,21 @@ app.get('/api/migrate-pelanggan', async (req, res) => {
     try {
         const result = require('child_process').execSync('node src/migrate-pelanggan.js').toString();
         res.json({status: 'success', message: 'Migration completed', log: result});
-
-app.use((req, res) => {
-    res.sendFile(path.join(__dirname, '../public/index.html'));
-});
-
-
     } catch (e) {
         res.status(500).json({status: 'error', message: e.message});
     }
+});
+
+app.get('/api/normalize-hp', async (req, res) => {
+    try {
+        const result = require('child_process').execSync('node src/normalize-hp.js').toString();
+        res.json({status: 'success', message: 'Normalization completed', log: result});
+    } catch (e) {
+        res.status(500).json({status: 'error', message: e.message});
+    }
+});
+app.use((req, res) => {
+    res.sendFile(path.join(__dirname, '../public/index.html'));
 });
 
 server.listen(PORT, () => {
