@@ -584,7 +584,7 @@
 
             const safeIdStr = (g.dateTravel || 'unknown').replace(/[^a-zA-Z0-9]/g, '_');
             const safeId = 'manifest-' + safeIdStr;
-            const isOpen = openManifestIds.includes(safeId);
+            const isOpen = openManifestIds.includes(safeId) || sortedGroups.length === 1;
             const rowClass = isOpen ? 'bg-white' : 'hidden bg-white';
             const iconTransform = isOpen ? 'rotate(180deg)' : 'rotate(0deg)';
 
@@ -3345,9 +3345,17 @@
             const res = await postToSheets('addBooking', payload);
             if(res.status === 'success') {
                 showMessage('Booking berhasil dibuat!');
-                refreshData();
+                await refreshData(); // Tunggu data baru masuk
                 resetAdminBooking();
                 closeBookingModal();
+
+                // Pindah ke menu manifest dan filter sesuai tanggal
+                if (typeof switchMenu === 'function') switchMenu('today');
+                const filterEl = document.getElementById('manifestFilterDate');
+                if (filterEl) {
+                    filterEl.value = rawDate; // yyyy-mm-dd format
+                    if (typeof renderTodayTable === 'function') renderTodayTable();
+                }
                 
                 // Populate Thermal Receipt
                 const now = new Date();
