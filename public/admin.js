@@ -2464,7 +2464,7 @@
         document.getElementById('loadingOverlay').classList.remove('hidden');
 
         try {
-            const payload = { id: id, status: "LUNAS", pembayaran: "LUNAS" };
+            const payload = { id_tiket: id, status: "LUNAS", pembayaran: "LUNAS" };
             const res = await postToSheets('updateStatus', payload);
 
             if (res && res.status === "success") {
@@ -2475,6 +2475,14 @@
                     localStorage.setItem("app_bookings", JSON.stringify(cachedBookings));
                 }
                 showMessage("Berhasil! Data di database sudah di-ACC.");
+                
+                // Tutup modal notifikasi jika terbuka
+                if (typeof closeNotifModal === 'function') closeNotifModal();
+                // Tutup modal detail booking jika terbuka
+                if (typeof closeBookingDetailModal === 'function') closeBookingDetailModal();
+                
+                // Lempar ke menu manifest (today)
+                if (typeof switchMenu === 'function') switchMenu('today');
             } else {
                 showMessage("Gagal ACC: " + (res.message || "Unknown error"));
             }
