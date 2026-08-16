@@ -958,7 +958,7 @@
         return `<tr class="border-b border-slate-50 group hover:bg-blue-50 transition-colors cursor-pointer" onclick="openBookingDetailModal('${safeId}', ${showAccBtn})">
             <td class="py-3 px-4 font-black text-xs text-blue-900 whitespace-nowrap">${b.bookingId}</td>
             <td class="py-3 px-4 font-bold text-xs text-slate-800 uppercase truncate max-w-[120px]">${b.name}</td>
-            <td class="py-3 px-4 font-bold text-xs text-slate-600 truncate max-w-[120px]">${tujuan}</td>
+            <td class="py-3 px-4 font-bold text-[10px] text-slate-500 truncate max-w-[150px]" title="${b.alamat || '-'}">${b.alamat || '-'}</td>\n            <td class="py-3 px-4 font-bold text-xs text-slate-600 truncate max-w-[120px]">${tujuan}</td>
             <td class="py-3 px-4 font-black text-xs text-slate-800 text-right whitespace-nowrap">${formatRupiah(total)}</td>
             <td class="py-3 px-4 text-center"><span class="inline-block px-2 py-1 rounded text-[9px] font-black ${badgeClass}">${badgeText}</span></td>
         </tr>`;
@@ -4516,6 +4516,9 @@ async function renderPelanggan(resetPage = false) {
                     </td>
                     <td class="p-4">
                         <span class="font-semibold text-slate-600 text-sm"><i class="fab fa-whatsapp text-emerald-500 mr-2"></i>${p.nomorHp}</span>
+                    </td>
+                    <td class="p-4">
+                        <span class="font-semibold text-slate-500 text-sm truncate max-w-[150px] inline-block" title="${p.alamat || '-'}">${p.alamat || '-'}</span>
                     </td>
                     <td class="p-4 text-center">
                         <span class="inline-flex items-center justify-center px-2 py-1 rounded-lg bg-blue-50 text-blue-600 text-xs font-black">${p.totalBooking} Order</span>
