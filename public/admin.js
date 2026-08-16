@@ -1871,7 +1871,7 @@
         const sortedTimes = Object.keys(groupedBookings).sort();
 
         if (format === 'csv') {
-            let csv = 'ID Tiket,Jam,Armada,Tujuan,Nama Penumpang,No HP,Jml,Kursi,Status,Ket\n';
+            let csv = 'ID Tiket,Armada,Tujuan,Nama Penumpang,Jml,Kursi,Status,Ket\n';
             
             sortedTimes.forEach(time => {
                 const groupData = groupedBookings[time];
@@ -1880,17 +1880,17 @@
                     const tujuan = b.armadaId !== 'UNKNOWN' && getArmada(b.armadaId) ? getArmada(b.armadaId).destination : (b.tujuan || b['Tujuan'] || '-');
                     const id = b.bookingId || b.id || '-';
                     const nama = b.name || b['NAMA'] || '-';
-                    const hp = b.hp || b['NOMOR HP'] || '-';
+
                     const jml = b.qty || b['JUMLAH PNP'] || 1;
                     const kursi = b.kursi || '-';
                     const status = b.status || '-';
                     const ket = b.keterangan || b['Keterangan'] || b['KETERANGAN'] || '';
                     
-                    csv += `"${id}","${time}","${armadaName}","${tujuan}","${nama}","${hp}","${jml}","${kursi}","${status}","${ket}"\n`;
+                    csv += `"${id}","${armadaName}","${tujuan}","${nama}","${jml}","${kursi}","${status}","${ket}"\n`;
                 });
                 
                 const groupTotalPnp = groupData.reduce((sum, b) => sum + (parseInt(b.qty || b['JUMLAH PNP']) || 1), 0);
-                csv += `,,,,"TOTAL PENUMPANG JAM ${time}",,"${groupTotalPnp}",,,\n\n`;
+                csv += `,,,"TOTAL PENUMPANG JAM ${time}","${groupTotalPnp}",,,\n\n`;
             });
 
             const blob = new Blob([csv], { type: 'text/csv' });
@@ -1913,7 +1913,7 @@
 
             const generateManifestPdf = async () => {
                 const { jsPDF } = window.jspdf;
-                const doc = new jsPDF('l', 'mm', 'a4'); // Landscape A4
+                const doc = new jsPDF('p', 'mm', 'a4'); // Portrait A4
                 
                 let titleX = 14;
                 try {
@@ -1946,7 +1946,7 @@
 
                 doc.setLineWidth(0.5);
                 doc.setDrawColor(200, 200, 200);
-                doc.line(14, 40, 283, 40);
+                doc.line(14, 40, 196, 40);
             
                 let currentY = 45;
 
@@ -1956,18 +1956,15 @@
                         const armadaName = b.armadaId !== 'UNKNOWN' && getArmada(b.armadaId) ? getArmada(b.armadaId).name : (b.kendaraan || b['JENIS KENDARAAN'] || '-');
                         const tujuan = b.armadaId !== 'UNKNOWN' && getArmada(b.armadaId) ? getArmada(b.armadaId).destination : (b.tujuan || b['Tujuan'] || '-');
                         const nama = b.name || b['NAMA'] || '-';
-                        const hp = b.hp || b['NOMOR HP'] || '-';
                         const jml = b.qty || b['JUMLAH PNP'] || 1;
                         const kursi = b.kursi || '-';
                         const ket = b.keterangan || b['Keterangan'] || b['KETERANGAN'] || '';
                         
                         return [
                             i + 1,
-                            time,
                             armadaName,
                             tujuan,
                             nama,
-                            hp,
                             jml,
                             kursi,
                             ket
@@ -1976,21 +1973,19 @@
 
                     doc.autoTable({
                         startY: currentY,
-                        head: [['No', 'Jam', 'Armada', 'Tujuan', 'Nama Penumpang', 'No HP', 'Jml', 'Kursi', 'Ket']],
+                        head: [['No', 'Armada', 'Tujuan', 'Nama Penumpang', 'Jml', 'Kursi', 'Ket']],
                         body: tableData,
                         theme: 'grid',
                         headStyles: { fillColor: [37, 99, 235], textColor: 255, fontStyle: 'bold' },
                         styles: { fontSize: 9, cellPadding: 3 },
                         columnStyles: {
                             0: { cellWidth: 10, halign: 'center' },
-                            1: { cellWidth: 15, halign: 'center' },
-                            2: { cellWidth: 40 },
-                            3: { cellWidth: 40 },
-                            4: { cellWidth: 55 },
-                            5: { cellWidth: 40 },
-                            6: { cellWidth: 12, halign: 'center' },
-                            7: { cellWidth: 20, halign: 'center' },
-                            8: { cellWidth: 'auto' }
+                            1: { cellWidth: 35 },
+                            2: { cellWidth: 35 },
+                            3: { cellWidth: 45 },
+                            4: { cellWidth: 10, halign: 'center' },
+                            5: { cellWidth: 15, halign: 'center' },
+                            6: { cellWidth: 'auto' }
                         },
                         margin: { bottom: 20 }
                     });
