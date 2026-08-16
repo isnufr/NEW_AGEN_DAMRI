@@ -4441,10 +4441,12 @@ async function searchPelanggan(query, formType, targetField) {
                 data.data.forEach(p => {
                     const div = document.createElement('div');
                     div.className = 'p-3 hover:bg-blue-50 cursor-pointer border-b border-slate-100 last:border-b-0 transition-colors flex justify-between items-center';
+                    const badgeAlamat = (p.alamat && p.alamat !== '-' && p.alamat !== 'null') ? `<div class="text-[10px] text-blue-600 font-semibold mt-0.5 truncate max-w-[150px]"><i class="fas fa-map-marker-alt"></i> ${p.alamat}</div>` : '';
                     div.innerHTML = `
                         <div>
                             <div class="font-bold text-sm text-slate-800">${p.nama}</div>
                             <div class="text-xs text-slate-500">${p.nomorHp}</div>
+                            ${badgeAlamat}
                         </div>
                         <div class="text-[10px] bg-slate-100 px-2 py-1 rounded font-bold text-slate-400">
                             ${p.totalBooking} Booking
@@ -4454,7 +4456,7 @@ async function searchPelanggan(query, formType, targetField) {
                         if (formType === 'booking') {
                             document.getElementById('adminBookingNama').value = p.nama;
                             document.getElementById('adminBookingHp').value = p.nomorHp;
-                            if (p.alamat && p.alamat !== '-') { document.getElementById('adminBookingAlamat').value = p.alamat; }
+                            document.getElementById('adminBookingAlamat').value = (p.alamat && p.alamat !== '-' && p.alamat !== 'null') ? p.alamat : '';
                             document.getElementById('autocompleteNamaBooking').classList.add('hidden');
                             document.getElementById('autocompleteHpBooking').classList.add('hidden');
                         } else {
