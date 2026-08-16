@@ -4620,7 +4620,7 @@ async function submitEditPelanggan() {
     const hp = document.getElementById('editPelangganHpOld').value;
     const newNama = document.getElementById('editPelangganNama').value.trim();
     const newAlamat = document.getElementById('editPelangganAlamat').value.trim();
-    if (!newNama) return alert('Nama tidak boleh kosong');
+    if (!newNama) return Swal.fire({ icon: 'error', title: 'Oops...', text: 'Nama tidak boleh kosong' });
     
     try {
         const res = await fetch('/api', {
@@ -4635,38 +4635,62 @@ async function submitEditPelanggan() {
         if (data.status === 'success') {
             closeEditPelangganModal();
             renderPelanggan();
-            showNotification('Berhasil', 'Nama pelanggan telah diperbarui.', 'success');
+            Swal.fire({
+                icon: 'success',
+                title: 'Berhasil',
+                text: 'Data pelanggan telah diperbarui!',
+                timer: 2000,
+                showConfirmButton: false
+            });
         } else {
-            alert('Gagal: ' + data.message);
+            Swal.fire({ icon: 'error', title: 'Gagal', text: data.message });
         }
     } catch (err) {
         console.error(err);
-        alert('Terjadi kesalahan server');
+        Swal.fire({ icon: 'error', title: 'Kesalahan Server', text: 'Gagal menyambung ke server' });
     }
 }
 
-async function deletePelanggan(hp) {
-    if (!confirm('Hapus pelanggan ini dari daftar kontak? (Tenang, riwayat pesanan sebelumnya TIDAK akan terhapus)')) return;
-    try {
-        const res = await fetch('/api', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': 'Bearer ' + localStorage.getItem('adminToken')
-            },
-            body: JSON.stringify({ action: 'deletePelanggan', payload: { nomorHp: hp } })
-        });
-        const data = await res.json();
-        if (data.status === 'success') {
-            renderPelanggan();
-            showNotification('Terhapus', 'Pelanggan berhasil dihapus dari daftar kontak.', 'success');
-        } else {
-            alert('Gagal menghapus: ' + data.message);
+function deletePelanggan(hp) {
+    Swal.fire({
+        title: 'Hapus Pelanggan?',
+        text: 'Riwayat pesanan orang ini TIDAK akan terhapus.',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#ef4444',
+        cancelButtonColor: '#64748b',
+        confirmButtonText: 'Ya, Hapus!',
+        cancelButtonText: 'Batal'
+    }).then(async (result) => {
+        if (result.isConfirmed) {
+            try {
+                const res = await fetch('/api', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + localStorage.getItem('adminToken')
+                    },
+                    body: JSON.stringify({ action: 'deletePelanggan', payload: { nomorHp: hp } })
+                });
+                const data = await res.json();
+                if (data.status === 'success') {
+                    renderPelanggan();
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Terhapus!',
+                        text: 'Pelanggan berhasil dihapus dari kontak.',
+                        timer: 2000,
+                        showConfirmButton: false
+                    });
+                } else {
+                    Swal.fire({ icon: 'error', title: 'Gagal', text: data.message });
+                }
+            } catch(err) {
+                console.error(err);
+                Swal.fire({ icon: 'error', title: 'Kesalahan Server', text: 'Gagal menyambung ke server' });
+            }
         }
-    } catch(err) {
-        console.error(err);
-        alert('Terjadi kesalahan server');
-    }
+    });
 }
 
 function exportPelangganCSV() {
