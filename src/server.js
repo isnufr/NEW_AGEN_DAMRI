@@ -417,6 +417,7 @@ app.post('/api', async (req, res) => {
                     waktu: payload['WAKTU'],
                     nomorKursi: payload['NOMOR KURSI'] || '',
                     keterangan: payload['KETERANGAN'] || payload['Keterangan'] || payload['keterangan'] || '',
+                    alamat: payload['ALAMAT'] || payload['alamat'] || '-',
                     totalHarga: totalHarga,
                     pembayaran: payload['PEMBAYARAN'] || 'CASH',
                     status: payload['Status'] ? payload['Status'] : (payload['PEMBAYARAN'] === 'LUNAS' || payload['PEMBAYARAN'] === 'ACC' ? 'LUNAS' : 'WAITING'),
@@ -427,7 +428,7 @@ app.post('/api', async (req, res) => {
             
             // Upsert pelanggan
             payload['NOMOR HP'] = normalizeHp(payload['NOMOR HP']);
-            await upsertPelanggan(payload['NOMOR HP'], payload['NAMA']);
+            await upsertPelanggan(payload['NOMOR HP'], payload['NAMA'], payload['ALAMAT'] || payload['alamat']);
             
             return res.json({ status: 'success', message: 'Booking berhasil', data: newBooking });
         }

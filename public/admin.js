@@ -2772,6 +2772,7 @@
         document.getElementById('editBookingIdDisplay').innerText = b.bookingId;
         document.getElementById('editBookingNama').value = b.name;
         document.getElementById('editBookingHp').value = b.hp;
+        document.getElementById('editBookingAlamat').value = b.alamat && b.alamat !== '-' ? b.alamat : '';
         
         let rawKet = String(b.keterangan || b.ket || '');
         const mKet = rawKet.match(/Biaya Tambahan: (.*?) \((Rp[ \d.,]+)\)/);
@@ -3034,6 +3035,7 @@
             id_tiket: id,
             nama: document.getElementById('editBookingNama').value,
             hp: document.getElementById('editBookingHp').value,
+            alamat: document.getElementById('editBookingAlamat').value,
             keterangan: finalKet,
             tanggalPemberangkatan: formattedDate,
             jenisKendaraan: armada ? armada.name : '',
@@ -3242,6 +3244,7 @@
         const hp = document.getElementById('adminBookingHp').value;
         const name = document.getElementById('adminBookingNama').value;
         const ket = document.getElementById('adminBookingKeterangan').value;
+        const alamat = document.getElementById('adminBookingAlamat').value;
         
         const hasBiayaTambahan = document.querySelector('input[name="adminBookingHasBiayaTambahan"]:checked').value === 'yes';
         const nominalBiayaTambahan = hasBiayaTambahan ? (parseInt(document.getElementById('adminBookingBiayaTambahanNominal').value) || 0) : 0;
@@ -3324,6 +3327,7 @@
             'PEMBAYARAN': 'CASH',
             'Status': statusPay,
             'Keterangan': finalKet,
+            'ALAMAT': alamat,
             'Biaya Tambahan': nominalBiayaTambahan,
             'NOMOR KURSI': kursiString,
             'Total Harga': total

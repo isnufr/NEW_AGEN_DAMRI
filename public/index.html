@@ -567,6 +567,11 @@
                             <input type="number" id="bookJumlah" min="1" value="1" oninput="calculateBookingTotal()"
                                 class="w-full p-3 md:p-4 bg-gray-50 rounded-xl md:rounded-2xl font-black text-gray-700 focus:outline-none form-input-focus text-center text-sm md:text-base">
                         </div>
+                        <div class="md:col-span-2">
+                            <label class="input-label">Alamat Lengkap / Detail Jemput</label>
+                            <input type="text" id="bookAlamat" placeholder="Contoh: Jl. Merdeka No. 10 (Opsional)"
+                                class="w-full p-3 md:p-4 bg-gray-50 rounded-xl md:rounded-2xl font-bold text-gray-700 focus:outline-none form-input-focus text-xs md:text-sm">
+                        </div>
 
                     </div>
                 </div>
@@ -1618,6 +1623,7 @@
 
     async function submitBooking() {
         const a = document.getElementById('bookArmada').value, w = document.getElementById('bookWaktu').value, d = document.getElementById('bookTanggal').value, n = document.getElementById('bookNama').value, h = document.getElementById('bookHp').value, j = document.getElementById('bookJumlah').value, k = document.getElementById('bookKeterangan').value, tot = document.getElementById('bookTotalBayar').value, mb = document.getElementById('bookMetodeBayar').value;
+        const alamat = document.getElementById('bookAlamat').value;
         let t = document.getElementById('bookTujuan').value;
         const tipePerjalanan = document.querySelector('input[name="bookTipePerjalanan"]:checked').value;
 
@@ -1644,7 +1650,7 @@
         else if (mb === "Saldo Dana") rekInfo = " (Dana: 082133607759 a.n ISNU FADKHUL ROIS)";
 
         const fd = new Date(d).toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
-        let msg = `Halo Admin Agen Damri Kawunganten,\nsaya ingin boking tiket:\n\n*ID Booking:* ${bookingId}\n*Armada:* ${a}\n*Tujuan:* ${t}\n*Tanggal:* ${fd}\n*Waktu:* ${w}\n\n*Nama:* ${n}\n*HP:* ${h}\n\n*Jumlah Penumpang:* ${j} orang\n*Total Bayar:* ${tot}\n*Metode Pembayaran:* ${mb}${rekInfo}\n\n`;
+        let msg = `Halo Admin Agen Damri Kawunganten,\nsaya ingin boking tiket:\n\n*ID Booking:* ${bookingId}\n*Armada:* ${a}\n*Tujuan:* ${t}\n*Tanggal:* ${fd}\n*Waktu:* ${w}\n\n*Nama:* ${n}\n*HP:* ${h}\n*Alamat:* ${alamat || '-'}\n\n*Jumlah Penumpang:* ${j} orang\n*Total Bayar:* ${tot}\n*Metode Pembayaran:* ${mb}${rekInfo}\n\n`;
         if (k.trim()) msg += `*Notes:* ${k}\n`;
 
         // POST Data ke Database
@@ -1662,6 +1668,7 @@
             "WAKTU": w,
             "NOMOR KURSI": "",
             "KETERANGAN": k,
+            "ALAMAT": alamat || "-",
             "Harga": parseInt(document.getElementById('bookHargaSatuan').value.replace(/[^0-9]/g, '')) || 0,
             "Total Harga": numericTotal,
             "PEMBAYARAN": mb,
