@@ -4601,10 +4601,13 @@ async function submitEditPelanggan() {
     if (!newNama) return alert('Nama tidak boleh kosong');
     
     try {
-        const res = await fetch('/api?action=editPelanggan', {
+        const res = await fetch('/api', {
             method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({ nomorHp: hp, namaBaru: newNama, alamatBaru: newAlamat })
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + localStorage.getItem('adminToken')
+            },
+            body: JSON.stringify({ action: 'editPelanggan', payload: { nomorHp: hp, namaBaru: newNama, alamatBaru: newAlamat } })
         });
         const data = await res.json();
         if (data.status === 'success') {
@@ -4623,10 +4626,13 @@ async function submitEditPelanggan() {
 async function deletePelanggan(hp) {
     if (!confirm('Hapus pelanggan ini dari daftar kontak? (Tenang, riwayat pesanan sebelumnya TIDAK akan terhapus)')) return;
     try {
-        const res = await fetch('/api?action=deletePelanggan', {
+        const res = await fetch('/api', {
             method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({ nomorHp: hp })
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + localStorage.getItem('adminToken')
+            },
+            body: JSON.stringify({ action: 'deletePelanggan', payload: { nomorHp: hp } })
         });
         const data = await res.json();
         if (data.status === 'success') {
