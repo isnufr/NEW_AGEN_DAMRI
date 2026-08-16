@@ -4389,11 +4389,17 @@ function updateChartColors(isDark) {
         btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> SEGARKAN...'; 
         btn.disabled = true;
         
-        await refreshData();
+        try {
+            if ('serviceWorker' in navigator) {
+                const registrations = await navigator.serviceWorker.getRegistrations();
+                for (let registration of registrations) {
+                    await registration.unregister();
+                }
+            }
+        } catch(e) { console.error(e); }
         
-        btn.innerHTML = 'Segarkan'; 
-        btn.disabled = false;
-        closePromptRefresh();
+        // Force reload from server with cache busting
+        window.location.href = window.location.href.split('?')[0] + '?_t=' + Date.now();
     }
     
     // Export globally
