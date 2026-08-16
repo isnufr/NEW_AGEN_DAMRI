@@ -137,6 +137,7 @@ app.get('/api', async (req, res) => {
                 'WAKTU': booking.waktu,
                 'NOMOR KURSI': booking.nomorKursi,
                 'KETERANGAN': booking.keterangan,
+                'ALAMAT': booking.alamat,
                 'Total Harga': booking.totalHarga,
                 'PEMBAYARAN': booking.pembayaran,
                 'Status': booking.status
@@ -162,6 +163,7 @@ app.get('/api', async (req, res) => {
                 'WAKTU': b.waktu,
                 'NOMOR KURSI': b.nomorKursi,
                 'KETERANGAN': b.keterangan,
+                'ALAMAT': b.alamat,
                 'Total Harga': b.totalHarga,
                 'PEMBAYARAN': b.pembayaran,
                 'Status': b.status

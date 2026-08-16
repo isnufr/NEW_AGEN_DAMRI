@@ -183,6 +183,7 @@ async function initData() {
                     bookingId: b["ID_TIKET"] || "UNKNOWN",
                     name: b["NAMA"] || "Tanpa Nama",
                     hp: b["NOMOR HP"] || "-",
+                    alamat: b["ALAMAT"] || b["alamat"] || "-",
                     armadaId: armadaMatch ? armadaMatch.id : "UNKNOWN",
                     tujuan: bTujuan,
                     qty: parseInt(b["JUMLAH PNP"]) || 1,
