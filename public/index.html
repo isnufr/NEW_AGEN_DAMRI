@@ -1575,19 +1575,32 @@
                     // Cari idArmada yang cocok dengan Nama & Tujuan (mengabaikan jam)
                     const matchingArmadaIds = allArmadas
                         .filter(arm => arm.name === a && arm.destination === t)
-                        .map(arm => arm.id);
+                        .map(arm => String(arm.id));
                         
                     // Cari apakah ada harga khusus yang aktif untuk salah satu idArmada tersebut pada tanggal yang dipilih
-                    const selectedDate = new Date(d).getTime();
+                    const dateObj = new Date(d);
+                    dateObj.setHours(0, 0, 0, 0);
+                    const selectedDate = dateObj.getTime();
+                    
                     const activeHk = hkList.find(hk => {
-                        if (!matchingArmadaIds.includes(hk.idArmada)) return false;
-                        const start = new Date(hk.tanggalAwal).getTime();
-                        const end = new Date(hk.tanggalAkhir).getTime();
+                        const hkIdArmada = String(hk.idArmada || '');
+                        if (!matchingArmadaIds.includes(hkIdArmada)) return false;
+                        
+                        if (!hk.tanggalAwal || !hk.tanggalAkhir) return false;
+
+                        const startObj = new Date(hk.tanggalAwal);
+                        startObj.setHours(0, 0, 0, 0);
+                        const start = startObj.getTime();
+                        
+                        const endObj = new Date(hk.tanggalAkhir);
+                        endObj.setHours(23, 59, 59, 999);
+                        const end = endObj.getTime();
+
                         return selectedDate >= start && selectedDate <= end;
                     });
                     
                     if (activeHk) {
-                        finalHarga = parseInt(activeHk.hargaBaru) || rute.price;
+                        finalHarga = parseInt(String(activeHk.hargaBaru).replace(/[^0-9]/g, '')) || rute.price;
                     }
                 }
                 
