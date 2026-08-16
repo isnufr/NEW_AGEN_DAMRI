@@ -4528,7 +4528,7 @@ async function renderPelanggan(resetPage = false) {
                     </td>
                     <td class="p-4 text-center">
                         <div class="flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                            <button onclick="openEditPelangganModal('${p.nomorHp}', '${p.nama}')" class="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white flex items-center justify-center transition-colors" title="Edit Nama">
+                            <button onclick="openEditPelangganModal('${p.nomorHp}', '${p.nama.replace(/'/g, "\\'")}', '${(p.alamat || "").replace(/'/g, "\\'")}')" class="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white flex items-center justify-center transition-colors" title="Edit Nama">
                                 <i class="fas fa-edit text-sm"></i>
                             </button>
                             <button onclick="deletePelanggan('${p.nomorHp}')" class="w-8 h-8 rounded-lg bg-red-50 text-red-600 hover:bg-red-600 hover:text-white flex items-center justify-center transition-colors" title="Hapus Pelanggan">
@@ -4560,10 +4560,11 @@ function changePagePelanggan(delta) {
     renderPelanggan();
 }
 
-function openEditPelangganModal(hp, nama) {
+function openEditPelangganModal(hp, nama, alamat) {
     document.getElementById('editPelangganHpOld').value = hp;
     document.getElementById('editPelangganHp').value = hp;
     document.getElementById('editPelangganNama').value = nama;
+    document.getElementById('editPelangganAlamat').value = alamat && alamat !== '-' && alamat !== 'null' ? alamat : '';
     const modal = document.getElementById('modalEditPelanggan');
     const content = document.getElementById('modalEditPelangganContent');
     modal.classList.remove('hidden');
@@ -4590,13 +4591,14 @@ function closeEditPelangganModal() {
 async function submitEditPelanggan() {
     const hp = document.getElementById('editPelangganHpOld').value;
     const newNama = document.getElementById('editPelangganNama').value.trim();
+    const newAlamat = document.getElementById('editPelangganAlamat').value.trim();
     if (!newNama) return alert('Nama tidak boleh kosong');
     
     try {
         const res = await fetch('/api?action=editPelanggan', {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({ nomorHp: hp, namaBaru: newNama })
+            body: JSON.stringify({ nomorHp: hp, namaBaru: newNama, alamatBaru: newAlamat })
         });
         const data = await res.json();
         if (data.status === 'success') {
