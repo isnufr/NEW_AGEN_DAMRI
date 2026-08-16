@@ -108,7 +108,7 @@ app.get('/api', async (req, res) => {
     const action = req.query.action;
 
     try {
-        const publicActions = ['getArmada', 'getBookingById'];
+        const publicActions = ['getArmada', 'getBookingById', 'getPelangganTable'];
         if (!publicActions.includes(action) && !req.user) {
             return res.status(401).json({ status: 'error', message: 'Unauthorized' });
         }
@@ -239,6 +239,36 @@ app.get('/api', async (req, res) => {
             return res.json({ status: 'success', data: pelanggan });
         }
         
+        
+        if (action === 'getPelangganTable') {
+            const page = parseInt(req.query.page) || 1;
+            const limit = parseInt(req.query.limit) || 25;
+            const search = req.query.search || '';
+            
+            const whereClause = search ? {
+                OR: [
+                    { nama: { contains: search } },
+                    { nomorHp: { contains: search } }
+                ]
+            } : {};
+            
+            const total = await prisma.pelanggan.count({ where: whereClause });
+            const pelangganList = await prisma.pelanggan.findMany({
+                where: whereClause,
+                orderBy: { totalBooking: 'desc' },
+                skip: (page - 1) * limit,
+                take: limit
+            });
+            
+            return res.json({ 
+                status: 'success', 
+                data: pelangganList,
+                page: page,
+                totalPages: Math.ceil(total / limit) || 1,
+                totalItems: total
+            });
+        }
+
         if (action === 'cariPelanggan') {
             const q = req.query.q;
             if (!q || q.length < 2) return res.json({ status: 'success', data: [] });
@@ -260,6 +290,37 @@ app.get('/api', async (req, res) => {
     } catch (error) {
         console.error(error);
         return res.status(500).json({ status: 'error', message: 'Server error' });
+    }
+});
+
+
+app.get('/api/export-pelanggan', async (req, res) => {
+    try {
+        const token = req.query.token;
+        if (!token) return res.status(401).send('Unauthorized');
+        try {
+            jwt.verify(token, JWT_SECRET);
+        } catch(err) {
+            return res.status(401).send('Invalid token');
+        }
+
+        const pelanggan = await prisma.pelanggan.findMany({
+            orderBy: { totalBooking: 'desc' }
+        });
+        
+        let csvContent = 'Nama Pelanggan,Nomor HP,Total Booking,Terdaftar Sejak\n';
+        pelanggan.forEach(p => {
+            const date = new Date(p.createdAt).toLocaleDateString('id-ID');
+            const safeNama = (p.nama || '').replace(/"/g, '""');
+            csvContent += `"${safeNama}","${p.nomorHp}",${p.totalBooking},"${date}"\n`;
+        });
+        
+        res.setHeader('Content-Type', 'text/csv');
+        res.setHeader('Content-Disposition', 'attachment; filename="Data_Pelanggan_Loyal.csv"');
+        return res.send(csvContent);
+    } catch (err) {
+        console.error('Export Error:', err);
+        res.status(500).send('Failed to export pelanggan');
     }
 });
 
@@ -686,6 +747,24 @@ app.post('/api', async (req, res) => {
             }
             await prisma.admin.delete({ where: { id } });
             return res.json({ status: 'success', message: 'Admin berhasil dihapus' });
+        }
+
+        
+        if (action === 'editPelanggan') {
+            const { nomorHp, namaBaru } = payload;
+            await prisma.pelanggan.update({
+                where: { nomorHp: nomorHp },
+                data: { nama: namaBaru }
+            });
+            return res.json({ status: 'success', message: 'Nama pelanggan berhasil diubah' });
+        }
+
+        if (action === 'deletePelanggan') {
+            const { nomorHp } = payload;
+            await prisma.pelanggan.delete({
+                where: { nomorHp: nomorHp }
+            });
+            return res.json({ status: 'success', message: 'Pelanggan berhasil dihapus dari kontak' });
         }
 
         if (action === 'migratePelanggan') {

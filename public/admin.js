@@ -4482,3 +4482,163 @@ document.addEventListener('click', (e) => {
         }
     });
 });
+
+
+// ==========================================
+// DATA PELANGGAN LOGIC
+// ==========================================
+let pelangganData = [];
+let currentPagePelanggan = 1;
+const itemsPerPagePelanggan = 25;
+
+async function renderPelanggan(resetPage = false) {
+    if (resetPage) currentPagePelanggan = 1;
+    const search = document.getElementById('pelangganSearch').value;
+    
+    try {
+        const res = await fetch(`/api?action=getPelangganTable&search=${encodeURIComponent(search)}&page=${currentPagePelanggan}&limit=${itemsPerPagePelanggan}`);
+        const data = await res.json();
+        
+        const tbody = document.getElementById('pelangganTableBody');
+        tbody.innerHTML = '';
+        
+        if (data.status === 'success' && data.data.length > 0) {
+            data.data.forEach(p => {
+                const tr = document.createElement('tr');
+                tr.className = 'border-b border-slate-50 hover:bg-slate-50/50 transition-colors group';
+                tr.innerHTML = `
+                    <td class="p-4">
+                        <div class="flex items-center gap-3">
+                            <div class="w-8 h-8 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center font-bold text-xs shrink-0">${p.nama.charAt(0).toUpperCase()}</div>
+                            <span class="font-bold text-slate-700 text-sm">${p.nama}</span>
+                        </div>
+                    </td>
+                    <td class="p-4">
+                        <span class="font-semibold text-slate-600 text-sm"><i class="fab fa-whatsapp text-emerald-500 mr-2"></i>${p.nomorHp}</span>
+                    </td>
+                    <td class="p-4 text-center">
+                        <span class="inline-flex items-center justify-center px-2 py-1 rounded-lg bg-blue-50 text-blue-600 text-xs font-black">${p.totalBooking} Order</span>
+                    </td>
+                    <td class="p-4 text-center">
+                        <span class="text-xs font-semibold text-slate-500">${new Date(p.createdAt).toLocaleDateString('id-ID', {day: 'numeric', month: 'short', year: 'numeric'})}</span>
+                    </td>
+                    <td class="p-4 text-center">
+                        <div class="flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <button onclick="openEditPelangganModal('${p.nomorHp}', '${p.nama}')" class="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white flex items-center justify-center transition-colors" title="Edit Nama">
+                                <i class="fas fa-edit text-sm"></i>
+                            </button>
+                            <button onclick="deletePelanggan('${p.nomorHp}')" class="w-8 h-8 rounded-lg bg-red-50 text-red-600 hover:bg-red-600 hover:text-white flex items-center justify-center transition-colors" title="Hapus Pelanggan">
+                                <i class="fas fa-trash text-sm"></i>
+                            </button>
+                        </div>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+            
+            document.getElementById('pelangganPageInfo').textContent = `Halaman ${data.page} dari ${data.totalPages}`;
+            document.getElementById('btnPrevPelanggan').disabled = data.page <= 1;
+            document.getElementById('btnNextPelanggan').disabled = data.page >= data.totalPages;
+            
+        } else {
+            tbody.innerHTML = '<tr><td colspan="5" class="text-center py-8 text-slate-400 font-bold text-sm">Tidak ada data pelanggan.</td></tr>';
+            document.getElementById('pelangganPageInfo').textContent = 'Halaman 1 dari 1';
+            document.getElementById('btnPrevPelanggan').disabled = true;
+            document.getElementById('btnNextPelanggan').disabled = true;
+        }
+    } catch (err) {
+        console.error('Error load pelanggan:', err);
+    }
+}
+
+function changePagePelanggan(delta) {
+    currentPagePelanggan += delta;
+    renderPelanggan();
+}
+
+function openEditPelangganModal(hp, nama) {
+    document.getElementById('editPelangganHpOld').value = hp;
+    document.getElementById('editPelangganHp').value = hp;
+    document.getElementById('editPelangganNama').value = nama;
+    const modal = document.getElementById('modalEditPelanggan');
+    const content = document.getElementById('modalEditPelangganContent');
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+    setTimeout(() => {
+        modal.classList.remove('opacity-0');
+        content.classList.remove('scale-95');
+        content.classList.add('scale-100');
+    }, 10);
+}
+
+function closeEditPelangganModal() {
+    const modal = document.getElementById('modalEditPelanggan');
+    const content = document.getElementById('modalEditPelangganContent');
+    modal.classList.add('opacity-0');
+    content.classList.remove('scale-100');
+    content.classList.add('scale-95');
+    setTimeout(() => {
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+    }, 300);
+}
+
+async function submitEditPelanggan() {
+    const hp = document.getElementById('editPelangganHpOld').value;
+    const newNama = document.getElementById('editPelangganNama').value.trim();
+    if (!newNama) return alert('Nama tidak boleh kosong');
+    
+    try {
+        const res = await fetch('/api?action=editPelanggan', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ nomorHp: hp, namaBaru: newNama })
+        });
+        const data = await res.json();
+        if (data.status === 'success') {
+            closeEditPelangganModal();
+            renderPelanggan();
+            showNotification('Berhasil', 'Nama pelanggan telah diperbarui.', 'success');
+        } else {
+            alert('Gagal: ' + data.message);
+        }
+    } catch (err) {
+        console.error(err);
+        alert('Terjadi kesalahan server');
+    }
+}
+
+async function deletePelanggan(hp) {
+    if (!confirm('Hapus pelanggan ini dari daftar kontak? (Tenang, riwayat pesanan sebelumnya TIDAK akan terhapus)')) return;
+    try {
+        const res = await fetch('/api?action=deletePelanggan', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ nomorHp: hp })
+        });
+        const data = await res.json();
+        if (data.status === 'success') {
+            renderPelanggan();
+            showNotification('Terhapus', 'Pelanggan berhasil dihapus dari daftar kontak.', 'success');
+        } else {
+            alert('Gagal menghapus: ' + data.message);
+        }
+    } catch(err) {
+        console.error(err);
+        alert('Terjadi kesalahan server');
+    }
+}
+
+function exportPelangganCSV() {
+    window.location.href = `/api/export-pelanggan?token=${localStorage.getItem('adminToken')}`;
+}
+
+// Ensure renderPelanggan is called when menu switches to pelanggan
+const oldSwitchMenu = switchMenu;
+window.switchMenu = function(menuId) {
+    oldSwitchMenu(menuId);
+    if (menuId === 'pelanggan') {
+        renderPelanggan(true);
+    }
+};
+

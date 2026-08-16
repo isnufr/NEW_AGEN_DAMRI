@@ -80,6 +80,11 @@
                     <i class="fas fa-list-alt"></i>
                     <span>Daftar Pesanan</span>
                 </div>
+                <div class="nav-item" data-menu="pelanggan" onclick="switchMenu('pelanggan')">
+                    <i class="fas fa-address-book"></i>
+                    <span>Data Pelanggan</span>
+                </div>
+
                 <div class="nav-item" data-menu="armada" onclick="switchMenu('armada')">
                     <i class="fas fa-bus-alt"></i>
                     <span>Daftar Armada</span>
@@ -1567,6 +1572,40 @@
 
     <!-- Custom script for admin dashboard -->
     <script src="admin.js?v=2.24"></script>
+
+    <!-- Modal Edit Pelanggan -->
+    <div id="modalEditPelanggan" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-[70] hidden items-center justify-center transition-opacity duration-300 opacity-0 p-4">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden transform scale-95 transition-all duration-300" id="modalEditPelangganContent">
+            <div class="p-5 border-b border-slate-100 flex justify-between items-center bg-slate-50">
+                <h3 class="text-lg font-black text-slate-800 tracking-tight">Edit Nama Pelanggan</h3>
+                <button onclick="closeEditPelangganModal()" class="text-slate-400 hover:text-red-500 transition-colors w-8 h-8 flex items-center justify-center rounded-lg hover:bg-red-50">
+                    <i class="fas fa-times text-lg"></i>
+                </button>
+            </div>
+            <div class="p-5">
+                <input type="hidden" id="editPelangganHpOld">
+                
+                <div class="mb-4">
+                    <label class="block text-xs font-black text-slate-500 uppercase tracking-widest mb-2">Nomor HP</label>
+                    <input type="text" id="editPelangganHp" class="w-full bg-slate-100 border border-slate-200 rounded-xl px-4 py-3 text-sm font-bold text-slate-500 outline-none cursor-not-allowed" readonly disabled>
+                    <p class="text-[10px] text-slate-400 mt-1">*Nomor HP tidak dapat diubah (sebagai identitas primary)</p>
+                </div>
+
+                <div class="mb-4">
+                    <label class="block text-xs font-black text-slate-500 uppercase tracking-widest mb-2">Nama Pelanggan</label>
+                    <input type="text" id="editPelangganNama" class="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm font-bold text-slate-700 outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-200 transition-all shadow-sm">
+                </div>
+
+                <div class="flex gap-3 mt-6">
+                    <button onclick="closeEditPelangganModal()" class="flex-1 px-4 py-3 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-xl text-sm font-bold transition-colors">Batal</button>
+                    <button onclick="submitEditPelanggan()" class="flex-1 px-4 py-3 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-slate-900 rounded-xl text-sm font-black uppercase tracking-widest shadow-lg shadow-amber-500/30 transition-all">
+                        Simpan
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
 </body>
 <!-- Modal Confirm Refresh -->
 <div id="modalConfirmRefresh" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden items-center justify-center z-[60] p-4 opacity-0 transition-opacity duration-300">
