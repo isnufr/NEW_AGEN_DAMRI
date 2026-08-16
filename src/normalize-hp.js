@@ -38,7 +38,7 @@ async function main() {
         // Jika beda dengan yang lama, update
         if (normHp !== b.nomorHp) {
             await prisma.booking.update({
-                where: { id: b.id },
+                where: { bookingId: b.bookingId },
                 data: { nomorHp: normHp }
             });
             updatedBookings++;
