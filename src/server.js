@@ -715,15 +715,16 @@ app.post('/api', async (req, res) => {
     }
 });
 
+app.get('/api/migrate-pelanggan', async (req, res) => {
+    try {
+        const result = require('child_process').execSync('node src/migrate-pelanggan.js').toString();
+        res.json({status: 'success', message: 'Migration completed', log: result});
+
 app.use((req, res) => {
     res.sendFile(path.join(__dirname, '../public/index.html'));
 });
 
 
-app.get('/api/migrate-pelanggan', async (req, res) => {
-    try {
-        const result = require('child_process').execSync('node src/migrate-pelanggan.js').toString();
-        res.json({status: 'success', message: 'Migration completed', log: result});
     } catch (e) {
         res.status(500).json({status: 'error', message: e.message});
     }
