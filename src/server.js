@@ -109,7 +109,7 @@ app.get('/api', async (req, res) => {
     const action = req.query.action;
 
     try {
-        const publicActions = ['getArmada', 'getBookingById', 'getPelangganTable'];
+        const publicActions = ['getArmada', 'getBookingById', 'getPelangganTable', 'getHargaKhusus'];
         if (!publicActions.includes(action) && !req.user) {
             return res.status(401).json({ status: 'error', message: 'Unauthorized' });
         }
