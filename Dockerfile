@@ -1,25 +1,7 @@
 FROM node:20-slim
 
-ENV DEBIAN_FRONTEND=noninteractive
-
-# Install openssl for Prisma and dependencies for Puppeteer
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    openssl \
-    unzip \
-    fontconfig \
-    libnss3 \
-    libxss1 \
-    libasound2 \
-    libatk-bridge2.0-0 \
-    libgtk-3-0 \
-    libgbm1 \
-    libnss3-dev \
-    libgdk-pixbuf2.0-dev \
-    libgtk-3-dev \
-    libxss-dev \
-    ca-certificates \
-    fonts-liberation \
-    && rm -rf /var/lib/apt/lists/*
+# Install openssl for Prisma
+RUN apt-get update && apt-get install -y --no-install-recommends openssl ca-certificates && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 
