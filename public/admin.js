@@ -1861,21 +1861,36 @@
             return armadaA.localeCompare(armadaB);
         });
 
+            // Group bookings by time for both CSV and PDF
+        const groupedBookings = {};
+        filteredBookings.forEach(b => {
+            const waktu = b.waktu || b['WAKTU'] || '-';
+            if (!groupedBookings[waktu]) groupedBookings[waktu] = [];
+            groupedBookings[waktu].push(b);
+        });
+        const sortedTimes = Object.keys(groupedBookings).sort();
+
         if (format === 'csv') {
             let csv = 'ID Tiket,Jam,Armada,Tujuan,Nama Penumpang,No HP,Jml,Kursi,Status,Ket\n';
-            filteredBookings.forEach(b => {
-                const armadaName = b.armadaId !== 'UNKNOWN' && getArmada(b.armadaId) ? getArmada(b.armadaId).name : (b.kendaraan || b['JENIS KENDARAAN'] || '-');
-                const tujuan = b.armadaId !== 'UNKNOWN' && getArmada(b.armadaId) ? getArmada(b.armadaId).destination : (b.tujuan || b['Tujuan'] || '-');
-                const waktu = b.waktu || b['WAKTU'] || '-';
-                const id = b.bookingId || b.id || '-';
-                const nama = b.name || b['NAMA'] || '-';
-                const hp = b.hp || b['NOMOR HP'] || '-';
-                const jml = b.qty || b['JUMLAH PNP'] || 1;
-                const kursi = b.kursi || '-';
-                const status = b.status || '-';
-                const ket = b.keterangan || b['Keterangan'] || b['KETERANGAN'] || '';
+            
+            sortedTimes.forEach(time => {
+                const groupData = groupedBookings[time];
+                groupData.forEach(b => {
+                    const armadaName = b.armadaId !== 'UNKNOWN' && getArmada(b.armadaId) ? getArmada(b.armadaId).name : (b.kendaraan || b['JENIS KENDARAAN'] || '-');
+                    const tujuan = b.armadaId !== 'UNKNOWN' && getArmada(b.armadaId) ? getArmada(b.armadaId).destination : (b.tujuan || b['Tujuan'] || '-');
+                    const id = b.bookingId || b.id || '-';
+                    const nama = b.name || b['NAMA'] || '-';
+                    const hp = b.hp || b['NOMOR HP'] || '-';
+                    const jml = b.qty || b['JUMLAH PNP'] || 1;
+                    const kursi = b.kursi || '-';
+                    const status = b.status || '-';
+                    const ket = b.keterangan || b['Keterangan'] || b['KETERANGAN'] || '';
+                    
+                    csv += `"${id}","${time}","${armadaName}","${tujuan}","${nama}","${hp}","${jml}","${kursi}","${status}","${ket}"\n`;
+                });
                 
-                csv += `"${id}","${waktu}","${armadaName}","${tujuan}","${nama}","${hp}","${jml}","${kursi}","${status}","${ket}"\n`;
+                const groupTotalPnp = groupData.reduce((sum, b) => sum + (parseInt(b.qty || b['JUMLAH PNP']) || 1), 0);
+                csv += `,,,,"TOTAL PENUMPANG JAM ${time}",,"${groupTotalPnp}",,,\n\n`;
             });
 
             const blob = new Blob([csv], { type: 'text/csv' });
@@ -1933,55 +1948,64 @@
                 doc.setDrawColor(200, 200, 200);
                 doc.line(14, 40, 283, 40);
             
-            const tableData = filteredBookings.map((b, i) => {
-                const armadaName = b.armadaId !== 'UNKNOWN' && getArmada(b.armadaId) ? getArmada(b.armadaId).name : (b.kendaraan || b['JENIS KENDARAAN'] || '-');
-                const tujuan = b.armadaId !== 'UNKNOWN' && getArmada(b.armadaId) ? getArmada(b.armadaId).destination : (b.tujuan || b['Tujuan'] || '-');
-                const waktu = b.waktu || b['WAKTU'] || '-';
-                const nama = b.name || b['NAMA'] || '-';
-                const hp = b.hp || b['NOMOR HP'] || '-';
-                const jml = b.qty || b['JUMLAH PNP'] || 1;
-                const kursi = b.kursi || '-';
-                const ket = b.keterangan || b['Keterangan'] || b['KETERANGAN'] || '';
-                
-                return [
-                    i + 1,
-                    waktu,
-                    armadaName,
-                    tujuan,
-                    nama,
-                    hp,
-                    jml,
-                    kursi,
-                    ket
-                ];
-            });
+                let currentY = 45;
 
-            doc.autoTable({
-                startY: 45,
-                head: [['No', 'Jam', 'Armada', 'Tujuan', 'Nama Penumpang', 'No HP', 'Jml', 'Kursi', 'Ket']],
-                body: tableData,
-                theme: 'grid',
-                headStyles: { fillColor: [37, 99, 235], textColor: 255, fontStyle: 'bold' },
-                styles: { fontSize: 9, cellPadding: 3 },
-                columnStyles: {
-                    0: { cellWidth: 10, halign: 'center' },
-                    1: { cellWidth: 15, halign: 'center' },
-                    2: { cellWidth: 40 },
-                    3: { cellWidth: 40 },
-                    4: { cellWidth: 55 },
-                    5: { cellWidth: 40 },
-                    6: { cellWidth: 12, halign: 'center' },
-                    7: { cellWidth: 20, halign: 'center' },
-                    8: { cellWidth: 'auto' }
-                }
-            });
-            
-            const totalPnp = filteredBookings.reduce((sum, b) => sum + (parseInt(b.qty || b['JUMLAH PNP']) || 1), 0);
-            doc.setFontSize(11);
-            doc.setFont("helvetica", "bold");
-            doc.text(`Total Penumpang: ${totalPnp} Orang`, 14, doc.lastAutoTable.finalY + 10);
+                sortedTimes.forEach((time, groupIndex) => {
+                    const groupData = groupedBookings[time];
+                    const tableData = groupData.map((b, i) => {
+                        const armadaName = b.armadaId !== 'UNKNOWN' && getArmada(b.armadaId) ? getArmada(b.armadaId).name : (b.kendaraan || b['JENIS KENDARAAN'] || '-');
+                        const tujuan = b.armadaId !== 'UNKNOWN' && getArmada(b.armadaId) ? getArmada(b.armadaId).destination : (b.tujuan || b['Tujuan'] || '-');
+                        const nama = b.name || b['NAMA'] || '-';
+                        const hp = b.hp || b['NOMOR HP'] || '-';
+                        const jml = b.qty || b['JUMLAH PNP'] || 1;
+                        const kursi = b.kursi || '-';
+                        const ket = b.keterangan || b['Keterangan'] || b['KETERANGAN'] || '';
+                        
+                        return [
+                            i + 1,
+                            time,
+                            armadaName,
+                            tujuan,
+                            nama,
+                            hp,
+                            jml,
+                            kursi,
+                            ket
+                        ];
+                    });
 
-            doc.save(`Manifest_${selectedDate}.pdf`);
+                    doc.autoTable({
+                        startY: currentY,
+                        head: [['No', 'Jam', 'Armada', 'Tujuan', 'Nama Penumpang', 'No HP', 'Jml', 'Kursi', 'Ket']],
+                        body: tableData,
+                        theme: 'grid',
+                        headStyles: { fillColor: [37, 99, 235], textColor: 255, fontStyle: 'bold' },
+                        styles: { fontSize: 9, cellPadding: 3 },
+                        columnStyles: {
+                            0: { cellWidth: 10, halign: 'center' },
+                            1: { cellWidth: 15, halign: 'center' },
+                            2: { cellWidth: 40 },
+                            3: { cellWidth: 40 },
+                            4: { cellWidth: 55 },
+                            5: { cellWidth: 40 },
+                            6: { cellWidth: 12, halign: 'center' },
+                            7: { cellWidth: 20, halign: 'center' },
+                            8: { cellWidth: 'auto' }
+                        },
+                        margin: { bottom: 20 }
+                    });
+                    
+                    const groupTotalPnp = groupData.reduce((sum, b) => sum + (parseInt(b.qty || b['JUMLAH PNP']) || 1), 0);
+                    doc.setFontSize(11);
+                    doc.setFont("helvetica", "bold");
+                    doc.setTextColor(0, 0, 0);
+                    currentY = doc.lastAutoTable.finalY + 8;
+                    doc.text(`Total Penumpang Jam ${time}: ${groupTotalPnp} Orang`, 14, currentY);
+                    
+                    currentY += 12; // Extra spacing for the next table
+                });
+
+                doc.save(`Manifest_${selectedDate}.pdf`);
             };
             generateManifestPdf();
         }
