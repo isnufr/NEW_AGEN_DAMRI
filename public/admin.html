@@ -1361,8 +1361,8 @@
 </div>
 
 <!-- Modal Edit Armada -->
-<div id="modalEditArmada" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden items-center justify-center p-4" style="z-index: 9999;">
-    <div class="bg-white rounded-3xl p-6 w-full max-w-md shadow-2xl transform scale-95 transition-transform duration-300 relative max-h-[90dvh] overflow-y-auto" id="modalEditArmadaContent">
+<div id="modalEditArmada" class="fixed inset-0 bg-gray-900/40 backdrop-blur-sm z-[160] hidden items-center justify-center p-4">
+    <div class="bg-white rounded-3xl p-6 w-full max-w-md shadow-2xl transform scale-95 opacity-0 transition-all duration-300 relative max-h-[90vh] overflow-y-auto" id="modalEditArmadaContent">
         <div class="absolute top-4 right-4 w-10 h-10 bg-amber-500 rounded-full flex items-center justify-center text-white text-lg shadow-lg cursor-pointer hover:bg-amber-600 transition-colors z-10" onclick="closeEditArmadaModal()">
             <i class="fas fa-times"></i>
         </div>
@@ -1409,8 +1409,8 @@
 </div>
 
 <!-- Modal Tambah Armada -->
-<div id="modalAddArmada" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden items-center justify-center p-4" style="z-index: 9999;">
-    <div class="bg-white rounded-3xl p-6 w-full max-w-md shadow-2xl transform scale-95 transition-transform duration-300 relative max-h-[90dvh] overflow-y-auto" id="modalAddArmadaContent">
+<div id="modalAddArmada" class="fixed inset-0 bg-gray-900/40 backdrop-blur-sm z-[160] hidden items-center justify-center p-4">
+    <div class="bg-white rounded-3xl p-6 w-full max-w-md shadow-2xl transform scale-95 opacity-0 transition-all duration-300 relative max-h-[90vh] overflow-y-auto" id="modalAddArmadaContent">
         <div class="absolute top-4 right-4 w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center text-white text-lg shadow-lg cursor-pointer hover:bg-blue-600 transition-colors z-10" onclick="closeAddArmadaModal()">
             <i class="fas fa-times"></i>
         </div>
@@ -1505,7 +1505,7 @@
 </div>
 
     <!-- Modal Tambah/Edit Ekstra -->
-    <div id="ekstraModal" class="fixed inset-0 hidden items-start pt-10 pb-10 justify-center bg-slate-900/50 backdrop-blur-sm transition-opacity overflow-y-auto" style="z-index: 9999;">
+    <div id="ekstraModal" class="fixed inset-0 bg-gray-900/40 backdrop-blur-sm z-[160] hidden items-start pt-10 pb-10 justify-center overflow-y-auto p-4">
         <div id="ekstraModalInner" class="bg-white rounded-3xl shadow-2xl w-full max-w-lg overflow-hidden transform scale-95 opacity-0 transition-all duration-300 flex flex-col max-h-[90vh]">
             <div class="px-6 py-4 bg-slate-50 border-b border-slate-100 flex justify-between items-center sticky top-0 z-10 shrink-0">
                 <h3 id="ekstraModalTitle" class="text-lg font-black text-slate-800">Tambah Tiket Ekstra</h3>
@@ -1643,7 +1643,7 @@
     </div>
 
     <!-- Custom script for admin dashboard -->
-    <script src="admin.js?v=2.26"></script>
+    <script src="admin.js?v=2.27"></script>
 
     <!-- Modal Edit Pelanggan -->
     <div id="modalEditPelanggan" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-[70] hidden items-center justify-center transition-opacity duration-300 opacity-0 p-4">

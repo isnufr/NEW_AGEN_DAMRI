@@ -3084,13 +3084,17 @@
         const m = document.getElementById('modalEditArmada');
         const c = document.getElementById('modalEditArmadaContent');
         m.classList.remove('hidden'); m.classList.add('flex');
-        setTimeout(() => { c.classList.remove('scale-95'); }, 10);
+        setTimeout(() => {
+            c.classList.remove('scale-95', 'opacity-0');
+            c.classList.add('scale-100', 'opacity-100');
+        }, 10);
     }
 
     function closeEditArmadaModal() {
         const m = document.getElementById('modalEditArmada');
         const c = document.getElementById('modalEditArmadaContent');
-        m.classList.add('opacity-0'); c.classList.add('scale-95');
+        c.classList.remove('scale-100', 'opacity-100');
+        c.classList.add('scale-95', 'opacity-0');
         setTimeout(() => { m.classList.add('hidden'); m.classList.remove('flex'); }, 300);
     }
 
@@ -3121,7 +3125,8 @@
             showMessage('Kesalahan jaringan', true);
         }
         
-        btn.innerText = 'Simpan Perubahan'; btn.disabled = false;
+        btn.innerText = 'Simpan Perubahan';
+        btn.disabled = false;
     }
 
     // ========================================
@@ -3163,8 +3168,8 @@
         const c = document.getElementById('modalAddArmadaContent');
         m.classList.remove('hidden'); m.classList.add('flex');
         setTimeout(() => {
-            c.classList.remove('scale-95');
-            c.classList.add('scale-100');
+            c.classList.remove('scale-95', 'opacity-0');
+            c.classList.add('scale-100', 'opacity-100');
         }, 10);
         } catch (error) {
             Swal.fire('Error di openAddArmadaModal', error.message + '\n' + error.stack, 'error');
@@ -3174,8 +3179,8 @@
     function closeAddArmadaModal() {
         const m = document.getElementById('modalAddArmada');
         const c = document.getElementById('modalAddArmadaContent');
-        c.classList.remove('scale-100');
-        c.classList.add('scale-95');
+        c.classList.remove('scale-100', 'opacity-100');
+        c.classList.add('scale-95', 'opacity-0');
         setTimeout(() => { m.classList.add('hidden'); m.classList.remove('flex'); }, 300);
     }
 
