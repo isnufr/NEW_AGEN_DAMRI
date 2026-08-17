@@ -2387,7 +2387,7 @@
             keterangan: rawKet
         };
 
-        const ruteFullText = asalText + ' ➔ ' + tujuan;
+        const ruteFullText = asalText + ' ➁E' + tujuan;
 
         // Populate Thermal Receipt
         if(document.getElementById('r_tgl_beli')) document.getElementById('r_tgl_beli').innerText = 'TGL BELI: ' + tglBeli;
@@ -4130,11 +4130,11 @@ function updateChartColors(isDark) {
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mt-1">
                             <div>
                                 <label class="block text-[10px] font-bold text-slate-500 mb-1 uppercase">Nama</label>
-                                <input type="text" class="ekstra-nama-input w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/50" placeholder="Nama Penumpang" value="${namaVal}" required>
+                                <input type="text" class="ekstra-nama-input w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-base md:text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/50" placeholder="Nama Penumpang" value="${namaVal}" required>
                             </div>
                             <div>
                                 <label class="block text-[10px] font-bold text-slate-500 mb-1 uppercase">Harga Dasar (Rp)</label>
-                                <input type="number" class="ekstra-harga-input w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/50" placeholder="Harga Tiket" value="${hargaVal}" oninput="calculateEkstraTotal()" required>
+                                <input type="number" class="ekstra-harga-input w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-base md:text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/50" placeholder="Harga Tiket" value="${hargaVal}" oninput="calculateEkstraTotal()" required>
                             </div>
                         </div>
                     </div>
@@ -4779,4 +4779,5 @@ window.switchMenu = function(menuId) {
         renderPelanggan(true);
     }
 };
+
 

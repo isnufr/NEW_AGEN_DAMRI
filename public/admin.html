@@ -42,7 +42,7 @@
 </head>
 <body class="bg-[#f1f5f9] text-gray-800">
 
-    <div id="loadingOverlay" class="fixed inset-0 bg-white/90 backdrop-blur-sm z-[100] flex flex-col items-center justify-center transition-all duration-500">
+    <div id="loadingOverlay" class="fixed inset-0 bg-white/90  z-[100] flex flex-col items-center justify-center transition-all duration-500">
         <div class="w-20 h-20 border-4 border-amber-200 border-t-amber-600 rounded-full animate-spin mb-4"></div>
         <h2 class="text-xl font-black text-slate-900 tracking-tighter uppercase italic">MENSINKRONISASI DATA...</h2>
         <p class="text-sm font-bold text-gray-500 mt-2 animate-pulse">Menghubungkan ke Server Database</p>
@@ -344,7 +344,7 @@
                             </div>
                             <div class="flex flex-col sm:flex-row items-center gap-2 w-full sm:w-auto">
                                 <div class="flex w-full sm:w-auto gap-2">
-                                    <input type="date" id="manifestFilterDate" class="flex-1 sm:flex-none bg-slate-50 border border-slate-300 text-slate-700 text-sm font-bold rounded-xl px-3 py-2 outline-none focus:border-blue-500 transition-colors shadow-sm cursor-pointer" onchange="renderTodayTable()">
+                                    <input type="date" id="manifestFilterDate" class="flex-1 sm:flex-none bg-slate-50 border border-slate-300 text-slate-700 text-base md:text-sm font-bold rounded-xl px-3 py-2 outline-none focus:border-blue-500 transition-colors shadow-sm cursor-pointer" onchange="renderTodayTable()">
                                     <button onclick="resetManifestFilter()" class="bg-slate-100 text-slate-500 hover:bg-red-50 hover:text-red-500 px-3 py-2 rounded-xl text-sm font-bold transition-colors shadow-sm border border-slate-200 flex-shrink-0" title="Reset Filter">
                                         <i class="fas fa-sync-alt"></i>
                                     </button>
@@ -376,7 +376,7 @@
                     <div class="mb-4 flex flex-col md:flex-row md:items-center justify-between gap-4 bg-slate-50 p-4 rounded-2xl border border-slate-100">
                         <div class="flex-1 w-full relative">
                             <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
-                            <input type="text" id="pesananSearch" class="w-full bg-white border border-slate-200 rounded-xl pl-11 pr-4 py-2.5 text-sm font-bold text-slate-700 outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-200 transition-all shadow-sm" placeholder="Cari ID Tiket, Nama, atau Tanggal..." oninput="renderPesanan(true)">
+                            <input type="text" id="pesananSearch" class="w-full bg-white border border-slate-200 rounded-xl pl-11 pr-4 py-2.5 text-base md:text-sm font-bold text-slate-700 outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-200 transition-colors shadow-sm" placeholder="Cari ID Tiket, Nama, atau Tanggal..." oninput="renderPesanan(true)">
                         </div>
                         <div class="flex flex-wrap items-center gap-2">
 
@@ -437,7 +437,7 @@
                     <div class="mb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-slate-50 p-4 rounded-2xl border border-slate-100">
                         <div class="flex-1 w-full relative">
                             <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
-                            <input type="text" id="pelangganSearch" class="w-full bg-white border border-slate-200 rounded-xl pl-11 pr-4 py-2.5 text-sm font-bold text-slate-700 outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-200 transition-all shadow-sm" placeholder="Cari Nama atau Nomor HP..." oninput="renderPelanggan(true)">
+                            <input type="text" id="pelangganSearch" class="w-full bg-white border border-slate-200 rounded-xl pl-11 pr-4 py-2.5 text-base md:text-sm font-bold text-slate-700 outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-200 transition-colors shadow-sm" placeholder="Cari Nama atau Nomor HP..." oninput="renderPelanggan(true)">
                         </div>
                         <button onclick="document.getElementById('pelangganSearch').value=''; renderPelanggan(true);" class="text-xs font-bold text-slate-500 hover:text-amber-600 uppercase tracking-widest px-3 py-2 bg-white border border-slate-200 rounded-lg hover:border-amber-200 transition-all whitespace-nowrap shadow-sm">
                             <i class="fas fa-times mr-1"></i> Reset
@@ -495,7 +495,7 @@
                     <div class="mb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-slate-50 p-4 rounded-2xl border border-slate-100">
                         <div class="flex-1 w-full relative">
                             <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
-                            <input type="text" id="searchArmadaInput" class="w-full bg-white border border-slate-200 rounded-xl pl-11 pr-4 py-2.5 text-sm font-bold text-slate-700 outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-200 transition-all shadow-sm" placeholder="Cari nama armada atau tujuan..." oninput="renderArmada()">
+                            <input type="text" id="searchArmadaInput" class="w-full bg-white border border-slate-200 rounded-xl pl-11 pr-4 py-2.5 text-base md:text-sm font-bold text-slate-700 outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-200 transition-colors shadow-sm" placeholder="Cari nama armada atau tujuan..." oninput="renderArmada()">
                         </div>
                         <button onclick="document.getElementById('searchArmadaInput').value=''; renderArmada();" class="text-xs font-bold text-slate-500 hover:text-amber-600 uppercase tracking-widest px-3 py-2 bg-white border border-slate-200 rounded-lg hover:border-amber-200 transition-all whitespace-nowrap shadow-sm">
                             <i class="fas fa-times mr-1"></i> Reset Pencarian
@@ -576,7 +576,7 @@
                                 </div>
                                 <h3 class="text-lg font-black text-slate-800">Laporan Bulanan</h3>
                                 <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1 mb-4">Penghasilan & Statistik Bulanan</p>
-                                <input type="month" id="laporanBulanInput" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm font-bold text-slate-700 outline-none focus:border-blue-500 transition-colors shadow-sm mb-4">
+                                <input type="month" id="laporanBulanInput" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-base md:text-sm font-bold text-slate-700 outline-none focus:border-blue-500 transition-colors shadow-sm mb-4">
                                 <div class="flex gap-2 mt-auto">
                                     <button onclick="downloadReport('bulanan', 'pdf')" class="flex-1 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-[10px] font-black uppercase tracking-widest transition-colors flex items-center justify-center gap-1 shadow-md shadow-blue-200">
                                         <i class="fas fa-file-pdf"></i> PDF
@@ -683,11 +683,11 @@
                                 <!-- Filter Tanggal -->
                                 <div class="flex-1">
                                     <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">Pilih Tanggal</label>
-                                    <select id="customManifestDateType" class="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm font-bold text-slate-700 outline-none focus:border-blue-500 transition-all mb-2" onchange="toggleCustomManifestDate()">
+                                    <select id="customManifestDateType" class="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-base md:text-sm font-bold text-slate-700 outline-none focus:border-blue-500 transition-colors mb-2" onchange="toggleCustomManifestDate()">
                                         <option value="today">Hari Ini</option>
                                         <option value="custom">Tanggal Custom</option>
                                     </select>
-                                    <input type="date" id="customManifestDateVal" class="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm font-bold text-slate-700 outline-none focus:border-blue-500 transition-all hidden" onchange="populateCustomManifestFilters()">
+                                    <input type="date" id="customManifestDateVal" class="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-base md:text-sm font-bold text-slate-700 outline-none focus:border-blue-500 transition-colors hidden" onchange="populateCustomManifestFilters()">
                                 </div>
                                 
                                 <!-- Filter Armada -->
@@ -754,7 +754,7 @@
                 <!-- ======================= -->
                 <!-- BOOKING TIKET MODAL     -->
                 <!-- ======================= -->
-                <div id="bookingModal" class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm z-[140] hidden justify-center items-center p-4 lg:p-8 overflow-y-auto">
+                <div id="bookingModal" class="fixed inset-0 bg-gray-900/60  z-[140] hidden justify-center items-center p-4 lg:p-8 overflow-y-auto">
                     <div class="bg-white rounded-[2rem] p-6 shadow-2xl border border-slate-100 max-w-2xl w-full relative max-h-[90dvh] overflow-y-auto my-auto">
                           <div class="absolute top-4 right-4 w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center text-white text-lg shadow-lg cursor-pointer hover:bg-blue-600 transition-colors z-10" onclick="closeBookingModal()">
                               <i class="fas fa-times"></i>
@@ -776,7 +776,7 @@
                                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                                     <div>
                                         <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Tanggal</label>
-                                        <input type="date" id="adminBookingDate" class="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm font-bold text-slate-700 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all" onchange="recalcAdminBooking()" required>
+                                        <input type="date" id="adminBookingDate" class="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-base md:text-sm font-bold text-slate-700 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-colors" onchange="recalcAdminBooking()" required>
                                     </div>
                                     <div class="col-span-1 md:col-span-2">
                                         <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Tipe Perjalanan</label>
@@ -793,17 +793,17 @@
                                     </div>
                                     <div>
                                         <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Pilih Armada</label>
-                                        <select id="adminBookingArmadaName" class="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm font-bold text-slate-700 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all" onchange="updateAdminTime()" required>
+                                        <select id="adminBookingArmadaName" class="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-base md:text-sm font-bold text-slate-700 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-colors" onchange="updateAdminTime()" required>
                                         </select>
                                     </div>
                                     <div>
                                         <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Jam</label>
-                                        <select id="adminBookingTime" class="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm font-bold text-slate-700 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all" onchange="updateAdminRute()" required>
+                                        <select id="adminBookingTime" class="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-base md:text-sm font-bold text-slate-700 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-colors" onchange="updateAdminRute()" required>
                                         </select>
                                     </div>
                                     <div>
                                         <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1" id="adminLabelTujuan">Rute</label>
-                                        <select id="adminBookingArmada" class="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm font-bold text-slate-700 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all" onchange="recalcAdminBooking()" required>
+                                        <select id="adminBookingArmada" class="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-base md:text-sm font-bold text-slate-700 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-colors" onchange="recalcAdminBooking()" required>
                                         </select>
                                     </div>
                                 </div>
@@ -815,12 +815,12 @@
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <div class="relative">
                                         <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Nama Penumpang</label>
-                                        <input type="text" id="adminBookingNama" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-bold text-slate-700 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all" oninput="searchPelanggan(this.value, 'booking', 'nama')" autocomplete="off" required>
+                                        <input type="text" id="adminBookingNama" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-base md:text-sm font-bold text-slate-700 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-colors" oninput="searchPelanggan(this.value, 'booking', 'nama')" autocomplete="off" required>
                                         <div id="autocompleteNamaBooking" class="absolute z-50 w-full bg-white border border-slate-200 rounded-xl shadow-lg mt-1 hidden max-h-48 overflow-y-auto"></div>
                                     </div>
                                     <div class="relative">
                                         <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">No HP / WA</label>
-                                        <input type="tel" id="adminBookingHp" inputmode="numeric" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-bold text-slate-700 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all" oninput="searchPelanggan(this.value, 'booking', 'hp')" autocomplete="off" required>
+                                        <input type="tel" id="adminBookingHp" inputmode="numeric" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-base md:text-sm font-bold text-slate-700 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-colors" oninput="searchPelanggan(this.value, 'booking', 'hp')" autocomplete="off" required>
                                         <div id="autocompleteHpBooking" class="absolute z-50 w-full bg-white border border-slate-200 rounded-xl shadow-lg mt-1 hidden max-h-48 overflow-y-auto"></div>
                                     </div>
                                 </div>
@@ -830,21 +830,21 @@
                                           <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                                               <i class="fas fa-map-marker-alt text-slate-400 group-focus-within:text-blue-500 transition-colors"></i>
                                           </div>
-                                          <input type="text" id="adminBookingAlamat" class="w-full bg-slate-50 border border-slate-200 rounded-xl pl-11 pr-4 py-3 text-sm font-bold text-slate-700 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all" placeholder="Alamat atau detail jemput">
+                                          <input type="text" id="adminBookingAlamat" class="w-full bg-slate-50 border border-slate-200 rounded-xl pl-11 pr-4 py-3 text-base md:text-sm font-bold text-slate-700 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-colors" placeholder="Alamat atau detail jemput">
                                       </div>
                                   </div>
                                 <div>
                                     <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Jumlah PNP</label>
                                     <div class="flex items-center">
                                         <button type="button" onclick="document.getElementById('adminBookingPnp').stepDown(); recalcAdminBooking();" class="bg-slate-200 text-slate-700 font-bold px-4 py-3 rounded-l-xl hover:bg-slate-300 transition-colors active:scale-95">-</button>
-                                        <input type="number" id="adminBookingPnp" min="1" value="1" class="w-full bg-slate-50 border-y border-slate-200 px-4 py-3 text-sm font-bold text-slate-700 outline-none text-center focus:border-blue-500 focus:ring-0 transition-all appearance-none" oninput="recalcAdminBooking()" required style="-moz-appearance: textfield;">
+                                        <input type="number" id="adminBookingPnp" min="1" value="1" class="w-full bg-slate-50 border-y border-slate-200 px-4 py-3 text-base md:text-sm font-bold text-slate-700 outline-none text-center focus:border-blue-500 focus:ring-0 transition-colors appearance-none" oninput="recalcAdminBooking()" required style="-moz-appearance: textfield;">
                                         <button type="button" onclick="document.getElementById('adminBookingPnp').stepUp(); recalcAdminBooking();" class="bg-slate-200 text-slate-700 font-bold px-4 py-3 rounded-r-xl hover:bg-slate-300 transition-colors active:scale-95">+</button>
                                     </div>
                                 </div>
                                 <div id="adminBookingKursiContainer" class="mt-4"></div>
                                 <div class="mt-4">
                                     <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Keterangan (Opsional)</label>
-                                    <input type="text" id="adminBookingKeterangan" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-bold text-slate-700 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all" placeholder="Catatan tambahan...">
+                                    <input type="text" id="adminBookingKeterangan" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-base md:text-sm font-bold text-slate-700 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-colors" placeholder="Catatan tambahan...">
                                 </div>
                             </div>
 
@@ -870,11 +870,11 @@
                                 <div id="adminBookingBiayaTambahanContainer" class="hidden grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <div>
                                         <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Nominal Biaya Tambahan</label>
-                                        <input type="number" id="adminBookingBiayaTambahanNominal" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-bold text-slate-700 outline-none focus:border-blue-500 transition-all" value="0" oninput="recalcAdminBooking()">
+                                        <input type="number" id="adminBookingBiayaTambahanNominal" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-base md:text-sm font-bold text-slate-700 outline-none focus:border-blue-500 transition-colors" value="0" oninput="recalcAdminBooking()">
                                     </div>
                                     <div>
                                         <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Keterangan Biaya Tambahan</label>
-                                        <input type="text" id="adminBookingBiayaTambahanKet" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-bold text-slate-700 outline-none focus:border-blue-500 transition-all" placeholder="Contoh: Bagasi ekstra">
+                                        <input type="text" id="adminBookingBiayaTambahanKet" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-base md:text-sm font-bold text-slate-700 outline-none focus:border-blue-500 transition-colors" placeholder="Contoh: Bagasi ekstra">
                                     </div>
                                 </div>
                                 
@@ -990,7 +990,7 @@
     </div>
 
     <!-- AP3 Modal -->
-    <div id="ap3Modal" class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm z-[150] hidden items-center justify-center p-4">
+    <div id="ap3Modal" class="fixed inset-0 bg-gray-900/60  z-[150] hidden items-center justify-center p-4">
         <div class="bg-white rounded-[2rem] shadow-2xl w-full max-w-3xl transform scale-95 opacity-0 transition-all duration-300 overflow-hidden flex flex-col max-h-[90vh]" id="ap3ModalInner">
             <div class="bg-gradient-to-br from-amber-500 to-orange-600 p-6 text-center relative overflow-hidden shrink-0">
                 <h2 class="text-2xl font-black text-white tracking-tight drop-shadow-md">Form Laporan AP/3</h2>
@@ -1001,11 +1001,11 @@
                 <div class="grid grid-cols-2 gap-4 mb-6">
                     <div>
                         <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Bus Code</label>
-                        <input type="text" id="ap3BusCode" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm font-bold text-slate-800 focus:outline-none focus:border-amber-500" placeholder="Kode Bus (misal: S.7410.B)">
+                        <input type="text" id="ap3BusCode" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-base md:text-sm font-bold text-slate-800 focus:outline-none focus:border-amber-500" placeholder="Kode Bus (misal: S.7410.B)">
                     </div>
                     <div>
                         <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Nama Terang Crew (Kiri Bawah)</label>
-                        <input type="text" id="ap3Crew" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm font-bold text-slate-800 focus:outline-none focus:border-amber-500" placeholder="Penerima / Crew...">
+                        <input type="text" id="ap3Crew" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-base md:text-sm font-bold text-slate-800 focus:outline-none focus:border-amber-500" placeholder="Penerima / Crew...">
                     </div>
                 </div>
 
@@ -1045,7 +1045,7 @@
     </div>
 
     <!-- Confirm Modal -->
-    <div id="confirmModal" class="fixed inset-0 bg-gray-900/40 backdrop-blur-sm z-[160] hidden items-center justify-center p-4">
+    <div id="confirmModal" class="fixed inset-0 bg-gray-900/40  z-[160] hidden items-center justify-center p-4">
         <div class="bg-white rounded-3xl shadow-2xl p-6 md:p-8 w-full max-w-sm text-center transform scale-95 opacity-0 transition-all duration-300" id="confirmModalInner">
             <div class="w-16 h-16 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-4">
                 <i class="fas fa-question text-amber-600 text-3xl"></i>
@@ -1060,7 +1060,7 @@
     </div>
 
     <!-- Delete Modal -->
-    <div id="deleteModal" class="fixed inset-0 bg-gray-900/40 backdrop-blur-sm z-[160] hidden items-center justify-center p-4">
+    <div id="deleteModal" class="fixed inset-0 bg-gray-900/40  z-[160] hidden items-center justify-center p-4">
         <div class="bg-white rounded-3xl shadow-2xl p-6 md:p-8 w-full max-w-sm text-center transform scale-95 opacity-0 transition-all duration-300" id="deleteModalInner">
             <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
                 <i class="fas fa-trash-alt text-red-600 text-3xl"></i>
@@ -1075,7 +1075,7 @@
     </div>
 
     <!-- Harga Khusus Modal -->
-    <div id="hargaKhususModal" class="fixed inset-0 bg-gray-900/40 backdrop-blur-sm z-[160] hidden items-center justify-center p-4">
+    <div id="hargaKhususModal" class="fixed inset-0 bg-gray-900/40  z-[160] hidden items-center justify-center p-4">
         <div class="bg-white rounded-3xl shadow-2xl p-6 md:p-8 w-full max-w-2xl transform scale-95 opacity-0 transition-all duration-300 flex flex-col max-h-[90vh]" id="hargaKhususModalInner">
             <div class="flex items-center justify-between mb-4">
                 <div>
@@ -1094,17 +1094,17 @@
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3">
                         <div>
                             <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Dari Tanggal</label>
-                            <input type="date" id="hkTanggalAwal" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-sm font-bold text-slate-700 focus:border-amber-500 transition-colors shadow-sm outline-none">
+                            <input type="date" id="hkTanggalAwal" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-base md:text-sm font-bold text-slate-700 focus:border-amber-500 transition-colors shadow-sm outline-none">
                         </div>
                         <div>
                             <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Sampai Tanggal</label>
-                            <input type="date" id="hkTanggalAkhir" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-sm font-bold text-slate-700 focus:border-amber-500 transition-colors shadow-sm outline-none">
+                            <input type="date" id="hkTanggalAkhir" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-base md:text-sm font-bold text-slate-700 focus:border-amber-500 transition-colors shadow-sm outline-none">
                         </div>
                     </div>
 
                     <div class="mb-3">
                         <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Pilih Armada</label>
-                        <select id="hkPilihArmada" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-sm font-bold text-slate-700 focus:border-amber-500 transition-colors shadow-sm outline-none" onchange="hkOnArmadaChange()">
+                        <select id="hkPilihArmada" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-base md:text-sm font-bold text-slate-700 focus:border-amber-500 transition-colors shadow-sm outline-none" onchange="hkOnArmadaChange()">
                             <option value="">-- Pilih Armada --</option>
                         </select>
                     </div>
@@ -1118,7 +1118,7 @@
 
                     <div class="mb-4">
                         <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Harga Baru (Rp)</label>
-                        <input type="text" id="hkHargaBaru" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-sm font-black text-amber-600 focus:border-amber-500 transition-colors shadow-sm outline-none" placeholder="Contoh: 250000" oninput="formatInputRupiah(this)">
+                        <input type="text" id="hkHargaBaru" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-base md:text-sm font-black text-amber-600 focus:border-amber-500 transition-colors shadow-sm outline-none" placeholder="Contoh: 250000" oninput="formatInputRupiah(this)">
                     </div>
                     <button onclick="saveHargaKhusus()" id="btnSaveHargaKhusus" class="w-full py-2.5 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-slate-900 font-black text-xs uppercase tracking-widest rounded-xl shadow-lg shadow-amber-500/30 transition-all">SIMPAN HARGA</button>
                 </div>
@@ -1132,7 +1132,7 @@
     </div>
 
     <!-- Delete Armada Modal -->
-    <div id="deleteArmadaModal" class="fixed inset-0 bg-gray-900/40 backdrop-blur-sm z-[160] hidden items-center justify-center p-4">
+    <div id="deleteArmadaModal" class="fixed inset-0 bg-gray-900/40  z-[160] hidden items-center justify-center p-4">
         <div class="bg-white rounded-3xl shadow-2xl p-6 md:p-8 w-full max-w-sm text-center transform scale-95 opacity-0 transition-all duration-300" id="deleteArmadaModalInner">
             <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
                 <i class="fas fa-trash-alt text-red-600 text-3xl"></i>
@@ -1146,7 +1146,7 @@
         </div>
     </div>
     <!-- Notification Modal -->
-    <div id="notifModal" class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm z-[150] hidden items-center justify-center p-4">
+    <div id="notifModal" class="fixed inset-0 bg-gray-900/60  z-[150] hidden items-center justify-center p-4">
         <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[85vh] flex flex-col transform scale-95 opacity-0 transition-all duration-300" id="notifModalInner">
             <div class="p-6 flex items-center justify-between border-b border-slate-100">
                 <div>
@@ -1164,7 +1164,7 @@
     </div>
 
     <!-- E-Ticket Modal -->
-    <div id="ticketModal" class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm z-[150] hidden items-center justify-center p-4">
+    <div id="ticketModal" class="fixed inset-0 bg-gray-900/60  z-[150] hidden items-center justify-center p-4">
         <div class="bg-white rounded-xl shadow-2xl w-full max-w-sm max-h-[90vh] overflow-y-auto transform scale-95 opacity-0 transition-all duration-300 flex flex-col font-sans font-bold text-sm text-black border-2 border-gray-200" id="ticketModalInner">
             
             <!-- Ticket Body -->
@@ -1242,7 +1242,7 @@
 
 
 <!-- Modal Edit Booking -->
-<div id="modalEditBooking" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden items-center justify-center z-50 p-4 opacity-0 transition-opacity duration-300">
+<div id="modalEditBooking" class="fixed inset-0 bg-slate-900/60  hidden items-center justify-center z-50 p-4 opacity-0 transition-opacity duration-300">
     <div class="bg-white rounded-3xl p-6 w-full max-w-lg shadow-2xl transform scale-95 transition-transform duration-300 relative max-h-[90dvh] overflow-y-auto overflow-x-hidden" id="modalEditBookingContent">
         <div class="absolute top-4 right-4 w-10 h-10 bg-amber-500 rounded-full flex items-center justify-center text-white text-lg shadow-lg cursor-pointer hover:bg-amber-600 transition-colors z-10" onclick="closeEditBookingModal()">
             <i class="fas fa-times"></i>
@@ -1261,19 +1261,19 @@
             <input type="hidden" id="editBookingId">
             <div>
                 <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Nama</label>
-                <input type="text" id="editBookingNama" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-sm font-bold text-slate-700 outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-200 transition-all" required>
+                <input type="text" id="editBookingNama" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-base md:text-sm font-bold text-slate-700 outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-200 transition-colors" required>
             </div>
             <div>
                 <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">No HP / WA</label>
-                <input type="text" id="editBookingHp" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-sm font-bold text-slate-700 outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-200 transition-all" required>
+                <input type="text" id="editBookingHp" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-base md:text-sm font-bold text-slate-700 outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-200 transition-colors" required>
             </div>
             <div>
                 <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Alamat (Opsional)</label>
-                <input type="text" id="editBookingAlamat" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-sm font-bold text-slate-700 outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-200 transition-all" placeholder="Alamat lengkap (Opsional)">
+                <input type="text" id="editBookingAlamat" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-base md:text-sm font-bold text-slate-700 outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-200 transition-colors" placeholder="Alamat lengkap (Opsional)">
             </div>
             <div>
                   <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Keterangan</label>
-                  <input type="text" id="editBookingKeterangan" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-sm font-bold text-slate-700 outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-200 transition-all" placeholder="Contoh: Dekat kursi depan (Opsional)">
+                  <input type="text" id="editBookingKeterangan" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-base md:text-sm font-bold text-slate-700 outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-200 transition-colors" placeholder="Contoh: Dekat kursi depan (Opsional)">
               </div>
               
               <!-- Biaya Tambahan Toggle -->
@@ -1294,24 +1294,24 @@
               <div id="editBookingBiayaTambahanContainer" class="hidden grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
                       <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Nominal Tambahan</label>
-                      <input type="number" id="editBookingBiayaTambahanNominal" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-sm font-bold text-slate-700 outline-none focus:border-amber-500 transition-all" value="0" oninput="recalcEditBooking()">
+                      <input type="number" id="editBookingBiayaTambahanNominal" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-base md:text-sm font-bold text-slate-700 outline-none focus:border-amber-500 transition-colors" value="0" oninput="recalcEditBooking()">
                   </div>
                   <div>
                       <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Ket. Tambahan</label>
-                      <input type="text" id="editBookingBiayaTambahanKet" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-sm font-bold text-slate-700 outline-none focus:border-amber-500 transition-all" placeholder="Contoh: Bagasi">
+                      <input type="text" id="editBookingBiayaTambahanKet" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-base md:text-sm font-bold text-slate-700 outline-none focus:border-amber-500 transition-colors" placeholder="Contoh: Bagasi">
                   </div>
               </div>
 
               <div class="grid grid-cols-2 gap-3">
                 <div>
                     <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Tanggal</label>
-                    <input type="date" id="editBookingDate" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-sm font-bold text-slate-700 outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-200 transition-all" required>
+                    <input type="date" id="editBookingDate" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-base md:text-sm font-bold text-slate-700 outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-200 transition-colors" required>
                 </div>
                 <div>
                     <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Jumlah PNP</label>
                     <div class="flex items-center">
                         <button type="button" onclick="document.getElementById('editBookingPnp').stepDown(); recalcEditBooking();" class="bg-slate-200 text-slate-700 font-bold px-4 py-2 rounded-l-xl hover:bg-slate-300 transition-colors active:scale-95">-</button>
-                        <input type="number" id="editBookingPnp" min="1" class="w-full bg-slate-50 border-y border-slate-200 px-4 py-2 text-sm font-bold text-slate-700 outline-none text-center focus:border-amber-500 focus:ring-0 transition-all appearance-none" oninput="recalcEditBooking()" required style="-moz-appearance: textfield;">
+                        <input type="number" id="editBookingPnp" min="1" class="w-full bg-slate-50 border-y border-slate-200 px-4 py-2 text-base md:text-sm font-bold text-slate-700 outline-none text-center focus:border-amber-500 focus:ring-0 transition-colors appearance-none" oninput="recalcEditBooking()" required style="-moz-appearance: textfield;">
                         <button type="button" onclick="document.getElementById('editBookingPnp').stepUp(); recalcEditBooking();" class="bg-slate-200 text-slate-700 font-bold px-4 py-2 rounded-r-xl hover:bg-slate-300 transition-colors active:scale-95">+</button>
                     </div>
                 </div>
@@ -1320,23 +1320,23 @@
             <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
                 <div class="min-w-0">
                     <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Armada</label>
-                    <select id="editBookingArmadaName" class="w-full min-w-0 bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-sm font-bold text-slate-700 outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-200 transition-all" onchange="updateEditBookingRute()" required>
+                    <select id="editBookingArmadaName" class="w-full min-w-0 bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-base md:text-sm font-bold text-slate-700 outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-200 transition-colors" onchange="updateEditBookingRute()" required>
                     </select>
                 </div>
                 <div class="min-w-0">
                     <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Rute</label>
-                    <select id="editBookingArmadaRute" class="w-full min-w-0 bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-sm font-bold text-slate-700 outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-200 transition-all" onchange="updateEditBookingJam()" required>
+                    <select id="editBookingArmadaRute" class="w-full min-w-0 bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-base md:text-sm font-bold text-slate-700 outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-200 transition-colors" onchange="updateEditBookingJam()" required>
                     </select>
                 </div>
                 <div class="min-w-0">
                     <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Jam</label>
-                    <select id="editBookingArmadaJam" class="w-full min-w-0 bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-sm font-bold text-slate-700 outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-200 transition-all" onchange="updateEditBookingArmadaId()" required>
+                    <select id="editBookingArmadaJam" class="w-full min-w-0 bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-base md:text-sm font-bold text-slate-700 outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-200 transition-colors" onchange="updateEditBookingArmadaId()" required>
                     </select>
                 </div>
             </div>
             <div>
                 <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Status Pembayaran</label>
-                <select id="editBookingStatus" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-sm font-bold text-slate-700 outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-200 transition-all">
+                <select id="editBookingStatus" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-base md:text-sm font-bold text-slate-700 outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-200 transition-colors">
                     <option value="LUNAS">LUNAS</option>
                     <option value="BELUM LUNAS">BELUM LUNAS</option>
                 </select>
@@ -1360,7 +1360,7 @@
 </div>
 
 <!-- Modal Edit Armada -->
-<div id="modalEditArmada" class="fixed inset-0 bg-gray-900/40 backdrop-blur-sm z-[160] hidden items-center justify-center p-4">
+<div id="modalEditArmada" class="fixed inset-0 bg-gray-900/40  z-[160] hidden items-center justify-center p-4">
     <div class="bg-white rounded-3xl shadow-2xl p-6 md:p-8 w-full max-w-md transform scale-95 opacity-0 transition-all duration-300 flex flex-col max-h-[90vh]" id="modalEditArmadaContent">
         <div class="flex items-center justify-between mb-4">
             <div>
@@ -1377,25 +1377,25 @@
                 <input type="hidden" id="editArmadaId">
                 <div>
                     <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Nama Armada</label>
-                    <input type="text" id="editArmadaNama" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-sm font-bold text-slate-700 outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-200 transition-all" required>
+                    <input type="text" id="editArmadaNama" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-base md:text-sm font-bold text-slate-700 outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-200 transition-colors" required>
                 </div>
                 <div>
                     <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Tujuan</label>
-                    <input type="text" id="editArmadaTujuan" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-sm font-bold text-slate-700 outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-200 transition-all" required>
+                    <input type="text" id="editArmadaTujuan" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-base md:text-sm font-bold text-slate-700 outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-200 transition-colors" required>
                 </div>
                 <div class="grid grid-cols-2 gap-3">
                     <div>
                         <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Jam Berangkat</label>
-                        <input type="text" id="editArmadaJam" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-sm font-bold text-slate-700 outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-200 transition-all" required>
+                        <input type="text" id="editArmadaJam" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-base md:text-sm font-bold text-slate-700 outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-200 transition-colors" required>
                     </div>
                     <div>
                         <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Harga</label>
-                        <input type="number" id="editArmadaHarga" min="0" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-sm font-bold text-slate-700 outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-200 transition-all" required>
+                        <input type="number" id="editArmadaHarga" min="0" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-base md:text-sm font-bold text-slate-700 outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-200 transition-colors" required>
                     </div>
                 </div>
                 <div>
                     <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Kapasitas Kursi</label>
-                    <input type="number" id="editArmadaSeat" min="1" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-sm font-bold text-slate-700 outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-200 transition-all" required>
+                    <input type="number" id="editArmadaSeat" min="1" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-base md:text-sm font-bold text-slate-700 outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-200 transition-colors" required>
                 </div>
                 
                 <div class="mt-4 border-t border-slate-100 pt-4">
@@ -1409,7 +1409,7 @@
 </div>
 
 <!-- Modal Tambah Armada -->
-<div id="modalAddArmada" class="fixed inset-0 bg-gray-900/40 backdrop-blur-sm z-[160] hidden items-center justify-center p-4">
+<div id="modalAddArmada" class="fixed inset-0 bg-gray-900/40  z-[160] hidden items-center justify-center p-4">
     <div class="bg-white rounded-3xl shadow-2xl p-6 md:p-8 w-full max-w-md transform scale-95 opacity-0 transition-all duration-300 flex flex-col max-h-[90vh]" id="modalAddArmadaContent">
         <div class="flex items-center justify-between mb-4">
             <div>
@@ -1425,29 +1425,29 @@
             <form id="formAddArmada" onsubmit="submitAddArmada(event)" class="space-y-3">
                 <div>
                     <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Nama Armada / PO</label>
-                    <select id="addArmadaNamaSelect" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-sm font-bold text-slate-700 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all mb-2" onchange="toggleAddArmadaNamaInput()" required>
+                    <select id="addArmadaNamaSelect" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-base md:text-sm font-bold text-slate-700 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-colors mb-2" onchange="toggleAddArmadaNamaInput()" required>
                     </select>
                     <div id="addArmadaNamaInputContainer" class="hidden">
-                        <input type="text" id="addArmadaNamaBaru" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-sm font-bold text-slate-700 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all" placeholder="Masukkan nama armada baru...">
+                        <input type="text" id="addArmadaNamaBaru" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-base md:text-sm font-bold text-slate-700 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-colors" placeholder="Masukkan nama armada baru...">
                     </div>
                 </div>
                 <div>
                     <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Tujuan</label>
-                    <input type="text" id="addArmadaTujuan" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-sm font-bold text-slate-700 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all" required placeholder="Contoh: Kawunganten - Jogja">
+                    <input type="text" id="addArmadaTujuan" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-base md:text-sm font-bold text-slate-700 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-colors" required placeholder="Contoh: Kawunganten - Jogja">
                 </div>
                 <div class="grid grid-cols-2 gap-3">
                     <div>
                         <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Jam Berangkat</label>
-                        <input type="text" id="addArmadaJam" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-sm font-bold text-slate-700 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all" required placeholder="Contoh: 16:00">
+                        <input type="text" id="addArmadaJam" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-base md:text-sm font-bold text-slate-700 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-colors" required placeholder="Contoh: 16:00">
                     </div>
                     <div>
                         <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Harga (Angka Murni)</label>
-                        <input type="number" id="addArmadaHarga" min="0" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-sm font-bold text-slate-700 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all" required placeholder="Contoh: 150000">
+                        <input type="number" id="addArmadaHarga" min="0" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-base md:text-sm font-bold text-slate-700 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-colors" required placeholder="Contoh: 150000">
                     </div>
                 </div>
                 <div>
                     <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Kapasitas Kursi</label>
-                    <input type="number" id="addArmadaSeat" min="1" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-sm font-bold text-slate-700 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all" required placeholder="Contoh: 14">
+                    <input type="number" id="addArmadaSeat" min="1" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-base md:text-sm font-bold text-slate-700 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-colors" required placeholder="Contoh: 14">
                 </div>
                 
                 <div class="mt-4 border-t border-slate-100 pt-4">
@@ -1464,7 +1464,7 @@
 <script src="bluetooth-printer.js"></script>
 
 <!-- MODALS UNTUK ADMIN AKUN -->
-<div id="adminModal" class="fixed inset-0 bg-gray-900/40 backdrop-blur-sm z-[150] hidden items-center justify-center p-4">
+<div id="adminModal" class="fixed inset-0 bg-gray-900/40  z-[150] hidden items-center justify-center p-4">
     <div class="bg-white rounded-[2rem] shadow-2xl w-full max-w-md animate-fade-in-up max-h-[90dvh] overflow-y-auto">
         <div class="p-6 border-b border-gray-100 flex justify-between items-center bg-blue-50/50">
             <div>
@@ -1479,11 +1479,11 @@
             <input type="hidden" id="adminId">
             <div>
                 <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1.5 ml-1">Username</label>
-                <input type="text" id="adminUsername" required class="w-full bg-slate-50 border border-slate-200 text-slate-800 text-sm rounded-xl focus:ring-4 focus:ring-blue-100 focus:border-blue-500 block p-3 font-semibold transition-all">
+                <input type="text" id="adminUsername" required class="w-full bg-slate-50 border border-slate-200 text-slate-800 text-base md:text-sm rounded-xl focus:ring-4 focus:ring-blue-100 focus:border-blue-500 block p-3 font-semibold transition-colors">
             </div>
             <div>
                 <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1.5 ml-1">Password</label>
-                <input type="text" id="adminPassword" class="w-full bg-slate-50 border border-slate-200 text-slate-800 text-sm rounded-xl focus:ring-4 focus:ring-blue-100 focus:border-blue-500 block p-3 font-semibold transition-all" placeholder="(Kosongkan jika tidak ingin diubah)">
+                <input type="text" id="adminPassword" class="w-full bg-slate-50 border border-slate-200 text-slate-800 text-base md:text-sm rounded-xl focus:ring-4 focus:ring-blue-100 focus:border-blue-500 block p-3 font-semibold transition-colors" placeholder="(Kosongkan jika tidak ingin diubah)">
             </div>
             <div class="pt-4 flex gap-3">
                 <button type="button" onclick="document.getElementById('adminModal').classList.add('hidden')" class="flex-1 px-4 py-3 rounded-xl text-xs font-black uppercase tracking-widest text-slate-500 bg-slate-100 hover:bg-slate-200 transition-all">Batal</button>
@@ -1493,7 +1493,7 @@
     </div>
 </div>
 
-<div id="deleteAdminModal" class="fixed inset-0 bg-gray-900/40 backdrop-blur-sm z-[160] hidden items-center justify-center p-4">
+<div id="deleteAdminModal" class="fixed inset-0 bg-gray-900/40  z-[160] hidden items-center justify-center p-4">
     <div class="bg-white rounded-[2rem] shadow-2xl w-full max-w-sm overflow-hidden animate-fade-in-up p-6 text-center">
         <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
             <i class="fas fa-exclamation-triangle text-2xl text-red-500"></i>
@@ -1508,7 +1508,7 @@
 </div>
 
     <!-- Modal Tambah/Edit Ekstra -->
-    <div id="ekstraModal" class="fixed inset-0 bg-gray-900/40 backdrop-blur-sm z-[160] hidden items-start pt-10 pb-10 justify-center overflow-y-auto p-4">
+    <div id="ekstraModal" class="fixed inset-0 bg-gray-900/40  z-[160] hidden items-start pt-10 pb-10 justify-center overflow-y-auto p-4">
         <div id="ekstraModalInner" class="bg-white rounded-3xl shadow-2xl w-full max-w-lg overflow-hidden transform scale-95 opacity-0 transition-all duration-300 flex flex-col max-h-[90vh]">
             <div class="px-6 py-4 bg-slate-50 border-b border-slate-100 flex justify-between items-center sticky top-0 z-10 shrink-0">
                 <h3 id="ekstraModalTitle" class="text-lg font-black text-slate-800">Tambah Tiket Ekstra</h3>
@@ -1559,7 +1559,7 @@
                             <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Jumlah Penumpang</label>
                             <div class="flex items-center">
                                 <button type="button" onclick="document.getElementById('ekstraJumlahPnp').stepDown(); generateEkstraPnpFields();" class="bg-slate-200 text-slate-700 font-bold px-4 py-2.5 rounded-l-xl hover:bg-slate-300 transition-colors active:scale-95">-</button>
-                                <input type="number" id="ekstraJumlahPnp" min="1" value="1" class="w-full bg-slate-50 border-y border-slate-200 px-4 py-2.5 text-sm font-bold text-slate-700 outline-none text-center focus:border-indigo-500 focus:ring-0 transition-all appearance-none" oninput="generateEkstraPnpFields()" required style="-moz-appearance: textfield;">
+                                <input type="number" id="ekstraJumlahPnp" min="1" value="1" class="w-full bg-slate-50 border-y border-slate-200 px-4 py-2.5 text-base md:text-sm font-bold text-slate-700 outline-none text-center focus:border-indigo-500 focus:ring-0 transition-colors appearance-none" oninput="generateEkstraPnpFields()" required style="-moz-appearance: textfield;">
                                 <button type="button" onclick="document.getElementById('ekstraJumlahPnp').stepUp(); generateEkstraPnpFields();" class="bg-slate-200 text-slate-700 font-bold px-4 py-2.5 rounded-r-xl hover:bg-slate-300 transition-colors active:scale-95">+</button>
                             </div>
                         </div>
@@ -1610,7 +1610,7 @@
     <!-- Script Logic Ekstra Booking -->    <!-- ======================================= -->
     <!-- BOOKING DETAIL MODAL -->
     <!-- ======================================= -->
-    <div id="bookingDetailModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
+    <div id="bookingDetailModal" class="fixed inset-0 bg-slate-900/50  z-50 hidden items-center justify-center p-4">
         <div id="bookingDetailModalInner" class="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden transform scale-95 opacity-0 transition-all duration-300 flex flex-col max-h-[90vh]">
             <div class="absolute top-4 right-4 w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center text-white text-lg shadow-lg cursor-pointer hover:bg-blue-600 transition-colors z-10" onclick="closeBookingDetailModal()">
                 <i class="fas fa-times"></i>
@@ -1646,10 +1646,10 @@
     </div>
 
     <!-- Custom script for admin dashboard -->
-    <script src="admin.js?v=2.35"></script>
+    <script src="admin.js?v=2.36"></script>
 
     <!-- Modal Edit Pelanggan -->
-    <div id="modalEditPelanggan" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-[70] hidden items-center justify-center transition-opacity duration-300 opacity-0 p-4">
+    <div id="modalEditPelanggan" class="fixed inset-0 bg-slate-900/50  z-[70] hidden items-center justify-center transition-opacity duration-300 opacity-0 p-4">
         <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden transform scale-95 transition-all duration-300" id="modalEditPelangganContent">
             <div class="p-5 border-b border-slate-100 flex justify-between items-center bg-slate-50">
                 <h3 class="text-lg font-black text-slate-800 tracking-tight">Edit Nama Pelanggan</h3>
@@ -1662,17 +1662,17 @@
                 
                 <div class="mb-4">
                     <label class="block text-xs font-black text-slate-500 uppercase tracking-widest mb-2">Nomor HP</label>
-                    <input type="text" id="editPelangganHp" class="w-full bg-slate-100 border border-slate-200 rounded-xl px-4 py-3 text-sm font-bold text-slate-500 outline-none cursor-not-allowed" readonly disabled>
+                    <input type="text" id="editPelangganHp" class="w-full bg-slate-100 border border-slate-200 rounded-xl px-4 py-3 text-base md:text-sm font-bold text-slate-500 outline-none cursor-not-allowed" readonly disabled>
                     <p class="text-[10px] text-slate-400 mt-1">*Nomor HP tidak dapat diubah (sebagai identitas primary)</p>
                 </div>
 
                 <div class="mb-4">
                     <label class="block text-xs font-black text-slate-500 uppercase tracking-widest mb-2">Nama Pelanggan</label>
-                    <input type="text" id="editPelangganNama" class="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm font-bold text-slate-700 outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-200 transition-all shadow-sm">
+                    <input type="text" id="editPelangganNama" class="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-base md:text-sm font-bold text-slate-700 outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-200 transition-colors shadow-sm">
                 </div>
                 <div class="mb-4">
                     <label class="block text-xs font-black text-slate-500 uppercase tracking-widest mb-2">Alamat (Opsional)</label>
-                    <input type="text" id="editPelangganAlamat" class="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm font-bold text-slate-700 outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-200 transition-all shadow-sm">
+                    <input type="text" id="editPelangganAlamat" class="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-base md:text-sm font-bold text-slate-700 outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-200 transition-colors shadow-sm">
                 </div>
 
                 <div class="flex gap-3 mt-6">
@@ -1687,7 +1687,7 @@
 
 </body>
 <!-- Modal Confirm Refresh -->
-<div id="modalConfirmRefresh" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden items-center justify-center z-[60] p-4 opacity-0 transition-opacity duration-300">
+<div id="modalConfirmRefresh" class="fixed inset-0 bg-slate-900/60  hidden items-center justify-center z-[60] p-4 opacity-0 transition-opacity duration-300">
     <div class="bg-white rounded-3xl p-6 w-full max-w-sm shadow-2xl transform scale-95 transition-transform duration-300 text-center" id="modalConfirmRefreshContent">
         <div class="w-16 h-16 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-3xl mx-auto mb-4">
             <i class="fas fa-sync-alt"></i>
@@ -1708,3 +1708,4 @@
 
 </body>
 </html>
+
