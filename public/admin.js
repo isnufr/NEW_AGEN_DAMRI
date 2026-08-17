@@ -3094,7 +3094,7 @@
                 }
             }, 10);
         } catch (e) {
-            alert('Error openEdit: ' + e.message + '\nLine: ' + e.lineNumber);
+            Swal.fire('Error openEdit', e.message, 'error');
         }
     }
 
@@ -3191,7 +3191,7 @@
                 }
             }, 10);
         } catch (e) {
-            alert('Error openAdd: ' + e.message + '\nLine: ' + e.lineNumber);
+            Swal.fire('Error openAdd', e.message, 'error');
         }
     }
 
