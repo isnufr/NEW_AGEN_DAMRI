@@ -3157,7 +3157,6 @@
     }
 
     function openAddArmadaModal() {
-        try {
             document.getElementById('formAddArmada').reset();
             
             const armadas = getArmadas();
