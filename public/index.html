@@ -4,15 +4,15 @@
 <head>
     <link rel="manifest" href="/manifest.json">
     <script>
-      if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-          navigator.serviceWorker.register('/sw.js').then(registration => {
-            console.log('SW registered: ', registration);
-          }).catch(registrationError => {
-            console.log('SW registration failed: ', registrationError);
-          });
-        });
-      }
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js').then(registration => {
+                    console.log('SW registered: ', registration);
+                }).catch(registrationError => {
+                    console.log('SW registration failed: ', registrationError);
+                });
+            });
+        }
     </script>
     <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-8REM8EXNBD"></script>
@@ -30,7 +30,8 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Agen Damri">
     <meta charset="UTF-8">
-    <meta name="description" content="Agen Bus Kawunganten Cilacap – Pesan tiket bus DAMRI, Efisiensi, Estu Trans, Best Premium dan travel online. Harga murah, jadwal lengkap, e-ticket resmi.">
+    <meta name="description"
+        content="Agen Bus Kawunganten Cilacap – Pesan tiket bus DAMRI, Efisiensi, Estu Trans, Best Premium dan travel online. Harga murah, jadwal lengkap, e-ticket resmi.">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AGEN BUS KAWUNGANTEN - Tiket Bus, Travel, Pesawat & Kapal</title>
     <script src="https://cdn.tailwindcss.com?v=2"></script>
@@ -49,22 +50,25 @@
     </script>
 
     <style>
-        html, body {
+        html,
+        body {
             max-width: 100vw;
             overflow-x: hidden;
         }
+
         body {
             font-family: 'Inter', sans-serif;
         }
 
         .bg-tertiary {
-            background-color: #f59e0b; /* Gold/Amber */
+            background-color: #f59e0b;
+            /* Gold/Amber */
         }
 
         .text-tertiary {
             color: #f59e0b;
         }
-        
+
         .border-tertiary {
             border-color: #f59e0b;
         }
@@ -85,7 +89,7 @@
             height: 60vw;
             max-width: 800px;
             max-height: 800px;
-            background: radial-gradient(circle, rgba(245, 158, 11, 0.15) 0%, rgba(0,0,0,0) 70%);
+            background: radial-gradient(circle, rgba(245, 158, 11, 0.15) 0%, rgba(0, 0, 0, 0) 70%);
             top: -20%;
             left: -10%;
             border-radius: 50%;
@@ -100,7 +104,7 @@
             height: 70vw;
             max-width: 900px;
             max-height: 900px;
-            background: radial-gradient(circle, rgba(253, 230, 138, 0.1) 0%, rgba(0,0,0,0) 70%);
+            background: radial-gradient(circle, rgba(253, 230, 138, 0.1) 0%, rgba(0, 0, 0, 0) 70%);
             bottom: -30%;
             right: -10%;
             border-radius: 50%;
@@ -110,8 +114,13 @@
         }
 
         @keyframes floatGlow {
-            0% { transform: translate(0, 0) scale(1); }
-            100% { transform: translate(30px, 40px) scale(1.1); }
+            0% {
+                transform: translate(0, 0) scale(1);
+            }
+
+            100% {
+                transform: translate(30px, 40px) scale(1.1);
+            }
         }
 
         .glass-badge {
@@ -437,995 +446,1107 @@
         }
     </style>
 </head>
+
 <body class="bg-gray-50/50 selection:bg-blue-600 selection:text-white overflow-x-hidden">
-<!-- Pop-up Modal Booking (MODERN VERSION - MOBILE OPTIMIZED) -->
-<div id="bookingModal"
-    class="hidden fixed inset-0 z-[300] bg-slate-900/90 backdrop-blur-md flex items-center justify-center p-2 sm:p-4">
-    <div
-        class="bg-white w-[96%] md:w-full max-w-4xl rounded-[1.5rem] md:rounded-[2.5rem] shadow-2xl overflow-hidden animate-fade-in-up border border-white/20 booking-modal-container max-h-[90dvh] overflow-y-auto">
+    <!-- Pop-up Modal Booking (MODERN VERSION - MOBILE OPTIMIZED) -->
+    <div id="bookingModal"
+        class="hidden fixed inset-0 z-[300] bg-slate-900/90 backdrop-blur-md flex items-center justify-center p-2 sm:p-4">
+        <div
+            class="bg-white w-[96%] md:w-full max-w-4xl rounded-[1.5rem] md:rounded-[2.5rem] shadow-2xl overflow-hidden animate-fade-in-up border border-white/20 booking-modal-container max-h-[90dvh] overflow-y-auto">
 
-        <!-- Header Modal (Sticky/Fixed at Top) -->
-        <div class="bg-tertiary p-4 md:p-8 text-center relative shrink-0">
-            <div class="absolute top-4 right-5">
-                <button onclick="closeBookingModal()" class="text-white/50 hover:text-white transition-colors p-2">
-                    <i class="fas fa-times text-lg"></i>
-                </button>
+            <!-- Header Modal (Sticky/Fixed at Top) -->
+            <div class="bg-tertiary p-4 md:p-8 text-center relative shrink-0">
+                <div class="absolute top-4 right-5">
+                    <button onclick="closeBookingModal()" class="text-white/50 hover:text-white transition-colors p-2">
+                        <i class="fas fa-times text-lg"></i>
+                    </button>
+                </div>
+                <div
+                    class="w-10 h-10 md:w-16 md:h-16 bg-white/10 rounded-xl md:rounded-2xl flex items-center justify-center mx-auto mb-2 md:mb-3 border border-white/20">
+                    <i class="fas fa-ticket-alt text-white text-lg md:text-2xl"></i>
+                </div>
+                <h3
+                    class="text-white font-black uppercase tracking-[0.1em] md:tracking-[0.15em] text-base md:text-xl italic leading-tight">
+                    Form Booking Tiket</h3>
+                <p
+                    class="text-blue-100 text-[8px] md:text-[9px] font-bold uppercase mt-1 opacity-70 tracking-widest text-center">
+                    Isi Data yang valid</p>
             </div>
-            <div
-                class="w-10 h-10 md:w-16 md:h-16 bg-white/10 rounded-xl md:rounded-2xl flex items-center justify-center mx-auto mb-2 md:mb-3 border border-white/20">
-                <i class="fas fa-ticket-alt text-white text-lg md:text-2xl"></i>
-            </div>
-            <h3
-                class="text-white font-black uppercase tracking-[0.1em] md:tracking-[0.15em] text-base md:text-xl italic leading-tight">
-                Form Booking Tiket</h3>
-            <p
-                class="text-blue-100 text-[8px] md:text-[9px] font-bold uppercase mt-1 opacity-70 tracking-widest text-center">
-                Isi Data yang valid</p>
-        </div>
 
-        <!-- Body Modal (Scrollable Area) -->
-        <div class="p-4 md:p-10 booking-modal-content">
-            <div class="space-y-6 md:space-y-10">
+            <!-- Body Modal (Scrollable Area) -->
+            <div class="p-4 md:p-10 booking-modal-content">
+                <div class="space-y-6 md:space-y-10">
 
-                <!-- Section 1: Informasi Perjalanan -->
-                <div>
-                    <div class="flex items-center gap-3 mb-4 md:mb-6">
-                        <span
-                            class="w-6 h-6 md:w-8 md:h-8 bg-blue-100 text-blue-700 rounded-full flex items-center justify-center font-black text-[10px] md:text-xs">01</span>
-                        <h4 class="font-black text-gray-800 uppercase text-[10px] md:text-xs tracking-widest italic">
-                            Detail Perjalanan</h4>
-                        <div class="flex-1 h-[1px] bg-gray-100"></div>
+                    <!-- Section 1: Informasi Perjalanan -->
+                    <div>
+                        <div class="flex items-center gap-3 mb-4 md:mb-6">
+                            <span
+                                class="w-6 h-6 md:w-8 md:h-8 bg-blue-100 text-blue-700 rounded-full flex items-center justify-center font-black text-[10px] md:text-xs">01</span>
+                            <h4
+                                class="font-black text-gray-800 uppercase text-[10px] md:text-xs tracking-widest italic">
+                                Detail Perjalanan</h4>
+                            <div class="flex-1 h-[1px] bg-gray-100"></div>
+                        </div>
+
+                        <div class="grid grid-cols-1 gap-4 md:gap-5">
+                            <div>
+                                <label class="input-label">Tipe Perjalanan</label>
+                                <div class="flex gap-4">
+                                    <label class="flex items-center gap-2 cursor-pointer">
+                                        <input type="radio" name="bookTipePerjalanan" value="Berangkat"
+                                            class="w-4 h-4 text-blue-600 focus:ring-blue-500 border-gray-300" checked
+                                            onchange="document.getElementById('labelKotaTujuan').innerText = 'Kota Tujuan';">
+                                        <span class="text-xs md:text-sm font-bold text-gray-700">Berangkat (Dari
+                                            Kawunganten)</span>
+                                    </label>
+                                    <label class="flex items-center gap-2 cursor-pointer">
+                                        <input type="radio" name="bookTipePerjalanan" value="Pulang"
+                                            class="w-4 h-4 text-blue-600 focus:ring-blue-500 border-gray-300"
+                                            onchange="document.getElementById('labelKotaTujuan').innerText = 'Kota Asal';">
+                                        <span class="text-xs md:text-sm font-bold text-gray-700">Pulang (Menuju
+                                            Kawunganten)</span>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div>
+                                <label class="input-label">Tanggal Pemberangkatan</label>
+                                <div class="relative">
+                                    <input type="date" id="bookTanggal" onchange="calculateBookingTotal()"
+                                        class="w-full p-3 md:p-4 pl-10 md:pl-12 bg-gray-50 rounded-xl md:rounded-2xl font-bold text-gray-700 focus:outline-none form-input-focus text-xs md:text-sm">
+                                    <i
+                                        class="fas fa-calendar-alt absolute left-4 md:left-5 top-1/2 -translate-y-1/2 text-gray-400 text-xs md:text-base"></i>
+                                </div>
+                            </div>
+
+                            <div>
+                                <label class="input-label">Pilih Armada</label>
+                                <div class="relative">
+                                    <select id="bookArmada" onchange="updateBookingFields()"
+                                        class="w-full p-3 md:p-4 pl-10 md:pl-12 bg-gray-50 rounded-xl md:rounded-2xl font-bold text-gray-700 focus:outline-none form-input-focus appearance-none text-xs md:text-sm">
+                                        <option value="">-- Pilih Jenis Bus / Travel --</option>
+                                    </select>
+                                    <i
+                                        class="fas fa-bus absolute left-4 md:left-5 top-1/2 -translate-y-1/2 text-gray-400 text-xs md:text-base"></i>
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5">
+                                <div>
+                                    <label class="input-label" id="labelKotaTujuan">Kota Tujuan</label>
+                                    <div class="relative">
+                                        <select id="bookTujuan" onchange="calculateBookingTotal()"
+                                            class="w-full p-3 md:p-4 pl-10 md:pl-12 bg-gray-50 rounded-xl md:rounded-2xl font-bold text-gray-700 focus:outline-none form-input-focus appearance-none text-xs md:text-sm">
+                                            <option value="">-- Pilih Armada Dahulu --</option>
+                                        </select>
+                                        <i
+                                            class="fas fa-map-marker-alt absolute left-4 md:left-5 top-1/2 -translate-y-1/2 text-gray-400 text-xs md:text-base"></i>
+                                    </div>
+                                </div>
+                                <div>
+                                    <label class="input-label">Jam Keberangkatan</label>
+                                    <div class="relative">
+                                        <select id="bookWaktu"
+                                            class="w-full p-3 md:p-4 pl-10 md:pl-12 bg-gray-50 rounded-xl md:rounded-2xl font-bold text-gray-700 focus:outline-none form-input-focus appearance-none text-xs md:text-sm">
+                                            <option value="">-- Pilih Armada Dahulu --</option>
+                                        </select>
+                                        <i
+                                            class="fas fa-clock absolute left-4 md:left-5 top-1/2 -translate-y-1/2 text-gray-400 text-xs md:text-base"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
-                    <div class="grid grid-cols-1 gap-4 md:gap-5">
-                        <div>
-                            <label class="input-label">Tipe Perjalanan</label>
-                            <div class="flex gap-4">
-                                <label class="flex items-center gap-2 cursor-pointer">
-                                    <input type="radio" name="bookTipePerjalanan" value="Berangkat" class="w-4 h-4 text-blue-600 focus:ring-blue-500 border-gray-300" checked onchange="document.getElementById('labelKotaTujuan').innerText = 'Kota Tujuan';">
-                                    <span class="text-xs md:text-sm font-bold text-gray-700">Berangkat (Dari Kawunganten)</span>
-                                </label>
-                                <label class="flex items-center gap-2 cursor-pointer">
-                                    <input type="radio" name="bookTipePerjalanan" value="Pulang" class="w-4 h-4 text-blue-600 focus:ring-blue-500 border-gray-300" onchange="document.getElementById('labelKotaTujuan').innerText = 'Kota Asal';">
-                                    <span class="text-xs md:text-sm font-bold text-gray-700">Pulang (Menuju Kawunganten)</span>
-                                </label>
-                            </div>
-                        </div>
-
-                        <div>
-                            <label class="input-label">Tanggal Pemberangkatan</label>
-                            <div class="relative">
-                                <input type="date" id="bookTanggal" onchange="calculateBookingTotal()"
-                                    class="w-full p-3 md:p-4 pl-10 md:pl-12 bg-gray-50 rounded-xl md:rounded-2xl font-bold text-gray-700 focus:outline-none form-input-focus text-xs md:text-sm">
-                                <i
-                                    class="fas fa-calendar-alt absolute left-4 md:left-5 top-1/2 -translate-y-1/2 text-gray-400 text-xs md:text-base"></i>
-                            </div>
-                        </div>
-
-                        <div>
-                            <label class="input-label">Pilih Armada</label>
-                            <div class="relative">
-                                <select id="bookArmada" onchange="updateBookingFields()"
-                                    class="w-full p-3 md:p-4 pl-10 md:pl-12 bg-gray-50 rounded-xl md:rounded-2xl font-bold text-gray-700 focus:outline-none form-input-focus appearance-none text-xs md:text-sm">
-                                    <option value="">-- Pilih Jenis Bus / Travel --</option>
-                                </select>
-                                <i
-                                    class="fas fa-bus absolute left-4 md:left-5 top-1/2 -translate-y-1/2 text-gray-400 text-xs md:text-base"></i>
-                            </div>
+                    <!-- Section 2: Data Penumpang -->
+                    <div>
+                        <div class="flex items-center gap-3 mb-4 md:mb-6">
+                            <span
+                                class="w-6 h-6 md:w-8 md:h-8 bg-blue-100 text-blue-700 rounded-full flex items-center justify-center font-black text-[10px] md:text-xs">02</span>
+                            <h4
+                                class="font-black text-gray-800 uppercase text-[10px] md:text-xs tracking-widest italic">
+                                Data Penumpang</h4>
+                            <div class="flex-1 h-[1px] bg-gray-100"></div>
                         </div>
 
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5">
-                            <div>
-                                <label class="input-label" id="labelKotaTujuan">Kota Tujuan</label>
-                                <div class="relative">
-                                    <select id="bookTujuan" onchange="calculateBookingTotal()"
-                                        class="w-full p-3 md:p-4 pl-10 md:pl-12 bg-gray-50 rounded-xl md:rounded-2xl font-bold text-gray-700 focus:outline-none form-input-focus appearance-none text-xs md:text-sm">
-                                        <option value="">-- Pilih Armada Dahulu --</option>
-                                    </select>
-                                    <i
-                                        class="fas fa-map-marker-alt absolute left-4 md:left-5 top-1/2 -translate-y-1/2 text-gray-400 text-xs md:text-base"></i>
-                                </div>
+                            <div class="md:col-span-2">
+                                <label class="input-label">Nama Lengkap Sesuai KTP</label>
+                                <input type="text" id="bookNama" placeholder="Contoh: Budi Santoso"
+                                    class="w-full p-3 md:p-4 bg-gray-50 rounded-xl md:rounded-2xl font-bold text-gray-700 focus:outline-none form-input-focus text-xs md:text-sm">
                             </div>
                             <div>
-                                <label class="input-label">Jam Keberangkatan</label>
-                                <div class="relative">
-                                    <select id="bookWaktu"
-                                        class="w-full p-3 md:p-4 pl-10 md:pl-12 bg-gray-50 rounded-xl md:rounded-2xl font-bold text-gray-700 focus:outline-none form-input-focus appearance-none text-xs md:text-sm">
-                                        <option value="">-- Pilih Armada Dahulu --</option>
-                                    </select>
-                                    <i
-                                        class="fas fa-clock absolute left-4 md:left-5 top-1/2 -translate-y-1/2 text-gray-400 text-xs md:text-base"></i>
+                                <label class="input-label">Nomor WhatsApp</label>
+                                <input type="tel" id="bookHp" placeholder="0821xxxx"
+                                    class="w-full p-3 md:p-4 bg-gray-50 rounded-xl md:rounded-2xl font-bold text-gray-700 focus:outline-none form-input-focus text-xs md:text-sm">
+                            </div>
+                            <div>
+                                <label class="input-label">Jumlah Penumpang</label>
+                                <input type="number" id="bookJumlah" min="1" value="1" oninput="calculateBookingTotal()"
+                                    class="w-full p-3 md:p-4 bg-gray-50 rounded-xl md:rounded-2xl font-black text-gray-700 focus:outline-none form-input-focus text-center text-sm md:text-base">
+                            </div>
+                            <div class="md:col-span-2">
+                                <label class="input-label">Alamat Lengkap</label>
+                                <input type="text" id="bookAlamat" placeholder="Contoh: Jl. Merdeka No. 10 (Opsional)"
+                                    class="w-full p-3 md:p-4 bg-gray-50 rounded-xl md:rounded-2xl font-bold text-gray-700 focus:outline-none form-input-focus text-xs md:text-sm">
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <!-- Section 3: Pembayaran -->
+                    <div
+                        class="bg-slate-50 p-4 md:p-10 rounded-[1.5rem] md:rounded-[2.5rem] border border-slate-100 shadow-inner">
+                        <div class="flex items-center gap-3 mb-6 md:mb-8">
+                            <span
+                                class="w-8 h-8 md:w-10 md:h-10 bg-blue-600 text-white rounded-full flex items-center justify-center font-black text-xs md:text-sm">03</span>
+                            <h4
+                                class="font-black text-slate-800 uppercase text-[10px] md:text-sm tracking-widest italic">
+                                Metode & Total Bayar</h4>
+                        </div>
+
+                        <div class="space-y-4 md:space-y-6">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+                                <div class="bg-white p-4 md:p-6 rounded-2xl md:rounded-3xl border border-slate-200">
+                                    <p class="text-[9px] md:text-[10px] font-black text-slate-400 uppercase mb-1">Harga
+                                        Satuan</p>
+                                    <input type="text" id="bookHargaSatuan" readonly
+                                        class="w-full bg-transparent font-black text-blue-700 text-base md:text-xl focus:outline-none"
+                                        value="Rp 0">
+                                </div>
+                                <div
+                                    class="bg-blue-600 p-4 md:p-6 rounded-2xl md:rounded-3xl shadow-xl shadow-blue-200">
+                                    <p class="text-[9px] md:text-[10px] font-black text-blue-100 uppercase mb-1">Total
+                                        Pembayaran</p>
+                                    <input type="text" id="bookTotalBayar" readonly
+                                        class="w-full bg-transparent font-black text-white text-base md:text-xl focus:outline-none"
+                                        value="Rp 0">
                                 </div>
                             </div>
-                        </div>
-                    </div>
-                </div>
 
-                <!-- Section 2: Data Penumpang -->
-                <div>
-                    <div class="flex items-center gap-3 mb-4 md:mb-6">
-                        <span
-                            class="w-6 h-6 md:w-8 md:h-8 bg-blue-100 text-blue-700 rounded-full flex items-center justify-center font-black text-[10px] md:text-xs">02</span>
-                        <h4 class="font-black text-gray-800 uppercase text-[10px] md:text-xs tracking-widest italic">
-                            Data Penumpang</h4>
-                        <div class="flex-1 h-[1px] bg-gray-100"></div>
-                    </div>
-
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5">
-                        <div class="md:col-span-2">
-                            <label class="input-label">Nama Lengkap Sesuai KTP</label>
-                            <input type="text" id="bookNama" placeholder="Contoh: Budi Santoso"
-                                class="w-full p-3 md:p-4 bg-gray-50 rounded-xl md:rounded-2xl font-bold text-gray-700 focus:outline-none form-input-focus text-xs md:text-sm">
-                        </div>
-                        <div>
-                            <label class="input-label">Nomor WhatsApp</label>
-                            <input type="tel" id="bookHp" placeholder="0821xxxx"
-                                class="w-full p-3 md:p-4 bg-gray-50 rounded-xl md:rounded-2xl font-bold text-gray-700 focus:outline-none form-input-focus text-xs md:text-sm">
-                        </div>
-                        <div>
-                            <label class="input-label">Jumlah Penumpang</label>
-                            <input type="number" id="bookJumlah" min="1" value="1" oninput="calculateBookingTotal()"
-                                class="w-full p-3 md:p-4 bg-gray-50 rounded-xl md:rounded-2xl font-black text-gray-700 focus:outline-none form-input-focus text-center text-sm md:text-base">
-                        </div>
-                        <div class="md:col-span-2">
-                            <label class="input-label">Alamat Lengkap / Detail Jemput</label>
-                            <input type="text" id="bookAlamat" placeholder="Contoh: Jl. Merdeka No. 10 (Opsional)"
-                                class="w-full p-3 md:p-4 bg-gray-50 rounded-xl md:rounded-2xl font-bold text-gray-700 focus:outline-none form-input-focus text-xs md:text-sm">
-                        </div>
-
-                    </div>
-                </div>
-
-                <!-- Section 3: Pembayaran -->
-                <div
-                    class="bg-slate-50 p-4 md:p-10 rounded-[1.5rem] md:rounded-[2.5rem] border border-slate-100 shadow-inner">
-                    <div class="flex items-center gap-3 mb-6 md:mb-8">
-                        <span
-                            class="w-8 h-8 md:w-10 md:h-10 bg-blue-600 text-white rounded-full flex items-center justify-center font-black text-xs md:text-sm">03</span>
-                        <h4 class="font-black text-slate-800 uppercase text-[10px] md:text-sm tracking-widest italic">
-                            Metode & Total Bayar</h4>
-                    </div>
-
-                    <div class="space-y-4 md:space-y-6">
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
-                            <div class="bg-white p-4 md:p-6 rounded-2xl md:rounded-3xl border border-slate-200">
-                                <p class="text-[9px] md:text-[10px] font-black text-slate-400 uppercase mb-1">Harga
-                                    Satuan</p>
-                                <input type="text" id="bookHargaSatuan" readonly
-                                    class="w-full bg-transparent font-black text-blue-700 text-base md:text-xl focus:outline-none"
-                                    value="Rp 0">
+                            <div>
+                                <label class="input-label text-slate-500">Pilih Metode Pembayaran</label>
+                                <select id="bookMetodeBayar" onchange="showPaymentDetails()"
+                                    class="w-full p-4 md:p-5 bg-white border-2 border-slate-200 rounded-xl md:rounded-[1.5rem] font-black text-slate-700 focus:outline-none focus:border-blue-600 transition-all text-center text-sm md:text-lg">
+                                    <option value="">-- Pilih Metode Pembayaran --</option>
+                                    <option value="Transfer Mandiri">BANK MANDIRI</option>
+                                    <option value="Transfer Seabank">SEABANK</option>
+                                    <option value="Saldo Dana">DANA (E-WALLET)</option>
+                                    <option value="QRIS AGEN">QRIS SCAN (OTOMATIS)</option>
+                                </select>
                             </div>
-                            <div class="bg-blue-600 p-4 md:p-6 rounded-2xl md:rounded-3xl shadow-xl shadow-blue-200">
-                                <p class="text-[9px] md:text-[10px] font-black text-blue-100 uppercase mb-1">Total
-                                    Pembayaran</p>
-                                <input type="text" id="bookTotalBayar" readonly
-                                    class="w-full bg-transparent font-black text-white text-base md:text-xl focus:outline-none"
-                                    value="Rp 0">
+
+                            <!-- Payment Detail Box with Copy Function -->
+                            <div id="paymentDetails"
+                                class="hidden animate-fade-in-up bg-white p-4 md:p-8 rounded-xl md:rounded-[2rem] border-2 border-dashed border-blue-200 text-center relative overflow-hidden">
+                                <div id="paymentLogoArea" class="mb-3 md:mb-4 flex justify-center"></div>
+
+                                <div class="flex flex-col items-center gap-2">
+                                    <div id="accountContainer"
+                                        class="flex flex-col items-center justify-center gap-2 w-full">
+                                        <p id="paymentInfoText"
+                                            class="text-xs md:text-base font-black text-blue-900 uppercase italic tracking-wider whitespace-pre-line leading-relaxed">
+                                        </p>
+                                        <button id="copyBtn" onclick="copyAccountInfo()"
+                                            class="hidden bg-blue-100 hover:bg-blue-200 text-blue-700 px-4 py-2 rounded-lg md:rounded-xl text-[9px] md:text-[10px] font-black uppercase tracking-widest transition-all active:scale-90 flex items-center gap-2">
+                                            <i class="fas fa-copy"></i> SALIN NO. REK
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
-                        </div>
 
-                        <div>
-                            <label class="input-label text-slate-500">Pilih Metode Pembayaran</label>
-                            <select id="bookMetodeBayar" onchange="showPaymentDetails()"
-                                class="w-full p-4 md:p-5 bg-white border-2 border-slate-200 rounded-xl md:rounded-[1.5rem] font-black text-slate-700 focus:outline-none focus:border-blue-600 transition-all text-center text-sm md:text-lg">
-                                <option value="">-- Pilih Metode Pembayaran --</option>
-                                <option value="Transfer Mandiri">BANK MANDIRI</option>
-                                <option value="Transfer Seabank">SEABANK</option>
-                                <option value="Saldo Dana">DANA (E-WALLET)</option>
-                                <option value="QRIS AGEN">QRIS SCAN (OTOMATIS)</option>
-                            </select>
-                        </div>
-
-                        <!-- Payment Detail Box with Copy Function -->
-                        <div id="paymentDetails"
-                            class="hidden animate-fade-in-up bg-white p-4 md:p-8 rounded-xl md:rounded-[2rem] border-2 border-dashed border-blue-200 text-center relative overflow-hidden">
-                            <div id="paymentLogoArea" class="mb-3 md:mb-4 flex justify-center"></div>
-
-                            <div class="flex flex-col items-center gap-2">
-                                <div id="accountContainer"
-                                    class="flex flex-col items-center justify-center gap-2 w-full">
-                                    <p id="paymentInfoText"
-                                        class="text-xs md:text-base font-black text-blue-900 uppercase italic tracking-wider whitespace-pre-line leading-relaxed">
+                            <!-- Catatan Pembayaran -->
+                            <div
+                                class="bg-yellow-50 border-l-4 border-yellow-400 p-4 md:p-5 rounded-xl md:rounded-2xl shadow-sm">
+                                <div class="flex gap-3">
+                                    <i class="fas fa-info-circle text-yellow-600 mt-0.5 text-base md:text-lg"></i>
+                                    <p
+                                        class="text-[9px] md:text-[12px] font-black text-yellow-900 uppercase italic leading-relaxed">
+                                        PENTING: Dimohon untuk melakukan pembayaran dahulu sesuai total harga sebelum
+                                        klik
+                                        boking, kemudian sertakan bukti pembayaran ketika klik boking.
                                     </p>
-                                    <button id="copyBtn" onclick="copyAccountInfo()"
-                                        class="hidden bg-blue-100 hover:bg-blue-200 text-blue-700 px-4 py-2 rounded-lg md:rounded-xl text-[9px] md:text-[10px] font-black uppercase tracking-widest transition-all active:scale-90 flex items-center gap-2">
-                                        <i class="fas fa-copy"></i> SALIN NO. REK
-                                    </button>
                                 </div>
                             </div>
-                        </div>
 
-                        <!-- Catatan Pembayaran -->
-                        <div
-                            class="bg-yellow-50 border-l-4 border-yellow-400 p-4 md:p-5 rounded-xl md:rounded-2xl shadow-sm">
-                            <div class="flex gap-3">
-                                <i class="fas fa-info-circle text-yellow-600 mt-0.5 text-base md:text-lg"></i>
-                                <p
-                                    class="text-[9px] md:text-[12px] font-black text-yellow-900 uppercase italic leading-relaxed">
-                                    PENTING: Dimohon untuk melakukan pembayaran dahulu sesuai total harga sebelum klik
-                                    boking, kemudian sertakan bukti pembayaran ketika klik boking.
-                                </p>
+                            <div>
+                                <label class="input-label text-slate-500">Keterangan Tambahan (Opsional)</label>
+                                <input type="text" id="bookKeterangan" placeholder="Contoh: Dekat kursi depan"
+                                    class="w-full p-4 md:p-5 bg-white border border-slate-200 rounded-xl md:rounded-[1.5rem] font-bold text-slate-700 focus:outline-none form-input-focus text-xs md:text-sm">
                             </div>
                         </div>
+                    </div>
+                </div>
+            </div>
 
-                        <div>
-                            <label class="input-label text-slate-500">Keterangan Tambahan (Opsional)</label>
-                            <input type="text" id="bookKeterangan" placeholder="Contoh: Dekat kursi depan"
-                                class="w-full p-4 md:p-5 bg-white border border-slate-200 rounded-xl md:rounded-[1.5rem] font-bold text-slate-700 focus:outline-none form-input-focus text-xs md:text-sm">
+            <!-- Footer Modal Action (Sticky/Fixed at Bottom) -->
+            <div
+                class="p-4 md:p-6 border-t border-gray-100 flex flex-col sm:flex-row gap-2 md:gap-3 bg-gray-50/80 backdrop-blur-sm shrink-0">
+                <button onclick="submitBooking()"
+                    class="flex-[2] bg-green-600 hover:bg-green-700 text-white py-3.5 md:py-5 rounded-xl md:rounded-2xl font-black shadow-lg shadow-green-200 transition-all uppercase tracking-[0.1em] text-[11px] md:text-sm flex items-center justify-center gap-2 md:gap-3 active:scale-95">
+                    <i class="fab fa-whatsapp text-lg md:text-2xl"></i> BOKING
+                </button>
+                <button onclick="closeBookingModal()"
+                    class="flex-1 bg-white hover:bg-gray-100 text-gray-400 py-3.5 md:py-5 rounded-xl md:rounded-2xl font-black transition-all uppercase tracking-widest text-[9px] border border-gray-200 sm:order-first">
+                    Batal
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Sukses Booking -->
+    <div id="successModal"
+        class="hidden fixed inset-0 z-[300] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+        <div
+            class="bg-white w-full max-md rounded-[2.5rem] shadow-2xl overflow-hidden animate-fade-in-up text-center p-8">
+            <div
+                class="w-20 h-20 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-6 text-center">
+                <i class="fas fa-check text-4xl"></i>
+            </div>
+            <h4 class="text-xl font-black text-gray-800 uppercase mb-4 tracking-tighter italic text-center">Boking
+                Berhasil!
+            </h4>
+            <p class="text-sm font-bold text-gray-500 leading-relaxed mb-8 uppercase italic text-center">
+                Terimakasih sudah memesan. Silakan tunggu konfirmasi admin melalui WhatsApp untuk mendapatkan ID Tiket
+                resmi
+                Anda.
+            </p>
+            <button onclick="closeSuccessModal()"
+                class="w-full bg-blue-700 hover:bg-blue-800 text-white py-4 rounded-2xl font-black shadow-lg transition-all uppercase tracking-widest text-center">
+                OKE, SAYA MENGERTI
+            </button>
+        </div>
+    </div>
+
+    <!-- Kontainer Pesan Kustom -->
+    <div id="customAlert"
+        class="bg-red-600 text-white px-6 py-3 rounded-2xl shadow-2xl font-bold flex items-center gap-3 text-center">
+        <i class="fas fa-exclamation-circle"></i>
+        <span id="alertText"></span>
+    </div>
+
+    <!-- Navigation -->
+    <nav
+        class="bg-white/80 backdrop-blur-md sticky top-0 z-[100] shadow-sm border-b border-gray-200/50 transition-all duration-300">
+        <div class="container mx-auto px-4 md:px-8 py-3 flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <a href="#home" class="flex items-center gap-2 group text-center">
+                    <img id="headerLogo" src="logobiru.webp" alt="Logo Agen Damri"
+                        class="h-10 md:h-14 w-auto object-contain transition-transform group-hover:scale-105"
+                        onerror="handleLogoError(this)">
+                    <div id="logoFallback" class="hidden flex items-center gap-2 text-center">
+                        <div class="bg-tertiary p-2 rounded-lg text-center"><i
+                                class="fas fa-bus text-white text-lg"></i>
+                        </div>
+                        <div class="text-center">
+                            <h1
+                                class="font-extrabold text-sm text-tertiary tracking-tighter uppercase leading-none text-center">
+                                Agen Damri</h1>
+                            <p class="text-[9px] font-bold text-yellow-500 uppercase tracking-widest text-center">
+                                Kawunganten</p>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            <div class="hidden lg:flex items-center space-x-1 font-bold text-slate-700 text-sm text-center">
+                <a href="#home"
+                    class="px-4 py-2 rounded-full hover:bg-amber-50 hover:text-amber-600 transition-all text-center">Beranda</a>
+                <a href="#cek-tiket"
+                    class="px-4 py-2 rounded-full hover:bg-amber-50 hover:text-amber-600 transition-all text-center">Cek
+                    Tiket</a>
+                <a href="#produk"
+                    class="px-4 py-2 rounded-full hover:bg-amber-50 hover:text-amber-600 transition-all text-center">Layanan</a>
+                <a href="#jadwal"
+                    class="px-4 py-2 rounded-full hover:bg-amber-50 hover:text-amber-600 transition-all text-center">Jadwal</a>
+                <a href="#kontak"
+                    class="px-4 py-2 rounded-full hover:bg-amber-50 hover:text-amber-600 transition-all text-center">Kontak</a>
+            </div>
+            <button onclick="toggleMobileMenu()"
+                class="lg:hidden text-amber-600 text-2xl focus:outline-none text-center hover:scale-110 transition-transform"><i
+                    class="fas fa-bars"></i></button>
+        </div>
+    </nav>
+
+    <!-- Overlay Mobile Menu -->
+    <div id="mobileOverlay" class="fixed inset-0 bg-black/50 z-[110] hidden" onclick="toggleMobileMenu()"></div>
+
+    <!-- Mobile Menu Drawer -->
+    <div id="mobileMenu"
+        class="fixed top-0 right-0 w-3/4 max-w-xs h-full bg-white z-[120] p-8 shadow-2xl flex flex-col gap-6 font-black text-gray-700 uppercase tracking-widest text-sm translate-x-full transition-transform duration-300 text-center">
+        <div class="flex justify-between items-center mb-4 text-center">
+            <span class="text-tertiary italic w-full text-center">MENU UTAMA</span>
+            <button onclick="toggleMobileMenu()" class="p-2 -mr-2"><i
+                    class="fas fa-times text-2xl text-tertiary"></i></button>
+        </div>
+        <a href="#home" onclick="toggleMobileMenu()"
+            class="hover:text-tertiary py-3 border-b border-gray-100 transition-colors block w-full">Beranda</a>
+        <a href="#cek-tiket" onclick="toggleMobileMenu()"
+            class="hover:text-tertiary py-3 border-b border-gray-100 transition-colors block w-full">Cek Tiket</a>
+        <a href="#produk" onclick="toggleMobileMenu()"
+            class="hover:text-tertiary py-3 border-b border-gray-100 transition-colors block w-full">Layanan</a>
+        <a href="#jadwal" onclick="toggleMobileMenu()"
+            class="hover:text-tertiary py-3 border-b border-gray-100 transition-colors block w-full">Jadwal</a>
+        <a href="#kontak" onclick="toggleMobileMenu()"
+            class="hover:text-tertiary py-3 border-b border-gray-100 transition-colors block w-full">Kontak</a>
+    </div>
+
+    <!-- Hero Section -->
+    <header id="home" class="hero-pattern relative py-16 lg:py-28 text-center text-white !overflow-visible z-[50]">
+        <!-- Container untuk elemen background agar tidak menembus batas layar -->
+        <div class="absolute inset-0 overflow-hidden pointer-events-none z-0">
+            <div class="hero-glow"></div>
+            <div class="hero-glow-2"></div>
+        </div>
+
+        <div class="container mx-auto px-4 relative z-10 text-center">
+            <span
+                class="inline-block glass-badge px-5 py-2 rounded-full text-xs font-black mb-6 uppercase tracking-[0.2em] italic text-center">AGEN
+                BUS KAWUNGANTEN</span>
+            <h2
+                class="text-4xl md:text-5xl lg:text-6xl font-black mb-5 leading-[1.15] text-center tracking-tight text-white">
+                Perjalanan <span
+                    class="text-transparent bg-clip-text bg-gradient-to-r from-amber-200 to-white">Nyaman</span><br><span
+                    class="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-amber-600">Pesan Tiket
+                    Aman</span></h2>
+            <p
+                class="text-slate-300 text-sm md:text-lg mb-10 font-medium uppercase tracking-wide text-center max-w-2xl mx-auto leading-relaxed">
+                Pusat Penjualan Tiket Bus, Travel, Pesawat & Kapal Laut <br>
+                Resmi dan Terpercaya di Kawunganten Cilacap</p>
+
+            <div class="relative max-w-xl mx-auto z-[200] text-center">
+                <div class="glass-search p-2 rounded-full flex flex-col md:flex-row gap-2 text-center">
+                    <div class="flex-1 flex items-center px-6 text-left">
+                        <i class="fas fa-search text-amber-500 mr-4 shrink-0 text-lg"></i>
+                        <input type="text" id="destSearch" oninput="liveSearch()"
+                            placeholder="Cari tujuan (Contoh: Jakarta)..."
+                            class="w-full py-3 bg-transparent text-slate-800 font-bold focus:outline-none placeholder:text-slate-400 text-center md:text-left text-sm md:text-base">
+                    </div>
+                    <button onclick="triggerSearch()"
+                        class="w-full md:w-auto bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white px-10 py-3.5 rounded-full font-black transition-all shadow-lg shadow-amber-500/30 hover:shadow-xl uppercase text-center text-sm md:text-base">Cari
+                        Armada</button>
+                </div>
+
+                <!-- Bagian Official Partner: Diubah menjadi Flex-Col agar terpisah baris -->
+                <div class="mt-4 animate-fade-in-up flex flex-col items-center justify-center gap-y-2 px-1 opacity-95"
+                    style="animation-delay: 0.4s;">
+                    <span class="text-[9px] font-black text-yellow-400 uppercase tracking-widest italic">Official
+                        Partner
+                        :</span>
+
+                    <div class="flex flex-wrap items-center justify-center gap-x-3 gap-y-2">
+                        <!-- Logo DAMRI -->
+                        <button onclick="scrollToArmada('damri-jkt')"
+                            class="flex items-center shrink-0 hover:scale-110 transition-transform active:scale-95">
+                            <span
+                                class="font-black italic text-[11px] tracking-tighter text-[#003d79] bg-white px-1.5 py-0.5 rounded shadow-sm">DAMRI</span>
+                        </button>
+                        <!-- Logo BEST PREMIUM -->
+                        <div class="flex items-center shrink-0">
+                            <span class="font-black text-[11px] tracking-tight text-[#FFD700] uppercase">Best <span
+                                    class="text-white">Premium</span></span>
+                        </div>
+                        <!-- Logo ESTU TRANS -->
+                        <div class="flex items-center shrink-0">
+                            <span class="font-extrabold italic text-[11px] text-[#22c55e]">ESTU <span
+                                    class="text-white">TRANS</span></span>
+                        </div>
+                        <!-- Logo EFISIENSI -->
+                        <div class="flex items-center shrink-0">
+                            <span
+                                class="font-black italic text-[11px] tracking-[0.1em] text-[#00CED1] border-b border-[#00CED1]">EFISIENSI</span>
+                        </div>
+                        <!-- Logo RIYAN -->
+                        <div class="flex items-center shrink-0">
+                            <span
+                                class="font-black italic text-[11px] text-red-600 bg-white px-1.5 rounded shadow-sm border border-red-600/20">RIYAN</span>
+                        </div>
+                        <!-- Logo ARDY TRANS -->
+                        <div class="flex items-center shrink-0">
+                            <span
+                                class="font-black text-[11px] text-red-500 bg-white/10 px-1.5 rounded border border-red-500/30">ARDY
+                                <span class="text-white">TRANS</span></span>
+                        </div>
+                        <!-- Logo QYTA TRANS -->
+                        <div class="flex items-center shrink-0">
+                            <span class="font-black italic text-[11px] text-orange-500 uppercase tracking-tighter">Qyta
+                                <span class="text-white">Trans</span></span>
+                        </div>
+                        <!-- Logo 77 TRANS -->
+                        <div class="flex items-center shrink-0">
+                            <span
+                                class="font-black text-[11px] text-yellow-400 border border-yellow-400 px-1.5 rounded shadow-lg shadow-yellow-400/10">77
+                                <span class="text-white">TRANS</span></span>
                         </div>
                     </div>
                 </div>
-            </div>
-        </div>
 
-        <!-- Footer Modal Action (Sticky/Fixed at Bottom) -->
-        <div
-            class="p-4 md:p-6 border-t border-gray-100 flex flex-col sm:flex-row gap-2 md:gap-3 bg-gray-50/80 backdrop-blur-sm shrink-0">
-            <button onclick="submitBooking()"
-                class="flex-[2] bg-green-600 hover:bg-green-700 text-white py-3.5 md:py-5 rounded-xl md:rounded-2xl font-black shadow-lg shadow-green-200 transition-all uppercase tracking-[0.1em] text-[11px] md:text-sm flex items-center justify-center gap-2 md:gap-3 active:scale-95">
-                <i class="fab fa-whatsapp text-lg md:text-2xl"></i> BOKING
-            </button>
-            <button onclick="closeBookingModal()"
-                class="flex-1 bg-white hover:bg-gray-100 text-gray-400 py-3.5 md:py-5 rounded-xl md:rounded-2xl font-black transition-all uppercase tracking-widest text-[9px] border border-gray-200 sm:order-first">
-                Batal
-            </button>
-        </div>
-    </div>
-</div>
-
-<!-- Modal Sukses Booking -->
-<div id="successModal"
-    class="hidden fixed inset-0 z-[300] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
-    <div class="bg-white w-full max-md rounded-[2.5rem] shadow-2xl overflow-hidden animate-fade-in-up text-center p-8">
-        <div
-            class="w-20 h-20 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-6 text-center">
-            <i class="fas fa-check text-4xl"></i>
-        </div>
-        <h4 class="text-xl font-black text-gray-800 uppercase mb-4 tracking-tighter italic text-center">Boking Berhasil!
-        </h4>
-        <p class="text-sm font-bold text-gray-500 leading-relaxed mb-8 uppercase italic text-center">
-            Terimakasih sudah memesan. Silakan tunggu konfirmasi admin melalui WhatsApp untuk mendapatkan ID Tiket resmi
-            Anda.
-        </p>
-        <button onclick="closeSuccessModal()"
-            class="w-full bg-blue-700 hover:bg-blue-800 text-white py-4 rounded-2xl font-black shadow-lg transition-all uppercase tracking-widest text-center">
-            OKE, SAYA MENGERTI
-        </button>
-    </div>
-</div>
-
-<!-- Kontainer Pesan Kustom -->
-<div id="customAlert"
-    class="bg-red-600 text-white px-6 py-3 rounded-2xl shadow-2xl font-bold flex items-center gap-3 text-center">
-    <i class="fas fa-exclamation-circle"></i>
-    <span id="alertText"></span>
-</div>
-
-<!-- Navigation -->
-<nav class="bg-white/80 backdrop-blur-md sticky top-0 z-[100] shadow-sm border-b border-gray-200/50 transition-all duration-300">
-    <div class="container mx-auto px-4 md:px-8 py-3 flex justify-between items-center">
-        <div class="flex items-center gap-3">
-            <a href="#home" class="flex items-center gap-2 group text-center">
-                <img id="headerLogo" src="logobiru.webp" alt="Logo Agen Damri"
-                    class="h-10 md:h-14 w-auto object-contain transition-transform group-hover:scale-105" onerror="handleLogoError(this)">
-                <div id="logoFallback" class="hidden flex items-center gap-2 text-center">
-                    <div class="bg-tertiary p-2 rounded-lg text-center"><i class="fas fa-bus text-white text-lg"></i>
-                    </div>
-                    <div class="text-center">
-                        <h1
-                            class="font-extrabold text-sm text-tertiary tracking-tighter uppercase leading-none text-center">
-                            Agen Damri</h1>
-                        <p class="text-[9px] font-bold text-yellow-500 uppercase tracking-widest text-center">
-                            Kawunganten</p>
-                    </div>
-                </div>
-            </a>
-        </div>
-        <div class="hidden lg:flex items-center space-x-1 font-bold text-slate-700 text-sm text-center">
-            <a href="#home" class="px-4 py-2 rounded-full hover:bg-amber-50 hover:text-amber-600 transition-all text-center">Beranda</a>
-            <a href="#cek-tiket" class="px-4 py-2 rounded-full hover:bg-amber-50 hover:text-amber-600 transition-all text-center">Cek Tiket</a>
-            <a href="#produk" class="px-4 py-2 rounded-full hover:bg-amber-50 hover:text-amber-600 transition-all text-center">Layanan</a>
-            <a href="#jadwal" class="px-4 py-2 rounded-full hover:bg-amber-50 hover:text-amber-600 transition-all text-center">Jadwal</a>
-            <a href="#kontak" class="px-4 py-2 rounded-full hover:bg-amber-50 hover:text-amber-600 transition-all text-center">Kontak</a>
-        </div>
-        <button onclick="toggleMobileMenu()" class="lg:hidden text-amber-600 text-2xl focus:outline-none text-center hover:scale-110 transition-transform"><i
-                class="fas fa-bars"></i></button>
-    </div>
-</nav>
-
-<!-- Overlay Mobile Menu -->
-<div id="mobileOverlay" class="fixed inset-0 bg-black/50 z-[110] hidden" onclick="toggleMobileMenu()"></div>
-
-<!-- Mobile Menu Drawer -->
-<div id="mobileMenu"
-    class="fixed top-0 right-0 w-3/4 max-w-xs h-full bg-white z-[120] p-8 shadow-2xl flex flex-col gap-6 font-black text-gray-700 uppercase tracking-widest text-sm translate-x-full transition-transform duration-300 text-center">
-    <div class="flex justify-between items-center mb-4 text-center">
-        <span class="text-tertiary italic w-full text-center">MENU UTAMA</span>
-        <button onclick="toggleMobileMenu()" class="p-2 -mr-2"><i
-                class="fas fa-times text-2xl text-tertiary"></i></button>
-    </div>
-    <a href="#home" onclick="toggleMobileMenu()"
-        class="hover:text-tertiary py-3 border-b border-gray-100 transition-colors block w-full">Beranda</a>
-    <a href="#cek-tiket" onclick="toggleMobileMenu()"
-        class="hover:text-tertiary py-3 border-b border-gray-100 transition-colors block w-full">Cek Tiket</a>
-    <a href="#produk" onclick="toggleMobileMenu()"
-        class="hover:text-tertiary py-3 border-b border-gray-100 transition-colors block w-full">Layanan</a>
-    <a href="#jadwal" onclick="toggleMobileMenu()"
-        class="hover:text-tertiary py-3 border-b border-gray-100 transition-colors block w-full">Jadwal</a>
-    <a href="#kontak" onclick="toggleMobileMenu()"
-        class="hover:text-tertiary py-3 border-b border-gray-100 transition-colors block w-full">Kontak</a>
-</div>
-
-<!-- Hero Section -->
-<header id="home" class="hero-pattern relative py-16 lg:py-28 text-center text-white !overflow-visible z-[50]">
-    <!-- Container untuk elemen background agar tidak menembus batas layar -->
-    <div class="absolute inset-0 overflow-hidden pointer-events-none z-0">
-        <div class="hero-glow"></div>
-        <div class="hero-glow-2"></div>
-    </div>
-
-    <div class="container mx-auto px-4 relative z-10 text-center">
-        <span
-            class="inline-block glass-badge px-5 py-2 rounded-full text-xs font-black mb-6 uppercase tracking-[0.2em] italic text-center">AGEN
-            BUS KAWUNGANTEN</span>
-        <h2 class="text-4xl md:text-5xl lg:text-6xl font-black mb-5 leading-[1.15] text-center tracking-tight text-white">Perjalanan <span class="text-transparent bg-clip-text bg-gradient-to-r from-amber-200 to-white">Nyaman</span><br><span
-                class="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-amber-600">Pesan Tiket Aman</span></h2>
-        <p class="text-slate-300 text-sm md:text-lg mb-10 font-medium uppercase tracking-wide text-center max-w-2xl mx-auto leading-relaxed">
-            Pusat Penjualan Tiket Bus, Travel, Pesawat & Kapal Laut <br>
-            Resmi dan Terpercaya di Kawunganten Cilacap</p>
-
-        <div class="relative max-w-xl mx-auto z-[200] text-center">
-            <div
-                class="glass-search p-2 rounded-full flex flex-col md:flex-row gap-2 text-center">
-                <div class="flex-1 flex items-center px-6 text-left">
-                    <i class="fas fa-search text-amber-500 mr-4 shrink-0 text-lg"></i>
-                    <input type="text" id="destSearch" oninput="liveSearch()"
-                        placeholder="Cari tujuan (Contoh: Jakarta)..."
-                        class="w-full py-3 bg-transparent text-slate-800 font-bold focus:outline-none placeholder:text-slate-400 text-center md:text-left text-sm md:text-base">
-                </div>
-                <button onclick="triggerSearch()"
-                    class="w-full md:w-auto bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white px-10 py-3.5 rounded-full font-black transition-all shadow-lg shadow-amber-500/30 hover:shadow-xl uppercase text-center text-sm md:text-base">Cari
-                    Armada</button>
-            </div>
-
-            <!-- Bagian Official Partner: Diubah menjadi Flex-Col agar terpisah baris -->
-            <div class="mt-4 animate-fade-in-up flex flex-col items-center justify-center gap-y-2 px-1 opacity-95"
-                style="animation-delay: 0.4s;">
-                <span class="text-[9px] font-black text-yellow-400 uppercase tracking-widest italic">Official Partner
-                    :</span>
-
-                <div class="flex flex-wrap items-center justify-center gap-x-3 gap-y-2">
-                    <!-- Logo DAMRI -->
-                    <button onclick="scrollToArmada('damri-jkt')"
-                        class="flex items-center shrink-0 hover:scale-110 transition-transform active:scale-95">
-                        <span
-                            class="font-black italic text-[11px] tracking-tighter text-[#003d79] bg-white px-1.5 py-0.5 rounded shadow-sm">DAMRI</span>
-                    </button>
-                    <!-- Logo BEST PREMIUM -->
-                    <div class="flex items-center shrink-0">
-                        <span class="font-black text-[11px] tracking-tight text-[#FFD700] uppercase">Best <span
-                                class="text-white">Premium</span></span>
-                    </div>
-                    <!-- Logo ESTU TRANS -->
-                    <div class="flex items-center shrink-0">
-                        <span class="font-extrabold italic text-[11px] text-[#22c55e]">ESTU <span
-                                class="text-white">TRANS</span></span>
-                    </div>
-                    <!-- Logo EFISIENSI -->
-                    <div class="flex items-center shrink-0">
-                        <span
-                            class="font-black italic text-[11px] tracking-[0.1em] text-[#00CED1] border-b border-[#00CED1]">EFISIENSI</span>
-                    </div>
-                    <!-- Logo RIYAN -->
-                    <div class="flex items-center shrink-0">
-                        <span
-                            class="font-black italic text-[11px] text-red-600 bg-white px-1.5 rounded shadow-sm border border-red-600/20">RIYAN</span>
-                    </div>
-                    <!-- Logo ARDY TRANS -->
-                    <div class="flex items-center shrink-0">
-                        <span
-                            class="font-black text-[11px] text-red-500 bg-white/10 px-1.5 rounded border border-red-500/30">ARDY
-                            <span class="text-white">TRANS</span></span>
-                    </div>
-                    <!-- Logo QYTA TRANS -->
-                    <div class="flex items-center shrink-0">
-                        <span class="font-black italic text-[11px] text-orange-500 uppercase tracking-tighter">Qyta
-                            <span class="text-white">Trans</span></span>
-                    </div>
-                    <!-- Logo 77 TRANS -->
-                    <div class="flex items-center shrink-0">
-                        <span
-                            class="font-black text-[11px] text-yellow-400 border border-yellow-400 px-1.5 rounded shadow-lg shadow-yellow-400/10">77
-                            <span class="text-white">TRANS</span></span>
-                    </div>
+                <div id="heroResultsContainer"
+                    class="absolute top-full left-0 right-0 mt-3 glass-panel rounded-3xl shadow-[0_25px_60px_-15px_rgba(0,0,0,0.5)] overflow-hidden max-h-[450px] overflow-y-auto hidden border-white/40 text-center">
+                    <div id="heroResultsList" class="p-6 text-left space-y-4"></div>
                 </div>
             </div>
-
-            <div id="heroResultsContainer"
-                class="absolute top-full left-0 right-0 mt-3 glass-panel rounded-3xl shadow-[0_25px_60px_-15px_rgba(0,0,0,0.5)] overflow-hidden max-h-[450px] overflow-y-auto hidden border-white/40 text-center">
-                <div id="heroResultsList" class="p-6 text-left space-y-4"></div>
-            </div>
         </div>
-    </div>
-</header>
+    </header>
 
-<!-- Cek Tiket Section -->
-<section id="cek-tiket" class="py-16 -mt-12 relative z-10 text-center">
-    <div class="container mx-auto px-4 text-center">
-        <div class="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-8 items-stretch text-center">
-            <div
-                class="bg-white rounded-[2.5rem] shadow-2xl border border-gray-100 overflow-hidden text-center flex flex-col h-full">
-                <div class="bg-gradient-to-r from-amber-400 to-amber-500 p-6 text-center shrink-0">
-                    <h3 class="text-slate-900 font-black uppercase tracking-widest text-lg text-center">Booking
-                        Tiket Cepat</h3>
-                </div>
-                <div class="p-8 text-center flex flex-col items-center justify-center flex-1">
-                    <p class="text-gray-500 font-bold text-sm mb-6 uppercase text-center">Pesan tiket Anda
-                        sekarang </p>
-                    <button onclick="openBookingModal()"
-                        class="w-full bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-500 hover:to-amber-600 text-slate-900 py-5 rounded-[2rem] font-black shadow-lg shadow-amber-500/20 transition-all uppercase tracking-widest flex items-center justify-center gap-3 active:scale-95 text-center">
-                        <i class="fas fa-plus-circle text-xl"></i> Boking Tiket
-                    </button>
-                </div>
-            </div>
-            <div
-                class="bg-white rounded-[2.5rem] shadow-2xl border border-gray-100 overflow-hidden text-center flex flex-col h-full">
-                <div class="bg-slate-900 p-6 text-center shrink-0">
-                    <h3 class="text-amber-400 font-black uppercase tracking-widest text-lg text-center">Status Tiket
-                        Anda</h3>
-                </div>
-                <div class="p-8 text-center flex flex-col justify-center flex-1">
-                    <div class="flex flex-col md:flex-row gap-3 justify-center mb-6 text-center">
-                        <input type="text" id="inputTiket" placeholder="Masukkan ID Tiket..."
-                            class="flex-1 p-4 bg-gray-50 border border-gray-200 rounded-2xl font-bold text-gray-700 focus:outline-none focus:ring-2 focus:ring-amber-500/50 text-center">
-                        <button onclick="cariTiket()"
-                            class="bg-slate-800 hover:bg-slate-900 text-white px-8 py-4 rounded-2xl font-black transition-all shadow-lg flex items-center justify-center gap-2 active:scale-95 uppercase text-center">
-                            <i class="fas fa-search text-amber-400"></i> Cek Tiket
+    <!-- Cek Tiket Section -->
+    <section id="cek-tiket" class="py-16 -mt-12 relative z-10 text-center">
+        <div class="container mx-auto px-4 text-center">
+            <div class="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-8 items-stretch text-center">
+                <div
+                    class="bg-white rounded-[2.5rem] shadow-2xl border border-gray-100 overflow-hidden text-center flex flex-col h-full">
+                    <div class="bg-gradient-to-r from-amber-400 to-amber-500 p-6 text-center shrink-0">
+                        <h3 class="text-slate-900 font-black uppercase tracking-widest text-lg text-center">Booking
+                            Tiket Cepat</h3>
+                    </div>
+                    <div class="p-8 text-center flex flex-col items-center justify-center flex-1">
+                        <p class="text-gray-500 font-bold text-sm mb-6 uppercase text-center">Pesan tiket Anda
+                            sekarang </p>
+                        <button onclick="openBookingModal()"
+                            class="w-full bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-500 hover:to-amber-600 text-slate-900 py-5 rounded-[2rem] font-black shadow-lg shadow-amber-500/20 transition-all uppercase tracking-widest flex items-center justify-center gap-3 active:scale-95 text-center">
+                            <i class="fas fa-plus-circle text-xl"></i> Boking Tiket
                         </button>
                     </div>
-                    <div id="hasil" class="mt-4 flex flex-col items-center gap-6 text-center"></div>
+                </div>
+                <div
+                    class="bg-white rounded-[2.5rem] shadow-2xl border border-gray-100 overflow-hidden text-center flex flex-col h-full">
+                    <div class="bg-slate-900 p-6 text-center shrink-0">
+                        <h3 class="text-amber-400 font-black uppercase tracking-widest text-lg text-center">Status Tiket
+                            Anda</h3>
+                    </div>
+                    <div class="p-8 text-center flex flex-col justify-center flex-1">
+                        <div class="flex flex-col md:flex-row gap-3 justify-center mb-6 text-center">
+                            <input type="text" id="inputTiket" placeholder="Masukkan ID Tiket..."
+                                class="flex-1 p-4 bg-gray-50 border border-gray-200 rounded-2xl font-bold text-gray-700 focus:outline-none focus:ring-2 focus:ring-amber-500/50 text-center">
+                            <button onclick="cariTiket()"
+                                class="bg-slate-800 hover:bg-slate-900 text-white px-8 py-4 rounded-2xl font-black transition-all shadow-lg flex items-center justify-center gap-2 active:scale-95 uppercase text-center">
+                                <i class="fas fa-search text-amber-400"></i> Cek Tiket
+                            </button>
+                        </div>
+                        <div id="hasil" class="mt-4 flex flex-col items-center gap-6 text-center"></div>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
-</section>
+    </section>
 
-<!-- Layanan Armada -->
-<section id="produk" class="py-20 bg-gray-50 text-center">
-    <div class="container mx-auto px-4 text-center">
-        <h2
-            class="text-slate-800 font-extrabold text-3xl md:text-4xl mb-4 uppercase tracking-tighter text-center">
-            Armada Bus & Travel</h2>
-        <div class="w-20 h-1.5 bg-gradient-to-r from-amber-400 to-amber-500 mx-auto rounded-full mb-4 text-center"></div>
-        <!-- Peringatan Harga -->
-        <p
-            class="text-[10px] font-black text-red-500/80 uppercase tracking-[0.2em] mb-12 italic flex items-center justify-center gap-2">
-            <i class="fas fa-info-circle text-xs"></i> Harga bisa berubah ubah sesuai kebijakan dan ketetapan dari
-            masing masing PO
-        </p>
-
-        <div id="jadwal" class="relative -top-24"></div>
-        <div id="armadaGridBus" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-20 text-center">
-            <!-- Data Armada akan dirender otomatis melalui JavaScript berdasarkan Database -->
-        </div>
-
-        <!-- Tiket Pesawat & Kapal Laut -->
-        <h2
-            class="text-tertiary font-extrabold text-3xl md:text-4xl mb-4 uppercase tracking-tighter italic text-center">
-            Tiket Pesawat & Kapal Laut</h2>
-        <div class="w-20 h-1.5 bg-yellow-400 mx-auto rounded-full mb-8 text-center"></div>
-        <div class="max-w-2xl mx-auto mb-12 bg-red-50 border-2 border-red-200 p-6 rounded-3xl shadow-lg text-center">
-            <p class="text-red-700 font-black text-sm uppercase italic text-center">
-                <i class="fas fa-exclamation-triangle mr-2 text-center"></i> PERHATIAN: PEMESANAN TIKET PESAWAT DAN
-                KAPAL LAUT HANYA DILAYANI SECARA OFFLINE / DATANG LANGSUNG KE TOKO.
+    <!-- Layanan Armada -->
+    <section id="produk" class="py-20 bg-gray-50 text-center">
+        <div class="container mx-auto px-4 text-center">
+            <h2 class="text-slate-800 font-extrabold text-3xl md:text-4xl mb-4 uppercase tracking-tighter text-center">
+                Armada Bus & Travel</h2>
+            <div class="w-20 h-1.5 bg-gradient-to-r from-amber-400 to-amber-500 mx-auto rounded-full mb-4 text-center">
+            </div>
+            <!-- Peringatan Harga -->
+            <p
+                class="text-[10px] font-black text-red-500/80 uppercase tracking-[0.2em] mb-12 italic flex items-center justify-center gap-2">
+                <i class="fas fa-info-circle text-xs"></i> Harga bisa berubah ubah sesuai kebijakan dan ketetapan dari
+                masing masing PO
             </p>
-        </div>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-20 max-w-4xl mx-auto text-center">
-            <div class="modern-card p-10 flex flex-col items-center text-center">
-                <div
-                    class="w-20 h-20 bg-amber-50 text-amber-600 rounded-3xl flex items-center justify-center mb-6 text-center">
-                    <i class="fas fa-plane-departure text-4xl"></i></div>
-                <h3 class="text-2xl font-black uppercase mb-4 text-slate-900 italic text-center">TIKET PESAWAT</h3>
-                <p class="text-gray-500 text-sm font-bold italic leading-relaxed text-center">Melayani rute Domestik dan
-                    Internasional dengan berbagai maskapai pilihan. Harga kompetitif dan proses cepat di tempat.</p>
-            </div>
-            <div class="modern-card p-10 flex flex-col items-center text-center">
-                <div
-                    class="w-20 h-20 bg-amber-50 text-amber-600 rounded-3xl flex items-center justify-center mb-6 text-center">
-                    <i class="fas fa-ship text-4xl"></i></div>
-                <h3 class="text-2xl font-black uppercase mb-4 text-slate-900 italic text-center">TIKET KAPAL LAUT</h3>
-                <p class="text-gray-500 text-sm font-bold italic leading-relaxed text-center">Pemesanan tiket Kapal Laut
-                    resmi (PELNI, DLU, ASDP) untuk semua rute antar pulau di Indonesia.</p>
-            </div>
-        </div>
-    </div>
-</section>
 
-<!-- Galeri Foto Armada -->
-<section id="galeri" class="py-24 bg-white overflow-hidden">
-    <div class="container mx-auto px-4 text-center">
-        <h2 class="text-slate-800 font-extrabold text-3xl md:text-4xl mb-4 uppercase tracking-tighter text-center">Galeri
-            Armada</h2>
-        <div class="w-20 h-1.5 bg-gradient-to-r from-amber-400 to-amber-500 mx-auto rounded-full mb-12"></div>
-
-        <div class="relative group max-w-6xl mx-auto">
-            <div id="slider" class="slider-container flex overflow-x-auto gap-6 pb-12 snap-x snap-mandatory">
-                <div class="slide-item snap-center">
-                    <div class="modern-card overflow-hidden group/item relative h-full">
-                        <div class="aspect-[16/10] overflow-hidden bg-gray-100">
-                            <img src="damri.webp" alt="Damri Jakarta"
-                                class="w-full h-full object-cover transition-transform duration-700 group-hover/item:scale-110">
-                        </div>
-                        <div class="p-6 text-center">
-                            <span
-                                class="bg-blue-600 text-white text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-widest mb-2 inline-block">Bus
-                                Antar Kota</span>
-                            <h4 class="text-blue-900 font-black italic uppercase tracking-tighter">DAMRI JAKARTA</h4>
-                        </div>
-                    </div>
-                </div>
-                <div class="slide-item snap-center">
-                    <div class="modern-card overflow-hidden group/item relative h-full">
-                        <div class="aspect-[16/10] overflow-hidden bg-gray-100">
-                            <img src="damri2.webp" alt="Damri Sumatra"
-                                class="w-full h-full object-cover transition-transform duration-700 group-hover/item:scale-110">
-                        </div>
-                        <div class="p-6 text-center">
-                            <span
-                                class="bg-blue-600 text-white text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-widest mb-2 inline-block">Bus
-                                Antar Pulau</span>
-                            <h4 class="text-blue-900 font-black italic uppercase tracking-tighter">DAMRI SUMATRA</h4>
-                        </div>
-                    </div>
-                </div>
-                <div class="slide-item snap-center">
-                    <div class="modern-card overflow-hidden group/item relative h-full">
-                        <div class="aspect-[16/10] overflow-hidden bg-gray-100">
-                            <img src="bestpremium.webp" alt="Best Premium"
-                                class="w-full h-full object-cover transition-transform duration-700 group-hover/item:scale-110">
-                        </div>
-                        <div class="p-6 text-center">
-                            <span
-                                class="bg-blue-600 text-white text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-widest mb-2 inline-block">Bus
-                                Antar Kota</span>
-                            <h4 class="text-blue-900 font-black italic uppercase tracking-tighter">BEST PREMIUM</h4>
-                        </div>
-                    </div>
-                </div>
-                <div class="slide-item snap-center">
-                    <div class="modern-card overflow-hidden group/item relative h-full">
-                        <div class="aspect-[16/10] overflow-hidden bg-gray-100">
-                            <img src="efisiensi.webp" alt="EFISIENSI"
-                                class="w-full h-full object-cover transition-transform duration-700 group-hover/item:scale-110">
-                        </div>
-                        <div class="p-6 text-center">
-                            <span
-                                class="bg-blue-600 text-white text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-widest mb-2 inline-block">Bus
-                                Antar Kota</span>
-                            <h4 class="text-blue-900 font-black italic uppercase tracking-tighter">EFISIENSI</h4>
-                        </div>
-                    </div>
-                </div>
-                <div class="slide-item snap-center">
-                    <div class="modern-card overflow-hidden group/item relative h-full">
-                        <div class="aspect-[16/10] overflow-hidden bg-gray-100">
-                            <img src="riyan.webp" alt="RIYAN"
-                                class="w-full h-full object-cover transition-transform duration-700 group-hover/item:scale-110">
-                        </div>
-                        <div class="p-6 text-center">
-                            <span
-                                class="bg-blue-600 text-white text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-widest mb-2 inline-block">Bus
-                                Antar Kota</span>
-                            <h4 class="text-blue-900 font-black italic uppercase tracking-tighter">RIYAN</h4>
-                        </div>
-                    </div>
-                </div>
-                <div class="slide-item snap-center">
-                    <div class="modern-card overflow-hidden group/item relative h-full">
-                        <div class="aspect-[16/10] overflow-hidden bg-gray-100">
-                            <img src="estutrans.webp" alt="Estu Trans"
-                                class="w-full h-full object-cover transition-transform duration-700 group-hover/item:scale-110">
-                        </div>
-                        <div class="p-6 text-center">
-                            <span
-                                class="bg-blue-600 text-white text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-widest mb-2 inline-block">Travel
-                                Executive</span>
-                            <h4 class="text-blue-900 font-black italic uppercase tracking-tighter">ESTU TRANS</h4>
-                        </div>
-                    </div>
-                </div>
-                <div class="slide-item snap-center">
-                    <div class="modern-card overflow-hidden group/item relative h-full">
-                        <div class="aspect-[16/10] overflow-hidden bg-gray-100">
-                            <img src="busjogja.webp" alt="Bus Jogja"
-                                class="w-full h-full object-cover transition-transform duration-700 group-hover/item:scale-110">
-                        </div>
-                        <div class="p-6 text-center">
-                            <span
-                                class="bg-blue-600 text-white text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-widest mb-2 inline-block">Bus
-                                Antar Kota</span>
-                            <h4 class="text-blue-900 font-black italic uppercase tracking-tighter">BUS JOGJA</h4>
-                        </div>
-                    </div>
-                </div>
-                <div class="slide-item snap-center">
-                    <div class="modern-card overflow-hidden group/item relative h-full">
-                        <div class="aspect-[16/10] overflow-hidden bg-gray-100">
-                            <img src="qyta.webp" alt="QYTA TRANS"
-                                class="w-full h-full object-cover transition-transform duration-700 group-hover/item:scale-110">
-                        </div>
-                        <div class="p-6 text-center">
-                            <span
-                                class="bg-blue-600 text-white text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-widest mb-2 inline-block">Travel
-                                Executive</span>
-                            <h4 class="text-blue-900 font-black italic uppercase tracking-tighter">QYTA TRANS</h4>
-                        </div>
-                    </div>
-                </div>
-                <div class="slide-item snap-center">
-                    <div class="modern-card overflow-hidden group/item relative h-full">
-                        <div class="aspect-[16/10] overflow-hidden bg-gray-100">
-                            <img src="77trans.webp" alt="77 TRANS"
-                                class="w-full h-full object-cover transition-transform duration-700 group-hover/item:scale-110">
-                        </div>
-                        <div class="p-6 text-center">
-                            <span
-                                class="bg-blue-600 text-white text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-widest mb-2 inline-block">Travel
-                                Executive</span>
-                            <h4 class="text-blue-900 font-black italic uppercase tracking-tighter">77 TRANS</h4>
-                        </div>
-                    </div>
-                </div>
+            <div id="jadwal" class="relative -top-24"></div>
+            <div id="armadaGridBus" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-20 text-center">
+                <!-- Data Armada akan dirender otomatis melalui JavaScript berdasarkan Database -->
             </div>
 
-            <button onclick="slidePrev()"
-                class="absolute left-2 top-1/2 -translate-y-1/2 w-12 h-12 bg-white/90 backdrop-blur shadow-2xl rounded-full flex items-center justify-center text-slate-800 hover:bg-amber-500 hover:text-white transition-all z-10 focus:outline-none">
-                <i class="fas fa-chevron-left text-lg"></i>
-            </button>
-            <button onclick="slideNext()"
-                class="absolute right-2 top-1/2 -translate-y-1/2 w-12 h-12 bg-white/90 backdrop-blur shadow-2xl rounded-full flex items-center justify-center text-slate-800 hover:bg-amber-500 hover:text-white transition-all z-10 focus:outline-none">
-                <i class="fas fa-chevron-right text-lg"></i>
-            </button>
-
-            <div class="flex justify-center gap-2 mt-4" id="sliderDots">
+            <!-- Tiket Pesawat & Kapal Laut -->
+            <h2
+                class="text-tertiary font-extrabold text-3xl md:text-4xl mb-4 uppercase tracking-tighter italic text-center">
+                Tiket Pesawat & Kapal Laut</h2>
+            <div class="w-20 h-1.5 bg-yellow-400 mx-auto rounded-full mb-8 text-center"></div>
+            <div
+                class="max-w-2xl mx-auto mb-12 bg-red-50 border-2 border-red-200 p-6 rounded-3xl shadow-lg text-center">
+                <p class="text-red-700 font-black text-sm uppercase italic text-center">
+                    <i class="fas fa-exclamation-triangle mr-2 text-center"></i> PERHATIAN: PEMESANAN TIKET PESAWAT DAN
+                    KAPAL LAUT HANYA DILAYANI SECARA OFFLINE / DATANG LANGSUNG KE TOKO.
+                </p>
             </div>
-        </div>
-    </div>
-</section>
-
-<!-- Wilayah Jangkauan Layanan -->
-<section id="jangkauan" class="py-20 bg-slate-50 border-y border-slate-100">
-    <div class="container mx-auto px-4 text-center">
-        <h2 class="text-slate-800 font-extrabold text-2xl md:text-3xl mb-4 uppercase tracking-tighter text-center">Wilayah
-            Jangkauan Kami</h2>
-        <p class="text-gray-500 font-bold text-xs uppercase mb-10 italic tracking-widest">Melayani pemesanan tiket untuk
-            Kawunganten & sekitarnya</p>
-
-        <div class="max-w-4xl mx-auto flex flex-wrap justify-center gap-3">
-            <span class="destination-tag px-6 py-3 bg-white border-blue-200 text-blue-800 text-[12px]"><i
-                    class="fas fa-map-pin mr-2"></i>Kawunganten</span>
-            <span class="destination-tag px-6 py-3 bg-white border-blue-200 text-blue-800 text-[12px]"><i
-                    class="fas fa-map-pin mr-2"></i>Bojong</span>
-            <span class="destination-tag px-6 py-3 bg-white border-blue-200 text-blue-800 text-[12px]"><i
-                    class="fas fa-map-pin mr-2"></i>Bringkeng</span>
-            <span class="destination-tag px-6 py-3 bg-white border-blue-200 text-blue-800 text-[12px]"><i
-                    class="fas fa-map-pin mr-2"></i>Grugu</span>
-            <span class="destination-tag px-6 py-3 bg-white border-blue-200 text-blue-800 text-[12px]"><i
-                    class="fas fa-map-pin mr-2"></i>Kalijeruk</span>
-            <span class="destination-tag px-6 py-3 bg-white border-blue-200 text-blue-800 text-[12px]"><i
-                    class="fas fa-map-pin mr-2"></i>Mentasan</span>
-            <span class="destination-tag px-6 py-3 bg-white border-blue-200 text-blue-800 text-[12px]"><i
-                    class="fas fa-map-pin mr-2"></i>Sarwadadi</span>
-            <span class="destination-tag px-6 py-3 bg-white border-blue-200 text-blue-800 text-[12px]"><i
-                    class="fas fa-map-pin mr-2"></i>Sidaurip</span>
-            <span class="destination-tag px-6 py-3 bg-white border-blue-200 text-blue-800 text-[12px]"><i
-                    class="fas fa-map-pin mr-2"></i>Ujungmanik</span>
-            <span class="destination-tag px-6 py-3 bg-white border-blue-200 text-blue-800 text-[12px]"><i
-                    class="fas fa-map-pin mr-2"></i>Jeruklegi</span>
-            <span class="destination-tag px-6 py-3 bg-white border-blue-200 text-blue-800 text-[12px]"><i
-                    class="fas fa-map-pin mr-2"></i>Bantarsari</span>
-            <span class="destination-tag px-6 py-3 bg-white border-blue-200 text-blue-800 text-[12px]"><i
-                    class="fas fa-map-pin mr-2"></i>Gandrungmangu</span>
-            <span class="destination-tag px-6 py-3 bg-white border-blue-200 text-blue-800 text-[12px]"><i
-                    class="fas fa-map-pin mr-2"></i>Sidareja</span>
-            <span class="destination-tag px-6 py-3 bg-white border-blue-200 text-blue-800 text-[12px]"><i
-                    class="fas fa-map-pin mr-2"></i>Karangpucung</span>
-        </div>
-        <p class="mt-10 text-[10px] font-bold text-gray-400 uppercase italic">Tersedia layanan jemput di lokasi (Sesuai
-            rute armada)</p>
-    </div>
-</section>
-
-<!-- Testimoni Pelanggan -->
-<section id="testimoni" class="py-20 bg-white">
-    <div class="container mx-auto px-4 text-center">
-        <h2 class="text-tertiary font-extrabold text-2xl md:text-3xl mb-4 uppercase tracking-tighter italic">Testimoni Pelanggan</h2>
-        <div class="w-20 h-1.5 bg-yellow-400 mx-auto rounded-full mb-12 text-center"></div>
-
-        <div class="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6">
-            <!-- Card 1 -->
-            <div class="modern-card p-6 text-left relative">
-                <i class="fas fa-quote-left text-blue-100 text-4xl absolute top-4 right-4 z-0"></i>
-                <div class="flex items-center gap-1 text-yellow-400 text-xs mb-4 relative z-10">
-                    <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
-                </div>
-                <p class="text-gray-600 font-bold text-sm italic mb-6 relative z-10 leading-relaxed">"Pesan tiket travel di sini gampang banget, supirnya ramah dan tepat waktu. Fasilitas AC dingin dan sangat nyaman untuk perjalanan jauh!"</p>
-                <div class="flex items-center gap-3 relative z-10 border-t border-gray-100 pt-4">
-                    <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center text-blue-700 font-black">B</div>
-                    <div>
-                        <h5 class="text-blue-900 font-black text-xs uppercase">Budi Santoso</h5>
-                        <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Cilacap</p>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-20 max-w-4xl mx-auto text-center">
+                <div class="modern-card p-10 flex flex-col items-center text-center">
+                    <div
+                        class="w-20 h-20 bg-amber-50 text-amber-600 rounded-3xl flex items-center justify-center mb-6 text-center">
+                        <i class="fas fa-plane-departure text-4xl"></i>
                     </div>
+                    <h3 class="text-2xl font-black uppercase mb-4 text-slate-900 italic text-center">TIKET PESAWAT</h3>
+                    <p class="text-gray-500 text-sm font-bold italic leading-relaxed text-center">Melayani rute Domestik
+                        dan
+                        Internasional dengan berbagai maskapai pilihan. Harga kompetitif dan proses cepat di tempat.</p>
                 </div>
-            </div>
-            <!-- Card 2 -->
-            <div class="modern-card p-6 text-left relative">
-                <i class="fas fa-quote-left text-blue-100 text-4xl absolute top-4 right-4 z-0"></i>
-                <div class="flex items-center gap-1 text-yellow-400 text-xs mb-4 relative z-10">
-                    <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
-                </div>
-                <p class="text-gray-600 font-bold text-sm italic mb-6 relative z-10 leading-relaxed">"Sangat membantu saat butuh tiket mendadak. Admin WhatsApp responsif, e-ticket langsung dikirim. Pelayanan sangat memuaskan, mantap!"</p>
-                <div class="flex items-center gap-3 relative z-10 border-t border-gray-100 pt-4">
-                    <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center text-green-700 font-black">S</div>
-                    <div>
-                        <h5 class="text-blue-900 font-black text-xs uppercase">Siti Aminah</h5>
-                        <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Kawunganten</p>
+                <div class="modern-card p-10 flex flex-col items-center text-center">
+                    <div
+                        class="w-20 h-20 bg-amber-50 text-amber-600 rounded-3xl flex items-center justify-center mb-6 text-center">
+                        <i class="fas fa-ship text-4xl"></i>
                     </div>
-                </div>
-            </div>
-            <!-- Card 3 -->
-            <div class="modern-card p-6 text-left relative">
-                <i class="fas fa-quote-left text-blue-100 text-4xl absolute top-4 right-4 z-0"></i>
-                <div class="flex items-center gap-1 text-yellow-400 text-xs mb-4 relative z-10">
-                    <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
-                </div>
-                <p class="text-gray-600 font-bold text-sm italic mb-6 relative z-10 leading-relaxed">"Armada bersih, keberangkatan sesuai jadwal. Ga nyesel langganan di Agen Damri Kawunganten, sukses terus untuk pelayanannya."</p>
-                <div class="flex items-center gap-3 relative z-10 border-t border-gray-100 pt-4">
-                    <div class="w-10 h-10 bg-yellow-100 rounded-full flex items-center justify-center text-yellow-700 font-black">A</div>
-                    <div>
-                        <h5 class="text-blue-900 font-black text-xs uppercase">Agus Setiawan</h5>
-                        <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Yogyakarta</p>
-                    </div>
+                    <h3 class="text-2xl font-black uppercase mb-4 text-slate-900 italic text-center">TIKET KAPAL LAUT
+                    </h3>
+                    <p class="text-gray-500 text-sm font-bold italic leading-relaxed text-center">Pemesanan tiket Kapal
+                        Laut
+                        resmi (PELNI, DLU, ASDP) untuk semua rute antar pulau di Indonesia.</p>
                 </div>
             </div>
         </div>
-    </div>
-</section>
+    </section>
 
-<!-- FAQ Section -->
-<section id="faq" class="py-20 bg-blue-50/30 border-t border-blue-100">
-    <div class="container mx-auto px-4">
-        <h2 class="text-tertiary font-extrabold text-2xl md:text-3xl mb-4 uppercase tracking-tighter italic text-center">Tanya Jawab (FAQ)</h2>
-        <div class="w-20 h-1.5 bg-yellow-400 mx-auto rounded-full mb-12 text-center"></div>
+    <!-- Galeri Foto Armada -->
+    <section id="galeri" class="py-24 bg-white overflow-hidden">
+        <div class="container mx-auto px-4 text-center">
+            <h2 class="text-slate-800 font-extrabold text-3xl md:text-4xl mb-4 uppercase tracking-tighter text-center">
+                Galeri
+                Armada</h2>
+            <div class="w-20 h-1.5 bg-gradient-to-r from-amber-400 to-amber-500 mx-auto rounded-full mb-12"></div>
 
-        <div class="max-w-3xl mx-auto space-y-4">
-            <!-- FAQ Item 1 -->
-            <div class="modern-card overflow-hidden">
-                <button onclick="toggleFaq('faq1')" class="w-full text-left px-6 py-5 flex justify-between items-center focus:outline-none group">
-                    <div class="flex items-center gap-3">
-                        <i class="fas fa-shopping-cart text-blue-500 group-hover:text-blue-700 transition-colors w-4 text-center"></i>
-                        <span class="font-black text-blue-900 uppercase text-sm">Bagaimana prosedur pemesanan tiket?</span>
+            <div class="relative group max-w-6xl mx-auto">
+                <div id="slider" class="slider-container flex overflow-x-auto gap-6 pb-12 snap-x snap-mandatory">
+                    <div class="slide-item snap-center">
+                        <div class="modern-card overflow-hidden group/item relative h-full">
+                            <div class="aspect-[16/10] overflow-hidden bg-gray-100">
+                                <img src="damri.webp" alt="Damri Jakarta"
+                                    class="w-full h-full object-cover transition-transform duration-700 group-hover/item:scale-110">
+                            </div>
+                            <div class="p-6 text-center">
+                                <span
+                                    class="bg-blue-600 text-white text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-widest mb-2 inline-block">Bus
+                                    Antar Kota</span>
+                                <h4 class="text-blue-900 font-black italic uppercase tracking-tighter">DAMRI JAKARTA
+                                </h4>
+                            </div>
+                        </div>
                     </div>
-                    <i id="icon-faq1" class="fas fa-chevron-down text-gray-400 transition-transform duration-300"></i>
+                    <div class="slide-item snap-center">
+                        <div class="modern-card overflow-hidden group/item relative h-full">
+                            <div class="aspect-[16/10] overflow-hidden bg-gray-100">
+                                <img src="damri2.webp" alt="Damri Sumatra"
+                                    class="w-full h-full object-cover transition-transform duration-700 group-hover/item:scale-110">
+                            </div>
+                            <div class="p-6 text-center">
+                                <span
+                                    class="bg-blue-600 text-white text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-widest mb-2 inline-block">Bus
+                                    Antar Pulau</span>
+                                <h4 class="text-blue-900 font-black italic uppercase tracking-tighter">DAMRI SUMATRA
+                                </h4>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="slide-item snap-center">
+                        <div class="modern-card overflow-hidden group/item relative h-full">
+                            <div class="aspect-[16/10] overflow-hidden bg-gray-100">
+                                <img src="bestpremium.webp" alt="Best Premium"
+                                    class="w-full h-full object-cover transition-transform duration-700 group-hover/item:scale-110">
+                            </div>
+                            <div class="p-6 text-center">
+                                <span
+                                    class="bg-blue-600 text-white text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-widest mb-2 inline-block">Bus
+                                    Antar Kota</span>
+                                <h4 class="text-blue-900 font-black italic uppercase tracking-tighter">BEST PREMIUM</h4>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="slide-item snap-center">
+                        <div class="modern-card overflow-hidden group/item relative h-full">
+                            <div class="aspect-[16/10] overflow-hidden bg-gray-100">
+                                <img src="efisiensi.webp" alt="EFISIENSI"
+                                    class="w-full h-full object-cover transition-transform duration-700 group-hover/item:scale-110">
+                            </div>
+                            <div class="p-6 text-center">
+                                <span
+                                    class="bg-blue-600 text-white text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-widest mb-2 inline-block">Bus
+                                    Antar Kota</span>
+                                <h4 class="text-blue-900 font-black italic uppercase tracking-tighter">EFISIENSI</h4>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="slide-item snap-center">
+                        <div class="modern-card overflow-hidden group/item relative h-full">
+                            <div class="aspect-[16/10] overflow-hidden bg-gray-100">
+                                <img src="riyan.webp" alt="RIYAN"
+                                    class="w-full h-full object-cover transition-transform duration-700 group-hover/item:scale-110">
+                            </div>
+                            <div class="p-6 text-center">
+                                <span
+                                    class="bg-blue-600 text-white text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-widest mb-2 inline-block">Bus
+                                    Antar Kota</span>
+                                <h4 class="text-blue-900 font-black italic uppercase tracking-tighter">RIYAN</h4>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="slide-item snap-center">
+                        <div class="modern-card overflow-hidden group/item relative h-full">
+                            <div class="aspect-[16/10] overflow-hidden bg-gray-100">
+                                <img src="estutrans.webp" alt="Estu Trans"
+                                    class="w-full h-full object-cover transition-transform duration-700 group-hover/item:scale-110">
+                            </div>
+                            <div class="p-6 text-center">
+                                <span
+                                    class="bg-blue-600 text-white text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-widest mb-2 inline-block">Travel
+                                    Executive</span>
+                                <h4 class="text-blue-900 font-black italic uppercase tracking-tighter">ESTU TRANS</h4>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="slide-item snap-center">
+                        <div class="modern-card overflow-hidden group/item relative h-full">
+                            <div class="aspect-[16/10] overflow-hidden bg-gray-100">
+                                <img src="busjogja.webp" alt="Bus Jogja"
+                                    class="w-full h-full object-cover transition-transform duration-700 group-hover/item:scale-110">
+                            </div>
+                            <div class="p-6 text-center">
+                                <span
+                                    class="bg-blue-600 text-white text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-widest mb-2 inline-block">Bus
+                                    Antar Kota</span>
+                                <h4 class="text-blue-900 font-black italic uppercase tracking-tighter">BUS JOGJA</h4>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="slide-item snap-center">
+                        <div class="modern-card overflow-hidden group/item relative h-full">
+                            <div class="aspect-[16/10] overflow-hidden bg-gray-100">
+                                <img src="qyta.webp" alt="QYTA TRANS"
+                                    class="w-full h-full object-cover transition-transform duration-700 group-hover/item:scale-110">
+                            </div>
+                            <div class="p-6 text-center">
+                                <span
+                                    class="bg-blue-600 text-white text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-widest mb-2 inline-block">Travel
+                                    Executive</span>
+                                <h4 class="text-blue-900 font-black italic uppercase tracking-tighter">QYTA TRANS</h4>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="slide-item snap-center">
+                        <div class="modern-card overflow-hidden group/item relative h-full">
+                            <div class="aspect-[16/10] overflow-hidden bg-gray-100">
+                                <img src="77trans.webp" alt="77 TRANS"
+                                    class="w-full h-full object-cover transition-transform duration-700 group-hover/item:scale-110">
+                            </div>
+                            <div class="p-6 text-center">
+                                <span
+                                    class="bg-blue-600 text-white text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-widest mb-2 inline-block">Travel
+                                    Executive</span>
+                                <h4 class="text-blue-900 font-black italic uppercase tracking-tighter">77 TRANS</h4>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <button onclick="slidePrev()"
+                    class="absolute left-2 top-1/2 -translate-y-1/2 w-12 h-12 bg-white/90 backdrop-blur shadow-2xl rounded-full flex items-center justify-center text-slate-800 hover:bg-amber-500 hover:text-white transition-all z-10 focus:outline-none">
+                    <i class="fas fa-chevron-left text-lg"></i>
                 </button>
-                <div id="faq1" class="max-h-0 overflow-hidden transition-all duration-300 opacity-0 bg-gray-50 border-t border-gray-100">
-                    <p class="p-6 text-xs text-gray-500 font-bold italic leading-relaxed">Untuk memesan tiket, silakan klik tombol <b class="text-blue-700">"Boking Tiket"</b> pada armada pilihan Anda, lalu tentukan tujuan serta jam keberangkatan. Setelah mengisi formulir data diri dan melakukan pembayaran, kirimkan bukti transfer melalui WhatsApp admin. Jika pesanan disetujui, Anda akan mendapatkan ID Booking yang bisa digunakan pada menu <b class="text-blue-700">"Cek Tiket"</b> untuk mengunduh E-Ticket.</p>
-                </div>
-            </div>
-            <!-- FAQ Item 2 -->
-            <div class="modern-card overflow-hidden">
-                <button onclick="toggleFaq('faq2')" class="w-full text-left px-6 py-5 flex justify-between items-center focus:outline-none group">
-                    <div class="flex items-center gap-3">
-                        <i class="fas fa-child text-green-500 group-hover:text-green-700 transition-colors w-4 text-center"></i>
-                        <span class="font-black text-blue-900 uppercase text-sm">Berapakah batasan umur anak untuk dikenakan tarif penuh?</span>
-                    </div>
-                    <i id="icon-faq2" class="fas fa-chevron-down text-gray-400 transition-transform duration-300"></i>
+                <button onclick="slideNext()"
+                    class="absolute right-2 top-1/2 -translate-y-1/2 w-12 h-12 bg-white/90 backdrop-blur shadow-2xl rounded-full flex items-center justify-center text-slate-800 hover:bg-amber-500 hover:text-white transition-all z-10 focus:outline-none">
+                    <i class="fas fa-chevron-right text-lg"></i>
                 </button>
-                <div id="faq2" class="max-h-0 overflow-hidden transition-all duration-300 opacity-0 bg-gray-50 border-t border-gray-100">
-                    <p class="p-6 text-xs text-gray-500 font-bold italic leading-relaxed">Bagi penumpang anak-anak yang telah berusia di atas <b class="text-blue-700">2 tahun</b>, akan dikenakan tarif 1 tiket penuh (harga normal).</p>
-                </div>
-            </div>
-            <!-- FAQ Item 3 -->
-            <div class="modern-card overflow-hidden">
-                <button onclick="toggleFaq('faq3')" class="w-full text-left px-6 py-5 flex justify-between items-center focus:outline-none group">
-                    <div class="flex items-center gap-3">
-                        <i class="fas fa-ban text-red-500 group-hover:text-red-700 transition-colors w-4 text-center"></i>
-                        <span class="font-black text-blue-900 uppercase text-sm">Apakah pesanan tiket dapat dibatalkan (Cancel)?</span>
-                    </div>
-                    <i id="icon-faq3" class="fas fa-chevron-down text-gray-400 transition-transform duration-300"></i>
-                </button>
-                <div id="faq3" class="max-h-0 overflow-hidden transition-all duration-300 opacity-0 bg-gray-50 border-t border-gray-100">
-                    <p class="p-6 text-xs text-gray-500 font-bold italic leading-relaxed">Pesanan tidak dapat dibatalkan secara mendadak. Proses pembatalan tiket hanya dapat dilakukan maksimal <b class="text-blue-700">1x24 jam sebelum jam keberangkatan</b>. Harap diperhatikan bahwa pembatalan akan dikenakan biaya potongan admin yang besarannya berbeda-beda tergantung kebijakan masing-masing PO (Perusahaan Otobus).</p>
-                </div>
-            </div>
-            <!-- FAQ Item 4 -->
-            <div class="modern-card overflow-hidden">
-                <button onclick="toggleFaq('faq4')" class="w-full text-left px-6 py-5 flex justify-between items-center focus:outline-none group">
-                    <div class="flex items-center gap-3">
-                        <i class="fas fa-calendar-alt text-yellow-500 group-hover:text-yellow-700 transition-colors w-4 text-center"></i>
-                        <span class="font-black text-blue-900 uppercase text-sm">Bagaimana kebijakan mengenai perubahan jadwal (Reschedule)?</span>
-                    </div>
-                    <i id="icon-faq4" class="fas fa-chevron-down text-gray-400 transition-transform duration-300"></i>
-                </button>
-                <div id="faq4" class="max-h-0 overflow-hidden transition-all duration-300 opacity-0 bg-gray-50 border-t border-gray-100">
-                    <p class="p-6 text-xs text-gray-500 font-bold italic leading-relaxed">Perubahan jadwal atau <i>reschedule</i> tiket dapat dilayani maksimal <b class="text-blue-700">1x24 jam sebelum waktu keberangkatan</b>. Proses <i>reschedule</i> ini akan dikenakan biaya potongan sebesar <b class="text-blue-700">20%</b> dari harga tiket Anda.</p>
-                </div>
-            </div>
-            <!-- FAQ Item 5 -->
-            <div class="modern-card overflow-hidden">
-                <button onclick="toggleFaq('faq5')" class="w-full text-left px-6 py-5 flex justify-between items-center focus:outline-none group">
-                    <div class="flex items-center gap-3">
-                        <i class="fas fa-mobile-alt text-indigo-500 group-hover:text-indigo-700 transition-colors w-4 text-center"></i>
-                        <span class="font-black text-blue-900 uppercase text-sm">Apakah saya harus mencetak (print) E-Ticket?</span>
-                    </div>
-                    <i id="icon-faq5" class="fas fa-chevron-down text-gray-400 transition-transform duration-300"></i>
-                </button>
-                <div id="faq5" class="max-h-0 overflow-hidden transition-all duration-300 opacity-0 bg-gray-50 border-t border-gray-100">
-                    <p class="p-6 text-xs text-gray-500 font-bold italic leading-relaxed">Tidak perlu mencetak sendiri sebelum berangkat. Anda cukup menunjukkan E-Ticket langsung dari layar <i>smartphone</i> Anda kepada petugas kami. Pencetakan tiket fisik akan dibantu oleh petugas kami di lokasi sebelum Anda berangkat.</p>
+
+                <div class="flex justify-center gap-2 mt-4" id="sliderDots">
                 </div>
             </div>
         </div>
-    </div>
-</section>
+    </section>
 
-<!-- Hubungi Kami -->
-<section id="kontak" class="py-24 bg-gray-50 text-center">
-    <div class="container mx-auto px-4 text-center">
-        <h2
-            class="text-tertiary font-extrabold text-3xl md:text-4xl mb-4 uppercase tracking-tighter italic text-center">
-            Hubungi Kami</h2>
-        <div class="w-20 h-1.5 bg-yellow-400 mx-auto rounded-full mb-12 text-center"></div>
+    <!-- Wilayah Jangkauan Layanan -->
+    <section id="jangkauan" class="py-20 bg-slate-50 border-y border-slate-100">
+        <div class="container mx-auto px-4 text-center">
+            <h2 class="text-slate-800 font-extrabold text-2xl md:text-3xl mb-4 uppercase tracking-tighter text-center">
+                Wilayah
+                Jangkauan Kami</h2>
+            <p class="text-gray-500 font-bold text-xs uppercase mb-10 italic tracking-widest">Melayani pemesanan tiket
+                untuk
+                Kawunganten & sekitarnya</p>
 
-        <div class="max-w-6xl mx-auto text-center">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-stretch text-center">
-                <div class="modern-card p-8 flex flex-col items-center justify-between text-center">
-                    <div class="flex flex-col items-center text-center">
+            <div class="max-w-4xl mx-auto flex flex-wrap justify-center gap-3">
+                <span class="destination-tag px-6 py-3 bg-white border-blue-200 text-blue-800 text-[12px]"><i
+                        class="fas fa-map-pin mr-2"></i>Kawunganten</span>
+                <span class="destination-tag px-6 py-3 bg-white border-blue-200 text-blue-800 text-[12px]"><i
+                        class="fas fa-map-pin mr-2"></i>Bojong</span>
+                <span class="destination-tag px-6 py-3 bg-white border-blue-200 text-blue-800 text-[12px]"><i
+                        class="fas fa-map-pin mr-2"></i>Bringkeng</span>
+                <span class="destination-tag px-6 py-3 bg-white border-blue-200 text-blue-800 text-[12px]"><i
+                        class="fas fa-map-pin mr-2"></i>Grugu</span>
+                <span class="destination-tag px-6 py-3 bg-white border-blue-200 text-blue-800 text-[12px]"><i
+                        class="fas fa-map-pin mr-2"></i>Kalijeruk</span>
+                <span class="destination-tag px-6 py-3 bg-white border-blue-200 text-blue-800 text-[12px]"><i
+                        class="fas fa-map-pin mr-2"></i>Mentasan</span>
+                <span class="destination-tag px-6 py-3 bg-white border-blue-200 text-blue-800 text-[12px]"><i
+                        class="fas fa-map-pin mr-2"></i>Sarwadadi</span>
+                <span class="destination-tag px-6 py-3 bg-white border-blue-200 text-blue-800 text-[12px]"><i
+                        class="fas fa-map-pin mr-2"></i>Sidaurip</span>
+                <span class="destination-tag px-6 py-3 bg-white border-blue-200 text-blue-800 text-[12px]"><i
+                        class="fas fa-map-pin mr-2"></i>Ujungmanik</span>
+                <span class="destination-tag px-6 py-3 bg-white border-blue-200 text-blue-800 text-[12px]"><i
+                        class="fas fa-map-pin mr-2"></i>Jeruklegi</span>
+                <span class="destination-tag px-6 py-3 bg-white border-blue-200 text-blue-800 text-[12px]"><i
+                        class="fas fa-map-pin mr-2"></i>Bantarsari</span>
+                <span class="destination-tag px-6 py-3 bg-white border-blue-200 text-blue-800 text-[12px]"><i
+                        class="fas fa-map-pin mr-2"></i>Gandrungmangu</span>
+                <span class="destination-tag px-6 py-3 bg-white border-blue-200 text-blue-800 text-[12px]"><i
+                        class="fas fa-map-pin mr-2"></i>Sidareja</span>
+                <span class="destination-tag px-6 py-3 bg-white border-blue-200 text-blue-800 text-[12px]"><i
+                        class="fas fa-map-pin mr-2"></i>Karangpucung</span>
+            </div>
+            <p class="mt-10 text-[10px] font-bold text-gray-400 uppercase italic">Tersedia layanan jemput di lokasi
+                (Sesuai
+                rute armada)</p>
+        </div>
+    </section>
+
+    <!-- Testimoni Pelanggan -->
+    <section id="testimoni" class="py-20 bg-white">
+        <div class="container mx-auto px-4 text-center">
+            <h2 class="text-tertiary font-extrabold text-2xl md:text-3xl mb-4 uppercase tracking-tighter italic">
+                Testimoni Pelanggan</h2>
+            <div class="w-20 h-1.5 bg-yellow-400 mx-auto rounded-full mb-12 text-center"></div>
+
+            <div class="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- Card 1 -->
+                <div class="modern-card p-6 text-left relative">
+                    <i class="fas fa-quote-left text-blue-100 text-4xl absolute top-4 right-4 z-0"></i>
+                    <div class="flex items-center gap-1 text-yellow-400 text-xs mb-4 relative z-10">
+                        <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i
+                            class="fas fa-star"></i><i class="fas fa-star"></i>
+                    </div>
+                    <p class="text-gray-600 font-bold text-sm italic mb-6 relative z-10 leading-relaxed">"Pesan tiket
+                        travel di sini gampang banget, supirnya ramah dan tepat waktu. Fasilitas AC dingin dan sangat
+                        nyaman untuk perjalanan jauh!"</p>
+                    <div class="flex items-center gap-3 relative z-10 border-t border-gray-100 pt-4">
                         <div
-                            class="w-14 h-14 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center mb-4 text-center">
-                            <i class="fas fa-map-marker-alt text-2xl"></i></div>
-                        <h4 class="font-black uppercase text-blue-900 italic mb-2 text-center">Lokasi Agen</h4>
-                        <p class="text-gray-500 font-bold text-sm italic mb-6 text-center">Jl. Raya Kawunganten, Desa
-                            Kawunganten, Kec. Kawunganten, Kab. Cilacap, Jawa Tengah.</p>
+                            class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center text-blue-700 font-black">
+                            B</div>
+                        <div>
+                            <h5 class="text-blue-900 font-black text-xs uppercase">Budi Santoso</h5>
+                            <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Cilacap</p>
+                        </div>
                     </div>
-                    <a href="https://maps.app.goo.gl/mFP2Nn4KUyworYe66" target="_blank"
-                        class="w-full bg-blue-700 text-white py-4 rounded-xl font-black uppercase tracking-widest text-sm shadow-lg hover:bg-blue-800 transition-all text-center">
-                        <i class="fas fa-directions mr-2 text-center"></i> Buka Google Maps
-                    </a>
                 </div>
-                <div class="modern-card p-8 flex flex-col items-center justify-between text-center">
-                    <div class="flex flex-col items-center text-center">
-                        <div
-                            class="w-14 h-14 bg-green-50 text-green-600 rounded-2xl flex items-center justify-center mb-4 text-center">
-                            <i class="fab fa-whatsapp text-2xl"></i></div>
-                        <h4 class="font-black uppercase text-blue-900 italic mb-2 text-center">WhatsApp Admin</h4>
-                        <p class="text-gray-500 font-bold text-sm mb-6 italic text-center">Konsultasi tiket & boking 24
-                            Jam via chat WhatsApp.</p>
+                <!-- Card 2 -->
+                <div class="modern-card p-6 text-left relative">
+                    <i class="fas fa-quote-left text-blue-100 text-4xl absolute top-4 right-4 z-0"></i>
+                    <div class="flex items-center gap-1 text-yellow-400 text-xs mb-4 relative z-10">
+                        <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i
+                            class="fas fa-star"></i><i class="fas fa-star"></i>
                     </div>
-                    <a href="https://wa.me/6282133607759" target="_blank"
-                        class="w-full bg-green-600 text-white py-4 rounded-xl font-black uppercase tracking-widest text-sm shadow-lg hover:bg-green-700 transition-all text-center">
-                        <i class="fab fa-whatsapp mr-2 text-center"></i> Chat Admin Sekarang
-                    </a>
+                    <p class="text-gray-600 font-bold text-sm italic mb-6 relative z-10 leading-relaxed">"Sangat
+                        membantu saat butuh tiket mendadak. Admin WhatsApp responsif, e-ticket langsung dikirim.
+                        Pelayanan sangat memuaskan, mantap!"</p>
+                    <div class="flex items-center gap-3 relative z-10 border-t border-gray-100 pt-4">
+                        <div
+                            class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center text-green-700 font-black">
+                            S</div>
+                        <div>
+                            <h5 class="text-blue-900 font-black text-xs uppercase">Siti Aminah</h5>
+                            <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Kawunganten</p>
+                        </div>
+                    </div>
+                </div>
+                <!-- Card 3 -->
+                <div class="modern-card p-6 text-left relative">
+                    <i class="fas fa-quote-left text-blue-100 text-4xl absolute top-4 right-4 z-0"></i>
+                    <div class="flex items-center gap-1 text-yellow-400 text-xs mb-4 relative z-10">
+                        <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i
+                            class="fas fa-star"></i><i class="fas fa-star"></i>
+                    </div>
+                    <p class="text-gray-600 font-bold text-sm italic mb-6 relative z-10 leading-relaxed">"Armada bersih,
+                        keberangkatan sesuai jadwal. Ga nyesel langganan di Agen Damri Kawunganten, sukses terus untuk
+                        pelayanannya."</p>
+                    <div class="flex items-center gap-3 relative z-10 border-t border-gray-100 pt-4">
+                        <div
+                            class="w-10 h-10 bg-yellow-100 rounded-full flex items-center justify-center text-yellow-700 font-black">
+                            A</div>
+                        <div>
+                            <h5 class="text-blue-900 font-black text-xs uppercase">Agus Setiawan</h5>
+                            <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Yogyakarta</p>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
-</section>
+    </section>
 
-<!-- Floating WhatsApp Button -->
-<a href="https://wa.me/6282133607759" target="_blank" class="fixed bottom-6 right-6 z-[200] bg-[#25D366] text-white w-14 h-14 rounded-full flex items-center justify-center shadow-[0_10px_20px_rgba(37,211,102,0.3)] hover:scale-110 transition-transform duration-300 group">
-    <i class="fab fa-whatsapp text-3xl"></i>
-    <span class="absolute right-16 bg-white text-gray-800 text-[10px] font-black uppercase px-3 py-2 rounded-lg shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap pointer-events-none">Chat Admin</span>
-</a>
+    <!-- FAQ Section -->
+    <section id="faq" class="py-20 bg-blue-50/30 border-t border-blue-100">
+        <div class="container mx-auto px-4">
+            <h2
+                class="text-tertiary font-extrabold text-2xl md:text-3xl mb-4 uppercase tracking-tighter italic text-center">
+                Tanya Jawab (FAQ)</h2>
+            <div class="w-20 h-1.5 bg-yellow-400 mx-auto rounded-full mb-12 text-center"></div>
 
-<!-- Footer -->
-<footer class="bg-slate-900 py-12 text-center text-white border-t-4 border-amber-500 text-center">
-    <div class="container mx-auto px-4 text-center">
-        <h2 class="font-black uppercase tracking-tighter text-3xl mb-4 text-amber-500 text-center">AGEN DAMRI
-            KAWUNGANTEN</h2>
-        <p class="text-xs font-bold text-white/80 uppercase italic px-4 mb-8 text-center">Jalan Raya Kawunganten, Desa
-            Kawunganten, Cilacap - Jawa Tengah.</p>
-        <div class="hidden justify-center gap-6 text-xl mb-8 text-center">
-            <a href="#" class="text-white/60 hover:text-amber-500 transition-all text-center"><i
-                    class="fab fa-facebook text-center"></i></a>
-            <a href="#" class="text-white/60 hover:text-amber-500 transition-all text-center"><i
-                    class="fab fa-instagram text-center"></i></a>
-            <a href="#" class="text-white/60 hover:text-amber-500 transition-all text-center"><i
-                    class="fab fa-tiktok text-center"></i></a>
+            <div class="max-w-3xl mx-auto space-y-4">
+                <!-- FAQ Item 1 -->
+                <div class="modern-card overflow-hidden">
+                    <button onclick="toggleFaq('faq1')"
+                        class="w-full text-left px-6 py-5 flex justify-between items-center focus:outline-none group">
+                        <div class="flex items-center gap-3">
+                            <i
+                                class="fas fa-shopping-cart text-blue-500 group-hover:text-blue-700 transition-colors w-4 text-center"></i>
+                            <span class="font-black text-blue-900 uppercase text-sm">Bagaimana prosedur pemesanan
+                                tiket?</span>
+                        </div>
+                        <i id="icon-faq1"
+                            class="fas fa-chevron-down text-gray-400 transition-transform duration-300"></i>
+                    </button>
+                    <div id="faq1"
+                        class="max-h-0 overflow-hidden transition-all duration-300 opacity-0 bg-gray-50 border-t border-gray-100">
+                        <p class="p-6 text-xs text-gray-500 font-bold italic leading-relaxed">Untuk memesan tiket,
+                            silakan klik tombol <b class="text-blue-700">"Boking Tiket"</b> pada armada pilihan Anda,
+                            lalu tentukan tujuan serta jam keberangkatan. Setelah mengisi formulir data diri dan
+                            melakukan pembayaran, kirimkan bukti transfer melalui WhatsApp admin. Jika pesanan
+                            disetujui, Anda akan mendapatkan ID Booking yang bisa digunakan pada menu <b
+                                class="text-blue-700">"Cek Tiket"</b> untuk mengunduh E-Ticket.</p>
+                    </div>
+                </div>
+                <!-- FAQ Item 2 -->
+                <div class="modern-card overflow-hidden">
+                    <button onclick="toggleFaq('faq2')"
+                        class="w-full text-left px-6 py-5 flex justify-between items-center focus:outline-none group">
+                        <div class="flex items-center gap-3">
+                            <i
+                                class="fas fa-child text-green-500 group-hover:text-green-700 transition-colors w-4 text-center"></i>
+                            <span class="font-black text-blue-900 uppercase text-sm">Berapakah batasan umur anak untuk
+                                dikenakan tarif penuh?</span>
+                        </div>
+                        <i id="icon-faq2"
+                            class="fas fa-chevron-down text-gray-400 transition-transform duration-300"></i>
+                    </button>
+                    <div id="faq2"
+                        class="max-h-0 overflow-hidden transition-all duration-300 opacity-0 bg-gray-50 border-t border-gray-100">
+                        <p class="p-6 text-xs text-gray-500 font-bold italic leading-relaxed">Bagi penumpang anak-anak
+                            yang telah berusia di atas <b class="text-blue-700">2 tahun</b>, akan dikenakan tarif 1
+                            tiket penuh (harga normal).</p>
+                    </div>
+                </div>
+                <!-- FAQ Item 3 -->
+                <div class="modern-card overflow-hidden">
+                    <button onclick="toggleFaq('faq3')"
+                        class="w-full text-left px-6 py-5 flex justify-between items-center focus:outline-none group">
+                        <div class="flex items-center gap-3">
+                            <i
+                                class="fas fa-ban text-red-500 group-hover:text-red-700 transition-colors w-4 text-center"></i>
+                            <span class="font-black text-blue-900 uppercase text-sm">Apakah pesanan tiket dapat
+                                dibatalkan (Cancel)?</span>
+                        </div>
+                        <i id="icon-faq3"
+                            class="fas fa-chevron-down text-gray-400 transition-transform duration-300"></i>
+                    </button>
+                    <div id="faq3"
+                        class="max-h-0 overflow-hidden transition-all duration-300 opacity-0 bg-gray-50 border-t border-gray-100">
+                        <p class="p-6 text-xs text-gray-500 font-bold italic leading-relaxed">Pesanan tidak dapat
+                            dibatalkan secara mendadak. Proses pembatalan tiket hanya dapat dilakukan maksimal <b
+                                class="text-blue-700">1x24 jam sebelum jam keberangkatan</b>. Harap diperhatikan bahwa
+                            pembatalan akan dikenakan biaya potongan admin yang besarannya berbeda-beda tergantung
+                            kebijakan masing-masing PO (Perusahaan Otobus).</p>
+                    </div>
+                </div>
+                <!-- FAQ Item 4 -->
+                <div class="modern-card overflow-hidden">
+                    <button onclick="toggleFaq('faq4')"
+                        class="w-full text-left px-6 py-5 flex justify-between items-center focus:outline-none group">
+                        <div class="flex items-center gap-3">
+                            <i
+                                class="fas fa-calendar-alt text-yellow-500 group-hover:text-yellow-700 transition-colors w-4 text-center"></i>
+                            <span class="font-black text-blue-900 uppercase text-sm">Bagaimana kebijakan mengenai
+                                perubahan jadwal (Reschedule)?</span>
+                        </div>
+                        <i id="icon-faq4"
+                            class="fas fa-chevron-down text-gray-400 transition-transform duration-300"></i>
+                    </button>
+                    <div id="faq4"
+                        class="max-h-0 overflow-hidden transition-all duration-300 opacity-0 bg-gray-50 border-t border-gray-100">
+                        <p class="p-6 text-xs text-gray-500 font-bold italic leading-relaxed">Perubahan jadwal atau
+                            <i>reschedule</i> tiket dapat dilayani maksimal <b class="text-blue-700">1x24 jam sebelum
+                                waktu keberangkatan</b>. Proses <i>reschedule</i> ini akan dikenakan biaya potongan
+                            sebesar <b class="text-blue-700">20%</b> dari harga tiket Anda.</p>
+                    </div>
+                </div>
+                <!-- FAQ Item 5 -->
+                <div class="modern-card overflow-hidden">
+                    <button onclick="toggleFaq('faq5')"
+                        class="w-full text-left px-6 py-5 flex justify-between items-center focus:outline-none group">
+                        <div class="flex items-center gap-3">
+                            <i
+                                class="fas fa-mobile-alt text-indigo-500 group-hover:text-indigo-700 transition-colors w-4 text-center"></i>
+                            <span class="font-black text-blue-900 uppercase text-sm">Apakah saya harus mencetak (print)
+                                E-Ticket?</span>
+                        </div>
+                        <i id="icon-faq5"
+                            class="fas fa-chevron-down text-gray-400 transition-transform duration-300"></i>
+                    </button>
+                    <div id="faq5"
+                        class="max-h-0 overflow-hidden transition-all duration-300 opacity-0 bg-gray-50 border-t border-gray-100">
+                        <p class="p-6 text-xs text-gray-500 font-bold italic leading-relaxed">Tidak perlu mencetak
+                            sendiri sebelum berangkat. Anda cukup menunjukkan E-Ticket langsung dari layar
+                            <i>smartphone</i> Anda kepada petugas kami. Pencetakan tiket fisik akan dibantu oleh petugas
+                            kami di lokasi sebelum Anda berangkat.</p>
+                    </div>
+                </div>
+            </div>
         </div>
-        <p class="text-[10px] font-bold text-white/40 uppercase tracking-widest text-center">© <span id="currentYear"></span> AGEN DAMRI
-            KAWUNGANTEN. ALL RIGHTS RESERVED.</p>
-    </div>
-</footer>
+    </section>
 
-<!-- Scroll to Top Button -->
-<button id="scrollToTopBtn" onclick="window.scrollTo({top: 0, behavior: 'smooth'})" class="fixed bottom-24 right-6 z-[190] bg-blue-600 text-white w-12 h-12 rounded-full flex items-center justify-center shadow-[0_10px_20px_rgba(37,99,235,0.3)] hover:scale-110 transition-all duration-300 opacity-0 pointer-events-none translate-y-4">
-    <i class="fas fa-arrow-up text-xl"></i>
-</button>
+    <!-- Hubungi Kami -->
+    <section id="kontak" class="py-24 bg-gray-50 text-center">
+        <div class="container mx-auto px-4 text-center">
+            <h2
+                class="text-tertiary font-extrabold text-3xl md:text-4xl mb-4 uppercase tracking-tighter italic text-center">
+                Hubungi Kami</h2>
+            <div class="w-20 h-1.5 bg-yellow-400 mx-auto rounded-full mb-12 text-center"></div>
 
-<script>
-    document.getElementById('currentYear').textContent = new Date().getFullYear();
+            <div class="max-w-6xl mx-auto text-center">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-stretch text-center">
+                    <div class="modern-card p-8 flex flex-col items-center justify-between text-center">
+                        <div class="flex flex-col items-center text-center">
+                            <div
+                                class="w-14 h-14 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center mb-4 text-center">
+                                <i class="fas fa-map-marker-alt text-2xl"></i>
+                            </div>
+                            <h4 class="font-black uppercase text-blue-900 italic mb-2 text-center">Lokasi Agen</h4>
+                            <p class="text-gray-500 font-bold text-sm italic mb-6 text-center">Jl. Raya Kawunganten,
+                                Desa
+                                Kawunganten, Kec. Kawunganten, Kab. Cilacap, Jawa Tengah.</p>
+                        </div>
+                        <a href="https://maps.app.goo.gl/mFP2Nn4KUyworYe66" target="_blank"
+                            class="w-full bg-blue-700 text-white py-4 rounded-xl font-black uppercase tracking-widest text-sm shadow-lg hover:bg-blue-800 transition-all text-center">
+                            <i class="fas fa-directions mr-2 text-center"></i> Buka Google Maps
+                        </a>
+                    </div>
+                    <div class="modern-card p-8 flex flex-col items-center justify-between text-center">
+                        <div class="flex flex-col items-center text-center">
+                            <div
+                                class="w-14 h-14 bg-green-50 text-green-600 rounded-2xl flex items-center justify-center mb-4 text-center">
+                                <i class="fab fa-whatsapp text-2xl"></i>
+                            </div>
+                            <h4 class="font-black uppercase text-blue-900 italic mb-2 text-center">WhatsApp Admin</h4>
+                            <p class="text-gray-500 font-bold text-sm mb-6 italic text-center">Konsultasi tiket & boking
+                                24
+                                Jam via chat WhatsApp.</p>
+                        </div>
+                        <a href="https://wa.me/6282133607759" target="_blank"
+                            class="w-full bg-green-600 text-white py-4 rounded-xl font-black uppercase tracking-widest text-sm shadow-lg hover:bg-green-700 transition-all text-center">
+                            <i class="fab fa-whatsapp mr-2 text-center"></i> Chat Admin Sekarang
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
 
-    let fleetData = [];
+    <!-- Floating WhatsApp Button -->
+    <a href="https://wa.me/6282133607759" target="_blank"
+        class="fixed bottom-6 right-6 z-[200] bg-[#25D366] text-white w-14 h-14 rounded-full flex items-center justify-center shadow-[0_10px_20px_rgba(37,211,102,0.3)] hover:scale-110 transition-transform duration-300 group">
+        <i class="fab fa-whatsapp text-3xl"></i>
+        <span
+            class="absolute right-16 bg-white text-gray-800 text-[10px] font-black uppercase px-3 py-2 rounded-lg shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap pointer-events-none">Chat
+            Admin</span>
+    </a>
 
-    // Mengambil data dari Database saat halaman dimuat
-    window.addEventListener('DOMContentLoaded', async () => {
-        const dateInput = document.getElementById('bookTanggal');
-        if (dateInput) {
-            const today = new Date().toISOString().split('T')[0];
-            dateInput.setAttribute('min', today);
-            dateInput.value = today;
-        }
+    <!-- Footer -->
+    <footer class="bg-slate-900 py-12 text-center text-white border-t-4 border-amber-500 text-center">
+        <div class="container mx-auto px-4 text-center">
+            <h2 class="font-black uppercase tracking-tighter text-3xl mb-4 text-amber-500 text-center">AGEN DAMRI
+                KAWUNGANTEN</h2>
+            <p class="text-xs font-bold text-white/80 uppercase italic px-4 mb-8 text-center">Jalan Raya Kawunganten,
+                Desa
+                Kawunganten, Cilacap - Jawa Tengah.</p>
+            <div class="hidden justify-center gap-6 text-xl mb-8 text-center">
+                <a href="#" class="text-white/60 hover:text-amber-500 transition-all text-center"><i
+                        class="fab fa-facebook text-center"></i></a>
+                <a href="#" class="text-white/60 hover:text-amber-500 transition-all text-center"><i
+                        class="fab fa-instagram text-center"></i></a>
+                <a href="#" class="text-white/60 hover:text-amber-500 transition-all text-center"><i
+                        class="fab fa-tiktok text-center"></i></a>
+            </div>
+            <p class="text-[10px] font-bold text-white/40 uppercase tracking-widest text-center">© <span
+                    id="currentYear"></span> AGEN DAMRI
+                KAWUNGANTEN. ALL RIGHTS RESERVED.</p>
+        </div>
+    </footer>
 
-        try {
-            // Memanggil fungsi initData dari app.js
-            await initData();
-            
-            const armadas = getArmadas();
-            if (armadas && armadas.length > 0) {
-                // Konversi data dari database ke struktur fleetData yang dibutuhkan index.html
-                const grouped = {};
-                armadas.forEach(a => {
-                    if (a.isActive === false) return; // Lewati armada yang dinonaktifkan
-                    if (!grouped[a.name]) {
-                        grouped[a.name] = { id: a.name.replace(/\s+/g, '-').toLowerCase(), name: a.name, routes: [], times: new Set() };
-                    }
-                    // Cek jika rute sudah ada
-                    const existingRoute = grouped[a.name].routes.find(r => r.dest === a.destination);
-                    if (!existingRoute) {
-                        grouped[a.name].routes.push({ dest: a.destination, price: parseInt(a.price) });
-                    }
-                    grouped[a.name].times.add(a.time);
-                });
-                
-                fleetData = Object.values(grouped).map(g => ({
-                    ...g,
-                    times: Array.from(g.times).sort()
-                }));
-                
-                // Update dropdown armada otomatis
-                populateArmadaDropdown();
-                renderArmadaGrid();
+    <!-- Scroll to Top Button -->
+    <button id="scrollToTopBtn" onclick="window.scrollTo({top: 0, behavior: 'smooth'})"
+        class="fixed bottom-24 right-6 z-[190] bg-blue-600 text-white w-12 h-12 rounded-full flex items-center justify-center shadow-[0_10px_20px_rgba(37,99,235,0.3)] hover:scale-110 transition-all duration-300 opacity-0 pointer-events-none translate-y-4">
+        <i class="fas fa-arrow-up text-xl"></i>
+    </button>
+
+    <script>
+        document.getElementById('currentYear').textContent = new Date().getFullYear();
+
+        let fleetData = [];
+
+        // Mengambil data dari Database saat halaman dimuat
+        window.addEventListener('DOMContentLoaded', async () => {
+            const dateInput = document.getElementById('bookTanggal');
+            if (dateInput) {
+                const today = new Date().toISOString().split('T')[0];
+                dateInput.setAttribute('min', today);
+                dateInput.value = today;
             }
-        } catch(e) {
-            console.error("Gagal memuat data armada", e);
-        }
-    });
 
-    function renderArmadaGrid() {
-        const grid = document.getElementById('armadaGridBus');
-        if(!grid) return;
-        
-        let html = '';
-        fleetData.forEach(f => {
-            let colorClass = "text-blue-900";
-            let bgHover = "group-hover:bg-blue-600";
-            let spanClass = "";
-            let nameDisplay = f.name;
-            
-            if (f.name.toUpperCase().includes("ESTU")) { colorClass = "text-[#22c55e]"; bgHover = "group-hover:bg-green-600"; spanClass = "font-extrabold italic text-2xl text-[#22c55e] group-hover:text-white"; }
-            else if (f.name.toUpperCase().includes("EFISIENSI")) { colorClass = "text-[#00CED1]"; bgHover = "group-hover:bg-cyan-500"; spanClass = "font-black italic text-3xl tracking-[0.1em] text-[#00CED1] border-b-2 border-[#00CED1] group-hover:text-white group-hover:border-white"; }
-            else if (f.name.toUpperCase().includes("QYTA")) { colorClass = "text-orange-500"; bgHover = "group-hover:bg-orange-500"; spanClass = "font-black italic text-2xl text-orange-500 uppercase tracking-tighter group-hover:text-white"; }
-            else if (f.name.toUpperCase().includes("RIYAN") || f.name.toUpperCase().includes("ARDY")) { colorClass = "text-red-600"; bgHover = "group-hover:bg-red-600"; spanClass = "font-black italic text-3xl tracking-tighter text-red-600 group-hover:text-white"; }
-            else if (f.name.toUpperCase().includes("BEST") || f.name.toUpperCase().includes("77")) { colorClass = "text-yellow-500"; bgHover = "group-hover:bg-yellow-500"; spanClass = "font-black text-2xl text-yellow-500 border-2 border-yellow-500 px-4 py-1 rounded-lg group-hover:text-white group-hover:border-white"; }
-            else { colorClass = "text-[#003d79]"; bgHover = "group-hover:bg-blue-900"; spanClass = "font-black italic text-3xl tracking-tighter text-[#003d79] group-hover:text-white"; }
-            
-            let priceHtml = f.routes.map(r => `<div class="bg-gray-100/80 p-2 rounded-xl text-[10px] font-bold text-gray-700">${r.dest}: <span class="text-green-700">${formatRupiah(r.price)}</span></div>`).join('');
-            let destTags = f.routes.map(r => `<span class="destination-tag">${r.dest}</span>`).join('');
-            let timeTags = f.times.map(t => `<span class="time-badge"><i class="fas fa-clock"></i> ${t}</span>`).join('');
-            
-            let bgImage = 'damri.webp';
-            let nameUpper = f.name.toUpperCase();
-            if (nameUpper.includes("77")) bgImage = "77trans.webp";
-            else if (nameUpper.includes("BEST")) bgImage = "bestpremium.webp";
-            else if (nameUpper.includes("JOGJA")) bgImage = "busjogja.webp";
-            else if (nameUpper.includes("EFISIENSI")) bgImage = "efisiensi.webp";
-            else if (nameUpper.includes("ESTU")) bgImage = "estutrans.webp";
-            else if (nameUpper.includes("QYTA")) bgImage = "qyta.webp";
-            else if (nameUpper.includes("RIYAN") || nameUpper.includes("ARDY")) bgImage = "riyan.webp";
-            else if (nameUpper.includes("SUMATRA")) bgImage = "damri2.webp";
-            else if (nameUpper.includes("JAKARTA")) bgImage = "damri.webp";
-            
-            html += `
+            try {
+                // Memanggil fungsi initData dari app.js
+                await initData();
+
+                const armadas = getArmadas();
+                if (armadas && armadas.length > 0) {
+                    // Konversi data dari database ke struktur fleetData yang dibutuhkan index.html
+                    const grouped = {};
+                    armadas.forEach(a => {
+                        if (a.isActive === false) return; // Lewati armada yang dinonaktifkan
+                        if (!grouped[a.name]) {
+                            grouped[a.name] = { id: a.name.replace(/\s+/g, '-').toLowerCase(), name: a.name, routes: [], times: new Set() };
+                        }
+                        // Cek jika rute sudah ada
+                        const existingRoute = grouped[a.name].routes.find(r => r.dest === a.destination);
+                        if (!existingRoute) {
+                            grouped[a.name].routes.push({ dest: a.destination, price: parseInt(a.price) });
+                        }
+                        grouped[a.name].times.add(a.time);
+                    });
+
+                    fleetData = Object.values(grouped).map(g => ({
+                        ...g,
+                        times: Array.from(g.times).sort()
+                    }));
+
+                    // Update dropdown armada otomatis
+                    populateArmadaDropdown();
+                    renderArmadaGrid();
+                }
+            } catch (e) {
+                console.error("Gagal memuat data armada", e);
+            }
+        });
+
+        function renderArmadaGrid() {
+            const grid = document.getElementById('armadaGridBus');
+            if (!grid) return;
+
+            let html = '';
+            fleetData.forEach(f => {
+                let colorClass = "text-blue-900";
+                let bgHover = "group-hover:bg-blue-600";
+                let spanClass = "";
+                let nameDisplay = f.name;
+
+                if (f.name.toUpperCase().includes("ESTU")) { colorClass = "text-[#22c55e]"; bgHover = "group-hover:bg-green-600"; spanClass = "font-extrabold italic text-2xl text-[#22c55e] group-hover:text-white"; }
+                else if (f.name.toUpperCase().includes("EFISIENSI")) { colorClass = "text-[#00CED1]"; bgHover = "group-hover:bg-cyan-500"; spanClass = "font-black italic text-3xl tracking-[0.1em] text-[#00CED1] border-b-2 border-[#00CED1] group-hover:text-white group-hover:border-white"; }
+                else if (f.name.toUpperCase().includes("QYTA")) { colorClass = "text-orange-500"; bgHover = "group-hover:bg-orange-500"; spanClass = "font-black italic text-2xl text-orange-500 uppercase tracking-tighter group-hover:text-white"; }
+                else if (f.name.toUpperCase().includes("RIYAN") || f.name.toUpperCase().includes("ARDY")) { colorClass = "text-red-600"; bgHover = "group-hover:bg-red-600"; spanClass = "font-black italic text-3xl tracking-tighter text-red-600 group-hover:text-white"; }
+                else if (f.name.toUpperCase().includes("BEST") || f.name.toUpperCase().includes("77")) { colorClass = "text-yellow-500"; bgHover = "group-hover:bg-yellow-500"; spanClass = "font-black text-2xl text-yellow-500 border-2 border-yellow-500 px-4 py-1 rounded-lg group-hover:text-white group-hover:border-white"; }
+                else { colorClass = "text-[#003d79]"; bgHover = "group-hover:bg-blue-900"; spanClass = "font-black italic text-3xl tracking-tighter text-[#003d79] group-hover:text-white"; }
+
+                let priceHtml = f.routes.map(r => `<div class="bg-gray-100/80 p-2 rounded-xl text-[10px] font-bold text-gray-700">${r.dest}: <span class="text-green-700">${formatRupiah(r.price)}</span></div>`).join('');
+                let destTags = f.routes.map(r => `<span class="destination-tag">${r.dest}</span>`).join('');
+                let timeTags = f.times.map(t => `<span class="time-badge"><i class="fas fa-clock"></i> ${t}</span>`).join('');
+
+                let bgImage = 'damri.webp';
+                let nameUpper = f.name.toUpperCase();
+                if (nameUpper.includes("77")) bgImage = "77trans.webp";
+                else if (nameUpper.includes("BEST")) bgImage = "bestpremium.webp";
+                else if (nameUpper.includes("JOGJA")) bgImage = "busjogja.webp";
+                else if (nameUpper.includes("EFISIENSI")) bgImage = "efisiensi.webp";
+                else if (nameUpper.includes("ESTU")) bgImage = "estutrans.webp";
+                else if (nameUpper.includes("QYTA")) bgImage = "qyta.webp";
+                else if (nameUpper.includes("RIYAN") || nameUpper.includes("ARDY")) bgImage = "riyan.webp";
+                else if (nameUpper.includes("SUMATRA")) bgImage = "damri2.webp";
+                else if (nameUpper.includes("JAKARTA")) bgImage = "damri.webp";
+
+                html += `
             <div class="modern-card overflow-hidden h-fit flex flex-col text-center relative group/card">
                 <div class="absolute inset-0 bg-cover bg-center opacity-[0.08] transition-opacity duration-300 group-hover/card:opacity-[0.15] pointer-events-none z-0" style="background-image: url('${bgImage}');"></div>
                 <div class="relative z-10 w-full flex flex-col">
@@ -1463,360 +1584,360 @@
                 </div>
             </div>
             </div>`;
-        });
-        
-        grid.innerHTML = html;
-    }
+            });
 
-    function populateArmadaDropdown() {
-        const select = document.getElementById('bookArmada');
-        if(!select) return;
-        
-        let html = '<option value="">-- Pilih Jenis Bus / Travel --</option>';
-        fleetData.forEach(f => {
-            html += `<option value="${f.name}">${f.name}</option>`;
-        });
-        select.innerHTML = html;
-    }
-
-    function formatRupiah(number) {
-        return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(number);
-    }
-
-    function copyToClipboard(text) {
-        const input = document.createElement('textarea');
-        input.value = text;
-        document.body.appendChild(input);
-        input.select();
-        try {
-            document.execCommand('copy');
-            showMessage("Nomor Rekening Berhasil Disalin!");
-        } catch (err) {
-            console.error('Gagal menyalin', err);
-        }
-        document.body.removeChild(input);
-    }
-
-    function copyAccountInfo() {
-        const text = document.getElementById('paymentInfoText').innerText;
-        // Ambil hanya angka nomor rekening menggunakan regex
-        const accountNumber = text.match(/\d+/);
-        if (accountNumber) {
-            copyToClipboard(accountNumber[0]);
-        }
-    }
-
-    // FUNGSI TAMPILKAN LOGO DAN DETAIL REKENING BERDASARKAN PILIHAN
-    function showPaymentDetails() {
-        const m = document.getElementById('bookMetodeBayar').value;
-        const p = document.getElementById('paymentDetails');
-        const t = document.getElementById('paymentInfoText');
-        const l = document.getElementById('paymentLogoArea');
-        const c = document.getElementById('copyBtn');
-
-        if (!m) {
-            p.classList.add('hidden');
-            return;
+            grid.innerHTML = html;
         }
 
-        p.classList.remove('hidden');
-        c.classList.remove('hidden');
-        let logoHtml = "";
-        let infoText = "";
+        function populateArmadaDropdown() {
+            const select = document.getElementById('bookArmada');
+            if (!select) return;
 
-        if (m === "Transfer Mandiri") {
-            logoHtml = `<div class="bg-[#003d79] text-white px-4 py-2 rounded-xl font-black text-xs shadow-md flex items-center gap-2 italic">BANK MANDIRI <i class="fas fa-university"></i></div>`;
-            infoText = "Mandiri: 1800013416526\na.n ISNU FADKHUL ROIS";
-        } else if (m === "Transfer Seabank") {
-            logoHtml = `<div class="bg-[#f05a28] text-white px-4 py-2 rounded-xl font-black text-xs shadow-md flex items-center gap-2 italic">SeaBank <i class="fas fa-shield-alt"></i></div>`;
-            infoText = "Seabank: 901528007687\na.n ISNU FADKHUL ROIS";
-        } else if (m === "Saldo Dana") {
-            logoHtml = `<div class="bg-[#118ee9] text-white px-4 py-2 rounded-xl font-black text-xs shadow-md flex items-center gap-2 italic">DANA <i class="fas fa-wallet"></i></div>`;
-            infoText = "Dana: 082133607759\na.n ISNU FADKHUL ROIS";
-        } else if (m === "QRIS AGEN") {
-            c.classList.add('hidden'); // Sembunyikan tombol salin untuk QRIS
-            logoHtml = `
+            let html = '<option value="">-- Pilih Jenis Bus / Travel --</option>';
+            fleetData.forEach(f => {
+                html += `<option value="${f.name}">${f.name}</option>`;
+            });
+            select.innerHTML = html;
+        }
+
+        function formatRupiah(number) {
+            return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(number);
+        }
+
+        function copyToClipboard(text) {
+            const input = document.createElement('textarea');
+            input.value = text;
+            document.body.appendChild(input);
+            input.select();
+            try {
+                document.execCommand('copy');
+                showMessage("Nomor Rekening Berhasil Disalin!");
+            } catch (err) {
+                console.error('Gagal menyalin', err);
+            }
+            document.body.removeChild(input);
+        }
+
+        function copyAccountInfo() {
+            const text = document.getElementById('paymentInfoText').innerText;
+            // Ambil hanya angka nomor rekening menggunakan regex
+            const accountNumber = text.match(/\d+/);
+            if (accountNumber) {
+                copyToClipboard(accountNumber[0]);
+            }
+        }
+
+        // FUNGSI TAMPILKAN LOGO DAN DETAIL REKENING BERDASARKAN PILIHAN
+        function showPaymentDetails() {
+            const m = document.getElementById('bookMetodeBayar').value;
+            const p = document.getElementById('paymentDetails');
+            const t = document.getElementById('paymentInfoText');
+            const l = document.getElementById('paymentLogoArea');
+            const c = document.getElementById('copyBtn');
+
+            if (!m) {
+                p.classList.add('hidden');
+                return;
+            }
+
+            p.classList.remove('hidden');
+            c.classList.remove('hidden');
+            let logoHtml = "";
+            let infoText = "";
+
+            if (m === "Transfer Mandiri") {
+                logoHtml = `<div class="bg-[#003d79] text-white px-4 py-2 rounded-xl font-black text-xs shadow-md flex items-center gap-2 italic">BANK MANDIRI <i class="fas fa-university"></i></div>`;
+                infoText = "Mandiri: 1800013416526\na.n ISNU FADKHUL ROIS";
+            } else if (m === "Transfer Seabank") {
+                logoHtml = `<div class="bg-[#f05a28] text-white px-4 py-2 rounded-xl font-black text-xs shadow-md flex items-center gap-2 italic">SeaBank <i class="fas fa-shield-alt"></i></div>`;
+                infoText = "Seabank: 901528007687\na.n ISNU FADKHUL ROIS";
+            } else if (m === "Saldo Dana") {
+                logoHtml = `<div class="bg-[#118ee9] text-white px-4 py-2 rounded-xl font-black text-xs shadow-md flex items-center gap-2 italic">DANA <i class="fas fa-wallet"></i></div>`;
+                infoText = "Dana: 082133607759\na.n ISNU FADKHUL ROIS";
+            } else if (m === "QRIS AGEN") {
+                c.classList.add('hidden'); // Sembunyikan tombol salin untuk QRIS
+                logoHtml = `
                     <div class="flex flex-col items-center gap-4">
                         <img src="qris.webp" alt="QRIS" class="w-64 h-auto mx-auto rounded-3xl shadow-xl border-4 border-white" onerror="this.src='https://placehold.co/300x300/eff6ff/1e40af?text=QRIS+SCAN+DISINI'">
                         <a href="qris.webp" download="QRIS_AGEN_DAMRI.webp" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-2xl text-xs font-black uppercase tracking-widest flex items-center gap-3 shadow-lg transition-all active:scale-95">
                             <i class="fas fa-download"></i> Simpan Gambar QRIS
                         </a>
                     </div>`;
-            infoText = "SILAKAN SCAN KODE QR DI ATAS";
+                infoText = "SILAKAN SCAN KODE QR DI ATAS";
+            }
+
+            l.innerHTML = logoHtml;
+            t.innerText = infoText;
         }
 
-        l.innerHTML = logoHtml;
-        t.innerText = infoText;
-    }
-
-    function updateBookingFields() {
-        const a = document.getElementById('bookArmada').value, t = document.getElementById('bookTujuan'), w = document.getElementById('bookWaktu');
-        const h = document.getElementById('bookHargaSatuan'), tot = document.getElementById('bookTotalBayar');
-        t.innerHTML = '<option value="">-- Pilih Tujuan --</option>'; w.innerHTML = '<option value="">-- Pilih Waktu --</option>'; h.value = 'Rp 0'; tot.value = 'Rp 0';
-        const f = fleetData.find(fl => fl.name === a);
-        if (f) {
-            f.routes.forEach(r => { const o = document.createElement('option'); o.value = r.dest; o.innerText = r.dest; t.appendChild(o); });
-            f.times.forEach(tm => { const o = document.createElement('option'); o.value = tm; o.innerText = tm; w.appendChild(o); });
-        }
-    }
-
-    function calculateBookingTotal() {
-        const a = document.getElementById('bookArmada').value, t = document.getElementById('bookTujuan').value, j = parseInt(document.getElementById('bookJumlah').value) || 0;
-        const d = document.getElementById('bookTanggal').value;
-        const hDisplay = document.getElementById('bookHargaSatuan'), totDisplay = document.getElementById('bookTotalBayar');
-        if (!a || !t || !d) { hDisplay.value = "Rp 0"; totDisplay.value = "Rp 0"; return; }
-        
-        const armada = fleetData.find(f => f.name === a);
-        if (armada) {
-            const rute = armada.routes.find(r => r.dest === t);
-            if (rute) { 
-                let finalHarga = rute.price;
-                
-                // Cek harga khusus
-                if (typeof getHargaKhususList === 'function' && typeof getArmadas === 'function') {
-                    const hkList = getHargaKhususList();
-                    const allArmadas = getArmadas();
-                    
-                    // Cari idArmada yang cocok dengan Nama & Tujuan (mengabaikan jam)
-                    const matchingArmadaIds = allArmadas
-                        .filter(arm => arm.name === a && arm.destination === t)
-                        .map(arm => String(arm.id));
-                        
-                    // Cari apakah ada harga khusus yang aktif untuk salah satu idArmada tersebut pada tanggal yang dipilih
-                    const dateObj = new Date(d);
-                    dateObj.setHours(0, 0, 0, 0);
-                    const selectedDate = dateObj.getTime();
-                    
-                    const activeHk = hkList.find(hk => {
-                        const hkIdArmada = String(hk.idArmada || '');
-                        if (!matchingArmadaIds.includes(hkIdArmada)) return false;
-                        
-                        if (!hk.tanggalAwal || !hk.tanggalAkhir) return false;
-
-                        const startObj = new Date(hk.tanggalAwal);
-                        startObj.setHours(0, 0, 0, 0);
-                        const start = startObj.getTime();
-                        
-                        const endObj = new Date(hk.tanggalAkhir);
-                        endObj.setHours(23, 59, 59, 999);
-                        const end = endObj.getTime();
-
-                        return selectedDate >= start && selectedDate <= end;
-                    });
-                    
-                    if (activeHk) {
-                        finalHarga = parseInt(String(activeHk.hargaBaru).replace(/[^0-9]/g, '')) || rute.price;
-                    }
-                }
-                
-                const total = finalHarga * j; 
-                hDisplay.value = formatRupiah(finalHarga); 
-                totDisplay.value = formatRupiah(total); 
+        function updateBookingFields() {
+            const a = document.getElementById('bookArmada').value, t = document.getElementById('bookTujuan'), w = document.getElementById('bookWaktu');
+            const h = document.getElementById('bookHargaSatuan'), tot = document.getElementById('bookTotalBayar');
+            t.innerHTML = '<option value="">-- Pilih Tujuan --</option>'; w.innerHTML = '<option value="">-- Pilih Waktu --</option>'; h.value = 'Rp 0'; tot.value = 'Rp 0';
+            const f = fleetData.find(fl => fl.name === a);
+            if (f) {
+                f.routes.forEach(r => { const o = document.createElement('option'); o.value = r.dest; o.innerText = r.dest; t.appendChild(o); });
+                f.times.forEach(tm => { const o = document.createElement('option'); o.value = tm; o.innerText = tm; w.appendChild(o); });
             }
         }
-    }
 
-    function openBookingModal() { document.getElementById('bookingModal').classList.remove('hidden'); document.body.style.overflow = 'hidden'; }
-    function openBookingWithArmada(name) { openBookingModal(); const aSelect = document.getElementById('bookArmada'); aSelect.value = name; updateBookingFields(); }
-    function closeBookingModal() { document.getElementById('bookingModal').classList.add('hidden'); document.body.style.overflow = 'auto'; }
-    function closeSuccessModal() { document.getElementById('successModal').classList.add('hidden'); document.body.style.overflow = 'auto'; }
+        function calculateBookingTotal() {
+            const a = document.getElementById('bookArmada').value, t = document.getElementById('bookTujuan').value, j = parseInt(document.getElementById('bookJumlah').value) || 0;
+            const d = document.getElementById('bookTanggal').value;
+            const hDisplay = document.getElementById('bookHargaSatuan'), totDisplay = document.getElementById('bookTotalBayar');
+            if (!a || !t || !d) { hDisplay.value = "Rp 0"; totDisplay.value = "Rp 0"; return; }
 
-    async function submitBooking() {
-        const a = document.getElementById('bookArmada').value, w = document.getElementById('bookWaktu').value, d = document.getElementById('bookTanggal').value, n = document.getElementById('bookNama').value, h = document.getElementById('bookHp').value, j = document.getElementById('bookJumlah').value, k = document.getElementById('bookKeterangan').value, tot = document.getElementById('bookTotalBayar').value, mb = document.getElementById('bookMetodeBayar').value;
-        const alamat = document.getElementById('bookAlamat').value;
-        let t = document.getElementById('bookTujuan').value;
-        const tipePerjalanan = document.querySelector('input[name="bookTipePerjalanan"]:checked').value;
+            const armada = fleetData.find(f => f.name === a);
+            if (armada) {
+                const rute = armada.routes.find(r => r.dest === t);
+                if (rute) {
+                    let finalHarga = rute.price;
 
-        if (!a || !t || !w || !d || !n || !h || !j || !mb) return showMessage("Lengkapi data boking & pilih metode bayar!");
+                    // Cek harga khusus
+                    if (typeof getHargaKhususList === 'function' && typeof getArmadas === 'function') {
+                        const hkList = getHargaKhususList();
+                        const allArmadas = getArmadas();
 
-        if (tipePerjalanan === 'Pulang') {
-            t = '[PULANG] ' + t;
-        }
+                        // Cari idArmada yang cocok dengan Nama & Tujuan (mengabaikan jam)
+                        const matchingArmadaIds = allArmadas
+                            .filter(arm => arm.name === a && arm.destination === t)
+                            .map(arm => String(arm.id));
 
-        // Generate ID 7 Karakter (Huruf + Angka)
-        const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-        let bookingId = '';
-        for (let i = 0; i < 7; i++) {
-            bookingId += chars.charAt(Math.floor(Math.random() * chars.length));
-        }
+                        // Cari apakah ada harga khusus yang aktif untuk salah satu idArmada tersebut pada tanggal yang dipilih
+                        const dateObj = new Date(d);
+                        dateObj.setHours(0, 0, 0, 0);
+                        const selectedDate = dateObj.getTime();
 
-        // Konversi string harga total (Rp x.xxx) ke angka murni untuk dikirim ke database (opsional tapi disarankan)
-        const numericTotal = parseInt(tot.replace(/[^0-9]/g, '')) || 0;
+                        const activeHk = hkList.find(hk => {
+                            const hkIdArmada = String(hk.idArmada || '');
+                            if (!matchingArmadaIds.includes(hkIdArmada)) return false;
 
-        // Tentukan data rekening berdasarkan pilihan bank
-        let rekInfo = "";
-        if (mb === "Transfer Mandiri") rekInfo = " (Mandiri: 1800013416526 a.n ISNU FADKHUL ROIS)";
-        else if (mb === "Transfer Seabank") rekInfo = " (Seabank: 901528007687 a.n ISNU FADKHUL ROIS)";
-        else if (mb === "Saldo Dana") rekInfo = " (Dana: 082133607759 a.n ISNU FADKHUL ROIS)";
+                            if (!hk.tanggalAwal || !hk.tanggalAkhir) return false;
 
-        const fd = new Date(d).toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
-        let msg = `Halo Admin Agen Damri Kawunganten,\nsaya ingin boking tiket:\n\n*ID Booking:* ${bookingId}\n*Armada:* ${a}\n*Tujuan:* ${t}\n*Tanggal:* ${fd}\n*Waktu:* ${w}\n\n*Nama:* ${n}\n*HP:* ${h}\n*Alamat:* ${alamat || '-'}\n\n*Jumlah Penumpang:* ${j} orang\n*Total Bayar:* ${tot}\n*Metode Pembayaran:* ${mb}${rekInfo}\n\n`;
-        if (k.trim()) msg += `*Notes:* ${k}\n`;
+                            const startObj = new Date(hk.tanggalAwal);
+                            startObj.setHours(0, 0, 0, 0);
+                            const start = startObj.getTime();
 
-        // POST Data ke Database
-        const submitBtn = document.querySelector('#bookingModal button[onclick="submitBooking()"]');
-        if(submitBtn) { submitBtn.innerText = "Memproses..."; submitBtn.disabled = true; }
+                            const endObj = new Date(hk.tanggalAkhir);
+                            endObj.setHours(23, 59, 59, 999);
+                            const end = endObj.getTime();
 
-        const payload = {
-            "TANGGAL PEMBERANGKATAN": fd,
-            "ID_TIKET": bookingId,
-            "JENIS KENDARAAN": a,
-            "Tujuan": t,
-            "NAMA": n,
-            "NOMOR HP": h,
-            "JUMLAH PNP": j,
-            "WAKTU": w,
-            "NOMOR KURSI": "",
-            "KETERANGAN": k,
-            "ALAMAT": alamat || "-",
-            "Harga": parseInt(document.getElementById('bookHargaSatuan').value.replace(/[^0-9]/g, '')) || 0,
-            "Total Harga": numericTotal,
-            "PEMBAYARAN": mb,
-            "Status": "Belum ACC"
-        };
-        
-        await postToSheets('addBooking', payload);
+                            return selectedDate >= start && selectedDate <= end;
+                        });
 
-        if(submitBtn) { submitBtn.innerText = "Kirim Permintaan Booking"; submitBtn.disabled = false; }
-
-        window.open(`https://wa.me/6282133607759?text=${encodeURIComponent(msg)}`, '_blank');
-        closeBookingModal();
-        setTimeout(() => document.getElementById('successModal').classList.remove('hidden'), 500);
-    }
-
-    function showMessage(t) { const b = document.getElementById('customAlert'); document.getElementById('alertText').innerText = t; b.style.display = 'flex'; setTimeout(() => b.style.display = 'none', 3000); }
-
-    async function cariTiket() {
-        const id = document.getElementById('inputTiket').value.trim().toUpperCase();
-        const h = document.getElementById('hasil');
-        if (!id) return showMessage("Masukkan ID Tiket!");
-        h.innerHTML = `<div class="flex items-center justify-center gap-3 text-blue-700 font-bold animate-pulse py-4 w-full text-center"><i class="fas fa-spinner fa-spin"></i><span>Mencari data...</span></div>`;
-
-        // Pastikan data sudah dimuat
-        if (!isDataLoaded) {
-            await initData();
-        }
-
-        // Cari di cachedBookings berdasarkan ID_TIKET
-        let tiket = cachedBookings.find(b => String(b.bookingId).toUpperCase() === id);
-
-        // Jika tidak ketemu di cache (karena bukan admin), ambil dari server
-        if (!tiket) {
-            try {
-                const res = await fetchFromSheets('getBookingById', `&id=${encodeURIComponent(id)}`);
-                if (res && res.ID_TIKET) {
-                    const bArmada = res["JENIS KENDARAAN"] ? String(res["JENIS KENDARAAN"]).trim() : "";
-                    const bTujuan = res["Tujuan"] ? String(res["Tujuan"]).trim() : "";
-                    
-                    const armadaMatch = getArmadas().find(a => 
-                        (a.name === bArmada || bArmada.includes(a.name) || a.name.includes(bArmada)) && 
-                        (a.destination === bTujuan || bTujuan.includes(a.destination) || a.destination.includes(bTujuan))
-                    );
-                    
-                    let statusLocal = "waiting_payment";
-                    const bStatus = res["Status"] ? String(res["Status"]).toUpperCase() : "";
-                    const bPembayaran = res["PEMBAYARAN"] ? String(res["PEMBAYARAN"]).toUpperCase() : "";
-                    
-                    if (bStatus === "LUNAS" || bStatus === "ACC" || bPembayaran === "LUNAS" || bPembayaran === "ACC") {
-                        statusLocal = "paid";
-                    } else if (bStatus === "BELUM LUNAS" || bPembayaran === "BELUM LUNAS") {
-                        statusLocal = "BELUM LUNAS";
-                    } else {
-                        statusLocal = bStatus || bPembayaran || "waiting_payment";
-                    }
-
-                    let tgl = "";
-                    if (res["TANGGAL PEMBERANGKATAN"]) {
-                        const rawDate = String(res["TANGGAL PEMBERANGKATAN"]);
-                        if (rawDate.includes('T')) {
-                            const d = new Date(rawDate);
-                            if (!isNaN(d.getTime())) {
-                                tgl = String(d.getDate()).padStart(2,'0') + '/' + String(d.getMonth()+1).padStart(2,'0') + '/' + d.getFullYear();
-                            } else {
-                                tgl = rawDate.split('T')[0];
-                            }
-                        } else {
-                            tgl = rawDate;
+                        if (activeHk) {
+                            finalHarga = parseInt(String(activeHk.hargaBaru).replace(/[^0-9]/g, '')) || rute.price;
                         }
                     }
 
-                    tiket = {
-                        bookingId: res["ID_TIKET"] || "UNKNOWN",
-                        name: res["NAMA"] || "Tanpa Nama",
-                        hp: res["NOMOR HP"] || "-",
-                        armadaId: armadaMatch ? armadaMatch.id : "UNKNOWN",
-                        tujuan: bTujuan,
-                        qty: parseInt(res["JUMLAH PNP"]) || 1,
-                        totalPrice: parseInt(res["Total Harga"]) || parseInt(res["Harga"]) || 0,
-                        status: statusLocal,
-                        dateCreated: res["Timestamp"] || "",
-                        dateTravel: tgl,
-                        waktu: res["WAKTU"] || "",
-                        pembayaran: res["PEMBAYARAN"] || "",
-                        keterangan: res["KETERANGAN"] || res["Keterangan"] || res["keterangan"] || "",
-                        kursi: res["NOMOR KURSI"] || ""
-                    };
+                    const total = finalHarga * j;
+                    hDisplay.value = formatRupiah(finalHarga);
+                    totDisplay.value = formatRupiah(total);
                 }
-            } catch (err) {
-                console.error("Gagal mengambil tiket:", err);
             }
         }
 
-        if (tiket) {
-            // Format tanggal
-            let fd = tiket.dateTravel || '-';
-            try {
-                const d = new Date(tiket.dateTravel);
-                if (!isNaN(d.getTime())) {
-                    fd = d.toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+        function openBookingModal() { document.getElementById('bookingModal').classList.remove('hidden'); document.body.style.overflow = 'hidden'; }
+        function openBookingWithArmada(name) { openBookingModal(); const aSelect = document.getElementById('bookArmada'); aSelect.value = name; updateBookingFields(); }
+        function closeBookingModal() { document.getElementById('bookingModal').classList.add('hidden'); document.body.style.overflow = 'auto'; }
+        function closeSuccessModal() { document.getElementById('successModal').classList.add('hidden'); document.body.style.overflow = 'auto'; }
+
+        async function submitBooking() {
+            const a = document.getElementById('bookArmada').value, w = document.getElementById('bookWaktu').value, d = document.getElementById('bookTanggal').value, n = document.getElementById('bookNama').value, h = document.getElementById('bookHp').value, j = document.getElementById('bookJumlah').value, k = document.getElementById('bookKeterangan').value, tot = document.getElementById('bookTotalBayar').value, mb = document.getElementById('bookMetodeBayar').value;
+            const alamat = document.getElementById('bookAlamat').value;
+            let t = document.getElementById('bookTujuan').value;
+            const tipePerjalanan = document.querySelector('input[name="bookTipePerjalanan"]:checked').value;
+
+            if (!a || !t || !w || !d || !n || !h || !j || !mb) return showMessage("Lengkapi data boking & pilih metode bayar!");
+
+            if (tipePerjalanan === 'Pulang') {
+                t = '[PULANG] ' + t;
+            }
+
+            // Generate ID 7 Karakter (Huruf + Angka)
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+            let bookingId = '';
+            for (let i = 0; i < 7; i++) {
+                bookingId += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+
+            // Konversi string harga total (Rp x.xxx) ke angka murni untuk dikirim ke database (opsional tapi disarankan)
+            const numericTotal = parseInt(tot.replace(/[^0-9]/g, '')) || 0;
+
+            // Tentukan data rekening berdasarkan pilihan bank
+            let rekInfo = "";
+            if (mb === "Transfer Mandiri") rekInfo = " (Mandiri: 1800013416526 a.n ISNU FADKHUL ROIS)";
+            else if (mb === "Transfer Seabank") rekInfo = " (Seabank: 901528007687 a.n ISNU FADKHUL ROIS)";
+            else if (mb === "Saldo Dana") rekInfo = " (Dana: 082133607759 a.n ISNU FADKHUL ROIS)";
+
+            const fd = new Date(d).toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+            let msg = `Halo Admin Agen Damri Kawunganten,\nsaya ingin boking tiket:\n\n*ID Booking:* ${bookingId}\n*Armada:* ${a}\n*Tujuan:* ${t}\n*Tanggal:* ${fd}\n*Waktu:* ${w}\n\n*Nama:* ${n}\n*HP:* ${h}\n*Alamat:* ${alamat || '-'}\n\n*Jumlah Penumpang:* ${j} orang\n*Total Bayar:* ${tot}\n*Metode Pembayaran:* ${mb}${rekInfo}\n\n`;
+            if (k.trim()) msg += `*Notes:* ${k}\n`;
+
+            // POST Data ke Database
+            const submitBtn = document.querySelector('#bookingModal button[onclick="submitBooking()"]');
+            if (submitBtn) { submitBtn.innerText = "Memproses..."; submitBtn.disabled = true; }
+
+            const payload = {
+                "TANGGAL PEMBERANGKATAN": fd,
+                "ID_TIKET": bookingId,
+                "JENIS KENDARAAN": a,
+                "Tujuan": t,
+                "NAMA": n,
+                "NOMOR HP": h,
+                "JUMLAH PNP": j,
+                "WAKTU": w,
+                "NOMOR KURSI": "",
+                "KETERANGAN": k,
+                "ALAMAT": alamat || "-",
+                "Harga": parseInt(document.getElementById('bookHargaSatuan').value.replace(/[^0-9]/g, '')) || 0,
+                "Total Harga": numericTotal,
+                "PEMBAYARAN": mb,
+                "Status": "Belum ACC"
+            };
+
+            await postToSheets('addBooking', payload);
+
+            if (submitBtn) { submitBtn.innerText = "Kirim Permintaan Booking"; submitBtn.disabled = false; }
+
+            window.open(`https://wa.me/6282133607759?text=${encodeURIComponent(msg)}`, '_blank');
+            closeBookingModal();
+            setTimeout(() => document.getElementById('successModal').classList.remove('hidden'), 500);
+        }
+
+        function showMessage(t) { const b = document.getElementById('customAlert'); document.getElementById('alertText').innerText = t; b.style.display = 'flex'; setTimeout(() => b.style.display = 'none', 3000); }
+
+        async function cariTiket() {
+            const id = document.getElementById('inputTiket').value.trim().toUpperCase();
+            const h = document.getElementById('hasil');
+            if (!id) return showMessage("Masukkan ID Tiket!");
+            h.innerHTML = `<div class="flex items-center justify-center gap-3 text-blue-700 font-bold animate-pulse py-4 w-full text-center"><i class="fas fa-spinner fa-spin"></i><span>Mencari data...</span></div>`;
+
+            // Pastikan data sudah dimuat
+            if (!isDataLoaded) {
+                await initData();
+            }
+
+            // Cari di cachedBookings berdasarkan ID_TIKET
+            let tiket = cachedBookings.find(b => String(b.bookingId).toUpperCase() === id);
+
+            // Jika tidak ketemu di cache (karena bukan admin), ambil dari server
+            if (!tiket) {
+                try {
+                    const res = await fetchFromSheets('getBookingById', `&id=${encodeURIComponent(id)}`);
+                    if (res && res.ID_TIKET) {
+                        const bArmada = res["JENIS KENDARAAN"] ? String(res["JENIS KENDARAAN"]).trim() : "";
+                        const bTujuan = res["Tujuan"] ? String(res["Tujuan"]).trim() : "";
+
+                        const armadaMatch = getArmadas().find(a =>
+                            (a.name === bArmada || bArmada.includes(a.name) || a.name.includes(bArmada)) &&
+                            (a.destination === bTujuan || bTujuan.includes(a.destination) || a.destination.includes(bTujuan))
+                        );
+
+                        let statusLocal = "waiting_payment";
+                        const bStatus = res["Status"] ? String(res["Status"]).toUpperCase() : "";
+                        const bPembayaran = res["PEMBAYARAN"] ? String(res["PEMBAYARAN"]).toUpperCase() : "";
+
+                        if (bStatus === "LUNAS" || bStatus === "ACC" || bPembayaran === "LUNAS" || bPembayaran === "ACC") {
+                            statusLocal = "paid";
+                        } else if (bStatus === "BELUM LUNAS" || bPembayaran === "BELUM LUNAS") {
+                            statusLocal = "BELUM LUNAS";
+                        } else {
+                            statusLocal = bStatus || bPembayaran || "waiting_payment";
+                        }
+
+                        let tgl = "";
+                        if (res["TANGGAL PEMBERANGKATAN"]) {
+                            const rawDate = String(res["TANGGAL PEMBERANGKATAN"]);
+                            if (rawDate.includes('T')) {
+                                const d = new Date(rawDate);
+                                if (!isNaN(d.getTime())) {
+                                    tgl = String(d.getDate()).padStart(2, '0') + '/' + String(d.getMonth() + 1).padStart(2, '0') + '/' + d.getFullYear();
+                                } else {
+                                    tgl = rawDate.split('T')[0];
+                                }
+                            } else {
+                                tgl = rawDate;
+                            }
+                        }
+
+                        tiket = {
+                            bookingId: res["ID_TIKET"] || "UNKNOWN",
+                            name: res["NAMA"] || "Tanpa Nama",
+                            hp: res["NOMOR HP"] || "-",
+                            armadaId: armadaMatch ? armadaMatch.id : "UNKNOWN",
+                            tujuan: bTujuan,
+                            qty: parseInt(res["JUMLAH PNP"]) || 1,
+                            totalPrice: parseInt(res["Total Harga"]) || parseInt(res["Harga"]) || 0,
+                            status: statusLocal,
+                            dateCreated: res["Timestamp"] || "",
+                            dateTravel: tgl,
+                            waktu: res["WAKTU"] || "",
+                            pembayaran: res["PEMBAYARAN"] || "",
+                            keterangan: res["KETERANGAN"] || res["Keterangan"] || res["keterangan"] || "",
+                            kursi: res["NOMOR KURSI"] || ""
+                        };
+                    }
+                } catch (err) {
+                    console.error("Gagal mengambil tiket:", err);
                 }
-            } catch (e) { }
-
-            // Cari nama armada dari armadaId
-            const armadaInfo = tiket.armadaId !== 'UNKNOWN' ? getArmada(tiket.armadaId) : null;
-            const namaKendaraan = armadaInfo ? armadaInfo.name : (String(tiket.keterangan || "").split(' - ')[0] || '-');
-            let tujuan = armadaInfo ? armadaInfo.destination : (String(tiket.keterangan || "").split(' - ')[1] || '-');
-
-            let asalText = 'AGEN DAMRI KAWUNGANTEN';
-            let tujuanText = tujuan;
-            if (tiket.tujuan && tiket.tujuan.startsWith('[PULANG] ')) {
-                asalText = tiket.tujuan.replace('[PULANG] ', '');
-                tujuanText = 'KAWUNGANTEN';
             }
-            
-            let extraInfoHTML = '';
-            
-            let extractedBiayaTambahanNominal = 0;
-            let extractedBiayaTambahanKet = '';
-            let rawKet = String(tiket.keterangan || '-');
 
-            const m = rawKet.match(/Biaya Tambahan: (.*?) \((Rp[ \d.,]+)\)/);
-            if (m) {
-                extractedBiayaTambahanKet = m[1].trim();
-                const nominalStr = m[2].replace(/[^\d]/g, '');
-                extractedBiayaTambahanNominal = parseInt(nominalStr) || 0;
-                
-                rawKet = rawKet.replace(/,?\s*Biaya Tambahan:.*?$/, '').trim();
-                if (!rawKet) rawKet = '-';
-            }
-            
-            if (rawKet !== '-') {
-                // Jangan tampilkan keterangan harga khusus massal di e-ticket
-                if (!rawKet.includes('Harga Khusus Massal')) {
-                    extraInfoHTML += `<div class="mb-1.5"><p class="text-[8px] font-black text-gray-400 uppercase mb-0.5 leading-none">Keterangan</p><p class="text-[9px] sm:text-[10px] font-bold text-gray-800 leading-tight">${rawKet}</p></div>`;
+            if (tiket) {
+                // Format tanggal
+                let fd = tiket.dateTravel || '-';
+                try {
+                    const d = new Date(tiket.dateTravel);
+                    if (!isNaN(d.getTime())) {
+                        fd = d.toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+                    }
+                } catch (e) { }
+
+                // Cari nama armada dari armadaId
+                const armadaInfo = tiket.armadaId !== 'UNKNOWN' ? getArmada(tiket.armadaId) : null;
+                const namaKendaraan = armadaInfo ? armadaInfo.name : (String(tiket.keterangan || "").split(' - ')[0] || '-');
+                let tujuan = armadaInfo ? armadaInfo.destination : (String(tiket.keterangan || "").split(' - ')[1] || '-');
+
+                let asalText = 'AGEN DAMRI KAWUNGANTEN';
+                let tujuanText = tujuan;
+                if (tiket.tujuan && tiket.tujuan.startsWith('[PULANG] ')) {
+                    asalText = tiket.tujuan.replace('[PULANG] ', '');
+                    tujuanText = 'KAWUNGANTEN';
                 }
-            }
-            if (extractedBiayaTambahanNominal > 0) {
-                const ketBiaya = extractedBiayaTambahanKet ? ` (${extractedBiayaTambahanKet})` : '';
-                extraInfoHTML += `<div class="mb-0"><p class="text-[8px] font-black text-gray-400 uppercase mb-0.5 leading-none">Biaya Tambahan${ketBiaya}</p><p class="text-[9px] sm:text-[10px] font-bold text-gray-800 leading-tight">${formatRupiah(extractedBiayaTambahanNominal)}</p></div>`;
-            }
-            
-            let extraInfoContainer = '';
-            if (extraInfoHTML !== '') {
-                extraInfoContainer = `<div class="bg-blue-50/30 p-2.5 rounded-xl border border-blue-100 mb-3 px-3 text-left w-full">${extraInfoHTML}</div>`;
-            }
 
-            h.innerHTML = `
+                let extraInfoHTML = '';
+
+                let extractedBiayaTambahanNominal = 0;
+                let extractedBiayaTambahanKet = '';
+                let rawKet = String(tiket.keterangan || '-');
+
+                const m = rawKet.match(/Biaya Tambahan: (.*?) \((Rp[ \d.,]+)\)/);
+                if (m) {
+                    extractedBiayaTambahanKet = m[1].trim();
+                    const nominalStr = m[2].replace(/[^\d]/g, '');
+                    extractedBiayaTambahanNominal = parseInt(nominalStr) || 0;
+
+                    rawKet = rawKet.replace(/,?\s*Biaya Tambahan:.*?$/, '').trim();
+                    if (!rawKet) rawKet = '-';
+                }
+
+                if (rawKet !== '-') {
+                    // Jangan tampilkan keterangan harga khusus massal di e-ticket
+                    if (!rawKet.includes('Harga Khusus Massal')) {
+                        extraInfoHTML += `<div class="mb-1.5"><p class="text-[8px] font-black text-gray-400 uppercase mb-0.5 leading-none">Keterangan</p><p class="text-[9px] sm:text-[10px] font-bold text-gray-800 leading-tight">${rawKet}</p></div>`;
+                    }
+                }
+                if (extractedBiayaTambahanNominal > 0) {
+                    const ketBiaya = extractedBiayaTambahanKet ? ` (${extractedBiayaTambahanKet})` : '';
+                    extraInfoHTML += `<div class="mb-0"><p class="text-[8px] font-black text-gray-400 uppercase mb-0.5 leading-none">Biaya Tambahan${ketBiaya}</p><p class="text-[9px] sm:text-[10px] font-bold text-gray-800 leading-tight">${formatRupiah(extractedBiayaTambahanNominal)}</p></div>`;
+                }
+
+                let extraInfoContainer = '';
+                if (extraInfoHTML !== '') {
+                    extraInfoContainer = `<div class="bg-blue-50/30 p-2.5 rounded-xl border border-blue-100 mb-3 px-3 text-left w-full">${extraInfoHTML}</div>`;
+                }
+
+                h.innerHTML = `
             <div id="eTicketOutput" class="animate-fade-in-up bg-white rounded-[2rem] shadow-2xl border border-gray-100 text-left relative p-1 w-full mx-auto max-w-[380px] max-h-[85dvh] overflow-y-auto custom-scroll">
                 
                 <!-- WATERMARK LOGO (Positioned at background) -->
@@ -1904,48 +2025,48 @@
                 <i class="fas fa-download"></i> Unduh E-Ticket (HD)
             </button>
             `;
-        } else {
-            h.innerHTML = `<div class="bg-red-50 border border-red-100 p-6 rounded-3xl text-center w-full"><p class="text-red-700 font-bold uppercase italic">ID "${id}" TIDAK DITEMUKAN</p></div>`;
-        }
-    }
-
-    function downloadTicket(id, btn) { if(btn) { btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Memproses...'; btn.disabled = true; } const target = document.getElementById('eTicketOutput'); html2canvas(target, { scale: 4, backgroundColor: "#ffffff", borderRadius: 32, useCORS: true }).then(c => { const l = document.createElement('a'); l.download = `E-Ticket-${id}.png`; l.href = c.toDataURL('image/png', 1.0); l.click(); if(btn) { btn.innerHTML = '<i class="fas fa-download"></i> Unduh E-Ticket (HD)'; btn.disabled = false; } }).catch(err => { if(btn) { btn.innerHTML = '<i class="fas fa-download"></i> Unduh E-Ticket (HD)'; btn.disabled = false; } alert("Gagal mengunduh tiket."); }); }
-    function toggleRoute(i) { const element = document.getElementById(i), icon = document.getElementById('icon-' + i); element.classList.toggle('show'); if (icon) icon.classList.toggle('active'); }
-    function togglePrice(i) { const element = document.getElementById(i); element.classList.toggle('show'); }
-    function toggleFaq(id) { const c = document.getElementById(id), i = document.getElementById('icon-' + id); if(c.classList.contains('max-h-0')) { c.classList.remove('max-h-0', 'opacity-0'); c.classList.add('max-h-[500px]', 'opacity-100'); i.classList.add('rotate-180'); } else { c.classList.add('max-h-0', 'opacity-0'); c.classList.remove('max-h-[500px]', 'opacity-100'); i.classList.remove('rotate-180'); } }
-    function toggleMobileMenu() { document.getElementById('mobileMenu').classList.toggle('open'); document.getElementById('mobileOverlay').classList.toggle('hidden'); }
-    function scrollToArmada(i) { document.getElementById('destSearch').value = ''; document.getElementById('heroResultsContainer').classList.add('hidden'); document.getElementById('produk').scrollIntoView({ behavior: 'smooth' }); setTimeout(() => { if (!document.getElementById(i).classList.contains('show')) toggleRoute(i); }, 800); }
-
-    function liveSearch() {
-        const q = document.getElementById('destSearch').value.toLowerCase(), c = document.getElementById('heroResultsContainer'), l = document.getElementById('heroResultsList');
-        if (q.length < 2) return c.classList.add('hidden');
-        const m = fleetData.filter(f => f.name.toLowerCase().includes(q) || f.routes.some(r => r.dest.toLowerCase().includes(q)));
-        if (m.length > 0) { c.classList.remove('hidden'); l.innerHTML = m.map(i => `<div class="bg-blue-50/50 p-4 rounded-2xl hover:bg-blue-600 hover:text-white border border-blue-100 cursor-pointer transition-all group" onclick="scrollToArmada('${i.id}')"><h5 class="font-black text-blue-900 group-hover:text-white text-sm uppercase italic text-center">${i.name}</h5><p class="text-[10px] text-gray-500 group-hover:text-blue-100 font-bold mt-1 italic truncate text-center">${i.routes.map(r => r.dest).join(', ')}</p></div>`).join(''); } else c.classList.add('hidden');
-    }
-
-    let currentSlide = 0; const slider = document.getElementById('slider');
-    function initDots() { const items = document.querySelectorAll('.slide-item'); const dotsContainer = document.getElementById('sliderDots'); if(!dotsContainer || items.length === 0) return; dotsContainer.innerHTML = Array.from(items).map((_, i) => `<div id="dot${i}" onclick="goToSlide(${i})" class="w-2 h-2 rounded-full cursor-pointer transition-all duration-300 ${i===0?'bg-blue-600 w-6':'bg-gray-300'}"></div>`).join(''); }
-    function updateDots() { const items = document.querySelectorAll('.slide-item'); const dotsCount = items.length; for (let i = 0; i < dotsCount; i++) { const dot = document.getElementById('dot' + i); if (dot) { dot.classList.remove('bg-blue-600', 'w-6'); dot.classList.add('bg-gray-300', 'w-2'); if (i === currentSlide % dotsCount) { dot.classList.add('bg-blue-600', 'w-6'); dot.classList.remove('bg-gray-300', 'w-2'); } } } }
-    function goToSlide(i) { currentSlide = i; const items = document.querySelectorAll('.slide-item'); if(items.length > 0) { const itemWidth = items[0].offsetWidth + 24; slider.scrollLeft = currentSlide * itemWidth; updateDots(); } }
-    function slideNext() { const items = document.querySelectorAll('.slide-item'); if (items.length === 0) return; const itemWidth = items[0].offsetWidth + 24; currentSlide++; if (currentSlide >= items.length) currentSlide = 0; slider.scrollLeft = currentSlide * itemWidth; updateDots(); }
-    function slidePrev() { const items = document.querySelectorAll('.slide-item'); if (items.length === 0) return; const itemWidth = items[0].offsetWidth + 24; currentSlide--; if (currentSlide < 0) currentSlide = items.length - 1; slider.scrollLeft = currentSlide * itemWidth; updateDots(); }
-    
-    window.addEventListener('DOMContentLoaded', () => {
-        initDots();
-        setInterval(slideNext, 5000);
-    });
-
-    window.addEventListener('scroll', () => {
-        const btn = document.getElementById('scrollToTopBtn');
-        if(btn) {
-            if(window.scrollY > 300) {
-                btn.classList.remove('opacity-0', 'pointer-events-none', 'translate-y-4');
             } else {
-                btn.classList.add('opacity-0', 'pointer-events-none', 'translate-y-4');
+                h.innerHTML = `<div class="bg-red-50 border border-red-100 p-6 rounded-3xl text-center w-full"><p class="text-red-700 font-bold uppercase italic">ID "${id}" TIDAK DITEMUKAN</p></div>`;
             }
         }
-    });
-</script>
+
+        function downloadTicket(id, btn) { if (btn) { btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Memproses...'; btn.disabled = true; } const target = document.getElementById('eTicketOutput'); html2canvas(target, { scale: 4, backgroundColor: "#ffffff", borderRadius: 32, useCORS: true }).then(c => { const l = document.createElement('a'); l.download = `E-Ticket-${id}.png`; l.href = c.toDataURL('image/png', 1.0); l.click(); if (btn) { btn.innerHTML = '<i class="fas fa-download"></i> Unduh E-Ticket (HD)'; btn.disabled = false; } }).catch(err => { if (btn) { btn.innerHTML = '<i class="fas fa-download"></i> Unduh E-Ticket (HD)'; btn.disabled = false; } alert("Gagal mengunduh tiket."); }); }
+        function toggleRoute(i) { const element = document.getElementById(i), icon = document.getElementById('icon-' + i); element.classList.toggle('show'); if (icon) icon.classList.toggle('active'); }
+        function togglePrice(i) { const element = document.getElementById(i); element.classList.toggle('show'); }
+        function toggleFaq(id) { const c = document.getElementById(id), i = document.getElementById('icon-' + id); if (c.classList.contains('max-h-0')) { c.classList.remove('max-h-0', 'opacity-0'); c.classList.add('max-h-[500px]', 'opacity-100'); i.classList.add('rotate-180'); } else { c.classList.add('max-h-0', 'opacity-0'); c.classList.remove('max-h-[500px]', 'opacity-100'); i.classList.remove('rotate-180'); } }
+        function toggleMobileMenu() { document.getElementById('mobileMenu').classList.toggle('open'); document.getElementById('mobileOverlay').classList.toggle('hidden'); }
+        function scrollToArmada(i) { document.getElementById('destSearch').value = ''; document.getElementById('heroResultsContainer').classList.add('hidden'); document.getElementById('produk').scrollIntoView({ behavior: 'smooth' }); setTimeout(() => { if (!document.getElementById(i).classList.contains('show')) toggleRoute(i); }, 800); }
+
+        function liveSearch() {
+            const q = document.getElementById('destSearch').value.toLowerCase(), c = document.getElementById('heroResultsContainer'), l = document.getElementById('heroResultsList');
+            if (q.length < 2) return c.classList.add('hidden');
+            const m = fleetData.filter(f => f.name.toLowerCase().includes(q) || f.routes.some(r => r.dest.toLowerCase().includes(q)));
+            if (m.length > 0) { c.classList.remove('hidden'); l.innerHTML = m.map(i => `<div class="bg-blue-50/50 p-4 rounded-2xl hover:bg-blue-600 hover:text-white border border-blue-100 cursor-pointer transition-all group" onclick="scrollToArmada('${i.id}')"><h5 class="font-black text-blue-900 group-hover:text-white text-sm uppercase italic text-center">${i.name}</h5><p class="text-[10px] text-gray-500 group-hover:text-blue-100 font-bold mt-1 italic truncate text-center">${i.routes.map(r => r.dest).join(', ')}</p></div>`).join(''); } else c.classList.add('hidden');
+        }
+
+        let currentSlide = 0; const slider = document.getElementById('slider');
+        function initDots() { const items = document.querySelectorAll('.slide-item'); const dotsContainer = document.getElementById('sliderDots'); if (!dotsContainer || items.length === 0) return; dotsContainer.innerHTML = Array.from(items).map((_, i) => `<div id="dot${i}" onclick="goToSlide(${i})" class="w-2 h-2 rounded-full cursor-pointer transition-all duration-300 ${i === 0 ? 'bg-blue-600 w-6' : 'bg-gray-300'}"></div>`).join(''); }
+        function updateDots() { const items = document.querySelectorAll('.slide-item'); const dotsCount = items.length; for (let i = 0; i < dotsCount; i++) { const dot = document.getElementById('dot' + i); if (dot) { dot.classList.remove('bg-blue-600', 'w-6'); dot.classList.add('bg-gray-300', 'w-2'); if (i === currentSlide % dotsCount) { dot.classList.add('bg-blue-600', 'w-6'); dot.classList.remove('bg-gray-300', 'w-2'); } } } }
+        function goToSlide(i) { currentSlide = i; const items = document.querySelectorAll('.slide-item'); if (items.length > 0) { const itemWidth = items[0].offsetWidth + 24; slider.scrollLeft = currentSlide * itemWidth; updateDots(); } }
+        function slideNext() { const items = document.querySelectorAll('.slide-item'); if (items.length === 0) return; const itemWidth = items[0].offsetWidth + 24; currentSlide++; if (currentSlide >= items.length) currentSlide = 0; slider.scrollLeft = currentSlide * itemWidth; updateDots(); }
+        function slidePrev() { const items = document.querySelectorAll('.slide-item'); if (items.length === 0) return; const itemWidth = items[0].offsetWidth + 24; currentSlide--; if (currentSlide < 0) currentSlide = items.length - 1; slider.scrollLeft = currentSlide * itemWidth; updateDots(); }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            initDots();
+            setInterval(slideNext, 5000);
+        });
+
+        window.addEventListener('scroll', () => {
+            const btn = document.getElementById('scrollToTopBtn');
+            if (btn) {
+                if (window.scrollY > 300) {
+                    btn.classList.remove('opacity-0', 'pointer-events-none', 'translate-y-4');
+                } else {
+                    btn.classList.add('opacity-0', 'pointer-events-none', 'translate-y-4');
+                }
+            }
+        });
+    </script>
 </body>
 
 </html>
