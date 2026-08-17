@@ -3109,8 +3109,8 @@
         }
         setTimeout(() => {
             if (m) {
-                m.classList.remove('flex', 'opacity-100');
-                m.classList.add('hidden', 'opacity-0');
+                m.classList.remove('flex');
+                m.classList.add('hidden');
             }
         }, 300);
     }
@@ -3208,8 +3208,8 @@
         }
         setTimeout(() => {
             if (m) {
-                m.classList.remove('flex', 'opacity-100');
-                m.classList.add('hidden', 'opacity-0');
+                m.classList.remove('flex');
+                m.classList.add('hidden');
             }
         }, 300);
     }
