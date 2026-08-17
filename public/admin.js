@@ -3074,10 +3074,14 @@
         const c = document.getElementById('modalEditArmadaContent');
         m.classList.remove('hidden');
         m.classList.add('flex');
+        m.style.setProperty('display', 'flex', 'important');
+        
         setTimeout(() => {
             if (c) {
                 c.classList.remove('scale-95', 'opacity-0');
                 c.classList.add('scale-100', 'opacity-100');
+                c.style.setProperty('opacity', '1', 'important');
+                c.style.setProperty('transform', 'scale(1)', 'important');
             }
         }, 10);
     }
@@ -3150,10 +3154,14 @@
         const c = document.getElementById('modalAddArmadaContent');
         m.classList.remove('hidden');
         m.classList.add('flex');
+        m.style.setProperty('display', 'flex', 'important');
+        
         setTimeout(() => {
             if (c) {
                 c.classList.remove('scale-95', 'opacity-0');
                 c.classList.add('scale-100', 'opacity-100');
+                c.style.setProperty('opacity', '1', 'important');
+                c.style.setProperty('transform', 'scale(1)', 'important');
             }
         }, 10);
     }
