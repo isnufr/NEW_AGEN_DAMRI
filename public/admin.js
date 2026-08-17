@@ -4423,14 +4423,39 @@ function updateChartColors(isDark) {
     if (typeof closeETicket !== 'undefined') window.closeETicket = closeETicket;
     if (typeof openEticketModal !== 'undefined') window.openEticketModal = openEticketModal;
     if (typeof closeEticketModal !== 'undefined') window.closeEticketModal = closeEticketModal;
+    
     if (typeof openEditBookingModal !== 'undefined') window.openEditBookingModal = openEditBookingModal;
     if (typeof closeEditBookingModal !== 'undefined') window.closeEditBookingModal = closeEditBookingModal;
+    if (typeof submitEditBooking !== 'undefined') window.submitEditBooking = submitEditBooking;
+    
     if (typeof openAddArmadaModal !== 'undefined') window.openAddArmadaModal = openAddArmadaModal;
     if (typeof closeAddArmadaModal !== 'undefined') window.closeAddArmadaModal = closeAddArmadaModal;
+    if (typeof submitAddArmada !== 'undefined') window.submitAddArmada = submitAddArmada;
+    if (typeof toggleAddArmadaNamaInput !== 'undefined') window.toggleAddArmadaNamaInput = toggleAddArmadaNamaInput;
+
+    if (typeof openEditArmadaModal !== 'undefined') window.openEditArmadaModal = openEditArmadaModal;
+    if (typeof closeEditArmadaModal !== 'undefined') window.closeEditArmadaModal = closeEditArmadaModal;
+    if (typeof submitEditArmada !== 'undefined') window.submitEditArmada = submitEditArmada;
+
     if (typeof openHargaKhususModal !== 'undefined') window.openHargaKhususModal = openHargaKhususModal;
     if (typeof closeHargaKhususModal !== 'undefined') window.closeHargaKhususModal = closeHargaKhususModal;
     if (typeof toggleHkGroup !== 'undefined') window.toggleHkGroup = toggleHkGroup;
     if (typeof toggleEditBiayaTambahan !== 'undefined') window.toggleEditBiayaTambahan = toggleEditBiayaTambahan;
+    
+    if (typeof openAddEkstraModal !== 'undefined') window.openAddEkstraModal = openAddEkstraModal;
+    if (typeof openEditEkstraModal !== 'undefined') window.openEditEkstraModal = openEditEkstraModal;
+    if (typeof closeEkstraModal !== 'undefined') window.closeEkstraModal = closeEkstraModal;
+    if (typeof submitEkstra !== 'undefined') window.submitEkstra = submitEkstra;
+    if (typeof deleteEkstra !== 'undefined') window.deleteEkstra = deleteEkstra;
+
+    if (typeof openAp3Modal !== 'undefined') window.openAp3Modal = openAp3Modal;
+    if (typeof closeAp3Modal !== 'undefined') window.closeAp3Modal = closeAp3Modal;
+
+    if (typeof submitAdminBooking !== 'undefined') window.submitAdminBooking = submitAdminBooking;
+    if (typeof saveAdmin !== 'undefined') window.saveAdmin = saveAdmin;
+    if (typeof editAdmin !== 'undefined') window.editAdmin = editAdmin;
+    if (typeof deleteAdmin !== 'undefined') window.deleteAdmin = deleteAdmin;
+    if (typeof openDeleteAdminModal !== 'undefined') window.openDeleteAdminModal = openDeleteAdminModal;
 
 // Autocomplete logic for Pelanggan
 let searchTimeout;
