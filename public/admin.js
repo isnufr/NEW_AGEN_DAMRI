@@ -3070,35 +3070,21 @@
     }
 
     function openEditArmadaModal(id) {
-        try {
-            Swal.fire({
-                title: 'Debugging',
-                text: 'Fungsi openEditArmadaModal mulai dijalankan... ID: ' + id,
-                icon: 'info',
-                timer: 1500,
-                showConfirmButton: false
-            });
-            const a = getArmada(id);
-            if(!a) {
-                Swal.fire('Error', 'Data armada tidak ditemukan untuk ID: ' + id, 'error');
-                return;
-            }
-            
-            document.getElementById('editArmadaId').value = a.id;
-            document.getElementById('editArmadaIdDisplay').innerText = a.id;
-            document.getElementById('editArmadaNama').value = a.name;
-            document.getElementById('editArmadaTujuan').value = a.destination;
-            document.getElementById('editArmadaJam').value = a.time;
+        const a = getArmada(id);
+        if(!a) return;
+        
+        document.getElementById('editArmadaId').value = a.id;
+        document.getElementById('editArmadaIdDisplay').innerText = a.id;
+        document.getElementById('editArmadaNama').value = a.name;
+        document.getElementById('editArmadaTujuan').value = a.destination;
+        document.getElementById('editArmadaJam').value = a.time;
         document.getElementById('editArmadaHarga').value = a.price;
         document.getElementById('editArmadaSeat').value = a.capacity;
 
         const m = document.getElementById('modalEditArmada');
         const c = document.getElementById('modalEditArmadaContent');
         m.classList.remove('hidden'); m.classList.add('flex');
-            setTimeout(() => { m.classList.remove('opacity-0'); c.classList.remove('scale-95'); }, 10);
-        } catch (error) {
-            Swal.fire('Error di openEditArmadaModal', error.message + '\n' + error.stack, 'error');
-        }
+        setTimeout(() => { c.classList.remove('scale-95'); }, 10);
     }
 
     function closeEditArmadaModal() {
@@ -3157,13 +3143,6 @@
 
     function openAddArmadaModal() {
         try {
-            Swal.fire({
-                title: 'Debugging',
-                text: 'Fungsi openAddArmadaModal mulai dijalankan...',
-                icon: 'info',
-                timer: 1500,
-                showConfirmButton: false
-            });
             document.getElementById('formAddArmada').reset();
             
             const armadas = getArmadas();
@@ -3184,7 +3163,6 @@
         const c = document.getElementById('modalAddArmadaContent');
         m.classList.remove('hidden'); m.classList.add('flex');
         setTimeout(() => {
-            m.classList.remove('opacity-0');
             c.classList.remove('scale-95');
             c.classList.add('scale-100');
         }, 10);
@@ -3196,7 +3174,6 @@
     function closeAddArmadaModal() {
         const m = document.getElementById('modalAddArmada');
         const c = document.getElementById('modalAddArmadaContent');
-        m.classList.add('opacity-0');
         c.classList.remove('scale-100');
         c.classList.add('scale-95');
         setTimeout(() => { m.classList.add('hidden'); m.classList.remove('flex'); }, 300);
