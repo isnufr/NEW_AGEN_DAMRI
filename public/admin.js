@@ -3083,19 +3083,29 @@
 
         const m = document.getElementById('modalEditArmada');
         const c = document.getElementById('modalEditArmadaContent');
-        m.classList.remove('hidden'); m.classList.add('flex');
+        m.classList.remove('hidden', 'opacity-0');
+        m.classList.add('flex', 'opacity-100');
         setTimeout(() => {
-            c.classList.remove('scale-95', 'opacity-0');
-            c.classList.add('scale-100', 'opacity-100');
+            if (c) {
+                c.classList.remove('scale-95', 'opacity-0');
+                c.classList.add('scale-100', 'opacity-100');
+            }
         }, 10);
     }
 
     function closeEditArmadaModal() {
         const m = document.getElementById('modalEditArmada');
         const c = document.getElementById('modalEditArmadaContent');
-        c.classList.remove('scale-100', 'opacity-100');
-        c.classList.add('scale-95', 'opacity-0');
-        setTimeout(() => { m.classList.add('hidden'); m.classList.remove('flex'); }, 300);
+        if (c) {
+            c.classList.remove('scale-100', 'opacity-100');
+            c.classList.add('scale-95', 'opacity-0');
+        }
+        setTimeout(() => {
+            if (m) {
+                m.classList.remove('flex', 'opacity-100');
+                m.classList.add('hidden', 'opacity-0');
+            }
+        }, 300);
     }
 
     async function submitEditArmada(e) {
@@ -3164,24 +3174,31 @@
         }
         toggleAddArmadaNamaInput();
 
-        const m = document.getElementById('modalAddArmada');
+          const m = document.getElementById('modalAddArmada');
         const c = document.getElementById('modalAddArmadaContent');
-        m.classList.remove('hidden'); m.classList.add('flex');
+        m.classList.remove('hidden', 'opacity-0');
+        m.classList.add('flex', 'opacity-100');
         setTimeout(() => {
-            c.classList.remove('scale-95', 'opacity-0');
-            c.classList.add('scale-100', 'opacity-100');
+            if (c) {
+                c.classList.remove('scale-95', 'opacity-0');
+                c.classList.add('scale-100', 'opacity-100');
+            }
         }, 10);
-        } catch (error) {
-            Swal.fire('Error di openAddArmadaModal', error.message + '\n' + error.stack, 'error');
-        }
     }
 
     function closeAddArmadaModal() {
         const m = document.getElementById('modalAddArmada');
         const c = document.getElementById('modalAddArmadaContent');
-        c.classList.remove('scale-100', 'opacity-100');
-        c.classList.add('scale-95', 'opacity-0');
-        setTimeout(() => { m.classList.add('hidden'); m.classList.remove('flex'); }, 300);
+        if (c) {
+            c.classList.remove('scale-100', 'opacity-100');
+            c.classList.add('scale-95', 'opacity-0');
+        }
+        setTimeout(() => {
+            if (m) {
+                m.classList.remove('flex', 'opacity-100');
+                m.classList.add('hidden', 'opacity-0');
+            }
+        }, 300);
     }
 
     async function submitAddArmada(e) {
@@ -4140,11 +4157,13 @@ function updateChartColors(isDark) {
             
             const modal = document.getElementById('ekstraModal');
             const inner = document.getElementById('ekstraModalInner');
-            modal.classList.remove('hidden');
-            modal.classList.add('flex');
+            modal.classList.remove('hidden', 'opacity-0');
+            modal.classList.add('flex', 'opacity-100');
             setTimeout(() => {
-                inner.classList.remove('scale-95', 'opacity-0');
-                inner.classList.add('scale-100', 'opacity-100');
+                if (inner) {
+                    inner.classList.remove('scale-95', 'opacity-0');
+                    inner.classList.add('scale-100', 'opacity-100');
+                }
             }, 10);
         }
 
@@ -4168,22 +4187,28 @@ function updateChartColors(isDark) {
             
             const modal = document.getElementById('ekstraModal');
             const inner = document.getElementById('ekstraModalInner');
-            modal.classList.remove('hidden');
-            modal.classList.add('flex');
+            modal.classList.remove('hidden', 'opacity-0');
+            modal.classList.add('flex', 'opacity-100');
             setTimeout(() => {
-                inner.classList.remove('scale-95', 'opacity-0');
-                inner.classList.add('scale-100', 'opacity-100');
+                if (inner) {
+                    inner.classList.remove('scale-95', 'opacity-0');
+                    inner.classList.add('scale-100', 'opacity-100');
+                }
             }, 10);
         }
 
         function closeEkstraModal() {
             const modal = document.getElementById('ekstraModal');
             const inner = document.getElementById('ekstraModalInner');
-            inner.classList.remove('scale-100', 'opacity-100');
-            inner.classList.add('scale-95', 'opacity-0');
+            if (inner) {
+                inner.classList.remove('scale-100', 'opacity-100');
+                inner.classList.add('scale-95', 'opacity-0');
+            }
             setTimeout(() => {
-                modal.classList.add('hidden');
-                modal.classList.remove('flex');
+                if (modal) {
+                    modal.classList.add('hidden', 'opacity-0');
+                    modal.classList.remove('flex', 'opacity-100');
+                }
             }, 300);
         }
 
