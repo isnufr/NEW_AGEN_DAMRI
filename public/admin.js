@@ -3070,32 +3070,16 @@
     }
 
     function openEditArmadaModal(id) {
-        Swal.fire({ title: 'Debug', text: 'Tombol Edit diklik: ' + id, icon: 'info' });
-        try {
-            const a = getArmada(id);
-            if(!a) return;
-            
-            document.getElementById('editArmadaId').value = a.id;
-            document.getElementById('editArmadaIdDisplay').innerText = a.id;
-            document.getElementById('editArmadaNama').value = a.name;
-            document.getElementById('editArmadaTujuan').value = a.destination;
-            document.getElementById('editArmadaJam').value = a.time;
-            document.getElementById('editArmadaHarga').value = a.price;
-            document.getElementById('editArmadaSeat').value = a.capacity;
-
-            const m = document.getElementById('modalEditArmada');
-            const c = document.getElementById('modalEditArmadaContent');
-            m.classList.remove('hidden');
-            m.classList.add('flex');
-            setTimeout(() => {
-                if (c) {
-                    c.classList.remove('scale-95', 'opacity-0');
-                    c.classList.add('scale-100', 'opacity-100');
-                }
-            }, 10);
-        } catch (e) {
-            Swal.fire('Error openEdit', e.message, 'error');
-        }
+        const m = document.getElementById('modalEditArmada');
+        const c = document.getElementById('modalEditArmadaContent');
+        m.classList.remove('hidden');
+        m.classList.add('flex');
+        setTimeout(() => {
+            if (c) {
+                c.classList.remove('scale-95', 'opacity-0');
+                c.classList.add('scale-100', 'opacity-100');
+            }
+        }, 10);
     }
 
     function closeEditArmadaModal() {
@@ -3162,37 +3146,16 @@
     }
 
     function openAddArmadaModal() {
-        Swal.fire({ title: 'Debug', text: 'Tombol Tambah diklik', icon: 'info' });
-        try {
-            document.getElementById('formAddArmada').reset();
-            
-            const armadas = getArmadas();
-            const uniqueNames = [...new Set(armadas.map(a => a.name.toUpperCase()))].sort();
-            const select = document.getElementById('addArmadaNamaSelect');
-
-            if (select) {
-                let html = '<option value="">Pilih Armada...</option>';
-                uniqueNames.forEach(name => {
-                    html += `<option value="${name}">${name}</option>`;
-                });
-                html += '<option value="BARU">+ Tambah Armada Baru</option>';
-                select.innerHTML = html;
+        const m = document.getElementById('modalAddArmada');
+        const c = document.getElementById('modalAddArmadaContent');
+        m.classList.remove('hidden');
+        m.classList.add('flex');
+        setTimeout(() => {
+            if (c) {
+                c.classList.remove('scale-95', 'opacity-0');
+                c.classList.add('scale-100', 'opacity-100');
             }
-            toggleAddArmadaNamaInput();
-
-            const m = document.getElementById('modalAddArmada');
-            const c = document.getElementById('modalAddArmadaContent');
-            m.classList.remove('hidden');
-            m.classList.add('flex');
-            setTimeout(() => {
-                if (c) {
-                    c.classList.remove('scale-95', 'opacity-0');
-                    c.classList.add('scale-100', 'opacity-100');
-                }
-            }, 10);
-        } catch (e) {
-            Swal.fire('Error openAdd', e.message, 'error');
-        }
+        }, 10);
     }
 
     function closeAddArmadaModal() {
