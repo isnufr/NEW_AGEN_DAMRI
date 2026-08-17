@@ -3070,21 +3070,35 @@
     }
 
     function openEditArmadaModal(id) {
-        const a = getArmada(id);
-        if(!a) return;
-        
-        document.getElementById('editArmadaId').value = a.id;
-        document.getElementById('editArmadaIdDisplay').innerText = a.id;
-        document.getElementById('editArmadaNama').value = a.name;
-        document.getElementById('editArmadaTujuan').value = a.destination;
-        document.getElementById('editArmadaJam').value = a.time;
+        try {
+            Swal.fire({
+                title: 'Debugging',
+                text: 'Fungsi openEditArmadaModal mulai dijalankan... ID: ' + id,
+                icon: 'info',
+                timer: 1500,
+                showConfirmButton: false
+            });
+            const a = getArmada(id);
+            if(!a) {
+                Swal.fire('Error', 'Data armada tidak ditemukan untuk ID: ' + id, 'error');
+                return;
+            }
+            
+            document.getElementById('editArmadaId').value = a.id;
+            document.getElementById('editArmadaIdDisplay').innerText = a.id;
+            document.getElementById('editArmadaNama').value = a.name;
+            document.getElementById('editArmadaTujuan').value = a.destination;
+            document.getElementById('editArmadaJam').value = a.time;
         document.getElementById('editArmadaHarga').value = a.price;
         document.getElementById('editArmadaSeat').value = a.capacity;
 
         const m = document.getElementById('modalEditArmada');
         const c = document.getElementById('modalEditArmadaContent');
         m.classList.remove('hidden'); m.classList.add('flex');
-        setTimeout(() => { m.classList.remove('opacity-0'); c.classList.remove('scale-95'); }, 10);
+            setTimeout(() => { m.classList.remove('opacity-0'); c.classList.remove('scale-95'); }, 10);
+        } catch (error) {
+            Swal.fire('Error di openEditArmadaModal', error.message + '\n' + error.stack, 'error');
+        }
     }
 
     function closeEditArmadaModal() {
@@ -3142,11 +3156,20 @@
     }
 
     function openAddArmadaModal() {
-        document.getElementById('formAddArmada').reset();
-        
-        const armadas = getArmadas();
-        const uniqueNames = [...new Set(armadas.map(a => a.name.toUpperCase()))].sort();
-        const select = document.getElementById('addArmadaNamaSelect');
+        try {
+            Swal.fire({
+                title: 'Debugging',
+                text: 'Fungsi openAddArmadaModal mulai dijalankan...',
+                icon: 'info',
+                timer: 1500,
+                showConfirmButton: false
+            });
+            document.getElementById('formAddArmada').reset();
+            
+            const armadas = getArmadas();
+            const uniqueNames = [...new Set(armadas.map(a => a.name.toUpperCase()))].sort();
+            const select = document.getElementById('addArmadaNamaSelect');
+
         if (select) {
             let html = '<option value="">Pilih Armada...</option>';
             uniqueNames.forEach(name => {
@@ -3165,6 +3188,9 @@
             c.classList.remove('scale-95');
             c.classList.add('scale-100');
         }, 10);
+        } catch (error) {
+            Swal.fire('Error di openAddArmadaModal', error.message + '\n' + error.stack, 'error');
+        }
     }
 
     function closeAddArmadaModal() {
