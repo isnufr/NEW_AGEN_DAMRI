@@ -3070,31 +3070,27 @@
     }
 
     function openEditArmadaModal(id) {
-        try {
-            const a = getArmada(id);
-            if(!a) return;
-            
-            document.getElementById('editArmadaId').value = a.id;
-            document.getElementById('editArmadaIdDisplay').innerText = a.id;
-            document.getElementById('editArmadaNama').value = a.name;
-            document.getElementById('editArmadaTujuan').value = a.destination;
-            document.getElementById('editArmadaJam').value = a.time;
-            document.getElementById('editArmadaHarga').value = a.price;
-            document.getElementById('editArmadaSeat').value = a.capacity;
+        const a = getArmada(id);
+        if(!a) return;
+        
+        document.getElementById('editArmadaId').value = a.id;
+        document.getElementById('editArmadaIdDisplay').innerText = a.id;
+        document.getElementById('editArmadaNama').value = a.name;
+        document.getElementById('editArmadaTujuan').value = a.destination;
+        document.getElementById('editArmadaJam').value = a.time;
+        document.getElementById('editArmadaHarga').value = a.price;
+        document.getElementById('editArmadaSeat').value = a.capacity;
 
-            const m = document.getElementById('modalEditArmada');
-            const c = document.getElementById('modalEditArmadaContent');
-            m.classList.remove('hidden', 'opacity-0');
-            m.classList.add('flex', 'opacity-100');
-            setTimeout(() => {
-                if (c) {
-                    c.classList.remove('scale-95', 'opacity-0');
-                    c.classList.add('scale-100', 'opacity-100');
-                }
-            }, 10);
-        } catch (e) {
-            alert('Error openEdit: ' + e.message + '\nLine: ' + e.lineNumber);
-        }
+        const m = document.getElementById('modalEditArmada');
+        const c = document.getElementById('modalEditArmadaContent');
+        m.classList.remove('hidden', 'opacity-0');
+        m.classList.add('flex', 'opacity-100');
+        setTimeout(() => {
+            if (c) {
+                c.classList.remove('scale-95', 'opacity-0');
+                c.classList.add('scale-100', 'opacity-100');
+            }
+        }, 10);
     }
 
     function closeEditArmadaModal() {
@@ -3161,36 +3157,32 @@
     }
 
     function openAddArmadaModal() {
-        try {
             document.getElementById('formAddArmada').reset();
             
             const armadas = getArmadas();
             const uniqueNames = [...new Set(armadas.map(a => a.name.toUpperCase()))].sort();
             const select = document.getElementById('addArmadaNamaSelect');
 
-            if (select) {
-                let html = '<option value="">Pilih Armada...</option>';
-                uniqueNames.forEach(name => {
-                    html += `<option value="${name}">${name}</option>`;
-                });
-                html += '<option value="BARU">+ Tambah Armada Baru</option>';
-                select.innerHTML = html;
-            }
-            toggleAddArmadaNamaInput();
-
-            const m = document.getElementById('modalAddArmada');
-            const c = document.getElementById('modalAddArmadaContent');
-            m.classList.remove('hidden', 'opacity-0');
-            m.classList.add('flex', 'opacity-100');
-            setTimeout(() => {
-                if (c) {
-                    c.classList.remove('scale-95', 'opacity-0');
-                    c.classList.add('scale-100', 'opacity-100');
-                }
-            }, 10);
-        } catch (e) {
-            alert('Error openAdd: ' + e.message + '\nLine: ' + e.lineNumber);
+        if (select) {
+            let html = '<option value="">Pilih Armada...</option>';
+            uniqueNames.forEach(name => {
+                html += `<option value="${name}">${name}</option>`;
+            });
+            html += '<option value="BARU">+ Tambah Armada Baru</option>';
+            select.innerHTML = html;
         }
+        toggleAddArmadaNamaInput();
+
+          const m = document.getElementById('modalAddArmada');
+        const c = document.getElementById('modalAddArmadaContent');
+        m.classList.remove('hidden', 'opacity-0');
+        m.classList.add('flex', 'opacity-100');
+        setTimeout(() => {
+            if (c) {
+                c.classList.remove('scale-95', 'opacity-0');
+                c.classList.add('scale-100', 'opacity-100');
+            }
+        }, 10);
     }
 
     function closeAddArmadaModal() {
@@ -4153,63 +4145,55 @@ function updateChartColors(isDark) {
         }
 
         function openAddEkstraModal() {
-            try {
-                document.getElementById('ekstraId').value = '';
-                document.getElementById('ekstraForm').reset();
-                document.getElementById('ekstraAsal').value = '';
-                document.getElementById('ekstraTujuan').value = '';
-                document.getElementById('ekstraJumlahPnp').value = 1;
-                document.getElementById('ekstraHp').value = '';
-                generateEkstraPnpFields();
-                document.getElementById('ekstraModalTitle').innerText = 'Tambah Tiket Ekstra';
-                
-                const modal = document.getElementById('ekstraModal');
-                const inner = document.getElementById('ekstraModalInner');
-                modal.classList.remove('hidden', 'opacity-0');
-                modal.classList.add('flex', 'opacity-100');
-                setTimeout(() => {
-                    if (inner) {
-                        inner.classList.remove('scale-95', 'opacity-0');
-                        inner.classList.add('scale-100', 'opacity-100');
-                    }
-                }, 10);
-            } catch (e) {
-                alert('Error openAddEkstra: ' + e.message + '\nLine: ' + e.lineNumber);
-            }
+            document.getElementById('ekstraId').value = '';
+            document.getElementById('ekstraForm').reset();
+            document.getElementById('ekstraAsal').value = '';
+            document.getElementById('ekstraTujuan').value = '';
+            document.getElementById('ekstraJumlahPnp').value = 1;
+            document.getElementById('ekstraHp').value = '';
+            generateEkstraPnpFields();
+            document.getElementById('ekstraModalTitle').innerText = 'Tambah Tiket Ekstra';
+            
+            const modal = document.getElementById('ekstraModal');
+            const inner = document.getElementById('ekstraModalInner');
+            modal.classList.remove('hidden', 'opacity-0');
+            modal.classList.add('flex', 'opacity-100');
+            setTimeout(() => {
+                if (inner) {
+                    inner.classList.remove('scale-95', 'opacity-0');
+                    inner.classList.add('scale-100', 'opacity-100');
+                }
+            }, 10);
         }
 
         function openEditEkstraModal(item) {
-            try {
-                document.getElementById('ekstraId').value = item.id;
-                document.getElementById('ekstraTipe').value = item.tipe;
-                document.getElementById('ekstraVendor').value = item.vendor;
-                const ruteParts = (item.rute || '').split(' - ');
-                document.getElementById('ekstraAsal').value = (ruteParts[0] || '').trim();
-                document.getElementById('ekstraTujuan').value = (ruteParts.slice(1).join(' - ') || '').trim();
-                document.getElementById('ekstraTanggal').value = item.tanggalBerangkat;
-                document.getElementById('ekstraJam').value = item.jamBerangkat;
-                document.getElementById('ekstraStatus').value = item.statusPembayaran;
-                document.getElementById('ekstraHp').value = parseEkstraHp(item) !== '-' ? parseEkstraHp(item) : '';
+            document.getElementById('ekstraId').value = item.id;
+            document.getElementById('ekstraTipe').value = item.tipe;
+            document.getElementById('ekstraVendor').value = item.vendor;
+            const ruteParts = (item.rute || '').split(' - ');
+            document.getElementById('ekstraAsal').value = (ruteParts[0] || '').trim();
+            document.getElementById('ekstraTujuan').value = (ruteParts.slice(1).join(' - ') || '').trim();
+            document.getElementById('ekstraTanggal').value = item.tanggalBerangkat;
+            document.getElementById('ekstraJam').value = item.jamBerangkat;
+            document.getElementById('ekstraStatus').value = item.statusPembayaran;
+            document.getElementById('ekstraHp').value = parseEkstraHp(item) !== '-' ? parseEkstraHp(item) : '';
 
-                const pnpList = parseEkstraPnp(item);
-                document.getElementById('ekstraJumlahPnp').value = pnpList.length;
-                generateEkstraPnpFields(pnpList);
+            const pnpList = parseEkstraPnp(item);
+            document.getElementById('ekstraJumlahPnp').value = pnpList.length;
+            generateEkstraPnpFields(pnpList);
 
-                document.getElementById('ekstraModalTitle').innerText = 'Edit Tiket Ekstra';
-                
-                const modal = document.getElementById('ekstraModal');
-                const inner = document.getElementById('ekstraModalInner');
-                modal.classList.remove('hidden', 'opacity-0');
-                modal.classList.add('flex', 'opacity-100');
-                setTimeout(() => {
-                    if (inner) {
-                        inner.classList.remove('scale-95', 'opacity-0');
-                        inner.classList.add('scale-100', 'opacity-100');
-                    }
-                }, 10);
-            } catch (e) {
-                alert('Error openEditEkstra: ' + e.message + '\nLine: ' + e.lineNumber);
-            }
+            document.getElementById('ekstraModalTitle').innerText = 'Edit Tiket Ekstra';
+            
+            const modal = document.getElementById('ekstraModal');
+            const inner = document.getElementById('ekstraModalInner');
+            modal.classList.remove('hidden', 'opacity-0');
+            modal.classList.add('flex', 'opacity-100');
+            setTimeout(() => {
+                if (inner) {
+                    inner.classList.remove('scale-95', 'opacity-0');
+                    inner.classList.add('scale-100', 'opacity-100');
+                }
+            }, 10);
         }
 
         function closeEkstraModal() {
