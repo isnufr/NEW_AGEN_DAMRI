@@ -3085,16 +3085,14 @@
             const m = document.getElementById('modalEditArmada');
             const c = document.getElementById('modalEditArmadaContent');
             
-            if (m) {
-                document.body.appendChild(m);
-                m.className = "fixed inset-0 bg-gray-900/40 backdrop-blur-sm flex items-center justify-center p-4";
-                m.style.cssText = "display: flex !important; z-index: 2147483647 !important;";
-            }
+            if (m) document.body.appendChild(m); // Safety append
             
+            m.classList.remove('hidden');
+            m.classList.add('flex');
             setTimeout(() => {
                 if (c) {
-                    c.className = "bg-white rounded-3xl shadow-2xl p-6 md:p-8 w-full max-w-md flex flex-col max-h-[90vh]";
-                    c.style.cssText = "opacity: 1 !important; transform: scale(1) !important; transition: all 0.3s ease-in-out !important;";
+                    c.classList.remove('scale-95', 'opacity-0');
+                    c.classList.add('scale-100', 'opacity-100');
                 }
             }, 10);
         } catch (e) {
@@ -3186,16 +3184,14 @@
             const m = document.getElementById('modalAddArmada');
             const c = document.getElementById('modalAddArmadaContent');
             
-            if (m) {
-                document.body.appendChild(m);
-                m.className = "fixed inset-0 bg-gray-900/40 backdrop-blur-sm flex items-center justify-center p-4";
-                m.style.cssText = "display: flex !important; z-index: 2147483647 !important;";
-            }
+            if (m) document.body.appendChild(m); // Safety append
             
+            m.classList.remove('hidden');
+            m.classList.add('flex');
             setTimeout(() => {
                 if (c) {
-                    c.className = "bg-white rounded-3xl shadow-2xl p-6 md:p-8 w-full max-w-md flex flex-col max-h-[90vh]";
-                    c.style.cssText = "opacity: 1 !important; transform: scale(1) !important; transition: all 0.3s ease-in-out !important;";
+                    c.classList.remove('scale-95', 'opacity-0');
+                    c.classList.add('scale-100', 'opacity-100');
                 }
             }, 10);
         } catch (e) {
