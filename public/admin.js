@@ -3070,7 +3070,6 @@
     }
 
     function openEditArmadaModal(id) {
-        Swal.fire({ title: 'Debug', text: 'Tombol Edit diklik: ' + id, icon: 'info' });
         try {
             const a = getArmada(id);
             if(!a) return;
@@ -3162,7 +3161,6 @@
     }
 
     function openAddArmadaModal() {
-        Swal.fire({ title: 'Debug', text: 'Tombol Tambah diklik', icon: 'info' });
         try {
             document.getElementById('formAddArmada').reset();
             
