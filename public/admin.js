@@ -3084,8 +3084,8 @@
 
             const m = document.getElementById('modalEditArmada');
             const c = document.getElementById('modalEditArmadaContent');
-            m.classList.remove('hidden', 'opacity-0');
-            m.classList.add('flex', 'opacity-100');
+            m.classList.remove('hidden');
+            m.classList.add('flex');
             setTimeout(() => {
                 if (c) {
                     c.classList.remove('scale-95', 'opacity-0');
@@ -3180,8 +3180,8 @@
 
             const m = document.getElementById('modalAddArmada');
             const c = document.getElementById('modalAddArmadaContent');
-            m.classList.remove('hidden', 'opacity-0');
-            m.classList.add('flex', 'opacity-100');
+            m.classList.remove('hidden');
+            m.classList.add('flex');
             setTimeout(() => {
                 if (c) {
                     c.classList.remove('scale-95', 'opacity-0');
