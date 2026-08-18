@@ -79,3 +79,17 @@ model Pelanggan {
   alamat       String   @default("-")
   createdAt    DateTime @default(now())
 }
+
+model PopupIklan {
+  id               String   @id @default(uuid())
+  judul            String
+  deskripsiSingkat String
+  deskripsiLengkap String   @db.Text
+  bannerUrl        String
+  nomorWhatsapp    String
+  pesanWhatsapp    String   @default("Halo, saya tertarik dengan iklan Anda")
+  tanggalMulai     String
+  tanggalBerakhir  String
+  isActive         Boolean  @default(false)
+  createdAt        DateTime @default(now())
+}

@@ -104,6 +104,10 @@
                     <i class="fas fa-users-cog"></i>
                     <span>Manajemen Akun</span>
                 </div>
+                <div class="nav-item" data-menu="iklan" onclick="switchMenu('iklan')">
+                    <i class="fas fa-bullhorn"></i>
+                    <span>Kelola Iklan</span>
+                </div>
 
                 <div class="h-px bg-white/10 my-4"></div>
                 <div class="text-[9px] font-black text-slate-600 uppercase tracking-[0.2em] px-4 mb-2">Aksi</div>
@@ -749,6 +753,143 @@
                         </div>
                     </div>
                 </section>
+
+                <!-- ======================= -->
+                <!-- MENU: KELOLA IKLAN      -->
+                <!-- ======================= -->
+                <section id="sec-iklan" class="content-section">
+                    <div class="mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                        <div>
+                            <h2 class="text-2xl font-black text-slate-800 tracking-tight">Kelola Iklan Pop-Up</h2>
+                            <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mt-1">Atur iklan yang muncul di halaman pengunjung</p>
+                        </div>
+                        <button onclick="showTambahIklanModal()"
+                                class="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-slate-900 px-5 py-2.5 rounded-xl text-xs font-black tracking-widest uppercase shadow-lg shadow-amber-500/30 transition-all flex items-center justify-center gap-2">
+                            <i class="fas fa-plus"></i> Tambah Iklan
+                        </button>
+                    </div>
+
+                    <div id="iklanListContainer" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+                        <!-- Iklan cards will be rendered by JS -->
+                        <div class="chart-card text-center py-12 col-span-full">
+                            <i class="fas fa-bullhorn text-4xl text-slate-200 mb-3"></i>
+                            <p class="text-sm font-bold text-slate-400">Belum ada iklan. Klik "Tambah Iklan" untuk memulai.</p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ======================= -->
+                <!-- IKLAN FORM MODAL        -->
+                <!-- ======================= -->
+                <div id="iklanModal" class="fixed inset-0 bg-gray-900/40 z-[150] hidden items-center justify-center p-4 overflow-y-auto">
+                    <div class="bg-white rounded-[2rem] shadow-2xl w-full max-w-lg animate-fade-in-up max-h-[90dvh] overflow-y-auto my-auto">
+                        <div class="p-6 border-b border-gray-100 flex justify-between items-center bg-amber-50/50">
+                            <div>
+                                <h3 class="text-lg font-black text-slate-800 tracking-tight" id="iklanModalTitle">Tambah Iklan</h3>
+                                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-0.5">Kelola Pop-Up Iklan</p>
+                            </div>
+                            <button onclick="closeIklanModal()" class="w-8 h-8 flex items-center justify-center rounded-xl bg-white text-gray-400 hover:text-red-500 hover:bg-red-50 shadow-sm transition-all">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                        <form id="iklanForm" onsubmit="submitIklan(event)" class="p-6 space-y-4" enctype="multipart/form-data">
+                            <input type="hidden" id="iklanEditId">
+                            <div>
+                                <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1.5 ml-1">Banner / Foto Iklan <span class="text-red-400">*</span></label>
+                                <div id="iklanBannerPreview" class="hidden mb-2 rounded-xl overflow-hidden border border-slate-200">
+                                    <img id="iklanBannerImg" src="" alt="Preview" class="w-full h-40 object-cover">
+                                </div>
+                                <input type="file" id="iklanBannerFile" accept="image/jpeg,image/png,image/webp,image/gif" onchange="previewIklanBanner(this)"
+                                       class="w-full bg-slate-50 border border-slate-200 text-slate-800 text-sm rounded-xl focus:ring-4 focus:ring-amber-100 focus:border-amber-500 block p-3 font-semibold transition-colors file:mr-3 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-black file:bg-amber-100 file:text-amber-700 file:cursor-pointer">
+                                <p class="text-[9px] font-bold text-slate-400 mt-1 ml-1">Maks. 4MB (JPG, PNG, WebP, GIF)</p>
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1.5 ml-1">Judul Iklan <span class="text-red-400">*</span></label>
+                                <input type="text" id="iklanJudul" required maxlength="80" placeholder="Contoh: Promo Travel Murah"
+                                       class="w-full bg-slate-50 border border-slate-200 text-slate-800 text-base md:text-sm rounded-xl focus:ring-4 focus:ring-amber-100 focus:border-amber-500 block p-3 font-semibold transition-colors">
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1.5 ml-1">Deskripsi Singkat <span class="text-red-400">*</span></label>
+                                <input type="text" id="iklanDeskripsiSingkat" required maxlength="150" placeholder="Deskripsi pendek untuk pop-up"
+                                       class="w-full bg-slate-50 border border-slate-200 text-slate-800 text-base md:text-sm rounded-xl focus:ring-4 focus:ring-amber-100 focus:border-amber-500 block p-3 font-semibold transition-colors">
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1.5 ml-1">Deskripsi Lengkap</label>
+                                <textarea id="iklanDeskripsiLengkap" rows="4" placeholder="Spesifikasi, harga, alamat, dll..."
+                                          class="w-full bg-slate-50 border border-slate-200 text-slate-800 text-base md:text-sm rounded-xl focus:ring-4 focus:ring-amber-100 focus:border-amber-500 block p-3 font-semibold transition-colors resize-none"></textarea>
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1.5 ml-1">No. WhatsApp <span class="text-red-400">*</span></label>
+                                    <input type="tel" id="iklanNomorWa" required placeholder="6281234567890"
+                                           class="w-full bg-slate-50 border border-slate-200 text-slate-800 text-base md:text-sm rounded-xl focus:ring-4 focus:ring-amber-100 focus:border-amber-500 block p-3 font-semibold transition-colors">
+                                </div>
+                                <div>
+                                    <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1.5 ml-1">Template Pesan WA</label>
+                                    <input type="text" id="iklanPesanWa" placeholder="Halo, saya tertarik..."
+                                           class="w-full bg-slate-50 border border-slate-200 text-slate-800 text-base md:text-sm rounded-xl focus:ring-4 focus:ring-amber-100 focus:border-amber-500 block p-3 font-semibold transition-colors">
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1.5 ml-1">Tanggal Mulai <span class="text-red-400">*</span></label>
+                                    <input type="date" id="iklanTglMulai" required
+                                           class="w-full bg-slate-50 border border-slate-200 text-slate-800 text-base md:text-sm rounded-xl focus:ring-4 focus:ring-amber-100 focus:border-amber-500 block p-3 font-semibold transition-colors">
+                                </div>
+                                <div>
+                                    <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1.5 ml-1">Tanggal Berakhir <span class="text-red-400">*</span></label>
+                                    <input type="date" id="iklanTglAkhir" required
+                                           class="w-full bg-slate-50 border border-slate-200 text-slate-800 text-base md:text-sm rounded-xl focus:ring-4 focus:ring-amber-100 focus:border-amber-500 block p-3 font-semibold transition-colors">
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-3 bg-slate-50 p-3 rounded-xl border border-slate-200">
+                                <label class="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" id="iklanIsActive" class="sr-only peer">
+                                    <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-500"></div>
+                                </label>
+                                <span class="text-xs font-bold text-slate-600">Aktifkan iklan ini</span>
+                            </div>
+                            <div class="pt-4 flex gap-3">
+                                <button type="button" onclick="closeIklanModal()" class="flex-1 px-4 py-3 rounded-xl text-xs font-black uppercase tracking-widest text-slate-500 bg-slate-100 hover:bg-slate-200 transition-all">Batal</button>
+                                <button type="button" onclick="previewIklanPopup()" class="px-4 py-3 rounded-xl text-xs font-black uppercase tracking-widest text-blue-600 bg-blue-50 hover:bg-blue-100 transition-all"><i class="fas fa-eye mr-1"></i> Preview</button>
+                                <button type="submit" class="flex-1 px-4 py-3 rounded-xl text-xs font-black uppercase tracking-widest text-slate-900 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 shadow-lg shadow-amber-500/30 transition-all">Simpan</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- ======================= -->
+                <!-- IKLAN PREVIEW MODAL     -->
+                <!-- ======================= -->
+                <div id="iklanPreviewModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-[200] hidden items-center justify-center p-4">
+                    <div class="relative w-full max-w-md animate-fade-in-up">
+                        <button onclick="document.getElementById('iklanPreviewModal').classList.add('hidden');document.getElementById('iklanPreviewModal').style.display='none';"
+                                class="absolute -top-3 -right-3 z-10 w-10 h-10 bg-white rounded-full shadow-xl flex items-center justify-center text-slate-500 hover:text-red-500 hover:bg-red-50 transition-all">
+                            <i class="fas fa-times text-lg"></i>
+                        </button>
+                        <div class="bg-white rounded-3xl shadow-2xl overflow-hidden">
+                            <img id="previewBannerImg" src="" alt="Preview Banner" class="w-full h-48 object-cover">
+                            <div class="p-5">
+                                <h3 id="previewJudul" class="text-lg font-black text-slate-800 mb-1"></h3>
+                                <p id="previewDeskripsiSingkat" class="text-sm text-slate-500 mb-4"></p>
+                                <div id="previewDeskripsiLengkapWrap" class="hidden bg-slate-50 rounded-xl p-4 mb-4 border border-slate-100">
+                                    <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Detail Lengkap</p>
+                                    <p id="previewDeskripsiLengkap" class="text-sm text-slate-600 whitespace-pre-line"></p>
+                                </div>
+                                <div class="flex gap-3">
+                                    <button onclick="document.getElementById('previewDeskripsiLengkapWrap').classList.toggle('hidden')"
+                                            class="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-xl text-xs font-black uppercase tracking-widest transition-all flex items-center justify-center gap-2">
+                                        <i class="fas fa-info-circle"></i> Selengkapnya
+                                    </button>
+                                    <a id="previewWaBtn" href="#" target="_blank"
+                                       class="flex-1 bg-emerald-500 hover:bg-emerald-600 text-white py-3 rounded-xl text-xs font-black uppercase tracking-widest transition-all flex items-center justify-center gap-2">
+                                        <i class="fab fa-whatsapp text-lg"></i> WhatsApp
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
                 <!-- ======================= -->
                 <!-- ======================= -->

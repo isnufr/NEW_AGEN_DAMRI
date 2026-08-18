@@ -254,6 +254,7 @@
         else if (currentMenu === 'ekstra') renderEkstra();
         else if (currentMenu === 'laporan') renderLaporan();
         else if (currentMenu === 'akun') renderAkun();
+        else if (currentMenu === 'iklan') renderIklan();
     }
 
     // ========================================
@@ -4778,6 +4779,283 @@ window.switchMenu = function(menuId) {
     if (menuId === 'pelanggan') {
         renderPelanggan(true);
     }
+    if (menuId === 'iklan') {
+        renderIklan();
+    }
 };
 
+// ========================================
+// KELOLA IKLAN POP-UP
+// ========================================
+let cachedIklanList = [];
+
+async function fetchIklanData() {
+    try {
+        const data = await fetchFromSheets('getSemuaIklan');
+        if (data && Array.isArray(data)) {
+            cachedIklanList = data;
+        }
+    } catch(e) {
+        console.error('Error fetching iklan:', e);
+    }
+}
+
+function renderIklan() {
+    const container = document.getElementById('iklanListContainer');
+    if (!container) return;
+
+    fetchIklanData().then(() => {
+        if (cachedIklanList.length === 0) {
+            container.innerHTML = `
+                <div class="chart-card text-center py-12 col-span-full">
+                    <i class="fas fa-bullhorn text-4xl text-slate-200 mb-3"></i>
+                    <p class="text-sm font-bold text-slate-400">Belum ada iklan. Klik "Tambah Iklan" untuk memulai.</p>
+                </div>`;
+            return;
+        }
+
+        const today = new Date().toISOString().split('T')[0];
+        container.innerHTML = cachedIklanList.map(iklan => {
+            const isLive = iklan.isActive && iklan.tanggalMulai <= today && iklan.tanggalBerakhir >= today;
+            const isExpired = iklan.tanggalBerakhir < today;
+            let statusBadge, statusText;
+            if (isLive) {
+                statusBadge = 'bg-emerald-100 text-emerald-700';
+                statusText = '● TAYANG';
+            } else if (isExpired) {
+                statusBadge = 'bg-red-100 text-red-600';
+                statusText = '● BERAKHIR';
+            } else if (iklan.isActive) {
+                statusBadge = 'bg-blue-100 text-blue-600';
+                statusText = '● TERJADWAL';
+            } else {
+                statusBadge = 'bg-slate-100 text-slate-500';
+                statusText = '● NONAKTIF';
+            }
+
+            const tglMulai = new Date(iklan.tanggalMulai).toLocaleDateString('id-ID', {day:'numeric',month:'short',year:'numeric'});
+            const tglAkhir = new Date(iklan.tanggalBerakhir).toLocaleDateString('id-ID', {day:'numeric',month:'short',year:'numeric'});
+
+            return `
+            <div class="chart-card overflow-hidden p-0 group hover:-translate-y-1 transition-all duration-300">
+                <div class="relative">
+                    <img src="${iklan.bannerUrl}" alt="${iklan.judul}" class="w-full h-40 object-cover" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDQwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3Qgd2lkdGg9IjQwMCIgaGVpZ2h0PSIyMDAiIGZpbGw9IiNlMmU4ZjAiLz48dGV4dCB4PSIyMDAiIHk9IjEwMCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zNWVtIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiIgZm9udC1zaXplPSIxNiIgZmlsbD0iIzk0YTNiOCI+Tm8gSW1hZ2U8L3RleHQ+PC9zdmc+'">
+                    <span class="absolute top-3 left-3 px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider ${statusBadge}">${statusText}</span>
+                </div>
+                <div class="p-4">
+                    <h4 class="text-sm font-black text-slate-800 mb-1 truncate">${iklan.judul}</h4>
+                    <p class="text-xs text-slate-500 mb-3 line-clamp-2">${iklan.deskripsiSingkat}</p>
+                    <div class="flex items-center gap-2 mb-3">
+                        <i class="fas fa-calendar-alt text-[10px] text-slate-400"></i>
+                        <span class="text-[10px] font-bold text-slate-400">${tglMulai} — ${tglAkhir}</span>
+                    </div>
+                    <div class="flex items-center gap-2 mb-4">
+                        <i class="fab fa-whatsapp text-[10px] text-emerald-500"></i>
+                        <span class="text-[10px] font-bold text-slate-400">${iklan.nomorWhatsapp}</span>
+                    </div>
+                    <div class="flex gap-2">
+                        <button onclick="showPreviewFromData('${iklan.id}')" class="flex-1 px-3 py-2 bg-blue-50 hover:bg-blue-100 text-blue-600 rounded-lg text-[10px] font-black uppercase tracking-wider transition-colors" title="Preview">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                        <button onclick="showEditIklanModal('${iklan.id}')" class="flex-1 px-3 py-2 bg-amber-50 hover:bg-amber-100 text-amber-600 rounded-lg text-[10px] font-black uppercase tracking-wider transition-colors" title="Edit">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button onclick="toggleIklanStatus('${iklan.id}', ${!iklan.isActive})" class="flex-1 px-3 py-2 ${iklan.isActive ? 'bg-slate-100 hover:bg-slate-200 text-slate-600' : 'bg-emerald-50 hover:bg-emerald-100 text-emerald-600'} rounded-lg text-[10px] font-black uppercase tracking-wider transition-colors" title="${iklan.isActive ? 'Nonaktifkan' : 'Aktifkan'}">
+                            <i class="fas fa-${iklan.isActive ? 'pause' : 'play'}"></i>
+                        </button>
+                        <button onclick="deleteIklan('${iklan.id}')" class="flex-1 px-3 py-2 bg-red-50 hover:bg-red-100 text-red-500 rounded-lg text-[10px] font-black uppercase tracking-wider transition-colors" title="Hapus">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>`;
+        }).join('');
+    });
+}
+
+function showTambahIklanModal() {
+    document.getElementById('iklanModalTitle').textContent = 'Tambah Iklan';
+    document.getElementById('iklanEditId').value = '';
+    document.getElementById('iklanForm').reset();
+    document.getElementById('iklanBannerPreview').classList.add('hidden');
+    document.getElementById('iklanBannerFile').required = true;
+    document.getElementById('iklanModal').classList.remove('hidden');
+    document.getElementById('iklanModal').style.display = 'flex';
+}
+
+function showEditIklanModal(id) {
+    const iklan = cachedIklanList.find(i => i.id === id);
+    if (!iklan) return;
+
+    document.getElementById('iklanModalTitle').textContent = 'Edit Iklan';
+    document.getElementById('iklanEditId').value = id;
+    document.getElementById('iklanJudul').value = iklan.judul;
+    document.getElementById('iklanDeskripsiSingkat').value = iklan.deskripsiSingkat;
+    document.getElementById('iklanDeskripsiLengkap').value = iklan.deskripsiLengkap || '';
+    document.getElementById('iklanNomorWa').value = iklan.nomorWhatsapp;
+    document.getElementById('iklanPesanWa').value = iklan.pesanWhatsapp || '';
+    document.getElementById('iklanTglMulai').value = iklan.tanggalMulai;
+    document.getElementById('iklanTglAkhir').value = iklan.tanggalBerakhir;
+    document.getElementById('iklanIsActive').checked = iklan.isActive;
+    document.getElementById('iklanBannerFile').required = false;
+
+    // Show existing banner
+    const preview = document.getElementById('iklanBannerPreview');
+    document.getElementById('iklanBannerImg').src = iklan.bannerUrl;
+    preview.classList.remove('hidden');
+
+    document.getElementById('iklanModal').classList.remove('hidden');
+    document.getElementById('iklanModal').style.display = 'flex';
+}
+
+function closeIklanModal() {
+    document.getElementById('iklanModal').classList.add('hidden');
+    document.getElementById('iklanModal').style.display = 'none';
+}
+
+function previewIklanBanner(input) {
+    if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            document.getElementById('iklanBannerImg').src = e.target.result;
+            document.getElementById('iklanBannerPreview').classList.remove('hidden');
+        };
+        reader.readAsDataURL(input.files[0]);
+    }
+}
+
+async function submitIklan(e) {
+    e.preventDefault();
+    const editId = document.getElementById('iklanEditId').value;
+    const isEdit = !!editId;
+
+    const formData = new FormData();
+    const bannerFile = document.getElementById('iklanBannerFile').files[0];
+
+    if (!isEdit && !bannerFile) {
+        Swal.fire('Error', 'File banner wajib diupload!', 'error');
+        return;
+    }
+
+    if (bannerFile) formData.append('banner', bannerFile);
+    formData.append('judul', document.getElementById('iklanJudul').value);
+    formData.append('deskripsiSingkat', document.getElementById('iklanDeskripsiSingkat').value);
+    formData.append('deskripsiLengkap', document.getElementById('iklanDeskripsiLengkap').value);
+    formData.append('nomorWhatsapp', document.getElementById('iklanNomorWa').value);
+    formData.append('pesanWhatsapp', document.getElementById('iklanPesanWa').value);
+    formData.append('tanggalMulai', document.getElementById('iklanTglMulai').value);
+    formData.append('tanggalBerakhir', document.getElementById('iklanTglAkhir').value);
+    formData.append('isActive', document.getElementById('iklanIsActive').checked ? 'true' : 'false');
+
+    try {
+        const url = isEdit ? `/api/iklan/${editId}` : '/api/iklan';
+        const method = isEdit ? 'PUT' : 'POST';
+        const token = localStorage.getItem('adminToken');
+
+        const res = await fetch(url, {
+            method,
+            headers: { 'Authorization': `Bearer ${token}` },
+            body: formData
+        });
+        const json = await res.json();
+
+        if (json.status === 'success') {
+            Swal.fire({ icon: 'success', title: 'Berhasil!', text: json.message, timer: 1500, showConfirmButton: false });
+            closeIklanModal();
+            renderIklan();
+        } else {
+            Swal.fire('Gagal', json.message || 'Terjadi kesalahan', 'error');
+        }
+    } catch(err) {
+        console.error('Submit iklan error:', err);
+        Swal.fire('Error', 'Gagal menghubungi server', 'error');
+    }
+}
+
+async function toggleIklanStatus(id, isActive) {
+    try {
+        const res = await postToSheets('toggleIklan', { id, isActive });
+        if (res.status === 'success') {
+            Swal.fire({ icon: 'success', title: 'Berhasil!', text: res.message, timer: 1200, showConfirmButton: false });
+            renderIklan();
+        } else {
+            Swal.fire('Gagal', res.message, 'error');
+        }
+    } catch(e) {
+        Swal.fire('Error', 'Gagal menghubungi server', 'error');
+    }
+}
+
+async function deleteIklan(id) {
+    const result = await Swal.fire({
+        title: 'Hapus Iklan?',
+        text: 'Iklan yang dihapus tidak dapat dikembalikan.',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#ef4444',
+        cancelButtonColor: '#94a3b8',
+        confirmButtonText: 'Ya, Hapus!',
+        cancelButtonText: 'Batal'
+    });
+    if (!result.isConfirmed) return;
+
+    try {
+        const res = await postToSheets('deleteIklan', { id });
+        if (res.status === 'success') {
+            Swal.fire({ icon: 'success', title: 'Dihapus!', text: res.message, timer: 1200, showConfirmButton: false });
+            renderIklan();
+        } else {
+            Swal.fire('Gagal', res.message, 'error');
+        }
+    } catch(e) {
+        Swal.fire('Error', 'Gagal menghubungi server', 'error');
+    }
+}
+
+function previewIklanPopup() {
+    const bannerFile = document.getElementById('iklanBannerFile').files[0];
+    const existingSrc = document.getElementById('iklanBannerImg').src;
+    const judul = document.getElementById('iklanJudul').value || 'Judul Iklan';
+    const deskSingkat = document.getElementById('iklanDeskripsiSingkat').value || 'Deskripsi singkat iklan';
+    const deskLengkap = document.getElementById('iklanDeskripsiLengkap').value || '';
+    const nomorWa = document.getElementById('iklanNomorWa').value || '6281234567890';
+    const pesanWa = document.getElementById('iklanPesanWa').value || 'Halo, saya tertarik dengan iklan Anda';
+
+    document.getElementById('previewJudul').textContent = judul;
+    document.getElementById('previewDeskripsiSingkat').textContent = deskSingkat;
+    document.getElementById('previewDeskripsiLengkap').textContent = deskLengkap;
+    document.getElementById('previewDeskripsiLengkapWrap').classList.add('hidden');
+    document.getElementById('previewWaBtn').href = `https://wa.me/${nomorWa.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(pesanWa)}`;
+
+    if (bannerFile) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            document.getElementById('previewBannerImg').src = e.target.result;
+            document.getElementById('iklanPreviewModal').classList.remove('hidden');
+            document.getElementById('iklanPreviewModal').style.display = 'flex';
+        };
+        reader.readAsDataURL(bannerFile);
+    } else if (existingSrc) {
+        document.getElementById('previewBannerImg').src = existingSrc;
+        document.getElementById('iklanPreviewModal').classList.remove('hidden');
+        document.getElementById('iklanPreviewModal').style.display = 'flex';
+    } else {
+        Swal.fire('Info', 'Upload banner terlebih dahulu untuk preview', 'info');
+    }
+}
+
+function showPreviewFromData(id) {
+    const iklan = cachedIklanList.find(i => i.id === id);
+    if (!iklan) return;
+
+    document.getElementById('previewBannerImg').src = iklan.bannerUrl;
+    document.getElementById('previewJudul').textContent = iklan.judul;
+    document.getElementById('previewDeskripsiSingkat').textContent = iklan.deskripsiSingkat;
+    document.getElementById('previewDeskripsiLengkap').textContent = iklan.deskripsiLengkap || '';
+    document.getElementById('previewDeskripsiLengkapWrap').classList.add('hidden');
+    document.getElementById('previewWaBtn').href = `https://wa.me/${(iklan.nomorWhatsapp || '').replace(/[^0-9]/g, '')}?text=${encodeURIComponent(iklan.pesanWhatsapp || 'Halo, saya tertarik dengan iklan Anda')}`;
+
+    document.getElementById('iklanPreviewModal').classList.remove('hidden');
+    document.getElementById('iklanPreviewModal').style.display = 'flex';
+}
 

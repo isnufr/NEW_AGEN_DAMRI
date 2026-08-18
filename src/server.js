@@ -6,6 +6,27 @@ const http = require('http');
 const { Server } = require('socket.io');
 const { PrismaClient } = require('@prisma/client');
 const jwt = require('jsonwebtoken');
+const multer = require('multer');
+const fs = require('fs');
+
+// Multer config for banner uploads
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => cb(null, path.join(__dirname, '../public/uploads')),
+    filename: (req, file, cb) => {
+        const ext = path.extname(file.originalname);
+        cb(null, Date.now() + '-' + Math.random().toString(36).substr(2, 9) + ext);
+    }
+});
+const upload = multer({
+    storage,
+    limits: { fileSize: 4 * 1024 * 1024 },
+    fileFilter: (req, file, cb) => {
+        const allowed = /jpeg|jpg|png|gif|webp/;
+        const extOk = allowed.test(path.extname(file.originalname).toLowerCase());
+        const mimeOk = allowed.test(file.mimetype.split('/')[1]);
+        cb(null, extOk && mimeOk);
+    }
+});
 
 const JWT_SECRET = process.env.JWT_SECRET || 'super-secret-key';
 
@@ -54,6 +75,7 @@ app.use((req, res, next) => {
 
 // Serve frontend build from /public
 app.use(express.static(path.join(__dirname, '../public')));
+app.use('/uploads', express.static(path.join(__dirname, '../public/uploads')));
 
 // Helper untuk parse tanggal dari format campuran (DD/MM/YYYY atau ISO)
 function parseCustomDate(dateStr) {
@@ -109,7 +131,7 @@ app.get('/api', async (req, res) => {
     const action = req.query.action;
 
     try {
-        const publicActions = ['getArmada', 'getBookingById', 'getPelangganTable', 'getHargaKhusus'];
+        const publicActions = ['getArmada', 'getBookingById', 'getPelangganTable', 'getHargaKhusus', 'getPopupIklan'];
         if (!publicActions.includes(action) && !req.user) {
             return res.status(401).json({ status: 'error', message: 'Unauthorized' });
         }
@@ -287,6 +309,26 @@ app.get('/api', async (req, res) => {
                 orderBy: { totalBooking: 'desc' }
             });
             return res.json({ status: 'success', data: results });
+        }
+
+        if (action === 'getPopupIklan') {
+            const today = new Date().toISOString().split('T')[0];
+            const iklanList = await prisma.popupIklan.findMany({
+                where: {
+                    isActive: true,
+                    tanggalMulai: { lte: today },
+                    tanggalBerakhir: { gte: today }
+                },
+                orderBy: { createdAt: 'desc' }
+            });
+            return res.json({ status: 'success', data: iklanList });
+        }
+
+        if (action === 'getSemuaIklan') {
+            const iklanList = await prisma.popupIklan.findMany({
+                orderBy: { createdAt: 'desc' }
+            });
+            return res.json({ status: 'success', data: iklanList });
         }
 
         return res.status(400).json({ status: 'error', message: 'Action not found' });
@@ -802,6 +844,26 @@ app.post('/api', async (req, res) => {
             return res.json({ status: 'success', message: `Migrasi selesai. ${inserted} pelanggan diproses.` });
         }
 
+        if (action === 'toggleIklan') {
+            const { id, isActive } = payload;
+            await prisma.popupIklan.update({
+                where: { id },
+                data: { isActive }
+            });
+            return res.json({ status: 'success', message: `Iklan berhasil ${isActive ? 'diaktifkan' : 'dinonaktifkan'}` });
+        }
+
+        if (action === 'deleteIklan') {
+            const { id } = payload;
+            const iklan = await prisma.popupIklan.findUnique({ where: { id } });
+            if (iklan && iklan.bannerUrl) {
+                const filePath = path.join(__dirname, '../public', iklan.bannerUrl);
+                try { fs.unlinkSync(filePath); } catch(e) {}
+            }
+            await prisma.popupIklan.delete({ where: { id } });
+            return res.json({ status: 'success', message: 'Iklan berhasil dihapus' });
+        }
+
         return res.status(400).json({ status: 'error', message: 'Action not found' });
     } catch (error) {
         console.error(error);
@@ -826,6 +888,79 @@ app.get('/api/normalize-hp', async (req, res) => {
         res.status(500).json({status: 'error', message: e.message});
     }
 });
+
+// Iklan upload endpoints (multipart form)
+app.post('/api/iklan', upload.single('banner'), async (req, res) => {
+    try {
+        const token = req.headers['authorization']?.split(' ')[1];
+        if (!token) return res.status(401).json({ status: 'error', message: 'Unauthorized' });
+        try { jwt.verify(token, JWT_SECRET); } catch(e) { return res.status(401).json({ status: 'error', message: 'Unauthorized' }); }
+
+        if (!req.file) return res.status(400).json({ status: 'error', message: 'File banner wajib diupload' });
+
+        const { judul, deskripsiSingkat, deskripsiLengkap, nomorWhatsapp, pesanWhatsapp, tanggalMulai, tanggalBerakhir, isActive } = req.body;
+        const bannerUrl = '/uploads/' + req.file.filename;
+
+        const iklan = await prisma.popupIklan.create({
+            data: {
+                judul,
+                deskripsiSingkat,
+                deskripsiLengkap: deskripsiLengkap || '',
+                bannerUrl,
+                nomorWhatsapp,
+                pesanWhatsapp: pesanWhatsapp || 'Halo, saya tertarik dengan iklan Anda',
+                tanggalMulai,
+                tanggalBerakhir,
+                isActive: isActive === 'true'
+            }
+        });
+        io.emit('data_updated');
+        return res.json({ status: 'success', message: 'Iklan berhasil ditambahkan', data: iklan });
+    } catch (err) {
+        console.error('Add Iklan Error:', err);
+        return res.status(500).json({ status: 'error', message: 'Gagal menambahkan iklan' });
+    }
+});
+
+app.put('/api/iklan/:id', upload.single('banner'), async (req, res) => {
+    try {
+        const token = req.headers['authorization']?.split(' ')[1];
+        if (!token) return res.status(401).json({ status: 'error', message: 'Unauthorized' });
+        try { jwt.verify(token, JWT_SECRET); } catch(e) { return res.status(401).json({ status: 'error', message: 'Unauthorized' }); }
+
+        const { id } = req.params;
+        const { judul, deskripsiSingkat, deskripsiLengkap, nomorWhatsapp, pesanWhatsapp, tanggalMulai, tanggalBerakhir, isActive } = req.body;
+
+        const updateData = {
+            judul,
+            deskripsiSingkat,
+            deskripsiLengkap: deskripsiLengkap || '',
+            nomorWhatsapp,
+            pesanWhatsapp: pesanWhatsapp || 'Halo, saya tertarik dengan iklan Anda',
+            tanggalMulai,
+            tanggalBerakhir,
+            isActive: isActive === 'true'
+        };
+
+        if (req.file) {
+            // Delete old banner
+            const old = await prisma.popupIklan.findUnique({ where: { id } });
+            if (old && old.bannerUrl) {
+                const oldPath = path.join(__dirname, '../public', old.bannerUrl);
+                try { fs.unlinkSync(oldPath); } catch(e) {}
+            }
+            updateData.bannerUrl = '/uploads/' + req.file.filename;
+        }
+
+        const iklan = await prisma.popupIklan.update({ where: { id }, data: updateData });
+        io.emit('data_updated');
+        return res.json({ status: 'success', message: 'Iklan berhasil diperbarui', data: iklan });
+    } catch (err) {
+        console.error('Edit Iklan Error:', err);
+        return res.status(500).json({ status: 'error', message: 'Gagal memperbarui iklan' });
+    }
+});
+
 app.use((req, res) => {
     res.sendFile(path.join(__dirname, '../public/index.html'));
 });

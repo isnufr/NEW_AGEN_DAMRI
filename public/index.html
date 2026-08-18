@@ -2067,6 +2067,194 @@
             }
         });
     </script>
+
+<!-- ======================= -->
+<!-- POP-UP IKLAN OVERLAY    -->
+<!-- ======================= -->
+<div id="popupIklanOverlay" class="fixed inset-0 z-[9999] hidden" style="background:rgba(0,0,0,0.6);backdrop-filter:blur(4px);">
+    <div class="flex items-center justify-center min-h-screen p-4">
+        <div id="popupIklanCard" class="relative w-full max-w-md" style="transform:scale(0.9);opacity:0;transition:all 0.4s cubic-bezier(0.34,1.56,0.64,1);">
+            <!-- Close button -->
+            <button onclick="closePopupIklan()" class="absolute -top-3 -right-3 z-10 w-10 h-10 bg-white rounded-full shadow-xl flex items-center justify-center text-slate-400 hover:text-red-500 hover:bg-red-50 transition-all hover:scale-110" style="border:2px solid #e2e8f0;">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+            </button>
+
+            <div class="bg-white rounded-3xl shadow-2xl overflow-hidden">
+                <!-- Carousel container -->
+                <div id="popupIklanCarousel" class="relative">
+                    <div id="popupIklanSlides" class="overflow-hidden">
+                        <!-- Slides injected by JS -->
+                    </div>
+                    <!-- Carousel dots -->
+                    <div id="popupIklanDots" class="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1.5 z-10 hidden">
+                    </div>
+                    <!-- Carousel arrows (only if >1 ads) -->
+                    <button id="popupPrevBtn" onclick="popupSlideNav(-1)" class="hidden absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 bg-white/80 hover:bg-white rounded-full shadow-lg flex items-center justify-center text-slate-600 transition-all z-10">
+                        <i class="fas fa-chevron-left text-xs"></i>
+                    </button>
+                    <button id="popupNextBtn" onclick="popupSlideNav(1)" class="hidden absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 bg-white/80 hover:bg-white rounded-full shadow-lg flex items-center justify-center text-slate-600 transition-all z-10">
+                        <i class="fas fa-chevron-right text-xs"></i>
+                    </button>
+                </div>
+
+                <!-- Info section (updated per slide) -->
+                <div class="p-5">
+                    <h3 id="popupIklanJudul" class="text-lg font-black text-slate-800 mb-1 leading-tight"></h3>
+                    <p id="popupIklanDeskripsi" class="text-sm text-slate-500 mb-4 leading-relaxed"></p>
+
+                    <!-- Detail section (toggled) -->
+                    <div id="popupIklanDetailWrap" class="hidden bg-gradient-to-br from-slate-50 to-blue-50/30 rounded-2xl p-4 mb-4 border border-slate-100">
+                        <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2"><i class="fas fa-info-circle mr-1"></i> Informasi Lengkap</p>
+                        <p id="popupIklanDetail" class="text-sm text-slate-600 whitespace-pre-line leading-relaxed"></p>
+                    </div>
+
+                    <div class="flex gap-3">
+                        <button onclick="togglePopupDetail()" id="popupBtnDetail"
+                                class="flex-1 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white py-3.5 rounded-2xl text-xs font-black uppercase tracking-widest transition-all shadow-lg shadow-blue-600/30 flex items-center justify-center gap-2">
+                            <i class="fas fa-info-circle"></i> Selengkapnya
+                        </button>
+                        <a id="popupBtnWa" href="#" target="_blank"
+                           class="flex-1 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white py-3.5 rounded-2xl text-xs font-black uppercase tracking-widest transition-all shadow-lg shadow-emerald-500/30 flex items-center justify-center gap-2 no-underline">
+                            <i class="fab fa-whatsapp text-lg"></i> WhatsApp
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// ========================================
+// POPUP IKLAN SYSTEM
+// ========================================
+let popupIklanData = [];
+let popupCurrentSlide = 0;
+
+async function loadPopupIklan() {
+    // Don't show if already seen this session
+    if (sessionStorage.getItem('popupIklanSeen')) return;
+
+    try {
+        const res = await fetch('/api?action=getPopupIklan&_t=' + Date.now());
+        const json = await res.json();
+        if (json.status === 'success' && json.data && json.data.length > 0) {
+            popupIklanData = json.data;
+            buildPopupSlides();
+            // Show popup after 1 second
+            setTimeout(() => {
+                const overlay = document.getElementById('popupIklanOverlay');
+                overlay.classList.remove('hidden');
+                overlay.style.display = 'block';
+                requestAnimationFrame(() => {
+                    const card = document.getElementById('popupIklanCard');
+                    card.style.transform = 'scale(1)';
+                    card.style.opacity = '1';
+                });
+            }, 1000);
+        }
+    } catch(e) {
+        console.error('Error loading popup iklan:', e);
+    }
+}
+
+function buildPopupSlides() {
+    const slidesContainer = document.getElementById('popupIklanSlides');
+    const dotsContainer = document.getElementById('popupIklanDots');
+
+    // Build image slides
+    slidesContainer.innerHTML = popupIklanData.map((iklan, idx) => `
+        <div class="popup-slide ${idx === 0 ? '' : 'hidden'}" data-slide-idx="${idx}">
+            <img src="${iklan.bannerUrl}" alt="${iklan.judul}" class="w-full h-52 object-cover" onerror="this.style.background='#e2e8f0';this.alt='Gambar tidak tersedia';">
+        </div>
+    `).join('');
+
+    // Build dots (only if multiple slides)
+    if (popupIklanData.length > 1) {
+        dotsContainer.innerHTML = popupIklanData.map((_, idx) => `
+            <button onclick="goToPopupSlide(${idx})" class="w-2 h-2 rounded-full transition-all ${idx === 0 ? 'bg-white w-4 shadow-md' : 'bg-white/50'}"></button>
+        `).join('');
+        dotsContainer.classList.remove('hidden');
+        document.getElementById('popupPrevBtn').classList.remove('hidden');
+        document.getElementById('popupPrevBtn').style.display = 'flex';
+        document.getElementById('popupNextBtn').classList.remove('hidden');
+        document.getElementById('popupNextBtn').style.display = 'flex';
+    }
+
+    // Set initial info
+    updatePopupInfo(0);
+}
+
+function updatePopupInfo(idx) {
+    const iklan = popupIklanData[idx];
+    if (!iklan) return;
+
+    document.getElementById('popupIklanJudul').textContent = iklan.judul;
+    document.getElementById('popupIklanDeskripsi').textContent = iklan.deskripsiSingkat;
+    document.getElementById('popupIklanDetail').textContent = iklan.deskripsiLengkap || '';
+    document.getElementById('popupIklanDetailWrap').classList.add('hidden');
+
+    const nomorWa = (iklan.nomorWhatsapp || '').replace(/[^0-9]/g, '');
+    const pesanWa = iklan.pesanWhatsapp || 'Halo, saya tertarik dengan iklan Anda';
+    document.getElementById('popupBtnWa').href = `https://wa.me/${nomorWa}?text=${encodeURIComponent(pesanWa)}`;
+}
+
+function goToPopupSlide(idx) {
+    popupCurrentSlide = idx;
+    document.querySelectorAll('.popup-slide').forEach((slide, i) => {
+        slide.classList.toggle('hidden', i !== idx);
+    });
+    // Update dots
+    const dots = document.querySelectorAll('#popupIklanDots button');
+    dots.forEach((dot, i) => {
+        dot.className = i === idx
+            ? 'w-4 h-2 rounded-full bg-white shadow-md transition-all'
+            : 'w-2 h-2 rounded-full bg-white/50 transition-all';
+    });
+    updatePopupInfo(idx);
+}
+
+function popupSlideNav(dir) {
+    let next = popupCurrentSlide + dir;
+    if (next < 0) next = popupIklanData.length - 1;
+    if (next >= popupIklanData.length) next = 0;
+    goToPopupSlide(next);
+}
+
+function togglePopupDetail() {
+    const wrap = document.getElementById('popupIklanDetailWrap');
+    wrap.classList.toggle('hidden');
+    const btn = document.getElementById('popupBtnDetail');
+    if (wrap.classList.contains('hidden')) {
+        btn.innerHTML = '<i class="fas fa-info-circle"></i> Selengkapnya';
+    } else {
+        btn.innerHTML = '<i class="fas fa-chevron-up"></i> Sembunyikan';
+    }
+}
+
+function closePopupIklan() {
+    const card = document.getElementById('popupIklanCard');
+    card.style.transform = 'scale(0.9)';
+    card.style.opacity = '0';
+    setTimeout(() => {
+        document.getElementById('popupIklanOverlay').classList.add('hidden');
+        document.getElementById('popupIklanOverlay').style.display = 'none';
+    }, 300);
+    // Mark as seen for this session
+    sessionStorage.setItem('popupIklanSeen', 'true');
+}
+
+// Also close on overlay click (outside card)
+document.getElementById('popupIklanOverlay')?.addEventListener('click', function(e) {
+    if (e.target === this || e.target.closest('.flex.items-center.justify-center') === e.target) {
+        closePopupIklan();
+    }
+});
+
+// Load popup ads on page load
+window.addEventListener('DOMContentLoaded', loadPopupIklan);
+</script>
+
 </body>
 
 </html>
