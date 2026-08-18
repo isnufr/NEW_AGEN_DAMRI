@@ -4839,7 +4839,7 @@ function renderIklan() {
             return `
             <div class="chart-card overflow-hidden p-0 group hover:-translate-y-1 transition-all duration-300">
                 <div class="relative">
-                    <img src="${iklan.bannerUrl}" alt="${iklan.judul}" class="w-full h-40 object-cover" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDQwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3Qgd2lkdGg9IjQwMCIgaGVpZ2h0PSIyMDAiIGZpbGw9IiNlMmU4ZjAiLz48dGV4dCB4PSIyMDAiIHk9IjEwMCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zNWVtIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiIgZm9udC1zaXplPSIxNiIgZmlsbD0iIzk0YTNiOCI+Tm8gSW1hZ2U8L3RleHQ+PC9zdmc+'">
+                    <img src="${iklan.bannerUrl}" alt="${iklan.judul}" class="w-full max-h-48 object-contain bg-slate-50" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDQwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3Qgd2lkdGg9IjQwMCIgaGVpZ2h0PSIyMDAiIGZpbGw9IiNlMmU4ZjAiLz48dGV4dCB4PSIyMDAiIHk9IjEwMCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zNWVtIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiIgZm9udC1zaXplPSIxNiIgZmlsbD0iIzk0YTNiOCI+Tm8gSW1hZ2U8L3RleHQ+PC9zdmc+'">
                     <span class="absolute top-3 left-3 px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider ${statusBadge}">${statusText}</span>
                 </div>
                 <div class="p-4">
@@ -4879,6 +4879,8 @@ function showTambahIklanModal() {
     document.getElementById('iklanForm').reset();
     document.getElementById('iklanBannerPreview').classList.add('hidden');
     document.getElementById('iklanBannerFile').required = true;
+    window._iklanOriginalDataUrl = null;
+    window._iklanCroppedBlob = null;
     document.getElementById('iklanModal').classList.remove('hidden');
     document.getElementById('iklanModal').style.display = 'flex';
 }
@@ -4919,9 +4921,94 @@ function previewIklanBanner(input) {
         reader.onload = function(e) {
             document.getElementById('iklanBannerImg').src = e.target.result;
             document.getElementById('iklanBannerPreview').classList.remove('hidden');
+            // Store original data URL for crop
+            window._iklanOriginalDataUrl = e.target.result;
+            window._iklanCroppedBlob = null; // Reset cropped blob
         };
         reader.readAsDataURL(input.files[0]);
     }
+}
+
+// ========================================
+// IMAGE CROP FUNCTIONS (Cropper.js)
+// ========================================
+let cropperInstance = null;
+
+function openCropModal() {
+    const src = window._iklanOriginalDataUrl || document.getElementById('iklanBannerImg').src;
+    if (!src) {
+        Swal.fire('Info', 'Upload gambar terlebih dahulu', 'info');
+        return;
+    }
+    const cropImg = document.getElementById('cropImage');
+    cropImg.src = src;
+    document.getElementById('cropModal').classList.remove('hidden');
+    document.getElementById('cropModal').style.display = 'flex';
+
+    // Destroy previous instance
+    if (cropperInstance) {
+        cropperInstance.destroy();
+        cropperInstance = null;
+    }
+
+    // Wait for image to load, then init cropper
+    cropImg.onload = function() {
+        cropperInstance = new Cropper(cropImg, {
+            viewMode: 1,
+            dragMode: 'move',
+            autoCropArea: 0.9,
+            responsive: true,
+            background: false,
+            guides: true,
+            center: true,
+            highlight: true,
+        });
+    };
+
+    // Reset ratio buttons
+    document.querySelectorAll('.crop-ratio-btn').forEach((btn, i) => {
+        btn.className = btn.className.replace(/bg-blue-100 text-blue-700/g, 'bg-slate-100 text-slate-600');
+        if (i === 0) btn.className = btn.className.replace(/bg-slate-100 text-slate-600/g, 'bg-blue-100 text-blue-700');
+    });
+}
+
+function closeCropModal() {
+    if (cropperInstance) {
+        cropperInstance.destroy();
+        cropperInstance = null;
+    }
+    document.getElementById('cropModal').classList.add('hidden');
+    document.getElementById('cropModal').style.display = 'none';
+}
+
+function setCropAspect(ratio) {
+    if (!cropperInstance) return;
+    cropperInstance.setAspectRatio(ratio);
+
+    // Update button styles
+    document.querySelectorAll('.crop-ratio-btn').forEach(btn => {
+        btn.className = btn.className.replace(/bg-blue-100 text-blue-700/g, 'bg-slate-100 text-slate-600');
+    });
+    event.target.className = event.target.className.replace(/bg-slate-100 text-slate-600/g, 'bg-blue-100 text-blue-700');
+}
+
+function applyCrop() {
+    if (!cropperInstance) return;
+
+    const canvas = cropperInstance.getCroppedCanvas({
+        maxWidth: 1200,
+        maxHeight: 1200,
+        imageSmoothingQuality: 'high'
+    });
+
+    canvas.toBlob((blob) => {
+        window._iklanCroppedBlob = blob;
+        // Update preview
+        const url = URL.createObjectURL(blob);
+        document.getElementById('iklanBannerImg').src = url;
+        closeCropModal();
+        Swal.fire({ icon: 'success', title: 'Gambar di-crop!', text: 'Gambar berhasil di-crop.', timer: 1200, showConfirmButton: false });
+    }, 'image/jpeg', 0.9);
 }
 
 async function submitIklan(e) {
@@ -4932,12 +5019,16 @@ async function submitIklan(e) {
     const formData = new FormData();
     const bannerFile = document.getElementById('iklanBannerFile').files[0];
 
-    if (!isEdit && !bannerFile) {
+    // Use cropped blob if available, otherwise use original file
+    if (window._iklanCroppedBlob) {
+        formData.append('banner', window._iklanCroppedBlob, 'cropped-banner.jpg');
+    } else if (bannerFile) {
+        formData.append('banner', bannerFile);
+    } else if (!isEdit) {
         Swal.fire('Error', 'File banner wajib diupload!', 'error');
         return;
     }
 
-    if (bannerFile) formData.append('banner', bannerFile);
     formData.append('judul', document.getElementById('iklanJudul').value);
     formData.append('deskripsiSingkat', document.getElementById('iklanDeskripsiSingkat').value);
     formData.append('deskripsiLengkap', document.getElementById('iklanDeskripsiLengkap').value);
@@ -4957,7 +5048,16 @@ async function submitIklan(e) {
             headers: { 'Authorization': `Bearer ${token}` },
             body: formData
         });
-        const json = await res.json();
+
+        let json;
+        try {
+            json = await res.json();
+        } catch(parseErr) {
+            const text = await res.text().catch(() => '');
+            console.error('Non-JSON response:', res.status, text);
+            Swal.fire('Error', `Server error (${res.status}). Pastikan tabel database sudah di-migrate.`, 'error');
+            return;
+        }
 
         if (json.status === 'success') {
             Swal.fire({ icon: 'success', title: 'Berhasil!', text: json.message, timer: 1500, showConfirmButton: false });
@@ -4968,7 +5068,7 @@ async function submitIklan(e) {
         }
     } catch(err) {
         console.error('Submit iklan error:', err);
-        Swal.fire('Error', 'Gagal menghubungi server', 'error');
+        Swal.fire('Error', 'Gagal menghubungi server. Periksa koneksi internet Anda.', 'error');
     }
 }
 

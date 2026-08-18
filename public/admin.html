@@ -39,6 +39,8 @@
     <script src="/socket.io/socket.io.js?v=2"></script>
     <script src="app.js?v=3"></script>
     <link rel="stylesheet" href="admin.css?v=2">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.js"></script>
 </head>
 <body class="bg-[#f1f5f9] text-gray-800">
 
@@ -796,12 +798,17 @@
                             <input type="hidden" id="iklanEditId">
                             <div>
                                 <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1.5 ml-1">Banner / Foto Iklan <span class="text-red-400">*</span></label>
-                                <div id="iklanBannerPreview" class="hidden mb-2 rounded-xl overflow-hidden border border-slate-200">
-                                    <img id="iklanBannerImg" src="" alt="Preview" class="w-full h-40 object-cover">
+                                <div id="iklanBannerPreview" class="hidden mb-2 rounded-xl overflow-hidden border border-slate-200 bg-slate-50">
+                                    <img id="iklanBannerImg" src="" alt="Preview" class="w-full max-h-64 object-contain">
+                                    <div class="flex justify-center p-2 bg-slate-100 border-t border-slate-200">
+                                        <button type="button" onclick="openCropModal()" class="px-4 py-1.5 bg-blue-500 hover:bg-blue-600 text-white rounded-lg text-[10px] font-black uppercase tracking-wider transition-colors flex items-center gap-1.5">
+                                            <i class="fas fa-crop-alt"></i> Crop Gambar
+                                        </button>
+                                    </div>
                                 </div>
                                 <input type="file" id="iklanBannerFile" accept="image/jpeg,image/png,image/webp,image/gif" onchange="previewIklanBanner(this)"
                                        class="w-full bg-slate-50 border border-slate-200 text-slate-800 text-sm rounded-xl focus:ring-4 focus:ring-amber-100 focus:border-amber-500 block p-3 font-semibold transition-colors file:mr-3 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-black file:bg-amber-100 file:text-amber-700 file:cursor-pointer">
-                                <p class="text-[9px] font-bold text-slate-400 mt-1 ml-1">Maks. 4MB (JPG, PNG, WebP, GIF)</p>
+                                <p class="text-[9px] font-bold text-slate-400 mt-1 ml-1">Maks. 4MB (JPG, PNG, WebP, GIF) — Bisa di-crop setelah upload</p>
                             </div>
                             <div>
                                 <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1.5 ml-1">Judul Iklan <span class="text-red-400">*</span></label>
@@ -868,7 +875,7 @@
                             <i class="fas fa-times text-lg"></i>
                         </button>
                         <div class="bg-white rounded-3xl shadow-2xl overflow-hidden">
-                            <img id="previewBannerImg" src="" alt="Preview Banner" class="w-full h-48 object-cover">
+                            <img id="previewBannerImg" src="" alt="Preview Banner" class="w-full max-h-72 object-contain bg-slate-50">
                             <div class="p-5">
                                 <h3 id="previewJudul" class="text-lg font-black text-slate-800 mb-1"></h3>
                                 <p id="previewDeskripsiSingkat" class="text-sm text-slate-500 mb-4"></p>
@@ -887,6 +894,40 @@
                                     </a>
                                 </div>
                             </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ======================= -->
+                <!-- CROP IMAGE MODAL        -->
+                <!-- ======================= -->
+                <div id="cropModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-[250] hidden items-center justify-center p-4">
+                    <div class="bg-white rounded-3xl shadow-2xl w-full max-w-xl overflow-hidden animate-fade-in-up">
+                        <div class="p-4 border-b border-gray-100 flex justify-between items-center bg-blue-50/50">
+                            <div>
+                                <h3 class="text-base font-black text-slate-800 tracking-tight">Crop Gambar</h3>
+                                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-0.5">Sesuaikan area gambar banner</p>
+                            </div>
+                            <button onclick="closeCropModal()" class="w-8 h-8 flex items-center justify-center rounded-xl bg-white text-gray-400 hover:text-red-500 hover:bg-red-50 shadow-sm transition-all">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                        <div class="p-2">
+                            <!-- Aspect ratio buttons -->
+                            <div class="flex gap-2 justify-center mb-2">
+                                <button type="button" onclick="setCropAspect(NaN)" class="crop-ratio-btn active px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-wider transition-colors bg-blue-100 text-blue-700">Bebas</button>
+                                <button type="button" onclick="setCropAspect(16/9)" class="crop-ratio-btn px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-wider transition-colors bg-slate-100 text-slate-600">16:9</button>
+                                <button type="button" onclick="setCropAspect(4/3)" class="crop-ratio-btn px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-wider transition-colors bg-slate-100 text-slate-600">4:3</button>
+                                <button type="button" onclick="setCropAspect(1)" class="crop-ratio-btn px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-wider transition-colors bg-slate-100 text-slate-600">1:1</button>
+                            </div>
+                            <!-- Crop area -->
+                            <div class="bg-slate-900 rounded-xl overflow-hidden" style="max-height:400px;">
+                                <img id="cropImage" src="" alt="Crop" class="w-full" style="max-height:400px;">
+                            </div>
+                        </div>
+                        <div class="p-4 border-t border-gray-100 flex gap-3">
+                            <button type="button" onclick="closeCropModal()" class="flex-1 px-4 py-3 rounded-xl text-xs font-black uppercase tracking-widest text-slate-500 bg-slate-100 hover:bg-slate-200 transition-all">Batal</button>
+                            <button type="button" onclick="applyCrop()" class="flex-1 px-4 py-3 rounded-xl text-xs font-black uppercase tracking-widest text-white bg-blue-600 hover:bg-blue-700 shadow-lg shadow-blue-500/30 transition-all">Terapkan Crop</button>
                         </div>
                     </div>
                 </div>

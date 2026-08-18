@@ -2165,7 +2165,7 @@ function buildPopupSlides() {
     // Build image slides
     slidesContainer.innerHTML = popupIklanData.map((iklan, idx) => `
         <div class="popup-slide ${idx === 0 ? '' : 'hidden'}" data-slide-idx="${idx}">
-            <img src="${iklan.bannerUrl}" alt="${iklan.judul}" class="w-full h-52 object-cover" onerror="this.style.background='#e2e8f0';this.alt='Gambar tidak tersedia';">
+            <img src="${iklan.bannerUrl}" alt="${iklan.judul}" class="w-full max-h-64 object-contain bg-slate-50" onerror="this.style.background='#e2e8f0';this.alt='Gambar tidak tersedia';">
         </div>
     `).join('');
 

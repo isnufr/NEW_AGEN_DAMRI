@@ -9,9 +9,15 @@ const jwt = require('jsonwebtoken');
 const multer = require('multer');
 const fs = require('fs');
 
+// Ensure uploads directory exists
+const uploadsDir = path.join(__dirname, '../public/uploads');
+if (!fs.existsSync(uploadsDir)) {
+    fs.mkdirSync(uploadsDir, { recursive: true });
+}
+
 // Multer config for banner uploads
 const storage = multer.diskStorage({
-    destination: (req, file, cb) => cb(null, path.join(__dirname, '../public/uploads')),
+    destination: (req, file, cb) => cb(null, uploadsDir),
     filename: (req, file, cb) => {
         const ext = path.extname(file.originalname);
         cb(null, Date.now() + '-' + Math.random().toString(36).substr(2, 9) + ext);
@@ -24,7 +30,11 @@ const upload = multer({
         const allowed = /jpeg|jpg|png|gif|webp/;
         const extOk = allowed.test(path.extname(file.originalname).toLowerCase());
         const mimeOk = allowed.test(file.mimetype.split('/')[1]);
-        cb(null, extOk && mimeOk);
+        if (extOk && mimeOk) {
+            cb(null, true);
+        } else {
+            cb(new Error('Format file tidak didukung. Gunakan JPG, PNG, WebP, atau GIF.'));
+        }
     }
 });
 
@@ -890,11 +900,29 @@ app.get('/api/normalize-hp', async (req, res) => {
 });
 
 // Iklan upload endpoints (multipart form)
-app.post('/api/iklan', upload.single('banner'), async (req, res) => {
+// Wrapper to handle multer errors gracefully
+function handleMulterError(err, req, res, next) {
+    if (err instanceof multer.MulterError) {
+        if (err.code === 'LIMIT_FILE_SIZE') {
+            return res.status(400).json({ status: 'error', message: 'Ukuran file terlalu besar. Maksimal 4MB.' });
+        }
+        return res.status(400).json({ status: 'error', message: 'Upload error: ' + err.message });
+    } else if (err) {
+        return res.status(400).json({ status: 'error', message: err.message });
+    }
+    next();
+}
+
+app.post('/api/iklan', (req, res, next) => {
+    upload.single('banner')(req, res, (err) => {
+        if (err) return handleMulterError(err, req, res, next);
+        next();
+    });
+}, async (req, res) => {
     try {
         const token = req.headers['authorization']?.split(' ')[1];
         if (!token) return res.status(401).json({ status: 'error', message: 'Unauthorized' });
-        try { jwt.verify(token, JWT_SECRET); } catch(e) { return res.status(401).json({ status: 'error', message: 'Unauthorized' }); }
+        try { jwt.verify(token, JWT_SECRET); } catch(e) { return res.status(401).json({ status: 'error', message: 'Token tidak valid. Silakan login ulang.' }); }
 
         if (!req.file) return res.status(400).json({ status: 'error', message: 'File banner wajib diupload' });
 
@@ -918,15 +946,20 @@ app.post('/api/iklan', upload.single('banner'), async (req, res) => {
         return res.json({ status: 'success', message: 'Iklan berhasil ditambahkan', data: iklan });
     } catch (err) {
         console.error('Add Iklan Error:', err);
-        return res.status(500).json({ status: 'error', message: 'Gagal menambahkan iklan' });
+        return res.status(500).json({ status: 'error', message: 'Gagal menambahkan iklan: ' + (err.message || 'Server error') });
     }
 });
 
-app.put('/api/iklan/:id', upload.single('banner'), async (req, res) => {
+app.put('/api/iklan/:id', (req, res, next) => {
+    upload.single('banner')(req, res, (err) => {
+        if (err) return handleMulterError(err, req, res, next);
+        next();
+    });
+}, async (req, res) => {
     try {
         const token = req.headers['authorization']?.split(' ')[1];
         if (!token) return res.status(401).json({ status: 'error', message: 'Unauthorized' });
-        try { jwt.verify(token, JWT_SECRET); } catch(e) { return res.status(401).json({ status: 'error', message: 'Unauthorized' }); }
+        try { jwt.verify(token, JWT_SECRET); } catch(e) { return res.status(401).json({ status: 'error', message: 'Token tidak valid. Silakan login ulang.' }); }
 
         const { id } = req.params;
         const { judul, deskripsiSingkat, deskripsiLengkap, nomorWhatsapp, pesanWhatsapp, tanggalMulai, tanggalBerakhir, isActive } = req.body;
@@ -957,7 +990,7 @@ app.put('/api/iklan/:id', upload.single('banner'), async (req, res) => {
         return res.json({ status: 'success', message: 'Iklan berhasil diperbarui', data: iklan });
     } catch (err) {
         console.error('Edit Iklan Error:', err);
-        return res.status(500).json({ status: 'error', message: 'Gagal memperbarui iklan' });
+        return res.status(500).json({ status: 'error', message: 'Gagal memperbarui iklan: ' + (err.message || 'Server error') });
     }
 });
 
