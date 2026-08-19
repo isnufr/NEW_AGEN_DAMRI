@@ -2246,7 +2246,7 @@ function closePopupIklan() {
 
 // Also close on overlay click (outside card)
 document.getElementById('popupIklanOverlay')?.addEventListener('click', function(e) {
-    if (e.target === this || e.target.closest('.flex.items-center.justify-center') === e.target) {
+    if (e.target === this) {
         closePopupIklan();
     }
 });
