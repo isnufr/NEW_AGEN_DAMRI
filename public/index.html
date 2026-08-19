@@ -576,10 +576,13 @@
                                 <input type="text" id="bookNama" placeholder="Contoh: Budi Santoso"
                                     class="w-full p-3 md:p-4 bg-gray-50 rounded-xl md:rounded-2xl font-bold text-gray-700 focus:outline-none form-input-focus text-xs md:text-sm">
                             </div>
-                            <div>
+                            <div class="relative">
                                 <label class="input-label">Nomor WhatsApp</label>
                                 <input type="tel" id="bookHp" placeholder="0821xxxx"
-                                    class="w-full p-3 md:p-4 bg-gray-50 rounded-xl md:rounded-2xl font-bold text-gray-700 focus:outline-none form-input-focus text-xs md:text-sm">
+                                    class="w-full p-3 md:p-4 bg-gray-50 rounded-xl md:rounded-2xl font-bold text-gray-700 focus:outline-none form-input-focus text-xs md:text-sm"
+                                    oninput="handleHpInput(this.value)" autocomplete="off">
+                                <div id="hpAutocomplete" class="absolute z-[400] w-full bg-white rounded-xl shadow-2xl border border-gray-100 hidden mt-1 max-h-48 overflow-y-auto">
+                                </div>
                             </div>
                             <div>
                                 <label class="input-label">Jumlah Penumpang</label>
@@ -1670,6 +1673,56 @@
             l.innerHTML = logoHtml;
             t.innerText = infoText;
         }
+
+        let hpTimeout;
+        async function handleHpInput(val) {
+            const container = document.getElementById('hpAutocomplete');
+            if (!container) return;
+            if (val.length < 4) {
+                container.classList.add('hidden');
+                return;
+            }
+            
+            clearTimeout(hpTimeout);
+            hpTimeout = setTimeout(async () => {
+                try {
+                    const res = await fetch(`/api?action=getPelangganTable&search=${encodeURIComponent(val)}&limit=5`);
+                    const json = await res.json();
+                    
+                    if (json.status === 'success' && json.data && json.data.length > 0) {
+                        container.innerHTML = json.data.map(p => `
+                            <div class="p-3 hover:bg-blue-50 cursor-pointer border-b border-gray-50 last:border-b-0 transition-colors" onclick="selectPelanggan('${(p.nama||'').replace(/'/g, "\\'")}', '${p.nomorHp}', '${(p.alamat||'').replace(/'/g, "\\'")}')">
+                                <div class="font-bold text-sm text-gray-800">${p.nama}</div>
+                                <div class="text-xs text-gray-500 flex justify-between mt-1">
+                                    <span><i class="fab fa-whatsapp mr-1 text-green-500"></i>${p.nomorHp}</span>
+                                    <span><i class="fas fa-map-marker-alt mr-1 text-red-400"></i>${p.alamat || '-'}</span>
+                                </div>
+                            </div>
+                        `).join('');
+                        container.classList.remove('hidden');
+                    } else {
+                        container.classList.add('hidden');
+                    }
+                } catch (e) {
+                    console.error('Error fetching pelanggan:', e);
+                }
+            }, 300);
+        }
+
+        function selectPelanggan(nama, hp, alamat) {
+            document.getElementById('bookNama').value = nama;
+            document.getElementById('bookHp').value = hp;
+            document.getElementById('bookAlamat').value = alamat && alamat !== '-' ? alamat : '';
+            const container = document.getElementById('hpAutocomplete');
+            if (container) container.classList.add('hidden');
+        }
+        
+        document.addEventListener('click', function(e) {
+            const container = document.getElementById('hpAutocomplete');
+            if (container && !e.target.closest('#bookHp') && !e.target.closest('#hpAutocomplete')) {
+                container.classList.add('hidden');
+            }
+        });
 
         function updateBookingFields() {
             const a = document.getElementById('bookArmada').value, t = document.getElementById('bookTujuan'), w = document.getElementById('bookWaktu');
