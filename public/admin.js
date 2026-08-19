@@ -2545,17 +2545,36 @@
     function addAp3Row() {
         ap3RowCount++;
         const tbody = document.getElementById('ap3Tbody');
-        const tr = document.createElement('tr');
-        tr.id = 'ap3row-' + ap3RowCount;
-        tr.innerHTML = `
-            <td class="p-2 font-black text-xs text-slate-500 border-b border-slate-100">${ap3RowCount}</td>
-            <td class="p-2 border-b border-slate-100"><input type="text" class="ap3-dari min-w-[100px] w-full bg-white border border-slate-200 rounded px-2 py-1.5 text-xs focus:outline-none focus:border-amber-500 font-bold text-slate-800" placeholder="Dari"></td>
-            <td class="p-2 border-b border-slate-100"><input type="text" class="ap3-ke min-w-[100px] w-full bg-white border border-slate-200 rounded px-2 py-1.5 text-xs focus:outline-none focus:border-amber-500 font-bold text-slate-800" placeholder="Ke"></td>
-            <td class="p-2 border-b border-slate-100"><input type="number" class="ap3-pnp min-w-[60px] w-full bg-white border border-slate-200 rounded px-2 py-1.5 text-xs focus:outline-none focus:border-amber-500 font-bold text-slate-800" placeholder="PNP" min="1"></td>
-            <td class="p-2 border-b border-slate-100"><input type="number" class="ap3-tarif min-w-[100px] w-full bg-white border border-slate-200 rounded px-2 py-1.5 text-xs focus:outline-none focus:border-amber-500 font-bold text-slate-800" placeholder="Tarif" min="0"></td>
-            <td class="p-2 border-b border-slate-100 text-center"><button onclick="document.getElementById('ap3row-${ap3RowCount}').remove()" class="text-red-400 hover:text-red-600 bg-red-50 hover:bg-red-100 p-2 rounded-lg transition-colors"><i class="fas fa-times"></i></button></td>
+        const row = document.createElement('div');
+        row.id = 'ap3row-' + ap3RowCount;
+        row.className = 'bg-slate-50 border border-slate-200 rounded-xl p-3 flex flex-col md:flex-row gap-2 relative ap3-item-row';
+        row.innerHTML = `
+            <div class="absolute -top-2 -left-2 w-6 h-6 bg-amber-500 text-white rounded-full flex items-center justify-center text-[10px] font-black border-2 border-white shadow-sm z-10">${ap3RowCount}</div>
+            
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-2 flex-1">
+                <div>
+                    <label class="block md:hidden text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Dari</label>
+                    <input type="text" class="ap3-dari w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-amber-500 font-bold text-slate-800" placeholder="Dari">
+                </div>
+                <div>
+                    <label class="block md:hidden text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Ke</label>
+                    <input type="text" class="ap3-ke w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-amber-500 font-bold text-slate-800" placeholder="Ke">
+                </div>
+                <div>
+                    <label class="block md:hidden text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Jumlah PNP</label>
+                    <input type="number" class="ap3-pnp w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-amber-500 font-bold text-slate-800" placeholder="PNP" min="1">
+                </div>
+                <div>
+                    <label class="block md:hidden text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Tarif (Rp)</label>
+                    <input type="number" class="ap3-tarif w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-amber-500 font-bold text-slate-800" placeholder="Tarif (Rp)" min="0">
+                </div>
+            </div>
+            
+            <button onclick="document.getElementById('ap3row-${ap3RowCount}').remove()" class="w-full md:w-10 h-10 md:h-auto shrink-0 flex items-center justify-center text-red-500 hover:text-white bg-red-50 hover:bg-red-500 rounded-lg transition-colors border border-red-100 hover:border-red-500 mt-2 md:mt-0">
+                <i class="fas fa-trash"></i>
+            </button>
         `;
-        tbody.appendChild(tr);
+        tbody.appendChild(row);
     }
 
     function calculateAp3() {
@@ -2566,11 +2585,11 @@
         let totalPnp = 0;
         let totalJumlah = 0;
         
-        document.querySelectorAll('#ap3Tbody tr').forEach(tr => {
-            const dari = tr.querySelector('.ap3-dari').value || '';
-            const ke = tr.querySelector('.ap3-ke').value || '';
-            const pnp = parseInt(tr.querySelector('.ap3-pnp').value) || 0;
-            const tarif = parseInt(tr.querySelector('.ap3-tarif').value) || 0;
+        document.querySelectorAll('#ap3Tbody .ap3-item-row').forEach(row => {
+            const dari = row.querySelector('.ap3-dari').value || '';
+            const ke = row.querySelector('.ap3-ke').value || '';
+            const pnp = parseInt(row.querySelector('.ap3-pnp').value) || 0;
+            const tarif = parseInt(row.querySelector('.ap3-tarif').value) || 0;
             
             if(dari || ke || pnp || tarif) {
                 const jumlah = pnp * tarif;
@@ -2608,7 +2627,8 @@
             customClass: {
                 popup: 'rounded-3xl',
                 title: 'text-xl font-black text-slate-800',
-                htmlContainer: 'mx-0'
+                htmlContainer: 'mx-0',
+                container: 'z-[9999]'
             }
         });
     }
