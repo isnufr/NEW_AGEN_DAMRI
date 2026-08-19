@@ -23,5 +23,5 @@ RUN rm -f .env
 # Expose port
 EXPOSE 3000
 
-# Start command: push schema to database, seed default data, then start server
-CMD ["sh", "-c", "npx prisma db push --accept-data-loss && node src/seed.js && npm start"]
+# Start command: push schema to database, then start server
+CMD ["sh", "-c", "npx prisma db push --accept-data-loss && npm start"]
