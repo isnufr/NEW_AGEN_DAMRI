@@ -2558,14 +2558,9 @@
         tbody.appendChild(tr);
     }
 
-    function generateAp3Pdf() {
-        if (typeof window.jspdf === 'undefined') {
-            showMessage("Library PDF belum termuat, mohon tunggu beberapa saat.");
-            return;
-        }
-
-        const busCode = document.getElementById('ap3BusCode').value || '';
-        const crewName = document.getElementById('ap3Crew').value || '';
+    function calculateAp3() {
+        const busCode = document.getElementById('ap3BusCode').value || '-';
+        const crewName = document.getElementById('ap3Crew').value || '-';
         
         const rows = [];
         let totalPnp = 0;
@@ -2585,184 +2580,37 @@
             }
         });
 
-        // 9.8% Komisi
+        if (rows.length === 0) {
+            showMessage("Silakan isi minimal satu baris data penumpang.", true);
+            return;
+        }
+
         const komisi = Math.round(totalJumlah * 0.098);
         const pendapatanBersih = totalJumlah - komisi;
-        const noRef = String(Math.floor(100000 + Math.random() * 900000));
         
-        const { jsPDF } = window.jspdf;
-        const doc = new jsPDF('l', 'mm', [200, 150]);
+        const htmlContent = `
+            <div class="text-left bg-slate-50 p-4 rounded-xl text-sm space-y-2 border border-slate-200">
+                <div class="flex justify-between border-b border-slate-200 pb-2"><span class="font-bold text-slate-500">Bus Code:</span> <span class="font-black">${busCode}</span></div>
+                <div class="flex justify-between border-b border-slate-200 pb-2"><span class="font-bold text-slate-500">Crew Name:</span> <span class="font-black">${crewName}</span></div>
+                <div class="flex justify-between border-b border-slate-200 pb-2"><span class="font-bold text-slate-500">Total Penumpang:</span> <span class="font-black text-blue-600">${totalPnp} Orang</span></div>
+                <div class="flex justify-between border-b border-slate-200 pb-2"><span class="font-bold text-slate-500">Pendapatan Angkutan:</span> <span class="font-black">${formatRupiah(totalJumlah)}</span></div>
+                <div class="flex justify-between border-b border-slate-200 pb-2"><span class="font-bold text-slate-500">Komisi Agen (9,8%):</span> <span class="font-black text-red-500">- ${formatRupiah(komisi)}</span></div>
+                <div class="flex justify-between pt-2 mt-2"><span class="font-black text-slate-700">Pendapatan Bersih (Disetorkan):</span> <span class="font-black text-green-600 text-lg">${formatRupiah(pendapatanBersih)}</span></div>
+            </div>
+        `;
 
-        doc.setFont("times", "bold");
-        doc.setFontSize(9);
-        doc.text('PERUSAHAAN UMUM "DAMRI"', 27.5, 10, { align: 'center' });
-        doc.text('( PERUM DAMRI )', 27.5, 14, { align: 'center' });
-        doc.text('KANTOR CABANG PURWOKERTO', 27.5, 18, { align: 'center' });
-        doc.setFontSize(7);
-        doc.setFont("times", "normal");
-        doc.text('Jl. Pasar Sri Rahayu No. 1 Purwokerto', 27.5, 22, { align: 'center' });
-        doc.text('Telp./Fax. (0281) 636064', 27.5, 25, { align: 'center' });
-        
-        doc.setLineWidth(0.5);
-        doc.line(5, 27, 50, 27);
-        doc.setLineWidth(0.2);
-        doc.line(5, 28, 50, 28);
-
-        // Center Title
-        doc.setFont("times", "bold");
-        doc.setFontSize(11);
-        doc.text('LAPORAN PENYERAHAN PENUMPANG', 125, 12, { align: 'center' });
-        doc.setLineWidth(0.3);
-        doc.line(90, 13, 160, 13);
-
-        // (AP/3)
-        doc.setFontSize(14);
-        doc.text('(AP/3)', 195, 12, { align: 'right' });
-        
-        // No
-        doc.setFontSize(14);
-        doc.setFont("times", "bold");
-        doc.text('No. :', 155, 20);
-        doc.setTextColor(220, 38, 38);
-        doc.text(noRef, 170, 20);
-        doc.setTextColor(0, 0, 0);
-
-        // Agen & Bus Code
-        doc.setFontSize(9);
-        doc.setFont("times", "normal");
-        doc.text('Agen/Sub Agen : KAWUNGANTEN', 75, 18);
-        doc.text('Bus Code         : ' + busCode, 75, 23);
-        
-        const head = [
-            [
-                { content: 'No.', rowSpan: 2, styles: { halign: 'center', valign: 'middle' } },
-                { content: 'TUJUAN', colSpan: 2, styles: { halign: 'center' } },
-                { content: 'PNP.', rowSpan: 2, styles: { halign: 'center', valign: 'middle' } },
-                { content: 'TARIF', rowSpan: 2, styles: { halign: 'center', valign: 'middle' } },
-                { content: 'PENDAPATAN (Rp.)', colSpan: 3, styles: { halign: 'center' } },
-                { content: 'KET.', rowSpan: 2, styles: { halign: 'center', valign: 'middle' } }
-            ],
-            [
-                { content: 'DARI', styles: { halign: 'center' } },
-                { content: 'KE', styles: { halign: 'center' } },
-                { content: 'PNP.', styles: { halign: 'center' } },
-                { content: 'BAGASI', styles: { halign: 'center' } },
-                { content: 'JUMLAH', styles: { halign: 'center' } }
-            ]
-        ];
-
-        const tableBody = [];
-        for (let i = 0; i < 10; i++) {
-            if (i < rows.length) {
-                const r = rows[i];
-                tableBody.push([
-                    (i+1).toString(),
-                    r.dari,
-                    r.ke,
-                    r.pnp.toString(),
-                    r.tarif.toLocaleString('id-ID'),
-                    '', 
-                    '', 
-                    r.jumlah.toLocaleString('id-ID'),
-                    ''  
-                ]);
-            } else {
-                tableBody.push(['', '', '', '', '', '', '', '', '']); 
+        Swal.fire({
+            title: 'Hasil Kalkulasi AP/3',
+            html: htmlContent,
+            icon: 'info',
+            confirmButtonText: 'Tutup & Kembali',
+            confirmButtonColor: '#f59e0b',
+            customClass: {
+                popup: 'rounded-3xl',
+                title: 'text-xl font-black text-slate-800',
+                htmlContainer: 'mx-0'
             }
-        }
-        
-        tableBody.push([
-            { content: 'JUMLAH :', colSpan: 3, styles: { halign: 'center', fontStyle: 'bold' } },
-            totalPnp > 0 ? totalPnp.toString() : '', 
-            '',
-            '',
-            '',
-            totalJumlah > 0 ? totalJumlah.toLocaleString('id-ID') : '', 
-            ''
-        ]);
-
-        doc.autoTable({
-            startY: 29,
-            head: head,
-            body: tableBody,
-            theme: 'grid',
-            styles: { 
-                font: 'times', 
-                fontSize: 8, 
-                lineWidth: 0.2, 
-                lineColor: [0, 0, 0],
-                textColor: [0, 0, 0]
-            },
-            headStyles: { 
-                fillColor: [255, 255, 255], 
-                textColor: [0, 0, 0],
-                fontStyle: 'normal'
-            },
-            margin: { left: 5, right: 5 },
-            columnStyles: {
-                0: { cellWidth: 8, halign: 'center' }, 
-                1: { cellWidth: 28, halign: 'center' }, 
-                2: { cellWidth: 28, halign: 'center' }, 
-                3: { cellWidth: 10, halign: 'center' }, 
-                4: { cellWidth: 25, halign: 'center' }, 
-                5: { cellWidth: 22, halign: 'center' }, 
-                6: { cellWidth: 22, halign: 'center' }, 
-                7: { cellWidth: 25, halign: 'center' }, 
-                8: { cellWidth: 22, halign: 'center' } 
-            },
-            tableWidth: 190 
         });
-
-        const finalY = doc.lastAutoTable.finalY + 4;
-        
-        doc.setFontSize(9);
-        
-        // Baris 1
-        doc.text('yang menerima,', 25, finalY + 2, { align: 'center' });
-        doc.text('Pendapatan Angkutan', 75, finalY + 2);
-        doc.text(': Rp.', 110, finalY + 2);
-        doc.text(totalJumlah.toLocaleString('id-ID'), 120, finalY + 2);
-        
-        const today = new Date();
-        const dStr = INDO_DAYS[today.getDay()] + ' - ' + today.getDate() + ' ' + INDO_MONTHS[today.getMonth()] + ' - ' + today.getFullYear();
-        doc.text('Kawunganten, ' + dStr, 175, finalY + 2, { align: 'center' });
-
-        // Baris 2
-        doc.text('( Crew )', 25, finalY + 6, { align: 'center' });
-        doc.text('Komisi 9,8 %', 75, finalY + 7);
-        doc.text(': Rp.', 110, finalY + 7);
-        doc.text(komisi.toLocaleString('id-ID'), 120, finalY + 7);
-        
-        // Underline Komisi
-        doc.setLineWidth(0.2);
-        doc.line(110, finalY + 8.5, 140, finalY + 8.5);
-
-        // Baris 3
-        doc.text('Agen', 175, finalY + 7, { align: 'center' });
-        doc.text('Pendapatan Bersih', 75, finalY + 12);
-        doc.text(': Rp.', 110, finalY + 12);
-        doc.text(pendapatanBersih.toLocaleString('id-ID'), 120, finalY + 12);
-        doc.text('(Cap)', 175, finalY + 11, { align: 'center' });
-
-        // Baris 4 (Signatures & Jumlah)
-        doc.text('Jumlah disetorkan', 75, finalY + 20);
-        doc.text(': Rp.', 110, finalY + 20);
-        doc.text(pendapatanBersih.toLocaleString('id-ID'), 120, finalY + 20);
-
-        doc.text('(........................................)', 25, finalY + 20, { align: 'center' });
-        doc.text('(........................................)', 175, finalY + 20, { align: 'center' });
-        
-        // Baris 5 (Nama Terang)
-        if (crewName) {
-            doc.text(crewName, 25, finalY + 19, { align: 'center' });
-        }
-        doc.text('Nama terang', 25, finalY + 24, { align: 'center' });
-        
-        doc.text('ISNU FR', 175, finalY + 19, { align: 'center' });
-        doc.text('Nama terang', 175, finalY + 24, { align: 'center' });
-
-        doc.save('AP3_DAMRI_' + noRef + '.pdf');
-        closeAp3Modal();
     }
 
     // ========================================
