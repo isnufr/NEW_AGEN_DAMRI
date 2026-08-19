@@ -322,7 +322,8 @@ app.get('/api', async (req, res) => {
         }
 
         if (action === 'getPopupIklan') {
-            const today = new Date().toISOString().split('T')[0];
+            const now = new Date();
+            const today = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0') + '-' + String(now.getDate()).padStart(2, '0');
             const iklanList = await prisma.popupIklan.findMany({
                 where: {
                     isActive: true,
