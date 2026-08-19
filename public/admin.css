@@ -1,4 +1,4 @@
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #0B1120; color: #cbd5e1; }
+        body { font-family: 'Inter', sans-serif; }
 
         /* Sidebar */
         .sidebar {
@@ -50,31 +50,17 @@
         .nav-item i { width: 20px; text-align: center; font-size: 14px; }
 
         /* Cards */
-        .glass-card {
-            background: rgba(30, 41, 59, 0.6);
-            backdrop-filter: blur(20px);
-            border-radius: 1.5rem;
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        .glass-card:hover {
-            transform: translateY(-6px) scale(1.02);
-            box-shadow: 0 10px 40px -10px rgba(245, 158, 11, 0.2);
-            border-color: rgba(245, 158, 11, 0.3);
-        }
-
         .stat-card {
-            background: rgba(30, 41, 59, 0.6);
+            background: rgba(255,255,255,0.92);
             backdrop-filter: blur(12px);
             border-radius: 1.25rem;
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            box-shadow: 0 4px 24px -4px rgba(0,0,0,0.2);
+            border: 1px solid rgba(255,255,255,0.6);
+            box-shadow: 0 4px 24px -4px rgba(0,0,0,0.06);
             transition: all 0.3s ease;
         }
         .stat-card:hover {
             transform: translateY(-4px);
-            box-shadow: 0 12px 32px -8px rgba(0,0,0,0.3);
+            box-shadow: 0 12px 32px -8px rgba(0,0,0,0.12);
         }
 
         /* Filter Buttons */
@@ -84,13 +70,13 @@
             font-size: 11px; font-weight: 800;
             text-transform: uppercase;
             letter-spacing: 0.1em;
-            border: 1px solid #334155;
-            background: #1e293b;
-            color: #94a3b8;
+            border: 1px solid #e2e8f0;
+            background: white;
+            color: #64748b;
             cursor: pointer;
             transition: all 0.2s ease;
         }
-        .filter-btn:hover { background: #334155; color: #f8fafc; }
+        .filter-btn:hover { background: #f1f5f9; }
         .filter-btn.active {
             background: linear-gradient(135deg, #f59e0b, #d97706);
             color: #0f172a; border-color: transparent;
@@ -106,16 +92,16 @@
             text-transform: uppercase;
             letter-spacing: 0.15em;
             background: #1e293b;
-            border-bottom: 2px solid #0f172a;
+            border-bottom: 2px solid #334155;
             text-align: left;
         }
         .data-table tbody td {
             padding: 14px 16px;
             font-size: 13px;
-            color: #cbd5e1;
-            border-bottom: 1px solid #1e293b;
+            border-bottom: 1px solid #f8fafc;
+            vertical-align: top;
         }
-        .data-table tbody tr:hover { background: rgba(255, 255, 255, 0.02); }
+        .data-table tbody tr:hover { background: #fffbeb; }
 
         .chart-card {
             background: white;
