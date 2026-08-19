@@ -3150,17 +3150,76 @@
     // ========================================
     // TAMBAH ARMADA
     // ========================================
-    function toggleAddArmadaNamaInput() {
-        const select = document.getElementById('addArmadaNamaSelect');
-        const input = document.getElementById('addArmadaNama');
-        if (!select || !input) return;
-        if (select.value === 'BARU') {
-            input.classList.remove('hidden');
+    function toggleAddArmadaTujuanInput() {
+        const select = document.getElementById('addArmadaTujuanSelect');
+        const inputContainer = document.getElementById('addArmadaTujuanInputContainer');
+        const input = document.getElementById('addArmadaTujuan');
+        if (!select || !inputContainer || !input) return;
+        if (select.value === 'LAIN') {
+            inputContainer.classList.remove('hidden');
             input.required = true;
             input.value = '';
         } else {
-            input.classList.add('hidden');
+            inputContainer.classList.add('hidden');
             input.required = false;
+        }
+    }
+
+    function toggleAddArmadaNamaInput() {
+        const select = document.getElementById('addArmadaNamaSelect');
+        const inputContainer = document.getElementById('addArmadaNamaInputContainer');
+        const input = document.getElementById('addArmadaNama');
+        const tujuanSelect = document.getElementById('addArmadaTujuanSelect');
+        
+        if (!select || !inputContainer || !input) return;
+        
+        if (select.value === 'BARU') {
+            inputContainer.classList.remove('hidden');
+            input.required = true;
+            input.value = '';
+            
+            // If new armada, populate tujuan with all unique destinations or just empty
+            if (tujuanSelect) {
+                tujuanSelect.innerHTML = '<option value="">Pilih Tujuan...</option><option value="LAIN">+ Tujuan Lain</option>';
+                tujuanSelect.value = 'LAIN';
+                toggleAddArmadaTujuanInput();
+            }
+        } else {
+            inputContainer.classList.add('hidden');
+            input.required = false;
+            
+            // Auto-populate Tujuan dropdown based on selected Armada Name
+            if (tujuanSelect && select.value !== '') {
+                const armadas = getArmadas();
+                const relatedArmadas = armadas.filter(a => a.name.toUpperCase() === select.value.toUpperCase());
+                const uniqueDestinations = [...new Set(relatedArmadas.map(a => a.destination))].sort();
+                
+                let html = '<option value="">Pilih Tujuan...</option>';
+                uniqueDestinations.forEach(dest => {
+                    html += `<option value="${dest}">${dest}</option>`;
+                });
+                html += '<option value="LAIN">+ Tujuan Lain</option>';
+                tujuanSelect.innerHTML = html;
+                
+                // Auto select the first destination if available
+                if (uniqueDestinations.length > 0) {
+                    tujuanSelect.value = uniqueDestinations[0];
+                    
+                    // Optional: auto-fill harga and seat based on the first match
+                    const match = relatedArmadas.find(a => a.destination === uniqueDestinations[0]);
+                    if (match) {
+                        document.getElementById('addArmadaHarga').value = match.price;
+                        document.getElementById('addArmadaSeat').value = match.capacity;
+                    }
+                } else {
+                    tujuanSelect.value = 'LAIN';
+                }
+                toggleAddArmadaTujuanInput();
+            } else if (tujuanSelect) {
+                tujuanSelect.innerHTML = '<option value="">Pilih Tujuan...</option><option value="LAIN">+ Tujuan Lain</option>';
+                tujuanSelect.value = '';
+                toggleAddArmadaTujuanInput();
+            }
         }
     }
 
@@ -3171,6 +3230,7 @@
             const armadas = getArmadas();
             const uniqueNames = [...new Set(armadas.map(a => a.name.toUpperCase()))].sort();
             const select = document.getElementById('addArmadaNamaSelect');
+            const tujuanSelect = document.getElementById('addArmadaTujuanSelect');
 
             if (select) {
                 let html = '<option value="">Pilih Armada...</option>';
@@ -3180,7 +3240,13 @@
                 html += '<option value="BARU">+ Tambah Armada Baru</option>';
                 select.innerHTML = html;
             }
+            
+            if (tujuanSelect) {
+                tujuanSelect.innerHTML = '<option value="">Pilih Tujuan...</option><option value="LAIN">+ Tujuan Lain</option>';
+            }
+            
             toggleAddArmadaNamaInput();
+            toggleAddArmadaTujuanInput();
 
             const m = document.getElementById('modalAddArmada');
             const c = document.getElementById('modalAddArmadaContent');
@@ -3230,8 +3296,25 @@
             armadaName = document.getElementById('addArmadaNama').value;
         }
         
+        let armadaTujuan = '';
+        const tujuanSelect = document.getElementById('addArmadaTujuanSelect');
+        if (tujuanSelect && tujuanSelect.value) {
+            if (tujuanSelect.value === 'LAIN') {
+                armadaTujuan = document.getElementById('addArmadaTujuan').value;
+            } else {
+                armadaTujuan = tujuanSelect.value;
+            }
+        } else {
+            armadaTujuan = document.getElementById('addArmadaTujuan').value;
+        }
+        
         if (!armadaName || armadaName.trim() === '') {
             showMessage('Nama armada tidak boleh kosong', true);
+            return;
+        }
+        
+        if (!armadaTujuan || armadaTujuan.trim() === '') {
+            showMessage('Tujuan armada tidak boleh kosong', true);
             return;
         }
 
@@ -3240,7 +3323,7 @@
 
         const payload = {
             nama_armada: armadaName,
-            tujuan_armada: document.getElementById('addArmadaTujuan').value,
+            tujuan_armada: armadaTujuan,
             jam: document.getElementById('addArmadaJam').value,
             harga: document.getElementById('addArmadaHarga').value,
             seat: document.getElementById('addArmadaSeat').value
@@ -3259,7 +3342,7 @@
             showMessage('Kesalahan jaringan', true);
         }
         
-        btn.innerText = 'Simpan Armada Baru'; btn.disabled = false;
+        btn.innerText = 'Tambah Armada'; btn.disabled = false;
     }
 
     // ========================================
