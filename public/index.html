@@ -571,18 +571,18 @@
                         </div>
 
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5">
-                            <div class="md:col-span-2">
+                            <div class="md:col-span-2 relative">
                                 <label class="input-label">Nama Lengkap Sesuai KTP</label>
                                 <input type="text" id="bookNama" placeholder="Contoh: Budi Santoso"
-                                    class="w-full p-3 md:p-4 bg-gray-50 rounded-xl md:rounded-2xl font-bold text-gray-700 focus:outline-none form-input-focus text-xs md:text-sm">
+                                    class="w-full p-3 md:p-4 bg-gray-50 rounded-xl md:rounded-2xl font-bold text-gray-700 focus:outline-none form-input-focus text-xs md:text-sm"
+                                    oninput="handlePelangganInput(this.value)" autocomplete="off">
+                                <div id="pelangganAutocomplete" class="absolute z-[400] w-full bg-white rounded-xl shadow-2xl border border-gray-100 hidden mt-1 max-h-48 overflow-y-auto">
+                                </div>
                             </div>
-                            <div class="relative">
+                            <div>
                                 <label class="input-label">Nomor WhatsApp</label>
                                 <input type="tel" id="bookHp" placeholder="0821xxxx"
-                                    class="w-full p-3 md:p-4 bg-gray-50 rounded-xl md:rounded-2xl font-bold text-gray-700 focus:outline-none form-input-focus text-xs md:text-sm"
-                                    oninput="handleHpInput(this.value)" autocomplete="off">
-                                <div id="hpAutocomplete" class="absolute z-[400] w-full bg-white rounded-xl shadow-2xl border border-gray-100 hidden mt-1 max-h-48 overflow-y-auto">
-                                </div>
+                                    class="w-full p-3 md:p-4 bg-gray-50 rounded-xl md:rounded-2xl font-bold text-gray-700 focus:outline-none form-input-focus text-xs md:text-sm">
                             </div>
                             <div>
                                 <label class="input-label">Jumlah Penumpang</label>
@@ -1674,17 +1674,17 @@
             t.innerText = infoText;
         }
 
-        let hpTimeout;
-        async function handleHpInput(val) {
-            const container = document.getElementById('hpAutocomplete');
+        let pelangganTimeout;
+        async function handlePelangganInput(val) {
+            const container = document.getElementById('pelangganAutocomplete');
             if (!container) return;
-            if (val.length < 4) {
+            if (val.length < 3) {
                 container.classList.add('hidden');
                 return;
             }
             
-            clearTimeout(hpTimeout);
-            hpTimeout = setTimeout(async () => {
+            clearTimeout(pelangganTimeout);
+            pelangganTimeout = setTimeout(async () => {
                 try {
                     const res = await fetch(`/api?action=getPelangganTable&search=${encodeURIComponent(val)}&limit=5`);
                     const json = await res.json();
@@ -1713,13 +1713,13 @@
             document.getElementById('bookNama').value = nama;
             document.getElementById('bookHp').value = hp;
             document.getElementById('bookAlamat').value = alamat && alamat !== '-' ? alamat : '';
-            const container = document.getElementById('hpAutocomplete');
+            const container = document.getElementById('pelangganAutocomplete');
             if (container) container.classList.add('hidden');
         }
         
         document.addEventListener('click', function(e) {
-            const container = document.getElementById('hpAutocomplete');
-            if (container && !e.target.closest('#bookHp') && !e.target.closest('#hpAutocomplete')) {
+            const container = document.getElementById('pelangganAutocomplete');
+            if (container && !e.target.closest('#bookNama') && !e.target.closest('#pelangganAutocomplete')) {
                 container.classList.add('hidden');
             }
         });
