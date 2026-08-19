@@ -882,23 +882,6 @@ app.post('/api', async (req, res) => {
     }
 });
 
-app.get('/api/migrate-pelanggan', async (req, res) => {
-    try {
-        const result = require('child_process').execSync('node src/migrate-pelanggan.js').toString();
-        res.json({status: 'success', message: 'Migration completed', log: result});
-    } catch (e) {
-        res.status(500).json({status: 'error', message: e.message});
-    }
-});
-
-app.get('/api/normalize-hp', async (req, res) => {
-    try {
-        const result = require('child_process').execSync('node src/normalize-hp.js').toString();
-        res.json({status: 'success', message: 'Normalization completed', log: result});
-    } catch (e) {
-        res.status(500).json({status: 'error', message: e.message});
-    }
-});
 
 // Iklan upload endpoints (multipart form)
 // Wrapper to handle multer errors gracefully
