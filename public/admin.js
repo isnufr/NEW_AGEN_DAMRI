@@ -527,16 +527,17 @@
         const todayOmset = todayOnlyBookings.reduce((sum, b) => sum + (parseInt(b.totalPrice) || 0), 0);
         // Setoran is Omset - Komisi (10% of Omset)
         const todaySetoran = todayOmset * 0.9;
+        const todayPendapatan = todayOmset - todaySetoran;
         
         const elPnp = document.getElementById('manifestTotalPnpToday');
         const elArmada = document.getElementById('manifestTotalArmada');
-        const elOmset = document.getElementById('manifestOmsetToday');
+        const elPendapatan = document.getElementById('manifestPendapatanToday');
         const elSetoran = document.getElementById('manifestSetoranToday');
         const labelEl = document.getElementById('todayDateLabel');
         
         if (elPnp) elPnp.textContent = todayPnp + ' Orang';
         if (elArmada) elArmada.textContent = todayArmadaSet.size + ' Armada';
-        if (elOmset) elOmset.textContent = formatRupiah(todayOmset);
+        if (elPendapatan) elPendapatan.textContent = formatRupiah(todayPendapatan);
         if (elSetoran) elSetoran.textContent = formatRupiah(todaySetoran);
         if (labelEl) labelEl.textContent = targetIndoDate ? targetIndoDate : 'Hari Ini & Mendatang';
 
@@ -593,22 +594,22 @@
             html += `
                 <tr class="cursor-pointer group" onclick="toggleManifest('${safeId}')">
                     <td class="p-2 sm:p-4 border-b-8 border-transparent">
-                        <div class="bg-gradient-to-br from-slate-800 to-slate-900 rounded-3xl p-4 sm:p-5 text-white shadow-xl shadow-slate-900/20 border border-slate-700 transition-all group-hover:-translate-y-1 group-hover:shadow-2xl group-hover:border-amber-500/50 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                        <div class="bg-white rounded-3xl p-4 sm:p-5 text-slate-800 shadow-xl shadow-slate-200/50 border-2 border-amber-400 transition-all group-hover:-translate-y-1 group-hover:shadow-2xl group-hover:shadow-amber-200/50 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                             <div class="flex items-center gap-4 w-full sm:w-auto">
-                                <div class="w-12 h-12 rounded-xl bg-slate-700 flex items-center justify-center text-amber-500 shadow-inner shrink-0">
+                                <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-amber-400 to-amber-500 flex items-center justify-center text-white shadow-md shrink-0">
                                     <i class="fas fa-calendar-alt text-xl"></i>
                                 </div>
                                 <div class="min-w-0 flex-1">
-                                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest leading-tight mb-1">Waktu Pemberangkatan</p>
-                                    <p class="font-black text-sm sm:text-base text-white uppercase truncate">${formattedDate}</p>
+                                    <p class="text-[10px] font-black text-amber-600 uppercase tracking-widest leading-tight mb-1">Waktu Pemberangkatan</p>
+                                    <p class="font-black text-sm sm:text-base text-slate-900 uppercase truncate">${formattedDate}</p>
                                 </div>
                             </div>
-                            <div class="flex items-center justify-between sm:justify-end w-full sm:w-auto gap-4 border-t border-slate-700 sm:border-0 pt-3 sm:pt-0">
+                            <div class="flex items-center justify-between sm:justify-end w-full sm:w-auto gap-4 border-t border-slate-200 sm:border-0 pt-3 sm:pt-0">
                                 <div class="text-left sm:text-right flex-1 sm:flex-none">
-                                    <p class="font-black text-lg sm:text-xl text-transparent bg-clip-text bg-gradient-to-r from-amber-200 to-amber-500">${totalPnp} PNP</p>
-                                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest leading-tight">${g.bookings.length} Pesanan</p>
+                                    <p class="font-black text-lg sm:text-xl text-transparent bg-clip-text bg-gradient-to-r from-amber-500 to-amber-600">${totalPnp} PNP</p>
+                                    <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest leading-tight">${g.bookings.length} Pesanan</p>
                                 </div>
-                                <div class="w-8 h-8 rounded-full bg-slate-700 flex items-center justify-center text-slate-300 group-hover:bg-amber-500 group-hover:text-slate-900 transition-colors shrink-0">
+                                <div class="w-8 h-8 rounded-full bg-amber-50 border border-amber-200 flex items-center justify-center text-amber-600 group-hover:bg-amber-500 group-hover:text-white transition-colors shrink-0">
                                     <i class="fas fa-chevron-down transition-transform duration-300" id="icon-${safeId}" style="transform: ${iconTransform}"></i>
                                 </div>
                             </div>
@@ -4079,14 +4080,14 @@ function updateChartColors(isDark) {
                 container.innerHTML += `
                     <div class="relative p-4 pt-5 bg-white border border-slate-200 rounded-xl shadow-sm mt-3">
                         <div class="absolute -top-2 left-4 bg-indigo-600 text-white text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded-md shadow-md">Penumpang ${i}</div>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mt-1">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-1">
                             <div>
-                                <label class="block text-[10px] font-bold text-slate-500 mb-1 uppercase">Nama</label>
-                                <input type="text" class="ekstra-nama-input w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-base md:text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/50" placeholder="Nama Penumpang" value="${namaVal}" required>
+                                <label class="block text-xs font-bold text-slate-500 mb-1 uppercase">Nama</label>
+                                <input type="text" class="ekstra-nama-input w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500/50" placeholder="Nama Penumpang" value="${namaVal}" required>
                             </div>
                             <div>
-                                <label class="block text-[10px] font-bold text-slate-500 mb-1 uppercase">Harga Dasar (Rp)</label>
-                                <input type="number" class="ekstra-harga-input w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-base md:text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/50" placeholder="Harga Tiket" value="${hargaVal}" oninput="calculateEkstraTotal()" required>
+                                <label class="block text-xs font-bold text-slate-500 mb-1 uppercase">Harga Dasar (Rp)</label>
+                                <input type="number" class="ekstra-harga-input w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500/50" placeholder="Harga Tiket" value="${hargaVal}" oninput="calculateEkstraTotal()" required>
                             </div>
                         </div>
                     </div>

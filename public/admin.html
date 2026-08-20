@@ -319,17 +319,17 @@
                             <h3 class="text-lg sm:text-2xl font-black text-white" id="manifestTotalArmada">0</h3>
                         </div>
 
-                        <!-- Omset -->
+                        <!-- Pendapatan -->
                         <div class="bg-gradient-to-br from-slate-800 to-slate-900 rounded-xl sm:rounded-2xl p-3.5 sm:p-5 text-white shadow-xl shadow-slate-900/20 border border-slate-700 transition-all hover:-translate-y-1 hover:shadow-2xl hover:border-amber-500/50">
                             <div class="flex flex-row items-center justify-between mb-2 sm:mb-3">
                                 <div class="flex flex-col">
-                                    <p class="text-[9px] sm:text-[10px] font-bold text-slate-400 uppercase tracking-widest leading-tight">Omset</p>
+                                    <p class="text-[9px] sm:text-[10px] font-bold text-slate-400 uppercase tracking-widest leading-tight">Pendapatan</p>
                                 </div>
                                 <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-slate-700 flex items-center justify-center text-amber-500 shadow-inner">
                                     <i class="fas fa-coins text-sm sm:text-lg"></i>
                                 </div>
                             </div>
-                            <h3 class="text-sm sm:text-xl font-black truncate text-white" id="manifestOmsetToday">Rp 0</h3>
+                            <h3 class="text-sm sm:text-xl font-black truncate text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-amber-600" id="manifestPendapatanToday">Rp 0</h3>
                         </div>
 
                         <!-- Setoran -->
@@ -342,7 +342,7 @@
                                     <i class="fas fa-hand-holding-usd text-sm sm:text-lg"></i>
                                 </div>
                             </div>
-                            <h3 class="text-sm sm:text-xl font-black truncate text-white" id="manifestSetoranToday">Rp 0</h3>
+                            <h3 class="text-sm sm:text-xl font-black truncate text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-amber-600" id="manifestSetoranToday">Rp 0</h3>
                         </div>
                     </div>
                     <div class="chart-card overflow-hidden fade-up">
@@ -1701,7 +1701,7 @@
             <div class="p-6 overflow-y-auto grow">
                 <form id="ekstraForm" onsubmit="submitEkstra(event)" class="space-y-4">
                     <input type="hidden" id="ekstraId">
-                    <div class="grid grid-cols-2 gap-4">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                             <label class="block text-xs font-bold text-slate-500 mb-1 uppercase">Tipe Tiket</label>
                             <select id="ekstraTipe" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500/50" required>
@@ -1715,7 +1715,7 @@
                         </div>
                     </div>
                     
-                    <div class="grid grid-cols-2 gap-4">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                             <label class="block text-xs font-bold text-slate-500 mb-1 uppercase">Asal</label>
                             <input type="text" id="ekstraAsal" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500/50" placeholder="Cth: CGK" required>
@@ -1726,7 +1726,7 @@
                         </div>
                     </div>
 
-                    <div class="grid grid-cols-2 gap-4">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                             <label class="block text-xs font-bold text-slate-500 mb-1 uppercase">Tgl Berangkat</label>
                             <input type="date" id="ekstraTanggal" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500/50" required>
@@ -1737,15 +1737,16 @@
                         </div>
                     </div>
 
-                        <div class="col-span-2 md:col-span-1">
-                            <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Jumlah Penumpang</label>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-500 mb-1 uppercase">Jumlah Penumpang</label>
                             <div class="flex items-center">
                                 <button type="button" onclick="document.getElementById('ekstraJumlahPnp').stepDown(); generateEkstraPnpFields();" class="bg-slate-200 text-slate-700 font-bold px-4 py-2.5 rounded-l-xl hover:bg-slate-300 transition-colors active:scale-95">-</button>
                                 <input type="number" id="ekstraJumlahPnp" min="1" value="1" class="w-full bg-slate-50 border-y border-slate-200 px-4 py-2.5 text-base md:text-sm font-bold text-slate-700 outline-none text-center focus:border-indigo-500 focus:ring-0 transition-colors appearance-none" oninput="generateEkstraPnpFields()" required style="-moz-appearance: textfield;">
                                 <button type="button" onclick="document.getElementById('ekstraJumlahPnp').stepUp(); generateEkstraPnpFields();" class="bg-slate-200 text-slate-700 font-bold px-4 py-2.5 rounded-r-xl hover:bg-slate-300 transition-colors active:scale-95">+</button>
                             </div>
                         </div>
-                        <div class="col-span-2 md:col-span-1">
+                        <div>
                             <label class="block text-xs font-bold text-slate-500 mb-1 uppercase">Status Pembayaran</label>
                             <select id="ekstraStatus" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500/50">
                                 <option value="LUNAS">LUNAS</option>
