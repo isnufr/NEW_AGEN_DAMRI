@@ -15,7 +15,23 @@ model Armada {
   harga        String
   seat         Int
   isActive     Boolean @default(true)
+  tipeArmada   String? @default("Bus Besar")
+  denahId      String?
+  denah        DenahArmada? @relation(fields: [denahId], references: [id], onDelete: SetNull)
   hargaKhusus  HargaKhusus[]
+}
+
+model DenahArmada {
+  id         String   @id @default(uuid())
+  nama       String
+  kategori   String   @default("Bus Besar")
+  baris      Int      @default(5)
+  kolom      Int      @default(4)
+  cells      String   @db.Text
+  totalKursi Int      @default(0)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  armadas    Armada[]
 }
 
 model Booking {

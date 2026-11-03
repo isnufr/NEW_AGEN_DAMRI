@@ -1194,7 +1194,7 @@
         if (!tbody) return;
 
         if (!armadas.length) {
-            tbody.innerHTML = '<tr><td colspan="4" class="text-center text-sm text-slate-400 font-bold py-8 italic uppercase tracking-widest">Belum ada data armada</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="5" class="text-center text-sm text-slate-400 font-bold py-8 italic uppercase tracking-widest">Belum ada data armada</td></tr>';
             return;
         }
 
@@ -1215,7 +1215,7 @@
 
             html += `
                 <tr class="cursor-pointer bg-blue-50 hover:bg-blue-100 transition-colors border-b border-blue-200" onclick="toggleArmada('${index}')">
-                    <td colspan="4" class="px-4 py-3">
+                    <td colspan="5" class="px-4 py-3">
                         <div class="flex items-center justify-between">
                             <div class="flex items-center gap-2">
                                 <i class="fas fa-bus text-blue-600"></i>
@@ -1231,6 +1231,13 @@
                 html += `
                     <tr class="armada-group-${index} ${hiddenClass} hover:bg-slate-50 transition-colors border-b border-slate-100 last:border-0">
                         <td class="pl-8"><span class="font-black text-[10px] text-slate-400">${a.id}</span></td>
+                        <td>
+                            <div class="font-bold text-sm text-slate-800 uppercase">${a.name}</div>
+                            <div class="flex items-center gap-1.5 mt-0.5">
+                                <span class="text-[9px] bg-slate-100 text-slate-600 font-extrabold px-1.5 py-0.5 rounded">${a.tipeArmada || 'Bus Besar'}</span>
+                                <span class="text-[9px] bg-amber-50 text-amber-700 font-extrabold px-1.5 py-0.5 rounded">${a.capacity} Kursi</span>
+                            </div>
+                        </td>
                         <td><span class="font-bold text-sm text-slate-800 uppercase">${a.destination}</span></td>
                         <td class="text-right"><p class="font-black text-sm text-slate-800">${formatRupiah(a.price)}</p><p class="text-[11px] text-blue-500 font-bold mt-1"><i class="far fa-clock mr-1"></i>${a.time}</p></td>
                         <td class="text-center">
@@ -2663,8 +2670,13 @@
         if(document.getElementById('editBookingKeterangan')) document.getElementById('editBookingKeterangan').value = rawKet;
         toggleEditBiayaTambahan();
         document.getElementById('editBookingPnp').value = b.qty;
-        const prefillKursi = b.kursi && b.kursi !== '-' ? b.kursi.split(',') : [];
-        renderEditBookingKursi(prefillKursi);
+        const prefillKursi = (b.kursi && b.kursi !== '-') ? b.kursi.split(',').map(s=>s.trim()).filter(Boolean) : [];
+        editBookingSelectedSeats = new Set(prefillKursi);
+        updateEditBookingSeatDisplay();
+        const currentArmadaForEdit = b.armadaId ? getArmada(b.armadaId) : null;
+        if (typeof loadEditBookingSeatMap === 'function') {
+            loadEditBookingSeatMap(b.bookingId, currentArmadaForEdit, b.dateTravel, prefillKursi);
+        }
         const statusSelect = document.getElementById('editBookingStatus');
         if (statusSelect) {
             statusSelect.value = (b.status === 'BELUM LUNAS') ? 'BELUM LUNAS' : 'LUNAS';
@@ -2874,22 +2886,7 @@
 
         const qty = parseInt(document.getElementById('editBookingPnp').value) || 1;
         
-        let filledKursiCount = 0;
-        let kursiValues = [];
-        for (let i = 1; i <= qty; i++) {
-            const el = document.getElementById('editBookingKursi_' + i);
-            const val = el ? el.value.trim() : '';
-            if (val) filledKursiCount++;
-            kursiValues.push(val);
-        }
-        
-        if (filledKursiCount > 0 && filledKursiCount < qty) {
-            alert('Harap isi semua nomor kursi (' + qty + ' kursi) atau biarkan semuanya kosong.');
-            const btn = document.getElementById('btnSubmitEditBooking');
-            btn.innerText = 'Simpan Perubahan'; btn.disabled = false;
-            return;
-        }
-        const kursiString = filledKursiCount === qty ? kursiValues.join(', ') : '';
+        const kursiString = editBookingSelectedSeats.size > 0 ? [...editBookingSelectedSeats].join(', ') : '';
 
         const dObjForHarga = parseIndoDate(formattedDate);
         const hargaEff = getEffectiveHarga(armada, dObjForHarga);
@@ -2951,6 +2948,8 @@
             document.getElementById('editArmadaJam').value = a.time;
             document.getElementById('editArmadaHarga').value = a.price;
             document.getElementById('editArmadaSeat').value = a.capacity;
+            if (document.getElementById('editArmadaTipe')) document.getElementById('editArmadaTipe').value = a.tipeArmada || 'Bus Besar';
+            if (typeof populateDenahDropdown === 'function') populateDenahDropdown('editArmadaDenah', a.denahId, a.tipeArmada);
 
             const m = document.getElementById('modalEditArmada');
             const c = document.getElementById('modalEditArmadaContent');
@@ -2996,7 +2995,9 @@
             tujuan_armada: document.getElementById('editArmadaTujuan').value,
             jam: document.getElementById('editArmadaJam').value,
             harga: document.getElementById('editArmadaHarga').value,
-            seat: document.getElementById('editArmadaSeat').value
+            seat: document.getElementById('editArmadaSeat').value,
+            tipe_armada: document.getElementById('editArmadaTipe')?.value || 'Bus Besar',
+            denah_id: document.getElementById('editArmadaDenah')?.value || null
         };
 
         try {
@@ -3116,6 +3117,8 @@
             
             toggleAddArmadaNamaInput();
             toggleAddArmadaTujuanInput();
+            if (typeof populateDenahDropdown === 'function') populateDenahDropdown('addArmadaDenah');
+            if (document.getElementById('addArmadaTipe')) document.getElementById('addArmadaTipe').value = 'Bus Besar';
 
             const m = document.getElementById('modalAddArmada');
             const c = document.getElementById('modalAddArmadaContent');
@@ -3195,7 +3198,9 @@
             tujuan_armada: armadaTujuan,
             jam: document.getElementById('addArmadaJam').value,
             harga: document.getElementById('addArmadaHarga').value,
-            seat: document.getElementById('addArmadaSeat').value
+            seat: document.getElementById('addArmadaSeat').value,
+            tipe_armada: document.getElementById('addArmadaTipe')?.value || 'Bus Besar',
+            denah_id: document.getElementById('addArmadaDenah')?.value || null
         };
 
         try {
@@ -3275,21 +3280,7 @@
         
         const total = armada ? (finalHargaSatuan * qty) + nominalBiayaTambahan : 0;
         
-        let filledKursiCount = 0;
-        let kursiValues = [];
-        for (let i = 1; i <= qty; i++) {
-            const el = document.getElementById('adminBookingKursi_' + i);
-            const val = el ? el.value.trim() : '';
-            if (val) filledKursiCount++;
-            kursiValues.push(val);
-        }
-        
-        if (filledKursiCount > 0 && filledKursiCount < qty) {
-            alert('Harap isi semua nomor kursi (' + qty + ' kursi) atau biarkan semuanya kosong.');
-            btn.innerText = 'BOOKING'; btn.disabled = false;
-            return;
-        }
-        const kursiString = filledKursiCount === qty ? kursiValues.join(', ') : '';
+        const kursiString = adminBookingSelectedSeats.size > 0 ? [...adminBookingSelectedSeats].join(', ') : '';
         
         const generateId = () => {
             const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
@@ -3565,9 +3556,11 @@
     }
 
     function openBookingModal() {
+        if (typeof resetAdminBooking === 'function') resetAdminBooking();
         const modal = document.getElementById('bookingModal');
         modal.classList.remove('hidden');
         modal.classList.add('flex');
+        if (typeof onAdminBookingTripChange === 'function') onAdminBookingTripChange();
     }
 
     function closeBookingModal() {
@@ -5113,3 +5106,862 @@ function showPreviewFromData(id) {
     document.getElementById('iklanPreviewModal').style.display = 'flex';
 }
 
+
+
+/* === FITUR DENAH & WIZARD 3 TAHAPAN === */
+
+// State Subtab Armada & Denah
+let currentArmadaSubtab = 'list';
+let currentDenahKategori = 'ALL';
+
+function switchArmadaSubtab(sub) {
+    currentArmadaSubtab = sub;
+    const tabList = document.getElementById('tabBtnArmadaList');
+    const tabDenah = document.getElementById('tabBtnArmadaDenah');
+    const paneList = document.getElementById('subtabArmadaList');
+    const paneDenah = document.getElementById('subtabArmadaDenah');
+    const actList = document.getElementById('armadaActionsList');
+    const actDenah = document.getElementById('armadaActionsDenah');
+
+    if (sub === 'list') {
+        if (tabList) { tabList.className = 'px-5 py-2.5 rounded-xl font-black text-xs uppercase tracking-widest transition-all bg-slate-900 text-amber-400 shadow-md flex items-center gap-2'; }
+        if (tabDenah) { tabDenah.className = 'px-5 py-2.5 rounded-xl font-black text-xs uppercase tracking-widest transition-all bg-white hover:bg-slate-100 text-slate-600 border border-slate-200 flex items-center gap-2'; }
+        if (paneList) paneList.classList.remove('hidden');
+        if (paneDenah) paneDenah.classList.add('hidden');
+        if (actList) actList.classList.remove('hidden');
+        if (actDenah) actDenah.classList.add('hidden');
+        renderArmada();
+    } else {
+        if (tabDenah) { tabDenah.className = 'px-5 py-2.5 rounded-xl font-black text-xs uppercase tracking-widest transition-all bg-slate-900 text-amber-400 shadow-md flex items-center gap-2'; }
+        if (tabList) { tabList.className = 'px-5 py-2.5 rounded-xl font-black text-xs uppercase tracking-widest transition-all bg-white hover:bg-slate-100 text-slate-600 border border-slate-200 flex items-center gap-2'; }
+        if (paneDenah) paneDenah.classList.remove('hidden');
+        if (paneList) paneList.classList.add('hidden');
+        if (actDenah) actDenah.classList.remove('hidden');
+        if (actList) actList.classList.add('hidden');
+        renderDenahCards();
+    }
+}
+
+function filterDenahKategori(cat) {
+    currentDenahKategori = cat;
+    document.querySelectorAll('.denah-cat-pill').forEach(btn => {
+        if (btn.getAttribute('data-cat') === cat) {
+            btn.className = 'denah-cat-pill active px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider bg-slate-900 text-amber-400 shadow-sm transition-all';
+        } else {
+            btn.className = 'denah-cat-pill px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider bg-white text-slate-600 border border-slate-200 hover:border-amber-400 shadow-sm transition-all';
+        }
+    });
+    renderDenahCards();
+}
+
+// Seat Map DOM Generator
+function buildSeatMapElement(layout, { taken = {}, selected = new Set(), onSeat = null, compact = false, currentUserSeat = '' } = {}) {
+    const wrap = document.createElement('div');
+    wrap.className = 'seatmap' + (compact ? ' is-compact' : '');
+    
+    const front = document.createElement('div');
+    front.className = 'seatmap-front';
+    front.innerHTML = '<i class="fas fa-arrow-up"></i> DEPAN (SUPIR)';
+    wrap.appendChild(front);
+
+    const grid = document.createElement('div');
+    grid.className = 'seatmap-grid';
+    grid.style.gridTemplateColumns = 'repeat(' + (layout.kolom || 4) + ', minmax(0, 1fr))';
+
+    const cells = Array.isArray(layout.cells) ? layout.cells : (typeof layout.cells === 'string' ? JSON.parse(layout.cells || '[]') : []);
+
+    cells.forEach((c) => {
+        if (c.t === 'seat') {
+            const seatNo = String(c.l || '').trim();
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = 'seat';
+            btn.setAttribute('data-seat', seatNo);
+
+            const isTaken = !!taken[seatNo];
+            const isSel = selected.has(seatNo);
+            const isUser = currentUserSeat && currentUserSeat.split(',').map(s=>s.trim()).includes(seatNo);
+
+            if (isSel) {
+                btn.classList.add('is-selected');
+            } else if (isUser) {
+                btn.classList.add('is-current-user');
+            } else if (isTaken) {
+                btn.classList.add('is-booked');
+                btn.disabled = true;
+                btn.title = 'Kursi ' + seatNo + ' sudah dibooking';
+            }
+
+            btn.innerHTML = '<span>' + seatNo + '</span>';
+            if (onSeat) {
+                btn.onclick = (e) => {
+                    e.preventDefault();
+                    onSeat(seatNo, isTaken, btn);
+                };
+            }
+            grid.appendChild(btn);
+        } else if (c.t === 'driver') {
+            const div = document.createElement('div');
+            div.className = 'seat-cell seat-cell-driver';
+            div.innerHTML = '<i class="fas fa-id-card-alt text-sm"></i><small>Supir</small>';
+            grid.appendChild(div);
+        } else if (c.t === 'door') {
+            const div = document.createElement('div');
+            div.className = 'seat-cell seat-cell-door';
+            div.innerHTML = '<i class="fas fa-door-open text-xs"></i><small>Pintu</small>';
+            grid.appendChild(div);
+        } else {
+            const div = document.createElement('div');
+            div.className = 'seat-cell';
+            grid.appendChild(div);
+        }
+    });
+
+    wrap.appendChild(grid);
+    return wrap;
+}
+
+// Render Denah Cards in Subtab 2
+function renderDenahCards() {
+    const grid = document.getElementById('denahCardGrid');
+    if (!grid) return;
+
+    let denahList = (typeof getDenahList === 'function' ? getDenahList() : []) || [];
+    if (currentDenahKategori !== 'ALL') {
+        denahList = denahList.filter(d => (d.kategori || '').toLowerCase() === currentDenahKategori.toLowerCase());
+    }
+
+    if (!denahList.length) {
+        grid.innerHTML = `<div class="col-span-full py-12 text-center bg-white rounded-3xl border border-slate-200">
+            <i class="fas fa-chair text-4xl text-slate-300 mb-3 block"></i>
+            <p class="font-extrabold text-slate-600 text-sm">Belum ada format denah untuk kategori ini</p>
+            <button onclick="openDenahEditor()" class="mt-4 px-4 py-2 bg-amber-500 hover:bg-amber-600 text-slate-900 font-black text-xs uppercase tracking-widest rounded-xl shadow-md transition-all">
+                + Buat Format Denah Baru
+            </button>
+        </div>`;
+        return;
+    }
+
+    grid.innerHTML = '';
+    denahList.forEach(d => {
+        const card = document.createElement('div');
+        card.className = 'bg-white rounded-3xl p-5 border border-slate-200 shadow-sm hover:shadow-md transition-all flex flex-col justify-between';
+        
+        const totalKursi = d.totalKursi || (Array.isArray(d.cells) ? d.cells.filter(c => c.t === 'seat').length : 0);
+        
+        const header = document.createElement('div');
+        header.className = 'flex items-start justify-between gap-3 mb-4';
+        header.innerHTML = `
+            <div>
+                <span class="text-[10px] font-black uppercase tracking-widest bg-amber-100 text-amber-800 px-2.5 py-0.5 rounded-full inline-block mb-1">${d.kategori || 'Bus Besar'}</span>
+                <h4 class="font-black text-slate-800 text-base leading-snug">${d.nama}</h4>
+                <p class="text-[11px] font-bold text-slate-400 mt-0.5">${d.baris} baris × ${d.kolom} kolom • <b class="text-amber-600">${totalKursi} kursi</b></p>
+            </div>
+            <div class="flex gap-1.5 flex-shrink-0">
+                <button type="button" class="btn-edit-denah w-8 h-8 rounded-xl bg-slate-100 hover:bg-amber-500 hover:text-white text-slate-600 flex items-center justify-center text-xs transition-colors shadow-sm" title="Edit Denah">
+                    <i class="fas fa-edit"></i>
+                </button>
+                <button type="button" class="btn-del-denah w-8 h-8 rounded-xl bg-slate-100 hover:bg-red-500 hover:text-white text-slate-600 flex items-center justify-center text-xs transition-colors shadow-sm" title="Hapus Denah">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </div>
+        `;
+        card.appendChild(header);
+
+        // Compact Seat Map Preview
+        const previewWrap = document.createElement('div');
+        previewWrap.className = 'my-2 p-3 bg-slate-50 rounded-2xl border border-slate-100 overflow-hidden';
+        previewWrap.appendChild(buildSeatMapElement(d, { compact: true }));
+        card.appendChild(previewWrap);
+
+        // Actions handlers
+        header.querySelector('.btn-edit-denah').onclick = () => openDenahEditor(d);
+        header.querySelector('.btn-del-denah').onclick = () => deleteDenah(d.id);
+
+        grid.appendChild(card);
+    });
+}
+
+// Visual Layout Editor State
+let editorLayoutItem = null;
+let editorRows = 5;
+let editorCols = 4;
+let editorCells = [];
+let editorTool = 'seat';
+
+function openDenahEditor(item = null) {
+    editorLayoutItem = item;
+    editorRows = item?.baris || 5;
+    editorCols = item?.kolom || 4;
+    editorTool = 'seat';
+
+    if (item && item.cells) {
+        editorCells = typeof item.cells === 'string' ? JSON.parse(item.cells) : JSON.parse(JSON.stringify(item.cells));
+    } else {
+        editorCells = [];
+        const need = editorRows * editorCols;
+        for (let i = 0; i < need; i++) editorCells.push({ t: 'empty' });
+        // Driver at top right
+        if (editorCells[editorCols - 1]) editorCells[editorCols - 1] = { t: 'driver' };
+        if (editorCells[0]) editorCells[0] = { t: 'seat', l: '1' };
+    }
+
+    document.getElementById('denahEditorId').value = item?.id || '';
+    document.getElementById('denahEditorNama').value = item?.nama || '';
+    document.getElementById('denahEditorRows').value = editorRows;
+    document.getElementById('denahEditorCols').value = editorCols;
+    document.getElementById('denahEditorModalTitle').innerText = item ? 'Edit Format Denah: ' + item.nama : 'Buat Format Denah Baru';
+
+    const katSelect = document.getElementById('denahEditorKategori');
+    const customInput = document.getElementById('denahEditorKategoriCustom');
+    const itemKat = item?.kategori || 'Bus Besar';
+    const foundOpt = Array.from(katSelect.options).find(o => o.value.toLowerCase() === itemKat.toLowerCase());
+    if (foundOpt) {
+        katSelect.value = foundOpt.value;
+        customInput.classList.add('hidden');
+    } else {
+        katSelect.value = 'CUSTOM';
+        customInput.classList.remove('hidden');
+        customInput.value = itemKat;
+    }
+
+    // Set active tool
+    document.querySelectorAll('#denahEditorTools button').forEach(b => {
+        b.classList.toggle('active', b.getAttribute('data-tool') === 'seat');
+        b.onclick = () => {
+            editorTool = b.getAttribute('data-tool');
+            document.querySelectorAll('#denahEditorTools button').forEach(x => x.classList.toggle('active', x === b));
+        };
+    });
+
+    drawDenahEditorGrid();
+
+    const m = document.getElementById('modalDenahEditor');
+    const c = document.getElementById('modalDenahEditorContent');
+    m.classList.remove('hidden');
+    m.classList.add('flex');
+    setTimeout(() => {
+        c.classList.remove('scale-95', 'opacity-0');
+        c.classList.add('scale-100', 'opacity-100');
+    }, 10);
+}
+
+function closeDenahEditor() {
+    const m = document.getElementById('modalDenahEditor');
+    const c = document.getElementById('modalDenahEditorContent');
+    if (c) {
+        c.classList.remove('scale-100', 'opacity-100');
+        c.classList.add('scale-95', 'opacity-0');
+    }
+    setTimeout(() => {
+        if (m) {
+            m.classList.remove('flex');
+            m.classList.add('hidden');
+        }
+    }, 300);
+}
+
+function toggleCustomDenahKategori() {
+    const sel = document.getElementById('denahEditorKategori');
+    const custom = document.getElementById('denahEditorKategoriCustom');
+    if (sel.value === 'CUSTOM') {
+        custom.classList.remove('hidden');
+        custom.focus();
+    } else {
+        custom.classList.add('hidden');
+    }
+}
+
+function syncEditorCellsSize() {
+    const need = editorRows * editorCols;
+    while (editorCells.length < need) editorCells.push({ t: 'empty' });
+    editorCells = editorCells.slice(0, need);
+}
+
+function getNextSeatNo() {
+    const used = new Set(editorCells.filter(c => c.t === 'seat').map(c => String(c.l || '').trim()));
+    let n = 1;
+    while (used.has(String(n))) n++;
+    return String(n);
+}
+
+function drawDenahEditorGrid() {
+    syncEditorCellsSize();
+    const g = document.getElementById('denahEditorGrid');
+    if (!g) return;
+
+    g.style.gridTemplateColumns = 'repeat(' + editorCols + ', minmax(0, 1fr))';
+    g.innerHTML = '';
+
+    let seatCount = 0;
+    editorCells.forEach((c, idx) => {
+        const cellBtn = document.createElement('button');
+        cellBtn.type = 'button';
+        cellBtn.className = 'le-cell';
+
+        if (c.t === 'seat') {
+            seatCount++;
+            cellBtn.classList.add('t-seat');
+            cellBtn.innerHTML = '<span>' + (c.l || '?') + '</span><small>Kursi</small>';
+        } else if (c.t === 'driver') {
+            cellBtn.classList.add('t-driver');
+            cellBtn.innerHTML = '<i class="fas fa-id-card-alt"></i><small>Sopir</small>';
+        } else if (c.t === 'door') {
+            cellBtn.classList.add('t-door');
+            cellBtn.innerHTML = '<i class="fas fa-door-open"></i><small>Pintu</small>';
+        } else {
+            cellBtn.innerHTML = '<small class="text-slate-300">Lorong</small>';
+        }
+
+        cellBtn.onclick = () => {
+            const cur = editorCells[idx];
+            if (editorTool === 'seat' && cur.t === 'seat') {
+                const nl = prompt('Ubah nomor/kode kursi (kosongkan untuk hapus kursi):', cur.l || '');
+                if (nl === null) return;
+                if (!nl.trim()) editorCells[idx] = { t: 'empty' };
+                else editorCells[idx] = { t: 'seat', l: nl.trim().slice(0, 6) };
+            } else if (editorTool === 'seat') {
+                editorCells[idx] = { t: 'seat', l: getNextSeatNo() };
+            } else {
+                editorCells[idx] = { t: editorTool };
+            }
+            drawDenahEditorGrid();
+        };
+
+        g.appendChild(cellBtn);
+    });
+
+    document.getElementById('denahEditorTotalKursiDisplay').innerText = seatCount + ' kursi penumpang';
+}
+
+function onDenahDimensionsChange() {
+    editorRows = Math.min(Math.max(parseInt(document.getElementById('denahEditorRows').value) || 1, 1), 15);
+    editorCols = Math.min(Math.max(parseInt(document.getElementById('denahEditorCols').value) || 1, 1), 6);
+    drawDenahEditorGrid();
+}
+
+function autoNumberDenahSeats() {
+    let n = 1;
+    editorCells.forEach(c => {
+        if (c.t === 'seat') {
+            c.l = String(n++);
+        }
+    });
+    drawDenahEditorGrid();
+    if (typeof showMessage === 'function') showMessage('Nomor kursi berhasil diurutkan!');
+}
+
+async function submitDenahEditor() {
+    const nama = document.getElementById('denahEditorNama').value.trim();
+    if (!nama) {
+        alert('Nama format denah kursi wajib diisi!');
+        return;
+    }
+
+    let kategori = document.getElementById('denahEditorKategori').value;
+    if (kategori === 'CUSTOM') {
+        kategori = document.getElementById('denahEditorKategoriCustom').value.trim() || 'Bus Besar';
+    }
+
+    const totalKursi = editorCells.filter(c => c.t === 'seat').length;
+    if (totalKursi < 1) {
+        alert('Denah minimal harus memiliki 1 kursi!');
+        return;
+    }
+
+    const payload = {
+        id: document.getElementById('denahEditorId').value || '',
+        nama: nama,
+        kategori: kategori,
+        baris: editorRows,
+        kolom: editorCols,
+        totalKursi: totalKursi,
+        cells: editorCells
+    };
+
+    const action = payload.id ? 'editDenahArmada' : 'addDenahArmada';
+    try {
+        const res = await postToSheets(action, payload);
+        if (res.status === 'success') {
+            if (typeof showMessage === 'function') showMessage('Format denah tempat duduk berhasil disimpan!');
+            closeDenahEditor();
+            await refreshData();
+            renderDenahCards();
+        } else {
+            alert(res.message || 'Gagal menyimpan denah');
+        }
+    } catch (e) {
+        alert(e.message);
+    }
+}
+
+async function deleteDenah(id) {
+    if (!confirm('Yakin ingin menghapus format denah tempat duduk ini?')) return;
+    try {
+        const res = await postToSheets('deleteDenahArmada', { id });
+        if (res.status === 'success') {
+            if (typeof showMessage === 'function') showMessage('Format denah tempat duduk berhasil dihapus');
+            await refreshData();
+            renderDenahCards();
+        } else {
+            alert(res.message || 'Gagal menghapus denah');
+        }
+    } catch (e) {
+        alert(e.message);
+    }
+}
+
+// Helper populate dropdown denah di form armada
+function populateDenahDropdown(selectId, selectedId = null, filterTipe = null) {
+    const sel = document.getElementById(selectId);
+    if (!sel) return;
+
+    const denahList = (typeof getDenahList === 'function' ? getDenahList() : []) || [];
+    let html = '<option value="">-- Pilih Format Denah --</option>';
+
+    denahList.forEach(d => {
+        const isMatch = selectedId && selectedId === d.id;
+        const total = d.totalKursi || (Array.isArray(d.cells) ? d.cells.filter(c => c.t === 'seat').length : 0);
+        html += `<option value="${d.id}" ${isMatch ? 'selected' : ''}>${d.nama} (${d.kategori} - ${total} Kursi)</option>`;
+    });
+
+    sel.innerHTML = html;
+}
+
+function onArmadaTipeChange(mode) {
+    const tipe = document.getElementById(mode + 'ArmadaTipe')?.value;
+    const denahSelect = document.getElementById(mode + 'ArmadaDenah');
+    if (!denahSelect || !tipe) return;
+
+    // Filter or highlight best matching denah
+    const denahList = (typeof getDenahList === 'function' ? getDenahList() : []) || [];
+    const bestMatch = denahList.find(d => (d.kategori || '').toLowerCase() === tipe.toLowerCase());
+    if (bestMatch && !denahSelect.value) {
+        denahSelect.value = bestMatch.id;
+        onArmadaDenahChange(mode);
+    }
+}
+
+function onArmadaDenahChange(mode) {
+    const denahId = document.getElementById(mode + 'ArmadaDenah')?.value;
+    const seatInput = document.getElementById(mode + 'ArmadaSeat');
+    if (!denahId || !seatInput) return;
+
+    const denah = typeof getDenah === 'function' ? getDenah(denahId) : null;
+    if (denah) {
+        const total = denah.totalKursi || (Array.isArray(denah.cells) ? denah.cells.filter(c => c.t === 'seat').length : 0);
+        if (total > 0) {
+            seatInput.value = total;
+        }
+    }
+}
+
+/* ====================================================================
+ * WIZARD 3 TAHAPAN BOOKING TIKET ADMIN & PEMILIHAN TEMPAT DUDUK INTERAKTIF
+ * ==================================================================== */
+let adminBookingStep = 1;
+let adminBookingSelectedSeats = new Set();
+let adminBookingTakenSeats = {};
+
+function goToBookingStep(step) {
+    // Validasi saat meninggalkan Step 1
+    if (adminBookingStep === 1 && step > 1) {
+        const dateVal = document.getElementById('adminBookingDate').value;
+        const armadaVal = document.getElementById('adminBookingArmada').value;
+        if (!dateVal) {
+            alert('Silakan pilih tanggal pemberangkatan terlebih dahulu!');
+            document.getElementById('adminBookingDate').focus();
+            return;
+        }
+        if (!armadaVal) {
+            alert('Silakan pilih armada, jam, dan rute perjalanan terlebih dahulu!');
+            document.getElementById('adminBookingArmada').focus();
+            return;
+        }
+    }
+
+    // Validasi saat meninggalkan Step 2 menuju Step 3
+    if (adminBookingStep === 2 && step > 2) {
+        const nama = document.getElementById('adminBookingNama').value.trim();
+        const hp = document.getElementById('adminBookingHp').value.trim();
+        if (!nama) {
+            alert('Nama penumpang wajib diisi!');
+            document.getElementById('adminBookingNama').focus();
+            return;
+        }
+        if (!hp) {
+            alert('Nomor HP / WhatsApp penumpang wajib diisi!');
+            document.getElementById('adminBookingHp').focus();
+            return;
+        }
+
+        const qty = parseInt(document.getElementById('adminBookingPnp').value) || 1;
+        if (adminBookingSelectedSeats.size > qty) {
+            alert('Jumlah kursi yang dipilih (' + adminBookingSelectedSeats.size + ') melebihi jumlah penumpang (' + qty + '). Silakan batalkan pilihan kursi yang berlebih.');
+            return;
+        }
+    }
+
+    adminBookingStep = step;
+
+    // Toggle Step Badges
+    for (let i = 1; i <= 3; i++) {
+        const badge = document.getElementById('bookingStepBadge' + i);
+        const pane = document.getElementById('bookingStepPane' + i);
+        if (badge) {
+            badge.classList.remove('active', 'completed');
+            if (i === step) badge.classList.add('active');
+            else if (i < step) badge.classList.add('completed');
+        }
+        if (pane) {
+            pane.classList.toggle('hidden', i !== step);
+        }
+    }
+
+    if (step === 2) {
+        loadAdminBookingSeatMap();
+    } else if (step === 3) {
+        updateAdminBookingSummary();
+    }
+}
+
+async function onAdminBookingTripChange() {
+    recalcAdminBooking();
+    const armadaId = document.getElementById('adminBookingArmada')?.value;
+    const armada = typeof getArmada === 'function' ? getArmada(armadaId) : null;
+    const infoText = document.getElementById('adminBookingArmadaInfoText');
+    const tarifBadge = document.getElementById('adminBookingTarifBadge');
+    
+    if (armada) {
+        const rawDate = document.getElementById('adminBookingDate')?.value;
+        const dObj = rawDate ? new Date(rawDate) : null;
+        const effectivePrice = typeof getEffectiveHarga === 'function' ? getEffectiveHarga(armada, dObj) : armada.price;
+        if (infoText) infoText.innerHTML = '<b>' + armada.name + '</b> (' + (armada.tipeArmada || 'Bus') + ') • Rute: ' + armada.destination + ' • Jam: ' + armada.time;
+        if (tarifBadge) tarifBadge.innerText = formatRupiah(effectivePrice) + ' / kursi';
+    } else {
+        if (infoText) infoText.innerText = 'Silakan pilih armada, jam, dan rute di atas';
+        if (tarifBadge) tarifBadge.innerText = 'Rp0 / kursi';
+    }
+
+    // Refresh seat map if currently in step 2
+    if (adminBookingStep === 2) {
+        loadAdminBookingSeatMap();
+    }
+}
+
+function onAdminBookingPnpChange() {
+    recalcAdminBooking();
+    updateAdminBookingSeatBadge();
+}
+
+function updateAdminBookingSeatBadge() {
+    const qty = parseInt(document.getElementById('adminBookingPnp')?.value) || 1;
+    const selCount = adminBookingSelectedSeats.size;
+    const badge = document.getElementById('adminBookingSeatCounterBadge');
+    const disp = document.getElementById('adminBookingSelectedSeatsDisplay');
+
+    if (badge) {
+        badge.innerText = selCount + '/' + qty + ' kursi';
+        if (selCount === qty) {
+            badge.className = 'ml-2 text-[10px] bg-green-100 text-green-800 font-extrabold px-2 py-0.5 rounded-full';
+        } else if (selCount > qty) {
+            badge.className = 'ml-2 text-[10px] bg-red-100 text-red-800 font-extrabold px-2 py-0.5 rounded-full';
+        } else {
+            badge.className = 'ml-2 text-[10px] bg-slate-200 text-slate-700 font-extrabold px-2 py-0.5 rounded-full';
+        }
+    }
+
+    if (disp) {
+        if (selCount === 0) {
+            disp.innerText = 'Belum memilih kursi (Bisa dilewati)';
+            disp.className = 'font-bold text-slate-400 text-xs ml-1 italic';
+        } else {
+            disp.innerText = [...adminBookingSelectedSeats].join(', ');
+            disp.className = 'font-black text-amber-600 text-sm ml-1';
+        }
+    }
+}
+
+function clearAdminBookingSeats() {
+    adminBookingSelectedSeats.clear();
+    updateAdminBookingSeatBadge();
+    loadAdminBookingSeatMap(false);
+}
+
+// Fetch taken seats for selected trip & render denah
+async function loadAdminBookingSeatMap(refetchTaken = true) {
+    const container = document.getElementById('adminBookingDenahContainer');
+    if (!container) return;
+
+    const armadaId = document.getElementById('adminBookingArmada')?.value;
+    const armada = typeof getArmada === 'function' ? getArmada(armadaId) : null;
+    const rawDate = document.getElementById('adminBookingDate')?.value;
+
+    if (!armada || !rawDate) {
+        container.innerHTML = '<div class="text-slate-400 text-xs font-bold py-6 text-center">Jadwal atau Armada belum dipilih di Tahap 1</div>';
+        return;
+    }
+
+    // Determine layout: armada.denahId or default
+    let layout = null;
+    if (armada.denahId && typeof getDenah === 'function') {
+        layout = getDenah(armada.denahId);
+    }
+    if (!layout && typeof getDenahList === 'function') {
+        const allDenah = getDenahList();
+        layout = allDenah.find(d => (d.kategori || '').toLowerCase() === (armada.tipeArmada || '').toLowerCase()) || allDenah[0];
+    }
+
+    if (!layout) {
+        container.innerHTML = '<div class="text-slate-400 text-xs font-bold py-6 text-center">Format denah belum tersedia untuk tipe armada ini</div>';
+        return;
+    }
+
+    document.getElementById('adminBookingDenahTipeLabel').innerText = armada.tipeArmada || 'Bus';
+    document.getElementById('adminBookingDenahNamaLabel').innerText = layout.nama;
+
+    // Load Taken Seats from cache & server
+    if (refetchTaken) {
+        adminBookingTakenSeats = {};
+        
+        // 1. Ambil dari cachedBookings yang sudah ada di memori
+        const [yyyy, mm, dd] = rawDate.split('-');
+        const dObj = new Date(parseInt(yyyy), parseInt(mm)-1, parseInt(dd));
+        const formattedDate = INDO_DAYS[dObj.getDay()] + ', ' + dObj.getDate() + ' ' + INDO_MONTHS[dObj.getMonth()] + ' ' + dObj.getFullYear();
+        
+        const allBookings = (typeof getBookings === 'function' ? getBookings() : []) || [];
+        allBookings.forEach(b => {
+            if (b.status === 'DITOLAK' || b.status === 'CANCEL') return;
+            const bDate = b.dateTravel || b['TANGGAL PEMBERANGKATAN'];
+            const bArmada = b.armada || b['JENIS KENDARAAN'];
+            const bWaktu = b.waktu || b['WAKTU'];
+
+            if (bDate === formattedDate && bArmada === armada.name && (!bWaktu || bWaktu === armada.time)) {
+                const seatStr = b.kursi || b['NOMOR KURSI'] || '';
+                if (seatStr && seatStr !== '-') {
+                    seatStr.split(',').forEach(s => {
+                        const trimmed = s.trim();
+                        if (trimmed) adminBookingTakenSeats[trimmed] = { status: b.status, name: b.name };
+                    });
+                }
+            }
+        });
+
+        // 2. Query server for freshness
+        try {
+            const apiRes = await fetchFromSheets('getTakenSeats', '&tanggal=' + encodeURIComponent(formattedDate) + '&armada=' + encodeURIComponent(armada.name) + '&waktu=' + encodeURIComponent(armada.time));
+            if (apiRes && apiRes.data && apiRes.data.taken) {
+                Object.assign(adminBookingTakenSeats, apiRes.data.taken);
+            }
+        } catch(e) {}
+    }
+
+    // Clean up selected seats if already taken
+    [...adminBookingSelectedSeats].forEach(s => {
+        if (adminBookingTakenSeats[s]) adminBookingSelectedSeats.delete(s);
+    });
+
+    container.innerHTML = '';
+    const seatMapEl = buildSeatMapElement(layout, {
+        taken: adminBookingTakenSeats,
+        selected: adminBookingSelectedSeats,
+        onSeat: (seatNo, isTaken) => {
+            if (isTaken) {
+                if (typeof showMessage === 'function') showMessage('Kursi ' + seatNo + ' sudah terisi oleh penumpang lain!', 'warning');
+                return;
+            }
+            const qty = parseInt(document.getElementById('adminBookingPnp').value) || 1;
+            if (adminBookingSelectedSeats.has(seatNo)) {
+                adminBookingSelectedSeats.delete(seatNo);
+            } else {
+                if (adminBookingSelectedSeats.size >= qty) {
+                    if (qty === 1) {
+                        adminBookingSelectedSeats.clear();
+                        adminBookingSelectedSeats.add(seatNo);
+                    } else {
+                        alert('Jumlah kursi yang dipilih sudah mencapai ' + qty + ' kursi. Batalkan kursi lain terlebih dahulu jika ingin mengganti.');
+                        return;
+                    }
+                } else {
+                    adminBookingSelectedSeats.add(seatNo);
+                }
+            }
+            updateAdminBookingSeatBadge();
+            loadAdminBookingSeatMap(false);
+        }
+    });
+
+    container.appendChild(seatMapEl);
+    updateAdminBookingSeatBadge();
+}
+
+function updateAdminBookingSummary() {
+    const armadaId = document.getElementById('adminBookingArmada')?.value;
+    const armada = typeof getArmada === 'function' ? getArmada(armadaId) : null;
+    const rawDate = document.getElementById('adminBookingDate')?.value;
+    const tipePerjalanan = document.querySelector('input[name="adminTipePerjalanan"]:checked')?.value || 'Berangkat';
+
+    let formattedDate = rawDate;
+    if (rawDate) {
+        const [yyyy, mm, dd] = rawDate.split('-');
+        const dObj = new Date(parseInt(yyyy), parseInt(mm)-1, parseInt(dd));
+        formattedDate = INDO_DAYS[dObj.getDay()] + ', ' + dObj.getDate() + ' ' + INDO_MONTHS[dObj.getMonth()] + ' ' + dObj.getFullYear();
+    }
+
+    const qty = parseInt(document.getElementById('adminBookingPnp')?.value) || 1;
+    const nama = document.getElementById('adminBookingNama')?.value || '-';
+
+    document.getElementById('summaryAdminTipeTrip').innerText = tipePerjalanan;
+    document.getElementById('summaryAdminArmada').innerText = (armada ? armada.name : '-') + ' (' + (armada?.tipeArmada || 'Bus') + ')';
+    document.getElementById('summaryAdminRute').innerText = armada ? armada.destination : '-';
+    document.getElementById('summaryAdminJadwal').innerText = formattedDate + ' • ' + (armada ? armada.time : '-');
+    document.getElementById('summaryAdminNama').innerText = nama;
+    document.getElementById('summaryAdminPnp').innerText = qty + ' Penumpang';
+
+    const seatDisp = document.getElementById('summaryAdminKursi');
+    if (adminBookingSelectedSeats.size > 0) {
+        seatDisp.innerText = [...adminBookingSelectedSeats].join(', ');
+        seatDisp.className = 'text-amber-600 font-black text-sm';
+    } else {
+        seatDisp.innerText = 'Dilewati / Belum ditentukan';
+        seatDisp.className = 'text-slate-400 font-bold text-xs italic';
+    }
+
+    recalcAdminBooking();
+}
+
+// Reset admin booking
+function resetAdminBooking() {
+    document.getElementById('formAdminBooking').reset();
+    adminBookingStep = 1;
+    adminBookingSelectedSeats.clear();
+    adminBookingTakenSeats = {};
+    for (let i = 1; i <= 3; i++) {
+        const badge = document.getElementById('bookingStepBadge' + i);
+        const pane = document.getElementById('bookingStepPane' + i);
+        if (badge) {
+            badge.classList.remove('active', 'completed');
+            if (i === 1) badge.classList.add('active');
+        }
+        if (pane) pane.classList.toggle('hidden', i !== 1);
+    }
+    recalcAdminBooking();
+}
+
+/* ====================================================================
+ * EDIT BOOKING MODAL WITH INTERACTIVE SEAT SELECTION
+ * ==================================================================== */
+let editBookingSelectedSeats = new Set();
+let editBookingTakenSeats = {};
+
+async function loadEditBookingSeatMap(bookingId, armada, formattedDate, initialKursiArr = []) {
+    const container = document.getElementById('editBookingDenahContainer');
+    if (!container) return;
+
+    if (!armada) {
+        container.innerHTML = '<div class="text-slate-400 text-xs font-bold py-4 text-center">Pilih armada untuk melihat denah</div>';
+        return;
+    }
+
+    let layout = null;
+    if (armada.denahId && typeof getDenah === 'function') {
+        layout = getDenah(armada.denahId);
+    }
+    if (!layout && typeof getDenahList === 'function') {
+        const allDenah = getDenahList();
+        layout = allDenah.find(d => (d.kategori || '').toLowerCase() === (armada.tipeArmada || '').toLowerCase()) || allDenah[0];
+    }
+
+    if (!layout) {
+        container.innerHTML = '<div class="text-slate-400 text-xs font-bold py-4 text-center">Format denah belum tersedia</div>';
+        return;
+    }
+
+    document.getElementById('editBookingDenahInfoText').innerText = layout.nama + ' (' + (armada.tipeArmada || 'Bus') + ')';
+
+    // Populate Taken seats excluding this booking
+    editBookingTakenSeats = {};
+    const allBookings = (typeof getBookings === 'function' ? getBookings() : []) || [];
+    allBookings.forEach(b => {
+        if (b.bookingId === bookingId || b.status === 'DITOLAK' || b.status === 'CANCEL') return;
+        const bDate = b.dateTravel || b['TANGGAL PEMBERANGKATAN'];
+        const bArmada = b.armada || b['JENIS KENDARAAN'];
+        const bWaktu = b.waktu || b['WAKTU'];
+
+        if (bDate === formattedDate && bArmada === armada.name && (!bWaktu || bWaktu === armada.time)) {
+            const seatStr = b.kursi || b['NOMOR KURSI'] || '';
+            if (seatStr && seatStr !== '-') {
+                seatStr.split(',').forEach(s => {
+                    const trimmed = s.trim();
+                    if (trimmed) editBookingTakenSeats[trimmed] = { status: b.status, name: b.name };
+                });
+            }
+        }
+    });
+
+    container.innerHTML = '';
+    const seatMapEl = buildSeatMapElement(layout, {
+        taken: editBookingTakenSeats,
+        selected: editBookingSelectedSeats,
+        compact: true,
+        onSeat: (seatNo, isTaken) => {
+            if (isTaken) {
+                if (typeof showMessage === 'function') showMessage('Kursi ' + seatNo + ' sudah dibooking penumpang lain!', 'warning');
+                return;
+            }
+            const qty = parseInt(document.getElementById('editBookingPnp').value) || 1;
+            if (editBookingSelectedSeats.has(seatNo)) {
+                editBookingSelectedSeats.delete(seatNo);
+            } else {
+                if (editBookingSelectedSeats.size >= qty) {
+                    if (qty === 1) {
+                        editBookingSelectedSeats.clear();
+                        editBookingSelectedSeats.add(seatNo);
+                    } else {
+                        alert('Jumlah kursi yang dipilih sudah mencapai ' + qty + ' kursi. Batalkan kursi lain terlebih dahulu.');
+                        return;
+                    }
+                } else {
+                    editBookingSelectedSeats.add(seatNo);
+                }
+            }
+            updateEditBookingSeatDisplay();
+            loadEditBookingSeatMap(bookingId, armada, formattedDate);
+        }
+    });
+
+    container.appendChild(seatMapEl);
+    updateEditBookingSeatDisplay();
+}
+
+function updateEditBookingSeatDisplay() {
+    const qty = parseInt(document.getElementById('editBookingPnp')?.value) || 1;
+    const selCount = editBookingSelectedSeats.size;
+    const badge = document.getElementById('editBookingSeatCounterBadge');
+    const disp = document.getElementById('editBookingSelectedSeatsDisplay');
+    const hidden = document.getElementById('editBookingKursiHidden');
+
+    if (badge) badge.innerText = selCount + '/' + qty;
+    if (disp) {
+        if (selCount === 0) {
+            disp.innerText = 'Belum memilih kursi';
+            disp.className = 'font-bold text-slate-400 text-xs ml-1 italic';
+        } else {
+            disp.innerText = [...editBookingSelectedSeats].join(', ');
+            disp.className = 'font-black text-amber-600 text-sm ml-1';
+        }
+    }
+    if (hidden) {
+        hidden.value = [...editBookingSelectedSeats].join(', ');
+    }
+}
+
+function clearEditBookingSeats() {
+    editBookingSelectedSeats.clear();
+    updateEditBookingSeatDisplay();
+    const id = document.getElementById('editBookingId')?.value;
+    const armadaId = document.getElementById('editBookingArmada')?.value;
+    const armada = typeof getArmada === 'function' ? getArmada(armadaId) : null;
+    const rawDate = document.getElementById('editBookingDate')?.value;
+    loadEditBookingSeatMap(id, armada, rawDate);
+}

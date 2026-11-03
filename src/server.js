@@ -136,14 +136,196 @@ async function upsertPelanggan(hp, nama, alamat) {
     }
 }
 
+// Helper Denah Armada (Database with JSON File Fallback & Sync)
+const DEFAULT_DENAH_FILE = path.join(__dirname, 'default-denah.json');
+const DATA_DIR = path.join(__dirname, '../data');
+const CUSTOM_DENAH_FILE = path.join(DATA_DIR, 'denah.json');
+
+if (!fs.existsSync(DATA_DIR)) {
+    try { fs.mkdirSync(DATA_DIR, { recursive: true }); } catch(e) {}
+}
+
+function loadDefaultDenah() {
+    try {
+        if (fs.existsSync(CUSTOM_DENAH_FILE)) {
+            const raw = fs.readFileSync(CUSTOM_DENAH_FILE, 'utf-8');
+            if (raw && raw.trim()) return JSON.parse(raw);
+        }
+        if (fs.existsSync(DEFAULT_DENAH_FILE)) {
+            const defaults = JSON.parse(fs.readFileSync(DEFAULT_DENAH_FILE, 'utf-8'));
+            try { fs.writeFileSync(CUSTOM_DENAH_FILE, JSON.stringify(defaults, null, 2)); } catch(e) {}
+            return defaults;
+        }
+    } catch (e) {
+        console.error('Error loading denah json:', e);
+    }
+    return [];
+}
+
+async function getAllDenah() {
+    try {
+        const denahFromDb = await prisma.denahArmada.findMany({
+            orderBy: { createdAt: 'asc' }
+        });
+        if (denahFromDb && denahFromDb.length > 0) {
+            return denahFromDb.map(d => ({
+                id: d.id,
+                nama: d.nama,
+                kategori: d.kategori,
+                baris: d.baris,
+                kolom: d.kolom,
+                totalKursi: d.totalKursi,
+                cells: typeof d.cells === 'string' ? JSON.parse(d.cells) : d.cells
+            }));
+        }
+
+        const defaults = loadDefaultDenah();
+        for (const item of defaults) {
+            try {
+                await prisma.denahArmada.create({
+                    data: {
+                        id: item.id,
+                        nama: item.nama,
+                        kategori: item.kategori || 'Bus Besar',
+                        baris: item.baris || 5,
+                        kolom: item.kolom || 4,
+                        totalKursi: item.totalKursi || 0,
+                        cells: JSON.stringify(item.cells || [])
+                    }
+                });
+            } catch (err) {}
+        }
+        return defaults;
+    } catch (err) {
+        return loadDefaultDenah();
+    }
+}
+
+async function saveOrUpdateDenah(item, isEdit = false) {
+    const cellsArr = Array.isArray(item.cells) ? item.cells : (typeof item.cells === 'string' ? JSON.parse(item.cells) : []);
+    const totalKursi = cellsArr.filter(c => c && c.t === 'seat').length;
+    const cellsStr = JSON.stringify(cellsArr);
+
+    let targetId = item.id;
+    if (!targetId || targetId.trim() === '') {
+        targetId = 'DENAH-' + Date.now().toString(36).toUpperCase();
+    }
+
+    let dbResult = null;
+    try {
+        if (isEdit && item.id) {
+            dbResult = await prisma.denahArmada.update({
+                where: { id: item.id },
+                data: {
+                    nama: item.nama,
+                    kategori: item.kategori || 'Bus Besar',
+                    baris: parseInt(item.baris) || 5,
+                    kolom: parseInt(item.kolom) || 4,
+                    totalKursi: totalKursi,
+                    cells: cellsStr
+                }
+            });
+        } else {
+            dbResult = await prisma.denahArmada.create({
+                data: {
+                    id: targetId,
+                    nama: item.nama,
+                    kategori: item.kategori || 'Bus Besar',
+                    baris: parseInt(item.baris) || 5,
+                    kolom: parseInt(item.kolom) || 4,
+                    totalKursi: totalKursi,
+                    cells: cellsStr
+                }
+            });
+        }
+    } catch (err) {
+        console.warn('Prisma denah save warning:', err.message);
+    }
+
+    try {
+        let list = loadDefaultDenah();
+        const obj = {
+            id: targetId,
+            nama: item.nama,
+            kategori: item.kategori || 'Bus Besar',
+            baris: parseInt(item.baris) || 5,
+            kolom: parseInt(item.kolom) || 4,
+            totalKursi: totalKursi,
+            cells: cellsArr
+        };
+        const idx = list.findIndex(d => d.id === targetId);
+        if (idx >= 0) {
+            list[idx] = obj;
+        } else {
+            list.push(obj);
+        }
+        fs.writeFileSync(CUSTOM_DENAH_FILE, JSON.stringify(list, null, 2));
+        return obj;
+    } catch (err) {
+        console.error('File fallback save error:', err);
+    }
+    return dbResult;
+}
+
+async function removeDenah(id) {
+    try {
+        await prisma.denahArmada.delete({ where: { id: id } });
+    } catch (err) {
+        console.warn('Prisma denah delete warning:', err.message);
+    }
+    try {
+        let list = loadDefaultDenah();
+        list = list.filter(d => d.id !== id);
+        fs.writeFileSync(CUSTOM_DENAH_FILE, JSON.stringify(list, null, 2));
+    } catch(err) {}
+}
+
 // API Endpoints
 app.get('/api', async (req, res) => {
     const action = req.query.action;
 
     try {
-        const publicActions = ['getArmada', 'getBookingById', 'getPelangganTable', 'getHargaKhusus', 'getPopupIklan'];
+        const publicActions = ['getArmada', 'getDenahArmada', 'getTakenSeats', 'getBookingById', 'getPelangganTable', 'getHargaKhusus', 'getPopupIklan'];
         if (!publicActions.includes(action) && !req.user) {
             return res.status(401).json({ status: 'error', message: 'Unauthorized' });
+        }
+
+        if (action === 'getDenahArmada') {
+            const list = await getAllDenah();
+            return res.json({ status: 'success', data: list });
+        }
+
+        if (action === 'getTakenSeats') {
+            const { tanggal, armada, waktu, tujuan, exclude_id } = req.query;
+            if (!tanggal || !armada) {
+                return res.json({ status: 'success', data: { taken: {} } });
+            }
+            const whereClause = {
+                tanggalPemberangkatan: tanggal,
+                jenisKendaraan: armada
+            };
+            if (waktu) whereClause.waktu = waktu;
+            if (exclude_id) {
+                whereClause.bookingId = { not: exclude_id };
+            }
+            const bookings = await prisma.booking.findMany({
+                where: whereClause
+            });
+            const taken = {};
+            bookings.forEach(b => {
+                if (b.status === 'DITOLAK' || b.status === 'CANCEL') return;
+                if (b.nomorKursi) {
+                    const seats = b.nomorKursi.split(',').map(s => s.trim()).filter(Boolean);
+                    seats.forEach(s => {
+                        taken[s] = {
+                            status: b.status,
+                            nama: b.nama,
+                            bookingId: b.bookingId
+                        };
+                    });
+                }
+            });
+            return res.json({ status: 'success', data: { taken } });
         }
 
         if (action === 'getBookingById') {
@@ -214,7 +396,9 @@ app.get('/api', async (req, res) => {
                 'jam': a.jam,
                 'harga': a.harga,
                 'Seat': a.seat,
-                'is_active': a.isActive
+                'is_active': a.isActive,
+                'tipe_armada': a.tipeArmada || 'Bus Besar',
+                'denah_id': a.denahId || null
             }));
             return res.json({ status: 'success', data: formattedArmadas });
         }
@@ -542,7 +726,7 @@ app.post('/api', async (req, res) => {
         }
 
         if (action === 'addArmada') {
-            const { nama_armada, tujuan_armada, jam, harga, seat } = payload;
+            const { nama_armada, tujuan_armada, jam, harga, seat, tipe_armada, denah_id } = payload;
             const newArmada = await prisma.armada.create({
                 data: {
                     idArmada: 'ARM' + Math.floor(Math.random() * 1000000).toString().padStart(6, '0'),
@@ -550,25 +734,46 @@ app.post('/api', async (req, res) => {
                     tujuanArmada: tujuan_armada,
                     jam: jam,
                     harga: harga.toString(),
-                    seat: parseInt(seat) || 40
+                    seat: parseInt(seat) || 40,
+                    tipeArmada: tipe_armada || 'Bus Besar',
+                    denahId: denah_id || null
                 }
             });
             return res.json({ status: 'success', message: 'Armada berhasil ditambahkan', data: newArmada });
         }
 
         if (action === 'editArmadaData') {
-            const { id_armada, nama_armada, tujuan_armada, jam, harga, seat } = payload;
+            const { id_armada, nama_armada, tujuan_armada, jam, harga, seat, tipe_armada, denah_id } = payload;
+            const updatePayload = {
+                namaArmada: nama_armada,
+                tujuanArmada: tujuan_armada,
+                jam: jam,
+                harga: harga.toString(),
+                seat: parseInt(seat) || 40
+            };
+            if (tipe_armada !== undefined) updatePayload.tipeArmada = tipe_armada;
+            if (denah_id !== undefined) updatePayload.denahId = denah_id || null;
+
             await prisma.armada.update({
                 where: { idArmada: id_armada },
-                data: {
-                    namaArmada: nama_armada,
-                    tujuanArmada: tujuan_armada,
-                    jam: jam,
-                    harga: harga.toString(),
-                    seat: parseInt(seat) || 40
-                }
+                data: updatePayload
             });
             return res.json({ status: 'success', message: 'Data armada berhasil diperbarui' });
+        }
+
+        if (action === 'addDenahArmada') {
+            const resData = await saveOrUpdateDenah(payload, false);
+            return res.json({ status: 'success', message: 'Denah format tempat duduk berhasil disimpan', data: resData });
+        }
+
+        if (action === 'editDenahArmada') {
+            const resData = await saveOrUpdateDenah(payload, true);
+            return res.json({ status: 'success', message: 'Denah format tempat duduk berhasil diperbarui', data: resData });
+        }
+
+        if (action === 'deleteDenahArmada') {
+            await removeDenah(payload.id);
+            return res.json({ status: 'success', message: 'Denah format tempat duduk berhasil dihapus' });
         }
 
         if (action === 'toggleArmadaStatus') {

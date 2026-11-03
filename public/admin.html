@@ -485,12 +485,17 @@
                 <!-- MENU 4: DAFTAR ARMADA   -->
                 <!-- ======================= -->
                 <section id="sec-armada" class="content-section">
-                    <div class="mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                        <div>
-                            <h2 class="text-2xl font-black text-slate-800 tracking-tight">Daftar Armada</h2>
-                            <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mt-1">Semua kendaraan yang tersedia</p>
-                        </div>
+                    <!-- Subtabs Header -->
+                    <div class="mb-6 flex flex-wrap items-center justify-between gap-4 border-b border-slate-200 pb-4">
                         <div class="flex gap-2">
+                            <button id="tabBtnArmadaList" onclick="switchArmadaSubtab('list')" class="px-5 py-2.5 rounded-xl font-black text-xs uppercase tracking-widest transition-all bg-slate-900 text-amber-400 shadow-md flex items-center gap-2">
+                                <i class="fas fa-bus"></i> Data Armada &amp; Rute
+                            </button>
+                            <button id="tabBtnArmadaDenah" onclick="switchArmadaSubtab('denah')" class="px-5 py-2.5 rounded-xl font-black text-xs uppercase tracking-widest transition-all bg-white hover:bg-slate-100 text-slate-600 border border-slate-200 flex items-center gap-2">
+                                <i class="fas fa-chair"></i> Tipe Armada &amp; Denah Kursi
+                            </button>
+                        </div>
+                        <div class="flex gap-2" id="armadaActionsList">
                             <button onclick="openHargaKhususModal()" class="bg-slate-800 hover:bg-slate-900 text-amber-500 px-4 py-2 rounded-xl text-sm font-black uppercase tracking-widest shadow-lg shadow-slate-900/20 transition-all flex items-center justify-center gap-2 border border-slate-700">
                                 <i class="fas fa-tags"></i> HARGA KHUSUS
                             </button>
@@ -498,36 +503,70 @@
                                 <i class="fas fa-plus"></i> Tambah Armada
                             </button>
                         </div>
-                    </div>
-
-                    <!-- Filter Pencarian Armada -->
-                    <div class="mb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-slate-50 p-4 rounded-2xl border border-slate-100">
-                        <div class="flex-1 w-full relative">
-                            <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
-                            <input type="text" id="searchArmadaInput" class="w-full bg-white border border-slate-200 rounded-xl pl-11 pr-4 py-2.5 text-base md:text-sm font-bold text-slate-700 outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-200 transition-colors shadow-sm" placeholder="Cari nama armada atau tujuan..." oninput="renderArmada()">
+                        <div class="flex gap-2 hidden" id="armadaActionsDenah">
+                            <button onclick="openDenahEditor()" class="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-slate-900 px-4 py-2 rounded-xl text-sm font-black uppercase tracking-widest shadow-lg shadow-amber-500/30 transition-all flex items-center justify-center gap-2">
+                                <i class="fas fa-plus"></i> Buat Format Denah Baru
+                            </button>
                         </div>
-                        <button onclick="document.getElementById('searchArmadaInput').value=''; renderArmada();" class="text-xs font-bold text-slate-500 hover:text-amber-600 uppercase tracking-widest px-3 py-2 bg-white border border-slate-200 rounded-lg hover:border-amber-200 transition-all whitespace-nowrap shadow-sm">
-                            <i class="fas fa-times mr-1"></i> Reset Pencarian
-                        </button>
                     </div>
 
-                    <div class="chart-card overflow-hidden">
-                        <div class="overflow-x-auto">
-                            <table class="data-table">
-                                <thead>
-                                    <tr>
-                                        <th>ID</th>
-                                        <th>Tujuan</th>
-                                        <th class="text-right">Jam &amp; Harga</th>
-                                        <th class="text-center w-16">Aksi</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="armadaTableBody">
-                                    <tr class="animate-pulse border-b border-slate-50"><td colspan="4" class="p-4"><div class="flex items-center gap-4"><div class="w-10 h-10 bg-slate-200 rounded-xl flex-shrink-0"></div><div class="flex-1 space-y-2"><div class="h-4 bg-slate-200 rounded w-1/3"></div><div class="h-3 bg-slate-100 rounded w-1/4"></div></div><div class="w-16 h-6 bg-slate-200 rounded-lg flex-shrink-0"></div></div></td></tr>
-                                    <tr class="animate-pulse border-b border-slate-50"><td colspan="4" class="p-4"><div class="flex items-center gap-4"><div class="w-10 h-10 bg-slate-200 rounded-xl flex-shrink-0"></div><div class="flex-1 space-y-2"><div class="h-4 bg-slate-200 rounded w-1/2"></div><div class="h-3 bg-slate-100 rounded w-1/3"></div></div><div class="w-16 h-6 bg-slate-200 rounded-lg flex-shrink-0"></div></div></td></tr>
-                                    <tr class="animate-pulse border-b border-slate-50"><td colspan="4" class="p-4"><div class="flex items-center gap-4"><div class="w-10 h-10 bg-slate-200 rounded-xl flex-shrink-0"></div><div class="flex-1 space-y-2"><div class="h-4 bg-slate-200 rounded w-2/5"></div><div class="h-3 bg-slate-100 rounded w-1/5"></div></div><div class="w-16 h-6 bg-slate-200 rounded-lg flex-shrink-0"></div></div></td></tr>
-                                </tbody>
-                            </table>
+                    <!-- SUBTAB 1: DAFTAR ARMADA & RUTE -->
+                    <div id="subtabArmadaList">
+                        <div class="mb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-slate-50 p-4 rounded-2xl border border-slate-100">
+                            <div class="flex-1 w-full relative">
+                                <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                                <input type="text" id="searchArmadaInput" class="w-full bg-white border border-slate-200 rounded-xl pl-11 pr-4 py-2.5 text-base md:text-sm font-bold text-slate-700 outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-200 transition-colors shadow-sm" placeholder="Cari nama armada, tipe, atau tujuan..." oninput="renderArmada()">
+                            </div>
+                            <button onclick="document.getElementById('searchArmadaInput').value=''; renderArmada();" class="text-xs font-bold text-slate-500 hover:text-amber-600 uppercase tracking-widest px-3 py-2 bg-white border border-slate-200 rounded-lg hover:border-amber-200 transition-all whitespace-nowrap shadow-sm">
+                                <i class="fas fa-times mr-1"></i> Reset Pencarian
+                            </button>
+                        </div>
+
+                        <div class="chart-card overflow-hidden">
+                            <div class="overflow-x-auto">
+                                <table class="data-table">
+                                    <thead>
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>Armada &amp; Tipe</th>
+                                            <th>Tujuan</th>
+                                            <th class="text-right">Jam &amp; Harga</th>
+                                            <th class="text-center w-16">Aksi</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="armadaTableBody">
+                                        <tr class="animate-pulse border-b border-slate-50"><td colspan="5" class="p-4"><div class="flex items-center gap-4"><div class="w-10 h-10 bg-slate-200 rounded-xl flex-shrink-0"></div><div class="flex-1 space-y-2"><div class="h-4 bg-slate-200 rounded w-1/3"></div><div class="h-3 bg-slate-100 rounded w-1/4"></div></div><div class="w-16 h-6 bg-slate-200 rounded-lg flex-shrink-0"></div></div></td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- SUBTAB 2: KELOLA TIPE ARMADA & DENAH TEMPAT DUDUK -->
+                    <div id="subtabArmadaDenah" class="hidden">
+                        <div class="mb-6 bg-gradient-to-r from-slate-900 to-slate-800 text-white p-6 rounded-3xl shadow-xl flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+                            <div>
+                                <span class="bg-amber-400 text-slate-900 text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-full mb-2 inline-block">Fitur Visual Interaktif</span>
+                                <h3 class="text-xl font-black tracking-tight text-white">Kelola Denah Tempat Duduk Tiap Tipe Armada</h3>
+                                <p class="text-xs text-slate-300 mt-1 max-w-xl">Atur posisi kursi, supir, pintu, dan lorong untuk setiap tipe armada (Hiace, Bus Besar, Long Elf, Medium Bus, dll). Perubahan otomatis dipakai saat booking tiket.</p>
+                            </div>
+                            <button onclick="openDenahEditor()" class="bg-amber-500 hover:bg-amber-600 text-slate-900 font-black text-xs uppercase tracking-widest px-5 py-3 rounded-2xl shadow-lg shadow-amber-500/30 transition-all flex items-center gap-2 flex-shrink-0">
+                                <i class="fas fa-plus"></i> Tambah Format Denah
+                            </button>
+                        </div>
+
+                        <!-- Filter Kategori / Tipe Armada -->
+                        <div class="flex items-center gap-2 overflow-x-auto pb-3 mb-4" id="denahFilterPills">
+                            <button onclick="filterDenahKategori('ALL')" class="denah-cat-pill active px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider bg-slate-900 text-amber-400 shadow-sm transition-all" data-cat="ALL">Semua Tipe</button>
+                            <button onclick="filterDenahKategori('Hiace')" class="denah-cat-pill px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider bg-white text-slate-600 border border-slate-200 hover:border-amber-400 shadow-sm transition-all" data-cat="Hiace">Hiace</button>
+                            <button onclick="filterDenahKategori('Bus Besar')" class="denah-cat-pill px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider bg-white text-slate-600 border border-slate-200 hover:border-amber-400 shadow-sm transition-all" data-cat="Bus Besar">Bus Besar</button>
+                            <button onclick="filterDenahKategori('Long Elf')" class="denah-cat-pill px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider bg-white text-slate-600 border border-slate-200 hover:border-amber-400 shadow-sm transition-all" data-cat="Long Elf">Long Elf</button>
+                            <button onclick="filterDenahKategori('Medium Bus')" class="denah-cat-pill px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider bg-white text-slate-600 border border-slate-200 hover:border-amber-400 shadow-sm transition-all" data-cat="Medium Bus">Medium Bus</button>
+                        </div>
+
+                        <!-- Grid Daftar Kartu Denah -->
+                        <div id="denahCardGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            <!-- Populated dynamically by renderDenahCards() -->
                         </div>
                     </div>
                 </section>
@@ -939,157 +978,309 @@
                 <!-- ======================= -->
                 <!-- BOOKING TIKET MODAL     -->
                 <!-- ======================= -->
-                <div id="bookingModal" class="fixed inset-0 bg-gray-900/60  z-[140] hidden justify-center items-center p-4 lg:p-8 overflow-y-auto">
-                    <div class="bg-white rounded-[2rem] p-6 shadow-2xl border border-slate-100 max-w-2xl w-full relative max-h-[90dvh] overflow-y-auto my-auto">
-                          <div class="absolute top-4 right-4 w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center text-white text-lg shadow-lg cursor-pointer hover:bg-blue-600 transition-colors z-10" onclick="closeBookingModal()">
-                              <i class="fas fa-times"></i>
-                          </div>
-                          <div class="mb-6 flex items-center gap-3 mt-8 md:mt-2">
-                              <div class="w-10 h-10 bg-blue-100 text-blue-600 rounded-xl flex items-center justify-center text-lg">
-                                  <i class="fas fa-ticket-alt"></i>
-                              </div>
-                              <div>
-                                  <h3 class="text-xl font-black text-slate-800 tracking-tight">Booking Tiket (Admin)</h3>
-                                  <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-1">Buat pesanan dan cetak struk E-Ticketing</p>
-                              </div>
-                          </div>
+                <!-- ======================= -->
+                <!-- BOOKING TIKET MODAL (3 TAHAPAN) -->
+                <!-- ======================= -->
+                <div id="bookingModal" class="fixed inset-0 bg-gray-900/60 z-[140] hidden justify-center items-center p-4 lg:p-8 overflow-y-auto">
+                    <div class="bg-white rounded-[2rem] p-6 sm:p-8 shadow-2xl border border-slate-100 max-w-2xl w-full relative max-h-[92dvh] overflow-y-auto my-auto">
+                        <div class="absolute top-4 right-4 w-10 h-10 bg-amber-500 rounded-full flex items-center justify-center text-white text-lg shadow-lg cursor-pointer hover:bg-amber-600 transition-colors z-10" onclick="closeBookingModal()">
+                            <i class="fas fa-times"></i>
+                        </div>
+                        
+                        <div class="mb-4 flex items-center gap-3 mt-6 sm:mt-1">
+                            <div class="w-10 h-10 bg-amber-100 text-amber-600 rounded-xl flex items-center justify-center text-lg flex-shrink-0">
+                                <i class="fas fa-ticket-alt"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-xl font-black text-slate-800 tracking-tight">Booking Tiket (Admin)</h3>
+                                <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-0.5">Alur Pemesanan 3 Tahapan Interaktif</p>
+                            </div>
+                        </div>
+
+                        <!-- Stepper Indicator 3 Tahap -->
+                        <div class="flex items-center gap-2 mb-6">
+                            <div id="bookingStepBadge1" class="wizard-step active">
+                                <span class="wizard-num">1</span>
+                                <span class="truncate">Jadwal &amp; PO</span>
+                            </div>
+                            <div id="bookingStepBadge2" class="wizard-step">
+                                <span class="wizard-num">2</span>
+                                <span class="truncate">Data &amp; Kursi</span>
+                            </div>
+                            <div id="bookingStepBadge3" class="wizard-step">
+                                <span class="wizard-num">3</span>
+                                <span class="truncate">Pembayaran</span>
+                            </div>
+                        </div>
+
                         <form id="formAdminBooking" onsubmit="submitAdminBooking(event)" class="space-y-6">
                             
-                            <!-- Step 1: Armada, Jam, Rute -->
-                            <div class="bg-slate-50 p-4 rounded-xl border border-slate-100 space-y-4">
-                                <h3 class="text-xs font-black text-slate-400 uppercase tracking-widest border-b border-slate-200 pb-2">1. Pemilihan Armada & Rute</h3>
-                                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                                    <div>
-                                        <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Tanggal</label>
-                                        <input type="date" id="adminBookingDate" class="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-base md:text-sm font-bold text-slate-700 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-colors" onchange="recalcAdminBooking()" required>
+                            <!-- ========================================== -->
+                            <!-- TAHAPAN 1: JADWAL, PO, RUTE & JAM           -->
+                            <!-- ========================================== -->
+                            <div id="bookingStepPane1" class="space-y-4">
+                                <div class="bg-slate-50 p-5 rounded-2xl border border-slate-100 space-y-4">
+                                    <div class="flex items-center justify-between border-b border-slate-200 pb-2">
+                                        <h3 class="text-xs font-black text-slate-600 uppercase tracking-widest flex items-center gap-2">
+                                            <i class="fas fa-calendar-alt text-amber-500"></i> 1. Pemilihan Tanggal &amp; Armada
+                                        </h3>
+                                        <span class="text-[10px] bg-amber-100 text-amber-800 font-extrabold px-2 py-0.5 rounded-full">Tahap 1 dari 3</span>
                                     </div>
-                                    <div class="col-span-1 md:col-span-2">
-                                        <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Tipe Perjalanan</label>
-                                        <div class="flex gap-4 p-3 bg-white border border-slate-200 rounded-xl">
-                                            <label class="flex items-center gap-2 cursor-pointer">
-                                                <input type="radio" name="adminTipePerjalanan" value="Berangkat" class="w-4 h-4 text-blue-600 focus:ring-blue-500 border-gray-300" checked onchange="document.getElementById('adminLabelTujuan').innerText = 'Tujuan';">
-                                                <span class="text-xs font-bold text-slate-700">Berangkat (Dari Kawunganten)</span>
+
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        <div>
+                                            <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Tanggal Pemberangkatan *</label>
+                                            <input type="date" id="adminBookingDate" class="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-base md:text-sm font-bold text-slate-700 outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-200 transition-colors" onchange="onAdminBookingTripChange()" required>
+                                        </div>
+                                        <div>
+                                            <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Tipe Perjalanan</label>
+                                            <div class="flex gap-2 p-1.5 bg-white border border-slate-200 rounded-xl">
+                                                <label class="flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-lg cursor-pointer transition-colors has-[:checked]:bg-amber-500 has-[:checked]:text-white text-slate-700">
+                                                    <input type="radio" name="adminTipePerjalanan" value="Berangkat" class="hidden" checked onchange="document.getElementById('adminLabelTujuan').innerText = 'Rute Tujuan'; onAdminBookingTripChange();">
+                                                    <span class="text-xs font-bold">Berangkat</span>
+                                                </label>
+                                                <label class="flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-lg cursor-pointer transition-colors has-[:checked]:bg-amber-500 has-[:checked]:text-white text-slate-700">
+                                                    <input type="radio" name="adminTipePerjalanan" value="Pulang" class="hidden" onchange="document.getElementById('adminLabelTujuan').innerText = 'Rute Asal'; onAdminBookingTripChange();">
+                                                    <span class="text-xs font-bold">Pulang</span>
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                        <div>
+                                            <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Pilih Armada / PO *</label>
+                                            <select id="adminBookingArmadaName" class="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-base md:text-sm font-bold text-slate-700 outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-200 transition-colors" onchange="updateAdminTime(); onAdminBookingTripChange();" required>
+                                            </select>
+                                        </div>
+                                        <div>
+                                            <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Jam Pemberangkatan *</label>
+                                            <select id="adminBookingTime" class="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-base md:text-sm font-bold text-slate-700 outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-200 transition-colors" onchange="updateAdminRute(); onAdminBookingTripChange();" required>
+                                            </select>
+                                        </div>
+                                        <div>
+                                            <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1" id="adminLabelTujuan">Rute / Tujuan *</label>
+                                            <select id="adminBookingArmada" class="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-base md:text-sm font-bold text-slate-700 outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-200 transition-colors" onchange="recalcAdminBooking(); onAdminBookingTripChange();" required>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <!-- Info Armada Banner -->
+                                    <div id="adminBookingArmadaInfoBanner" class="p-3 bg-amber-50 border border-amber-200/60 rounded-xl flex items-center justify-between text-xs">
+                                        <div class="flex items-center gap-2 text-slate-700">
+                                            <i class="fas fa-info-circle text-amber-600 text-sm"></i>
+                                            <span id="adminBookingArmadaInfoText" class="font-bold">Silakan pilih armada, jam, dan rute di atas</span>
+                                        </div>
+                                        <span id="adminBookingTarifBadge" class="font-black text-amber-700">Rp0 / kursi</span>
+                                    </div>
+                                </div>
+
+                                <div class="flex gap-3 pt-2">
+                                    <button type="button" onclick="resetAdminBooking(); closeBookingModal();" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-600 font-black text-xs uppercase tracking-widest py-3.5 rounded-xl transition-all">BATAL</button>
+                                    <button type="button" onclick="goToBookingStep(2)" class="flex-[2] bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-slate-900 font-black text-xs uppercase tracking-widest py-3.5 rounded-xl shadow-lg shadow-amber-500/30 transition-all flex items-center justify-center gap-2">
+                                        Lanjut ke Data &amp; Kursi (Tahap 2) <i class="fas fa-arrow-right"></i>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- ========================================== -->
+                            <!-- TAHAPAN 2: DATA PENUMPANG & DENAH TEMPAT DUDUK -->
+                            <!-- ========================================== -->
+                            <div id="bookingStepPane2" class="space-y-5 hidden">
+                                <div class="bg-slate-50 p-5 rounded-2xl border border-slate-100 space-y-4">
+                                    <div class="flex items-center justify-between border-b border-slate-200 pb-2">
+                                        <h3 class="text-xs font-black text-slate-600 uppercase tracking-widest flex items-center gap-2">
+                                            <i class="fas fa-user-edit text-amber-500"></i> 2. Data Penumpang &amp; Pilihan Kursi
+                                        </h3>
+                                        <span class="text-[10px] bg-amber-100 text-amber-800 font-extrabold px-2 py-0.5 rounded-full">Tahap 2 dari 3</span>
+                                    </div>
+
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        <div class="relative">
+                                            <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Nama Penumpang *</label>
+                                            <input type="text" id="adminBookingNama" class="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-base md:text-sm font-bold text-slate-700 outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-200 transition-colors" oninput="searchPelanggan(this.value, 'booking', 'nama')" autocomplete="off" placeholder="Nama lengkap penumpang" required>
+                                            <div id="autocompleteNamaBooking" class="absolute z-50 w-full bg-white border border-slate-200 rounded-xl shadow-lg mt-1 hidden max-h-48 overflow-y-auto"></div>
+                                        </div>
+                                        <div class="relative">
+                                            <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">No HP / WA *</label>
+                                            <input type="tel" id="adminBookingHp" inputmode="numeric" class="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-base md:text-sm font-bold text-slate-700 outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-200 transition-colors" oninput="searchPelanggan(this.value, 'booking', 'hp')" autocomplete="off" placeholder="08xxxxxxxxxx" required>
+                                            <div id="autocompleteHpBooking" class="absolute z-50 w-full bg-white border border-slate-200 rounded-xl shadow-lg mt-1 hidden max-h-48 overflow-y-auto"></div>
+                                        </div>
+                                    </div>
+
+                                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                        <div class="md:col-span-2">
+                                            <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Alamat Penjemputan (Opsional)</label>
+                                            <div class="relative group">
+                                                <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
+                                                    <i class="fas fa-map-marker-alt text-slate-400 group-focus-within:text-amber-500 transition-colors"></i>
+                                                </div>
+                                                <input type="text" id="adminBookingAlamat" class="w-full bg-white border border-slate-200 rounded-xl pl-10 pr-4 py-3 text-base md:text-sm font-bold text-slate-700 outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-200 transition-colors" placeholder="Contoh: Depan pasar kawunganten / titik kumpul">
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Jumlah PNP *</label>
+                                            <div class="flex items-center">
+                                                <button type="button" onclick="document.getElementById('adminBookingPnp').stepDown(); onAdminBookingPnpChange();" class="bg-slate-200 text-slate-700 font-bold px-4 py-3 rounded-l-xl hover:bg-slate-300 transition-colors active:scale-95">-</button>
+                                                <input type="number" id="adminBookingPnp" min="1" value="1" class="w-full bg-white border-y border-slate-200 px-3 py-3 text-base md:text-sm font-bold text-slate-700 outline-none text-center focus:border-amber-500 focus:ring-0 transition-colors appearance-none" oninput="onAdminBookingPnpChange()" required style="-moz-appearance: textfield;">
+                                                <button type="button" onclick="document.getElementById('adminBookingPnp').stepUp(); onAdminBookingPnpChange();" class="bg-slate-200 text-slate-700 font-bold px-4 py-3 rounded-r-xl hover:bg-slate-300 transition-colors active:scale-95">+</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- SEKSI DENAH TEMPAT DUDUK INTERAKTIF -->
+                                <div class="bg-white p-5 rounded-2xl border-2 border-slate-200 space-y-3">
+                                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 pb-3">
+                                        <div>
+                                            <h4 class="text-xs font-black text-slate-800 uppercase tracking-wider flex items-center gap-2">
+                                                <i class="fas fa-chair text-amber-500"></i> Skema / Denah Tempat Duduk
+                                            </h4>
+                                            <p class="text-[11px] text-slate-500 mt-0.5">Tipe Armada: <b id="adminBookingDenahTipeLabel" class="text-slate-800">-</b> • Format: <b id="adminBookingDenahNamaLabel" class="text-slate-800">-</b></p>
+                                        </div>
+                                        <div class="flex items-center gap-2">
+                                            <button type="button" onclick="clearAdminBookingSeats()" class="text-xs font-bold text-slate-500 hover:text-red-500 bg-slate-100 hover:bg-red-50 px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1.5 shadow-sm">
+                                                <i class="fas fa-undo"></i> Kosongkan Kursi
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <!-- Legend Kursi -->
+                                    <div class="seat-legend mb-2">
+                                        <span><i class="seat-legend-dot"></i> Tersedia (Klik)</span>
+                                        <span><i class="seat-legend-dot is-sel"></i> Dipilih</span>
+                                        <span><i class="seat-legend-dot is-book"></i> Terisi (Booked)</span>
+                                    </div>
+
+                                    <!-- Container Denah Kursi -->
+                                    <div id="adminBookingDenahContainer" class="py-2 flex justify-center">
+                                        <div class="text-center py-6 text-slate-400 font-bold text-xs">
+                                            <i class="fas fa-spinner fa-spin text-lg mb-2 block"></i> Memuat denah tempat duduk...
+                                        </div>
+                                    </div>
+
+                                    <!-- Ringkasan Kursi Terpilih & Skip Info -->
+                                    <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                                        <div class="text-xs">
+                                            <span class="text-slate-500 font-bold">Kursi Terpilih:</span>
+                                            <span id="adminBookingSelectedSeatsDisplay" class="font-black text-amber-600 text-sm ml-1">Belum memilih kursi</span>
+                                            <span id="adminBookingSeatCounterBadge" class="ml-2 text-[10px] bg-slate-200 text-slate-700 font-extrabold px-2 py-0.5 rounded-full">0/1 kursi</span>
+                                        </div>
+                                        <div class="text-[11px] text-slate-400 font-medium italic">
+                                            <i class="fas fa-info-circle mr-1 text-amber-500"></i> Pengisian kursi tidak wajib (bisa dilewati)
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="flex gap-3 pt-2">
+                                    <button type="button" onclick="goToBookingStep(1)" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 font-black text-xs uppercase tracking-widest py-3.5 rounded-xl transition-all flex items-center justify-center gap-2">
+                                        <i class="fas fa-arrow-left"></i> Kembali ke Tahap 1
+                                    </button>
+                                    <button type="button" onclick="goToBookingStep(3)" class="flex-[2] bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-slate-900 font-black text-xs uppercase tracking-widest py-3.5 rounded-xl shadow-lg shadow-amber-500/30 transition-all flex items-center justify-center gap-2">
+                                        Lanjut ke Pembayaran (Tahap 3) <i class="fas fa-arrow-right"></i>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- ========================================== -->
+                            <!-- TAHAPAN 3: BIAYA TAMBAHAN, RINGKASAN & STATUS -->
+                            <!-- ========================================== -->
+                            <div id="bookingStepPane3" class="space-y-4 hidden">
+                                <div class="bg-slate-50 p-5 rounded-2xl border border-slate-100 space-y-4">
+                                    <div class="flex items-center justify-between border-b border-slate-200 pb-2">
+                                        <h3 class="text-xs font-black text-slate-600 uppercase tracking-widest flex items-center gap-2">
+                                            <i class="fas fa-money-bill-wave text-amber-500"></i> 3. Biaya, Catatan &amp; Pembayaran
+                                        </h3>
+                                        <span class="text-[10px] bg-amber-100 text-amber-800 font-extrabold px-2 py-0.5 rounded-full">Tahap 3 dari 3</span>
+                                    </div>
+
+                                    <!-- Biaya Tambahan Toggle -->
+                                    <div>
+                                        <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1.5">Ada Biaya Tambahan? (Cas Antar/Bagasi)</label>
+                                        <div class="flex gap-2 max-w-xs">
+                                            <label class="flex-1 cursor-pointer">
+                                                <input type="radio" name="adminBookingHasBiayaTambahan" value="no" class="peer hidden" checked onchange="toggleAdminBiayaTambahan()">
+                                                <div class="text-center py-2 px-3 rounded-xl border border-slate-200 peer-checked:bg-slate-900 peer-checked:text-amber-400 peer-checked:border-slate-900 font-bold text-xs text-slate-500 transition-all shadow-sm">TIDAK ADA</div>
                                             </label>
-                                            <label class="flex items-center gap-2 cursor-pointer">
-                                                <input type="radio" name="adminTipePerjalanan" value="Pulang" class="w-4 h-4 text-blue-600 focus:ring-blue-500 border-gray-300" onchange="document.getElementById('adminLabelTujuan').innerText = 'Asal';">
-                                                <span class="text-xs font-bold text-slate-700">Pulang (Menuju Kawunganten)</span>
+                                            <label class="flex-1 cursor-pointer">
+                                                <input type="radio" name="adminBookingHasBiayaTambahan" value="yes" class="peer hidden" onchange="toggleAdminBiayaTambahan()">
+                                                <div class="text-center py-2 px-3 rounded-xl border border-slate-200 peer-checked:bg-amber-500 peer-checked:text-white peer-checked:border-amber-500 font-bold text-xs text-slate-500 transition-all shadow-sm">YA, ADA BIAYA</div>
                                             </label>
                                         </div>
                                     </div>
+
+                                    <div id="adminBookingBiayaTambahanContainer" class="hidden grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        <div>
+                                            <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Nominal Tambahan (Rp)</label>
+                                            <input type="number" id="adminBookingBiayaTambahanNominal" class="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-base md:text-sm font-bold text-slate-700 outline-none focus:border-amber-500 transition-colors" value="0" oninput="recalcAdminBooking()">
+                                        </div>
+                                        <div>
+                                            <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Keterangan Biaya Tambahan</label>
+                                            <input type="text" id="adminBookingBiayaTambahanKet" class="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-base md:text-sm font-bold text-slate-700 outline-none focus:border-amber-500 transition-colors" placeholder="Contoh: Cas antar jauh / Bagasi motor">
+                                        </div>
+                                    </div>
+
                                     <div>
-                                        <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Pilih Armada</label>
-                                        <select id="adminBookingArmadaName" class="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-base md:text-sm font-bold text-slate-700 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-colors" onchange="updateAdminTime()" required>
-                                        </select>
+                                        <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Catatan Tambahan (Opsional)</label>
+                                        <input type="text" id="adminBookingKeterangan" class="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-base md:text-sm font-bold text-slate-700 outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-200 transition-colors" placeholder="Catatan untuk manifes / sopir...">
                                     </div>
+
+                                    <!-- Ringkasan Tiket Card -->
+                                    <div class="p-4 bg-white rounded-2xl border-2 border-amber-300 shadow-sm space-y-2.5">
+                                        <div class="flex items-center justify-between border-b border-slate-100 pb-2">
+                                            <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Ringkasan Pemesanan</span>
+                                            <span class="text-xs font-black text-amber-600 uppercase" id="summaryAdminTipeTrip">Berangkat</span>
+                                        </div>
+                                        <div class="grid grid-cols-2 gap-2 text-xs">
+                                            <div><span class="text-slate-400">Armada / PO:</span> <b id="summaryAdminArmada" class="text-slate-800 block">-</b></div>
+                                            <div><span class="text-slate-400">Rute:</span> <b id="summaryAdminRute" class="text-slate-800 block">-</b></div>
+                                            <div><span class="text-slate-400">Tanggal &amp; Jam:</span> <b id="summaryAdminJadwal" class="text-slate-800 block">-</b></div>
+                                            <div><span class="text-slate-400">Penumpang:</span> <b id="summaryAdminNama" class="text-slate-800 block">-</b></div>
+                                            <div class="col-span-2 pt-1 border-t border-slate-100 flex items-center justify-between">
+                                                <span><span class="text-slate-400">Nomor Kursi:</span> <b id="summaryAdminKursi" class="text-amber-600 font-black text-sm">Belum ditentukan</b></span>
+                                                <span class="text-slate-500 font-bold" id="summaryAdminPnp">1 Penumpang</span>
+                                            </div>
+                                        </div>
+                                        <div class="bg-gradient-to-r from-blue-50 to-indigo-50 p-4 rounded-xl border border-blue-100 flex items-center justify-between mt-2">
+                                            <div>
+                                                <span class="text-[10px] font-bold text-blue-700 uppercase tracking-widest block">Total Pembayaran</span>
+                                                <small class="text-[10px] text-slate-500">Termasuk tiket &amp; biaya tambahan</small>
+                                            </div>
+                                            <span class="font-black text-2xl sm:text-3xl text-blue-600 leading-none" id="adminBookingTotalDisplay">Rp0</span>
+                                        </div>
+                                    </div>
+
                                     <div>
-                                        <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Jam</label>
-                                        <select id="adminBookingTime" class="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-base md:text-sm font-bold text-slate-700 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-colors" onchange="updateAdminRute()" required>
-                                        </select>
-                                    </div>
-                                    <div>
-                                        <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1" id="adminLabelTujuan">Rute</label>
-                                        <select id="adminBookingArmada" class="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-base md:text-sm font-bold text-slate-700 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-colors" onchange="recalcAdminBooking()" required>
-                                        </select>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Step 2: Data Penumpang -->
-                            <div class="space-y-4">
-                                <h3 class="text-xs font-black text-slate-400 uppercase tracking-widest border-b border-slate-100 pb-2">2. Data Penumpang</h3>
-                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    <div class="relative">
-                                        <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Nama Penumpang</label>
-                                        <input type="text" id="adminBookingNama" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-base md:text-sm font-bold text-slate-700 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-colors" oninput="searchPelanggan(this.value, 'booking', 'nama')" autocomplete="off" required>
-                                        <div id="autocompleteNamaBooking" class="absolute z-50 w-full bg-white border border-slate-200 rounded-xl shadow-lg mt-1 hidden max-h-48 overflow-y-auto"></div>
-                                    </div>
-                                    <div class="relative">
-                                        <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">No HP / WA</label>
-                                        <input type="tel" id="adminBookingHp" inputmode="numeric" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-base md:text-sm font-bold text-slate-700 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-colors" oninput="searchPelanggan(this.value, 'booking', 'hp')" autocomplete="off" required>
-                                        <div id="autocompleteHpBooking" class="absolute z-50 w-full bg-white border border-slate-200 rounded-xl shadow-lg mt-1 hidden max-h-48 overflow-y-auto"></div>
-                                    </div>
-                                </div>
-                                  <div class="mt-4">
-                                      <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Alamat (Opsional)</label>
-                                      <div class="relative group">
-                                          <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                                              <i class="fas fa-map-marker-alt text-slate-400 group-focus-within:text-blue-500 transition-colors"></i>
-                                          </div>
-                                          <input type="text" id="adminBookingAlamat" class="w-full bg-slate-50 border border-slate-200 rounded-xl pl-11 pr-4 py-3 text-base md:text-sm font-bold text-slate-700 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-colors" placeholder="Alamat atau detail jemput">
-                                      </div>
-                                  </div>
-                                <div>
-                                    <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Jumlah PNP</label>
-                                    <div class="flex items-center">
-                                        <button type="button" onclick="document.getElementById('adminBookingPnp').stepDown(); recalcAdminBooking();" class="bg-slate-200 text-slate-700 font-bold px-4 py-3 rounded-l-xl hover:bg-slate-300 transition-colors active:scale-95">-</button>
-                                        <input type="number" id="adminBookingPnp" min="1" value="1" class="w-full bg-slate-50 border-y border-slate-200 px-4 py-3 text-base md:text-sm font-bold text-slate-700 outline-none text-center focus:border-blue-500 focus:ring-0 transition-colors appearance-none" oninput="recalcAdminBooking()" required style="-moz-appearance: textfield;">
-                                        <button type="button" onclick="document.getElementById('adminBookingPnp').stepUp(); recalcAdminBooking();" class="bg-slate-200 text-slate-700 font-bold px-4 py-3 rounded-r-xl hover:bg-slate-300 transition-colors active:scale-95">+</button>
-                                    </div>
-                                </div>
-                                <div id="adminBookingKursiContainer" class="mt-4"></div>
-                                <div class="mt-4">
-                                    <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Keterangan (Opsional)</label>
-                                    <input type="text" id="adminBookingKeterangan" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-base md:text-sm font-bold text-slate-700 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-colors" placeholder="Catatan tambahan...">
-                                </div>
-                            </div>
-
-                            <!-- Step 3: Pembayaran -->
-                            <div class="mb-8 flex flex-col gap-5 mt-4">
-                                <h3 class="text-xs font-black text-slate-400 uppercase tracking-widest border-b border-slate-100 pb-2">3. Pembayaran</h3>
-
-                                <!-- Biaya Tambahan Toggle -->
-                                <div>
-                                    <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2 text-center">Ada Biaya Tambahan?</label>
-                                    <div class="flex gap-2">
-                                        <label class="flex-1 cursor-pointer">
-                                            <input type="radio" name="adminBookingHasBiayaTambahan" value="no" class="peer hidden" checked onchange="toggleAdminBiayaTambahan()">
-                                            <div class="text-center py-2 px-2 rounded-lg border border-slate-200 peer-checked:bg-blue-500 peer-checked:text-white peer-checked:border-blue-500 font-bold text-xs text-slate-500 transition-all shadow-sm">TIDAK</div>
-                                        </label>
-                                        <label class="flex-1 cursor-pointer">
-                                            <input type="radio" name="adminBookingHasBiayaTambahan" value="yes" class="peer hidden" onchange="toggleAdminBiayaTambahan()">
-                                            <div class="text-center py-2 px-2 rounded-lg border border-slate-200 peer-checked:bg-blue-500 peer-checked:text-white peer-checked:border-blue-500 font-bold text-xs text-slate-500 transition-all shadow-sm">YA</div>
-                                        </label>
+                                        <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1.5 text-center">Status Pembayaran</label>
+                                        <div class="flex gap-2">
+                                            <label class="flex-1 cursor-pointer">
+                                                <input type="radio" name="adminBookingStatus" value="LUNAS" class="peer hidden" checked>
+                                                <div class="text-center py-2.5 px-3 rounded-xl border-2 border-slate-200 peer-checked:bg-green-600 peer-checked:text-white peer-checked:border-green-600 font-bold text-xs text-slate-600 transition-all shadow-sm">
+                                                    <i class="fas fa-check-circle mr-1"></i> LUNAS
+                                                </div>
+                                            </label>
+                                            <label class="flex-1 cursor-pointer">
+                                                <input type="radio" name="adminBookingStatus" value="BELUM LUNAS" class="peer hidden">
+                                                <div class="text-center py-2.5 px-3 rounded-xl border-2 border-slate-200 peer-checked:bg-amber-500 peer-checked:text-white peer-checked:border-amber-500 font-bold text-xs text-slate-600 transition-all shadow-sm">
+                                                    <i class="fas fa-clock mr-1"></i> BELUM LUNAS / COD
+                                                </div>
+                                            </label>
+                                        </div>
                                     </div>
                                 </div>
 
-                                <div id="adminBookingBiayaTambahanContainer" class="hidden grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    <div>
-                                        <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Nominal Biaya Tambahan</label>
-                                        <input type="number" id="adminBookingBiayaTambahanNominal" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-base md:text-sm font-bold text-slate-700 outline-none focus:border-blue-500 transition-colors" value="0" oninput="recalcAdminBooking()">
-                                    </div>
-                                    <div>
-                                        <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Keterangan Biaya Tambahan</label>
-                                        <input type="text" id="adminBookingBiayaTambahanKet" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-base md:text-sm font-bold text-slate-700 outline-none focus:border-blue-500 transition-colors" placeholder="Contoh: Bagasi ekstra">
-                                    </div>
+                                <div class="flex gap-3 pt-2">
+                                    <button type="button" onclick="goToBookingStep(2)" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 font-black text-xs uppercase tracking-widest py-3.5 rounded-xl transition-all flex items-center justify-center gap-2">
+                                        <i class="fas fa-arrow-left"></i> Kembali ke Tahap 2
+                                    </button>
+                                    <button type="submit" id="btnSubmitAdminBooking" class="flex-[2] bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-slate-900 font-black text-xs uppercase tracking-widest py-3.5 rounded-xl shadow-lg shadow-amber-500/30 transition-all flex items-center justify-center gap-2">
+                                        <i class="fas fa-check-double"></i> SELESAIKAN BOOKING
+                                    </button>
                                 </div>
-                                
-                                <div class="bg-blue-50 p-4 rounded-xl border border-blue-100 flex flex-col items-center justify-center text-center mt-2">
-                                    <span class="text-[10px] font-bold text-blue-700 uppercase tracking-widest">Total Harga</span>
-                                    <span class="font-black text-3xl text-blue-600 leading-none mt-2" id="adminBookingTotalDisplay">Rp0</span>
-                                </div>
-
-                                <div>
-                                    <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2 text-center">Status Pembayaran</label>
-                                    <div class="flex gap-2">
-                                        <label class="flex-1 cursor-pointer">
-                                            <input type="radio" name="adminBookingStatus" value="LUNAS" class="peer hidden" checked>
-                                            <div class="text-center py-2 px-2 rounded-lg border border-slate-200 peer-checked:bg-green-500 peer-checked:text-white peer-checked:border-green-500 font-bold text-xs text-slate-500 transition-all shadow-sm">LUNAS</div>
-                                        </label>
-                                        <label class="flex-1 cursor-pointer">
-                                            <input type="radio" name="adminBookingStatus" value="BELUM LUNAS" class="peer hidden">
-                                            <div class="text-center py-2 px-2 rounded-lg border border-slate-200 peer-checked:bg-orange-500 peer-checked:text-white peer-checked:border-orange-500 font-bold text-xs text-slate-500 transition-all shadow-sm">BELUM LUNAS</div>
-                                        </label>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="flex gap-3 pt-4 border-t border-slate-100">
-                                <button type="button" onclick="resetAdminBooking(); closeBookingModal();" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-600 font-black text-sm uppercase tracking-widest py-3 rounded-xl transition-all">BATAL</button>
-                                <button type="submit" id="btnSubmitAdminBooking" class="flex-[2] bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-slate-900 font-black text-sm uppercase tracking-widest py-3 rounded-xl shadow-lg shadow-amber-500/30 transition-all">BOOKING</button>
                             </div>
                         </form>
                     </div>
-                  </div>
+                </div>
               </div>
           </main>
         </div>
@@ -1520,7 +1711,36 @@
                 </select>
             </div>
 
-            <div id="editBookingKursiContainer" class="mt-2"></div>
+            <div class="bg-amber-50/50 p-4 rounded-2xl border-2 border-amber-200/80 space-y-3 mt-3">
+                <div class="flex items-center justify-between border-b border-amber-200/60 pb-2">
+                    <div>
+                        <h4 class="text-xs font-black text-slate-800 uppercase tracking-wider flex items-center gap-1.5">
+                            <i class="fas fa-chair text-amber-500"></i> Ubah / Pindah Tempat Duduk
+                        </h4>
+                        <p class="text-[10px] text-slate-500 mt-0.5" id="editBookingDenahInfoText">Ketuk kursi pada denah untuk memilih nomor kursi</p>
+                    </div>
+                    <button type="button" onclick="clearEditBookingSeats()" class="text-[11px] font-bold text-slate-500 hover:text-red-500 bg-white px-2.5 py-1 rounded-lg border border-slate-200 shadow-sm transition-colors">
+                        <i class="fas fa-undo mr-1"></i> Kosongkan
+                    </button>
+                </div>
+                <div class="seat-legend mb-1 text-[10px]">
+                    <span><i class="seat-legend-dot"></i> Kosong</span>
+                    <span><i class="seat-legend-dot is-sel"></i> Kursi Anda</span>
+                    <span><i class="seat-legend-dot is-book"></i> Booked</span>
+                </div>
+                <div id="editBookingDenahContainer" class="py-1 flex justify-center">
+                    <!-- Rendered by renderEditBookingSeatMap() -->
+                </div>
+                <div class="p-2.5 bg-white rounded-xl border border-slate-200 flex items-center justify-between text-xs">
+                    <div>
+                        <span class="text-slate-500 font-bold">Kursi Dipilih:</span>
+                        <span id="editBookingSelectedSeatsDisplay" class="font-black text-amber-600 ml-1">-</span>
+                        <span id="editBookingSeatCounterBadge" class="ml-2 text-[10px] bg-slate-200 text-slate-700 font-extrabold px-2 py-0.5 rounded-full">0/1</span>
+                    </div>
+                    <small class="text-slate-400 font-semibold italic text-[10px]">Tidak wajib (bisa di-skip)</small>
+                </div>
+                <input type="hidden" id="editBookingKursiHidden">
+            </div>
             <div class="bg-amber-50 p-3 rounded-xl border border-amber-100 flex justify-between items-center mt-2">
                 <span class="text-[10px] font-bold text-amber-700 uppercase tracking-widest">Total Harga Baru</span>
                 <span class="font-black text-lg text-amber-600" id="editBookingTotalDisplay">Rp0</span>
@@ -1569,6 +1789,26 @@
                     <div>
                         <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Harga</label>
                         <input type="number" id="editArmadaHarga" min="0" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-base md:text-sm font-bold text-slate-700 outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-200 transition-colors" required>
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Tipe Armada</label>
+                        <select id="editArmadaTipe" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-base md:text-sm font-bold text-slate-700 outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-200 transition-colors" onchange="onArmadaTipeChange('edit')">
+                            <option value="Bus Besar">Bus Besar</option>
+                            <option value="Hiace">Hiace</option>
+                            <option value="Long Elf">Long Elf</option>
+                            <option value="Medium Bus">Medium Bus</option>
+                            <option value="Elf Short">Elf Short</option>
+                            <option value="Innova/MPV">Innova / MPV</option>
+                            <option value="Lainnya">Lainnya</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Format Denah Kursi</label>
+                        <select id="editArmadaDenah" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-base md:text-sm font-bold text-slate-700 outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-200 transition-colors" onchange="onArmadaDenahChange('edit')">
+                            <option value="">-- Pilih Denah --</option>
+                        </select>
                     </div>
                 </div>
                 <div>
@@ -1625,6 +1865,26 @@
                     <div>
                         <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Harga (Angka Murni)</label>
                         <input type="number" id="addArmadaHarga" min="0" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-base md:text-sm font-bold text-slate-700 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-colors" required placeholder="Contoh: 150000">
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Tipe Armada</label>
+                        <select id="addArmadaTipe" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-base md:text-sm font-bold text-slate-700 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-colors" onchange="onArmadaTipeChange('add')">
+                            <option value="Bus Besar">Bus Besar</option>
+                            <option value="Hiace">Hiace</option>
+                            <option value="Long Elf">Long Elf</option>
+                            <option value="Medium Bus">Medium Bus</option>
+                            <option value="Elf Short">Elf Short</option>
+                            <option value="Innova/MPV">Innova / MPV</option>
+                            <option value="Lainnya">Lainnya</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Format Denah Kursi</label>
+                        <select id="addArmadaDenah" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-base md:text-sm font-bold text-slate-700 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-colors" onchange="onArmadaDenahChange('add')">
+                            <option value="">-- Pilih Denah --</option>
+                        </select>
                     </div>
                 </div>
                 <div>
@@ -1867,6 +2127,110 @@
             </div>
         </div>
     </div>
+
+
+<!-- Modal Editor Format Denah Kursi Visual -->
+<div id="modalDenahEditor" class="fixed inset-0 bg-gray-900/60 z-[170] hidden items-center justify-center p-4 overflow-y-auto">
+    <div class="bg-white rounded-3xl shadow-2xl p-6 sm:p-8 w-full max-w-xl transform scale-95 opacity-0 transition-all duration-300 flex flex-col max-h-[92vh] my-auto" id="modalDenahEditorContent">
+        <div class="flex items-center justify-between mb-4 border-b border-slate-100 pb-3">
+            <div>
+                <h3 class="text-xl font-black text-slate-800" id="denahEditorModalTitle">Buat Format Denah Kursi</h3>
+                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-0.5">Atur tata letak kursi, supir, pintu, dan lorong</p>
+            </div>
+            <button type="button" onclick="closeDenahEditor()" class="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 hover:bg-red-100 hover:text-red-500 transition-colors">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+
+        <div class="overflow-y-auto flex-1 pr-1 space-y-4">
+            <input type="hidden" id="denahEditorId">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Nama Format Kursi *</label>
+                    <input type="text" id="denahEditorNama" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-base md:text-sm font-bold text-slate-700 outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-200 transition-colors" placeholder="Contoh: Hiace 14 Seat / Bus 40 Seat" required>
+                </div>
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Tipe / Kategori Armada *</label>
+                    <div>
+                        <select id="denahEditorKategori" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-base md:text-sm font-bold text-slate-700 outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-200 transition-colors" onchange="toggleCustomDenahKategori()">
+                            <option value="Hiace">Hiace</option>
+                            <option value="Bus Besar">Bus Besar</option>
+                            <option value="Long Elf">Long Elf</option>
+                            <option value="Medium Bus">Medium Bus</option>
+                            <option value="Elf Short">Elf Short</option>
+                            <option value="Innova/MPV">Innova / MPV</option>
+                            <option value="CUSTOM">+ Tipe Armada Lainnya...</option>
+                        </select>
+                        <input type="text" id="denahEditorKategoriCustom" class="w-full mt-2 hidden bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-sm font-bold text-slate-700 outline-none focus:border-amber-500 transition-colors" placeholder="Ketik nama tipe armada...">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Dimensi Baris & Kolom -->
+            <div class="grid grid-cols-3 gap-3 items-end">
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Jumlah Baris</label>
+                    <input type="number" id="denahEditorRows" min="1" max="15" value="5" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm font-bold text-slate-700 outline-none text-center focus:border-amber-500 transition-colors" onchange="onDenahDimensionsChange()">
+                </div>
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Jumlah Kolom</label>
+                    <input type="number" id="denahEditorCols" min="1" max="6" value="4" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm font-bold text-slate-700 outline-none text-center focus:border-amber-500 transition-colors" onchange="onDenahDimensionsChange()">
+                </div>
+                <div>
+                    <button type="button" onclick="autoNumberDenahSeats()" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs py-2.5 px-2 rounded-xl transition-colors border border-slate-200 flex items-center justify-center gap-1.5 shadow-sm" title="Urutkan nomor kursi dari 1, 2, 3...">
+                        <i class="fas fa-sort-numeric-down text-amber-500"></i> Urutkan No
+                    </button>
+                </div>
+            </div>
+
+            <!-- Palette Tools -->
+            <div>
+                <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1.5">Pilih Alat, lalu ketuk kotak pada denah di bawah:</label>
+                <div class="le-tools" id="denahEditorTools">
+                    <button type="button" class="le-tool active" data-tool="seat">
+                        <i class="fas fa-chair text-amber-500 text-base"></i>
+                        <span>Kursi</span>
+                    </button>
+                    <button type="button" class="le-tool" data-tool="driver">
+                        <i class="fas fa-id-card-alt text-slate-600 text-base"></i>
+                        <span>Sopir</span>
+                    </button>
+                    <button type="button" class="le-tool" data-tool="door">
+                        <i class="fas fa-door-open text-amber-700 text-base"></i>
+                        <span>Pintu</span>
+                    </button>
+                    <button type="button" class="le-tool" data-tool="empty">
+                        <i class="fas fa-times text-slate-400 text-base"></i>
+                        <span>Lorong</span>
+                    </button>
+                </div>
+                <small class="text-slate-400 text-[11px] block mt-1.5 italic">
+                    <i class="fas fa-info-circle mr-1 text-amber-500"></i> Tips: Ketuk kursi yang sudah ada untuk mengubah nomor/kode kursinya (misal 1A, 2B, CC, dll).
+                </small>
+            </div>
+
+            <!-- Visual Grid Preview Canvas -->
+            <div class="le-grid-wrap">
+                <div class="seatmap-front">
+                    <i class="fas fa-arrow-up text-amber-500"></i> DEPAN KENDARAAN (Kaca Depan / Supir)
+                </div>
+                <div class="le-grid" id="denahEditorGrid"></div>
+            </div>
+
+            <div class="p-3 bg-amber-50 rounded-xl border border-amber-200/60 flex items-center justify-between text-xs font-bold text-slate-700">
+                <span>Total Kursi Penumpang:</span>
+                <span id="denahEditorTotalKursiDisplay" class="font-black text-amber-700 text-sm">0 kursi</span>
+            </div>
+        </div>
+
+        <div class="flex gap-3 pt-4 border-t border-slate-100 mt-2">
+            <button type="button" onclick="closeDenahEditor()" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-600 font-black text-xs uppercase tracking-widest py-3 rounded-xl transition-all">BATAL</button>
+            <button type="button" onclick="submitDenahEditor()" class="flex-[2] bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-slate-900 font-black text-xs uppercase tracking-widest py-3 rounded-xl shadow-lg shadow-amber-500/30 transition-all flex items-center justify-center gap-2">
+                <i class="fas fa-save"></i> SIMPAN FORMAT DENAH
+            </button>
+        </div>
+    </div>
+</div>
 
 </body>
 <!-- Modal Confirm Refresh -->

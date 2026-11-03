@@ -31,6 +31,7 @@ let cachedHargaKhusus = [];
 let cachedBookings = [];
 let cachedLaporan = [];
 let cachedEkstraBookings = [];
+let cachedDenah = [];
 let isDataLoaded = false;
 
 // ==========================================
@@ -88,7 +89,8 @@ async function initData() {
         
         const promises = [
             fetchFromSheets('getArmada'),
-            fetchFromSheets('getHargaKhusus')
+            fetchFromSheets('getHargaKhusus'),
+            fetchFromSheets('getDenahArmada')
         ];
         
         if (isAdmin) {
@@ -103,12 +105,18 @@ async function initData() {
         
         const aData = results[0];
         const hData = results[1];
+        const dData = results[2];
         let bData = [], lData = [], eData = [];
         
         if (isAdmin) {
-            bData = results[2];
-            lData = results[3];
-            eData = results[4];
+            bData = results[3];
+            lData = results[4];
+            eData = results[5];
+        }
+
+        if (dData && Array.isArray(dData)) {
+            cachedDenah = dData;
+            localStorage.setItem("app_denah", JSON.stringify(cachedDenah));
         }
 
         if (aData && Array.isArray(aData)) {
@@ -129,7 +137,9 @@ async function initData() {
                     time: String(find(["Jam", "jam", "JAM", "Waktu"]) || "00:00").trim(),
                     price: parseInt(String(find(["Harga", "harga", "HARGA", "Price"]) || '0').replace(/[^0-9]/g, '')) || 0,
                     capacity: parseInt(find(["Kapasitas", "Seat", "seat", "kapasitas", "KAPASITAS"])) || 40,
-                    isActive: find(["is_active", "isActive"]) !== false // Defaults to true if undefined
+                    isActive: find(["is_active", "isActive"]) !== false, // Defaults to true if undefined
+                    tipeArmada: String(find(["tipe_armada", "tipeArmada", "tipe", "Tipe"]) || "Bus Besar").trim(),
+                    denahId: find(["denah_id", "denahId", "id_denah"]) || null
                 };
             });
             localStorage.setItem("app_armadas", JSON.stringify(cachedArmadas));
@@ -241,11 +251,13 @@ async function initData() {
         // Fallback to localStorage if fetch fails
         const localA = localStorage.getItem("app_armadas");
         const localH = localStorage.getItem("app_harga_khusus");
+        const localD = localStorage.getItem("app_denah");
         const localB = localStorage.getItem("app_bookings");
         const localL = localStorage.getItem("app_laporan");
         const localE = localStorage.getItem("app_ekstra");
         if (localA) cachedArmadas = JSON.parse(localA);
         if (localH) cachedHargaKhusus = JSON.parse(localH);
+        if (localD) cachedDenah = JSON.parse(localD);
         if (localB) cachedBookings = JSON.parse(localB);
         if (localL) cachedLaporan = JSON.parse(localL);
         if (localE) cachedEkstraBookings = JSON.parse(localE);
@@ -260,6 +272,14 @@ async function initData() {
 // ==========================================
 function getArmadas() {
     return cachedArmadas;
+}
+
+function getDenahList() {
+    return cachedDenah;
+}
+
+function getDenah(id) {
+    return cachedDenah.find(d => d.id === id);
 }
 
 function getHargaKhususList() {

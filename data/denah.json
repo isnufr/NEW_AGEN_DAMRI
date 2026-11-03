@@ -1,0 +1,108 @@
+[
+  {
+    "id": "preset-hiace-14",
+    "nama": "Hiace Commuter (14 Kursi)",
+    "kategori": "Hiace",
+    "baris": 5,
+    "kolom": 4,
+    "totalKursi": 14,
+    "cells": [
+      { "t": "seat", "l": "1" }, { "t": "empty" }, { "t": "empty" }, { "t": "driver" },
+      { "t": "door" }, { "t": "seat", "l": "2" }, { "t": "seat", "l": "3" }, { "t": "seat", "l": "4" },
+      { "t": "empty" }, { "t": "seat", "l": "5" }, { "t": "seat", "l": "6" }, { "t": "seat", "l": "7" },
+      { "t": "empty" }, { "t": "seat", "l": "8" }, { "t": "seat", "l": "9" }, { "t": "seat", "l": "10" },
+      { "t": "seat", "l": "11" }, { "t": "seat", "l": "12" }, { "t": "seat", "l": "13" }, { "t": "seat", "l": "14" }
+    ]
+  },
+  {
+    "id": "preset-hiace-11",
+    "nama": "Hiace Premio (11 Kursi)",
+    "kategori": "Hiace",
+    "baris": 5,
+    "kolom": 4,
+    "totalKursi": 11,
+    "cells": [
+      { "t": "seat", "l": "1" }, { "t": "empty" }, { "t": "empty" }, { "t": "driver" },
+      { "t": "door" }, { "t": "empty" }, { "t": "seat", "l": "2" }, { "t": "seat", "l": "3" },
+      { "t": "seat", "l": "4" }, { "t": "empty" }, { "t": "empty" }, { "t": "seat", "l": "5" },
+      { "t": "seat", "l": "6" }, { "t": "empty" }, { "t": "empty" }, { "t": "seat", "l": "7" },
+      { "t": "seat", "l": "8" }, { "t": "seat", "l": "9" }, { "t": "seat", "l": "10" }, { "t": "seat", "l": "11" }
+    ]
+  },
+  {
+    "id": "preset-elf-long-19",
+    "nama": "Long Elf (19 Kursi)",
+    "kategori": "Long Elf",
+    "baris": 6,
+    "kolom": 5,
+    "totalKursi": 19,
+    "cells": [
+      { "t": "seat", "l": "1" }, { "t": "seat", "l": "2" }, { "t": "empty" }, { "t": "empty" }, { "t": "driver" },
+      { "t": "door" }, { "t": "seat", "l": "3" }, { "t": "seat", "l": "4" }, { "t": "empty" }, { "t": "seat", "l": "5" },
+      { "t": "empty" }, { "t": "seat", "l": "6" }, { "t": "seat", "l": "7" }, { "t": "empty" }, { "t": "seat", "l": "8" },
+      { "t": "empty" }, { "t": "seat", "l": "9" }, { "t": "seat", "l": "10" }, { "t": "empty" }, { "t": "seat", "l": "11" },
+      { "t": "empty" }, { "t": "seat", "l": "12" }, { "t": "seat", "l": "13" }, { "t": "empty" }, { "t": "seat", "l": "14" },
+      { "t": "seat", "l": "15" }, { "t": "seat", "l": "16" }, { "t": "seat", "l": "17" }, { "t": "seat", "l": "18" }, { "t": "seat", "l": "19" }
+    ]
+  },
+  {
+    "id": "preset-bus-besar-40",
+    "nama": "Bus Besar 2-2 (40 Kursi)",
+    "kategori": "Bus Besar",
+    "baris": 11,
+    "kolom": 5,
+    "totalKursi": 40,
+    "cells": [
+      { "t": "door" }, { "t": "empty" }, { "t": "empty" }, { "t": "empty" }, { "t": "driver" },
+      { "t": "seat", "l": "1" }, { "t": "seat", "l": "2" }, { "t": "empty" }, { "t": "seat", "l": "3" }, { "t": "seat", "l": "4" },
+      { "t": "seat", "l": "5" }, { "t": "seat", "l": "6" }, { "t": "empty" }, { "t": "seat", "l": "7" }, { "t": "seat", "l": "8" },
+      { "t": "seat", "l": "9" }, { "t": "seat", "l": "10" }, { "t": "empty" }, { "t": "seat", "l": "11" }, { "t": "seat", "l": "12" },
+      { "t": "seat", "l": "13" }, { "t": "seat", "l": "14" }, { "t": "empty" }, { "t": "seat", "l": "15" }, { "t": "seat", "l": "16" },
+      { "t": "seat", "l": "17" }, { "t": "seat", "l": "18" }, { "t": "empty" }, { "t": "seat", "l": "19" }, { "t": "seat", "l": "20" },
+      { "t": "seat", "l": "21" }, { "t": "seat", "l": "22" }, { "t": "empty" }, { "t": "seat", "l": "23" }, { "t": "seat", "l": "24" },
+      { "t": "seat", "l": "25" }, { "t": "seat", "l": "26" }, { "t": "empty" }, { "t": "seat", "l": "27" }, { "t": "seat", "l": "28" },
+      { "t": "seat", "l": "29" }, { "t": "seat", "l": "30" }, { "t": "empty" }, { "t": "seat", "l": "31" }, { "t": "seat", "l": "32" },
+      { "t": "seat", "l": "33" }, { "t": "seat", "l": "34" }, { "t": "empty" }, { "t": "seat", "l": "35" }, { "t": "seat", "l": "36" },
+      { "t": "seat", "l": "37" }, { "t": "seat", "l": "38" }, { "t": "empty" }, { "t": "seat", "l": "39" }, { "t": "seat", "l": "40" }
+    ]
+  },
+  {
+    "id": "preset-bus-besar-28",
+    "nama": "Bus Besar 2-1 VIP (28 Kursi)",
+    "kategori": "Bus Besar",
+    "baris": 10,
+    "kolom": 4,
+    "totalKursi": 28,
+    "cells": [
+      { "t": "door" }, { "t": "empty" }, { "t": "empty" }, { "t": "driver" },
+      { "t": "seat", "l": "1" }, { "t": "seat", "l": "2" }, { "t": "empty" }, { "t": "seat", "l": "3" },
+      { "t": "seat", "l": "4" }, { "t": "seat", "l": "5" }, { "t": "empty" }, { "t": "seat", "l": "6" },
+      { "t": "seat", "l": "7" }, { "t": "seat", "l": "8" }, { "t": "empty" }, { "t": "seat", "l": "9" },
+      { "t": "seat", "l": "10" }, { "t": "seat", "l": "11" }, { "t": "empty" }, { "t": "seat", "l": "12" },
+      { "t": "seat", "l": "13" }, { "t": "seat", "l": "14" }, { "t": "empty" }, { "t": "seat", "l": "15" },
+      { "t": "seat", "l": "16" }, { "t": "seat", "l": "17" }, { "t": "empty" }, { "t": "seat", "l": "18" },
+      { "t": "seat", "l": "19" }, { "t": "seat", "l": "20" }, { "t": "empty" }, { "t": "seat", "l": "21" },
+      { "t": "seat", "l": "22" }, { "t": "seat", "l": "23" }, { "t": "empty" }, { "t": "seat", "l": "24" },
+      { "t": "seat", "l": "25" }, { "t": "seat", "l": "26" }, { "t": "seat", "l": "27" }, { "t": "seat", "l": "28" }
+    ]
+  },
+  {
+    "id": "preset-medium-bus-31",
+    "nama": "Medium Bus 2-2 (31 Kursi)",
+    "kategori": "Medium Bus",
+    "baris": 9,
+    "kolom": 5,
+    "totalKursi": 31,
+    "cells": [
+      { "t": "door" }, { "t": "empty" }, { "t": "empty" }, { "t": "empty" }, { "t": "driver" },
+      { "t": "seat", "l": "1" }, { "t": "seat", "l": "2" }, { "t": "empty" }, { "t": "seat", "l": "3" }, { "t": "seat", "l": "4" },
+      { "t": "seat", "l": "5" }, { "t": "seat", "l": "6" }, { "t": "empty" }, { "t": "seat", "l": "7" }, { "t": "seat", "l": "8" },
+      { "t": "seat", "l": "9" }, { "t": "seat", "l": "10" }, { "t": "empty" }, { "t": "seat", "l": "11" }, { "t": "seat", "l": "12" },
+      { "t": "seat", "l": "13" }, { "t": "seat", "l": "14" }, { "t": "empty" }, { "t": "seat", "l": "15" }, { "t": "seat", "l": "16" },
+      { "t": "seat", "l": "17" }, { "t": "seat", "l": "18" }, { "t": "empty" }, { "t": "seat", "l": "19" }, { "t": "seat", "l": "20" },
+      { "t": "seat", "l": "21" }, { "t": "seat", "l": "22" }, { "t": "empty" }, { "t": "seat", "l": "23" }, { "t": "seat", "l": "24" },
+      { "t": "seat", "l": "25" }, { "t": "seat", "l": "26" }, { "t": "empty" }, { "t": "seat", "l": "27" }, { "t": "seat", "l": "28" },
+      { "t": "seat", "l": "29" }, { "t": "seat", "l": "30" }, { "t": "seat", "l": "31" }, { "t": "empty" }, { "t": "empty" }
+    ]
+  }
+]
