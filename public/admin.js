@@ -4269,6 +4269,84 @@ function updateChartColors(isDark) {
             tbody.innerHTML = html;
         }
 
+        // =========================================================
+        // EKSTRA BOOKING (PESAWAT & KAPAL) LOGIC WITH FULL ROUTES
+        // =========================================================
+        function onEkstraTipeChanged() {
+            const tipe = document.getElementById('ekstraTipe')?.value || 'PESAWAT';
+            const isPlane = (tipe === 'PESAWAT');
+
+            const badge = document.getElementById('ekstraModalBadge');
+            const icon = document.getElementById('ekstraModalIcon');
+            const subtitle = document.getElementById('ekstraModalSubtitle');
+            const vendorLabel = document.getElementById('ekstraVendorLabel');
+            const vendorInput = document.getElementById('ekstraVendor');
+            const ruteTitle = document.getElementById('ruteSectionTitle');
+            const asalLabel = document.getElementById('asalSelectLabel');
+            const tujuanLabel = document.getElementById('tujuanSelectLabel');
+
+            if (badge) {
+                badge.className = isPlane 
+                    ? 'w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 text-white flex items-center justify-center text-lg shadow-sm shrink-0 transition-all'
+                    : 'w-10 h-10 rounded-xl bg-gradient-to-br from-teal-500 to-cyan-600 text-white flex items-center justify-center text-lg shadow-sm shrink-0 transition-all';
+            }
+            if (icon) {
+                icon.className = isPlane ? 'fas fa-plane' : 'fas fa-ship';
+            }
+            if (subtitle) {
+                subtitle.innerText = isPlane ? 'Booking Tiket Pesawat Komersil Domestik & Internasional' : 'Booking Tiket Kapal Laut & Penyeberangan Ferry';
+            }
+            if (vendorLabel) {
+                vendorLabel.innerText = isPlane ? 'Maskapai Pesawat' : 'Operator / Nama Kapal';
+            }
+            if (vendorInput) {
+                vendorInput.placeholder = isPlane ? 'Cth: Garuda / Citilink / AirAsia' : 'Cth: PELNI / ASDP / DLU';
+            }
+            if (ruteTitle) {
+                ruteTitle.innerHTML = isPlane 
+                    ? '<i class="fas fa-plane-departure text-blue-600"></i> Rute Penerbangan (Bandara)' 
+                    : '<i class="fas fa-ship text-teal-600"></i> Rute Pelayaran (Pelabuhan)';
+            }
+            if (asalLabel) {
+                asalLabel.innerHTML = isPlane 
+                    ? '<i class="fas fa-plane-departure text-blue-600 text-[10px]"></i> Asal Bandara' 
+                    : '<i class="fas fa-anchor text-teal-600 text-[10px]"></i> Asal Pelabuhan';
+            }
+            if (tujuanLabel) {
+                tujuanLabel.innerHTML = isPlane 
+                    ? '<i class="fas fa-plane-arrival text-emerald-600 text-[10px]"></i> Tujuan Bandara' 
+                    : '<i class="fas fa-flag-checkered text-emerald-600 text-[10px]"></i> Tujuan Pelabuhan';
+            }
+
+            // Populate dropdowns with comprehensive dataset
+            if (typeof populateRouteDropdown === 'function') {
+                populateRouteDropdown('ekstraAsal', tipe);
+                populateRouteDropdown('ekstraTujuan', tipe);
+            }
+            if (typeof populateVendorDatalist === 'function') {
+                populateVendorDatalist('ekstraVendorList', tipe);
+            }
+
+            // Hide manual inputs by default
+            const asalManual = document.getElementById('ekstraAsalManual');
+            const tujuanManual = document.getElementById('ekstraTujuanManual');
+            if (asalManual) asalManual.classList.add('hidden');
+            if (tujuanManual) tujuanManual.classList.add('hidden');
+        }
+
+        function onRouteSelectChanged(selectId) {
+            const selectEl = document.getElementById(selectId);
+            const manualEl = document.getElementById(selectId + 'Manual');
+            if (!selectEl || !manualEl) return;
+
+            if (selectEl.value === 'MANUAL') {
+                manualEl.classList.remove('hidden');
+                manualEl.focus();
+            } else {
+                manualEl.classList.add('hidden');
+            }
+        }
+
         function generateEkstraPnpFields(data = null) {
             const countInput = document.getElementById('ekstraJumlahPnp');
             let count = parseInt(countInput.value) || 1;
@@ -4286,16 +4364,18 @@ function updateChartColors(isDark) {
                 }
                 
                 container.innerHTML += `
-                    <div class="relative p-4 pt-5 bg-white border border-slate-200 rounded-xl shadow-sm mt-3">
-                        <div class="absolute -top-2 left-4 bg-indigo-600 text-white text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded-md shadow-md">Penumpang ${i}</div>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-1">
+                    <div class="relative p-3 pt-3.5 bg-slate-50/80 border border-slate-200 rounded-xl shadow-2xs">
+                        <div class="absolute -top-2 left-3 bg-indigo-600 text-white text-[8px] font-black uppercase tracking-wider px-2 py-0.5 rounded shadow-2xs">
+                            Penumpang ${i}
+                        </div>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-0.5">
                             <div>
-                                <label class="block text-xs font-bold text-slate-500 mb-1 uppercase">Nama</label>
-                                <input type="text" class="ekstra-nama-input w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500/50" placeholder="Nama Penumpang" value="${namaVal}" required>
+                                <label class="block text-[9px] font-bold text-slate-500 mb-0.5 uppercase tracking-wider">Nama Penumpang</label>
+                                <input type="text" class="ekstra-nama-input w-full bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 text-xs font-bold text-slate-800 outline-none focus:border-indigo-500" placeholder="Nama Lengkap" value="${namaVal}" required>
                             </div>
                             <div>
-                                <label class="block text-xs font-bold text-slate-500 mb-1 uppercase">Harga Dasar (Rp)</label>
-                                <input type="number" class="ekstra-harga-input w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500/50" placeholder="Harga Tiket" value="${hargaVal}" oninput="calculateEkstraTotal()" required>
+                                <label class="block text-[9px] font-bold text-slate-500 mb-0.5 uppercase tracking-wider">Harga Dasar (Rp)</label>
+                                <input type="number" class="ekstra-harga-input w-full bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 text-xs font-bold text-slate-800 outline-none focus:border-indigo-500" placeholder="Contoh: 1250000" value="${hargaVal}" oninput="calculateEkstraTotal()" required>
                             </div>
                         </div>
                     </div>
@@ -4323,10 +4403,11 @@ function updateChartColors(isDark) {
             try {
                 document.getElementById('ekstraId').value = '';
                 document.getElementById('ekstraForm').reset();
-                document.getElementById('ekstraAsal').value = '';
-                document.getElementById('ekstraTujuan').value = '';
+                document.getElementById('ekstraTipe').value = 'PESAWAT';
                 document.getElementById('ekstraJumlahPnp').value = 1;
                 document.getElementById('ekstraHp').value = '';
+                
+                onEkstraTipeChanged();
                 generateEkstraPnpFields();
                 document.getElementById('ekstraModalTitle').innerText = 'Tambah Tiket Ekstra';
                 
@@ -4341,25 +4422,34 @@ function updateChartColors(isDark) {
                     }
                 }, 10);
             } catch (e) {
-                alert('Error openAddEkstra: ' + e.message + '\nLine: ' + e.lineNumber);
+                alert('Error openAddEkstra: ' + e.message);
             }
         }
 
         function openEditEkstraModal(item) {
             try {
                 document.getElementById('ekstraId').value = item.id;
-                document.getElementById('ekstraTipe').value = item.tipe;
-                document.getElementById('ekstraVendor').value = item.vendor;
+                document.getElementById('ekstraTipe').value = item.tipe || 'PESAWAT';
+                onEkstraTipeChanged();
+
+                document.getElementById('ekstraVendor').value = item.vendor || '';
+
                 const ruteParts = (item.rute || '').split(' - ');
-                document.getElementById('ekstraAsal').value = (ruteParts[0] || '').trim();
-                document.getElementById('ekstraTujuan').value = (ruteParts.slice(1).join(' - ') || '').trim();
-                document.getElementById('ekstraTanggal').value = item.tanggalBerangkat;
-                document.getElementById('ekstraJam').value = item.jamBerangkat;
-                document.getElementById('ekstraStatus').value = item.statusPembayaran;
+                const ruteAsal = (ruteParts[0] || '').trim();
+                const ruteTujuan = (ruteParts.slice(1).join(' - ') || '').trim();
+
+                if (typeof populateRouteDropdown === 'function') {
+                    populateRouteDropdown('ekstraAsal', item.tipe || 'PESAWAT', ruteAsal);
+                    populateRouteDropdown('ekstraTujuan', item.tipe || 'PESAWAT', ruteTujuan);
+                }
+
+                document.getElementById('ekstraTanggal').value = item.tanggalBerangkat || '';
+                document.getElementById('ekstraJam').value = item.jamBerangkat || '';
+                document.getElementById('ekstraStatus').value = item.statusPembayaran || 'LUNAS';
                 document.getElementById('ekstraHp').value = parseEkstraHp(item) !== '-' ? parseEkstraHp(item) : '';
 
                 const pnpList = parseEkstraPnp(item);
-                document.getElementById('ekstraJumlahPnp').value = pnpList.length;
+                document.getElementById('ekstraJumlahPnp').value = pnpList.length || 1;
                 generateEkstraPnpFields(pnpList);
 
                 document.getElementById('ekstraModalTitle').innerText = 'Edit Tiket Ekstra';
@@ -4375,7 +4465,7 @@ function updateChartColors(isDark) {
                     }
                 }, 10);
             } catch (e) {
-                alert('Error openEditEkstra: ' + e.message + '\nLine: ' + e.lineNumber);
+                alert('Error openEditEkstra: ' + e.message);
             }
         }
 
@@ -4414,9 +4504,28 @@ function updateChartColors(isDark) {
                 });
             }
 
-            const ruteAsal = document.getElementById('ekstraAsal').value.trim();
-            const ruteTujuan = document.getElementById('ekstraTujuan').value.trim();
-            const ruteFinal = (ruteAsal && ruteTujuan) ? ruteAsal + ' - ' + ruteTujuan : (ruteAsal || ruteTujuan);
+            // Get Asal (either from dropdown or manual)
+            const asalSelect = document.getElementById('ekstraAsal');
+            let ruteAsal = (asalSelect?.value || '').trim();
+            if (ruteAsal === 'MANUAL') {
+                ruteAsal = (document.getElementById('ekstraAsalManual')?.value || '').trim();
+            }
+
+            // Get Tujuan (either from dropdown or manual)
+            const tujuanSelect = document.getElementById('ekstraTujuan');
+            let ruteTujuan = (tujuanSelect?.value || '').trim();
+            if (ruteTujuan === 'MANUAL') {
+                ruteTujuan = (document.getElementById('ekstraTujuanManual')?.value || '').trim();
+            }
+
+            if (!ruteAsal || !ruteTujuan) {
+                alert('Silakan pilih atau isi Asal dan Tujuan rute perjalanan');
+                btn.innerHTML = originalContent;
+                btn.disabled = false;
+                return;
+            }
+
+            const ruteFinal = ruteAsal + ' - ' + ruteTujuan;
 
             const payload = {
                 id: id,
@@ -4444,6 +4553,7 @@ function updateChartColors(isDark) {
                 if(result.status === 'success') {
                     closeEkstraModal();
                     await refreshData();
+                    if (typeof showMessage === 'function') showMessage('Tiket berhasil disimpan!');
                 } else {
                     alert('Gagal: ' + result.message);
                 }
@@ -4468,6 +4578,7 @@ function updateChartColors(isDark) {
                 const result = await res.json();
                 if(result.status === 'success') {
                     await refreshData();
+                    if (typeof showMessage === 'function') showMessage('Tiket berhasil dihapus');
                 } else {
                     alert('Gagal menghapus: ' + result.message);
                 }
@@ -4983,6 +5094,8 @@ async function submitEditPo(e) {
     if (typeof toggleHkGroup !== 'undefined') window.toggleHkGroup = toggleHkGroup;
     if (typeof toggleEditBiayaTambahan !== 'undefined') window.toggleEditBiayaTambahan = toggleEditBiayaTambahan;
     
+        if (typeof onEkstraTipeChanged !== 'undefined') window.onEkstraTipeChanged = onEkstraTipeChanged;
+    if (typeof onRouteSelectChanged !== 'undefined') window.onRouteSelectChanged = onRouteSelectChanged;
     if (typeof openAddEkstraModal !== 'undefined') window.openAddEkstraModal = openAddEkstraModal;
     if (typeof openEditEkstraModal !== 'undefined') window.openEditEkstraModal = openEditEkstraModal;
     if (typeof closeEkstraModal !== 'undefined') window.closeEkstraModal = closeEkstraModal;
