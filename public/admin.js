@@ -450,6 +450,26 @@
         renderTodayTable();
     };
 
+    // Helper to render seat number badges with rounded/circular styling
+    function renderKursiBadges(kursiStr) {
+        if (!kursiStr || kursiStr === '-' || kursiStr === 'null' || kursiStr === 'undefined') {
+            return '<span class="inline-flex items-center px-1.5 py-0.5 rounded-full bg-slate-100 text-slate-400 text-[9px] font-bold border border-slate-200">No Seat</span>';
+        }
+        const cleanStr = String(kursiStr).replace(/^kursi\s*:?\s*/i, '').trim();
+        if (!cleanStr || cleanStr === '-') {
+            return '<span class="inline-flex items-center px-1.5 py-0.5 rounded-full bg-slate-100 text-slate-400 text-[9px] font-bold border border-slate-200">No Seat</span>';
+        }
+        const seats = cleanStr.split(/[,;\s]+/).filter(Boolean);
+        if (seats.length === 0) {
+            return '<span class="inline-flex items-center px-1.5 py-0.5 rounded-full bg-slate-100 text-slate-400 text-[9px] font-bold border border-slate-200">No Seat</span>';
+        }
+        return seats.map(s => `
+            <span class="inline-flex items-center justify-center min-w-[20px] h-[20px] sm:min-w-[22px] sm:h-[22px] px-1 sm:px-1.5 rounded-full bg-amber-500 text-slate-950 font-black text-[9px] sm:text-[10px] shadow-2xs border border-amber-400 leading-none shrink-0" title="Nomor Kursi ${s}">
+                ${s}
+            </span>
+        `).join(' ');
+    }
+
     function renderTodayTable() {
         // Record open manifests before re-render
         const openManifestIds = [];
@@ -730,37 +750,42 @@
                     const waNumber = String(bHp).replace(/\D/g, '').replace(/^0/, '62');
 
                     html += `
-                                    <div onclick="openBookingDetailModal('${bId}')" class="group flex items-center justify-between p-3 sm:p-3.5 border-b border-slate-100 last:border-0 hover:bg-blue-50/70 active:bg-blue-100/60 cursor-pointer transition-all gap-2.5 sm:gap-3 w-full overflow-hidden select-none" title="Klik untuk lihat Detail Data Pesanan">
-                                        <!-- Left: Data Penumpang -->
-                                        <div class="flex-1 min-w-0 flex flex-col pr-1">
-                                            <!-- Row 1: ID Tiket & Tujuan -->
-                                            <div class="flex items-center gap-1.5 mb-0.5 sm:mb-1">
-                                                <span class="text-[10px] font-black text-blue-600 uppercase tracking-wider truncate">${bId} • ${bTujuan}</span>
+                                    <div onclick="openBookingDetailModal('${bId}')" class="group flex flex-col justify-center p-2.5 sm:p-3 border-b border-slate-100 last:border-0 hover:bg-blue-50/70 active:bg-blue-100/60 cursor-pointer transition-all w-full overflow-hidden select-none" title="Klik untuk lihat Detail Data Pesanan">
+                                        <!-- Baris 1: Kode Booking & Rute (Kiri) | Status Pembayaran (Kanan) -->
+                                        <div class="flex items-center justify-between gap-2">
+                                            <div class="flex items-center gap-1.5 min-w-0 flex-1">
+                                                <span class="text-[10px] sm:text-[11px] font-black text-blue-600 uppercase tracking-wider truncate">${bId} • ${bTujuan}</span>
                                             </div>
-                                            
-                                            <!-- Row 2: Nama Penumpang -->
-                                            <div class="mb-0.5 sm:mb-1 w-full">
+                                            <div class="flex items-center gap-1.5 shrink-0">
+                                                <span class="inline-block px-2 sm:px-2.5 py-0.5 rounded-full text-[8px] sm:text-[9px] font-black uppercase tracking-wider shadow-xs ${badgeClass}">${badgeText}</span>
+                                                <div class="w-5 h-5 rounded-full bg-slate-100 group-hover:bg-blue-600 group-hover:text-white flex items-center justify-center text-slate-400 transition-all shadow-2xs">
+                                                    <i class="fas fa-chevron-right text-[8px] transform group-hover:translate-x-0.5 transition-transform"></i>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Baris 2: Nama Penumpang (Kiri) | Jumlah PNP & No Kursi (Kanan, tepat dibawah status pembayaran) -->
+                                        <div class="flex items-center justify-between gap-2 mt-1">
+                                            <div class="min-w-0 flex-1 pr-2">
                                                 <span class="font-black text-xs sm:text-sm text-slate-800 uppercase tracking-tight truncate block group-hover:text-blue-700 transition-colors">${bName}</span>
                                             </div>
-                                            
-                                            <!-- Row 3: Qty & Kursi -->
-                                            <div class="flex items-center gap-2.5 sm:gap-3 text-[10px] sm:text-[11px] font-bold text-slate-600">
-                                                <span class="flex items-center gap-1"><i class="fas fa-users text-slate-400 text-[10px]"></i> ${bQty} PNP</span>
-                                                <span class="flex items-center gap-1"><i class="fas fa-chair text-amber-500 text-[10px]"></i> Kursi: <span class="text-slate-900 font-extrabold">${bKursi}</span></span>
-                                            </div>
-
-                                            <!-- Row 4: Keterangan & Warning (if any) -->
-                                            ${ket ? `<div class="mt-1 text-[9px] text-amber-700 bg-amber-50 px-2 py-0.5 rounded border border-amber-100 max-w-full truncate inline-block w-fit"><i class="fas fa-info-circle mr-1"></i>${ket}</div>` : ''}
-                                            ${warningHtml ? `<div class="mt-1">${warningHtml}</div>` : ''}
-                                        </div>
-
-                                        <!-- Right: Status Badge & Chevron Icon (Sleek & Space-Saving) -->
-                                        <div class="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
-                                            <span class="inline-block px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-full text-[8px] sm:text-[9px] font-black uppercase tracking-wider shadow-xs ${badgeClass}">${badgeText}</span>
-                                            <div class="w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-slate-100 group-hover:bg-blue-600 group-hover:text-white flex items-center justify-center text-slate-400 transition-all shadow-xs">
-                                                <i class="fas fa-chevron-right text-[9px] sm:text-[10px] transform group-hover:translate-x-0.5 transition-transform"></i>
+                                            <div class="flex items-center gap-1.5 sm:gap-2 shrink-0 justify-end">
+                                                <span class="text-[10px] sm:text-[11px] font-bold text-slate-500 whitespace-nowrap flex items-center gap-1">
+                                                    <i class="fas fa-users text-slate-400 text-[9px]"></i> ${bQty} PNP
+                                                </span>
+                                                <div class="flex items-center gap-1 flex-wrap justify-end">
+                                                    ${renderKursiBadges(bKursi)}
+                                                </div>
                                             </div>
                                         </div>
+
+                                        <!-- Keterangan & Warning jika ada -->
+                                        ${(ket || warningHtml) ? `
+                                            <div class="mt-1 pt-1 border-t border-slate-100/70 flex items-center gap-2 flex-wrap">
+                                                ${ket ? `<span class="text-[9px] text-amber-700 bg-amber-50 px-2 py-0.5 rounded border border-amber-100 max-w-full truncate inline-block"><i class="fas fa-info-circle mr-1"></i>${ket}</span>` : ''}
+                                                ${warningHtml ? warningHtml : ''}
+                                            </div>
+                                        ` : ''}
                                     </div>
                     `;
                 });
@@ -1074,9 +1099,14 @@
 
                     <!-- Kursi & Penumpang -->
                     <div class="col-span-1 bg-slate-50/80 p-2.5 sm:p-3 rounded-xl border border-slate-100">
-                        <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-0.5">Kursi / PNP</p>
-                        <p class="font-extrabold text-amber-600 text-xs sm:text-sm">Kursi: ${bKursi}</p>
-                        <p class="text-slate-600 font-bold text-[11px] mt-0.5">${bQty} Orang</p>
+                        <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1">Kursi / PNP</p>
+                        <div class="flex items-center gap-1.5 flex-wrap">
+                            <span class="text-xs font-bold text-slate-500">Kursi:</span>
+                            <div class="flex items-center gap-1 flex-wrap">
+                                ${renderKursiBadges(bKursi)}
+                            </div>
+                        </div>
+                        <p class="text-slate-600 font-bold text-[11px] mt-1"><i class="fas fa-users text-slate-400 text-[10px] mr-1"></i>${bQty} Orang</p>
                     </div>
 
                     <!-- Total Bayar -->
@@ -1103,41 +1133,23 @@
             </div>
         `;
 
-        // Shortcut buttons styling:
-        // Status toggle button:
-        const statusBtnClass = isPaid ? 'bg-amber-600 hover:bg-amber-700 active:bg-amber-800 text-white' : 'bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white';
-        const statusBtnIcon = isPaid ? 'fas fa-undo-alt' : 'fas fa-check-circle';
-        const statusBtnText = isPaid ? 'Set Belum Lunas' : 'Tandai Lunas';
-
         actions.innerHTML = `
-            <div class="w-full flex flex-col gap-2">
-                <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 w-full">
-                    <!-- 1. WHATSAPP -->
-                    <a href="${waLink}" target="_blank" class="flex items-center justify-center gap-1.5 py-2.5 px-2 bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white rounded-xl shadow-xs transition-all text-center min-h-[42px] select-none">
-                        <i class="fab fa-whatsapp text-sm sm:text-base"></i>
-                        <span class="text-[11px] sm:text-xs font-black uppercase tracking-wider">WhatsApp</span>
-                    </a>
-
-                    <!-- 2. E-TICKET -->
-                    <button type="button" onclick="closeBookingDetailModal(); openETicket('${bTicketId}')" class="flex items-center justify-center gap-1.5 py-2.5 px-2 bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 text-white rounded-xl shadow-xs transition-all text-center min-h-[42px] select-none">
-                        <i class="fas fa-ticket-alt text-sm sm:text-base"></i>
-                        <span class="text-[11px] sm:text-xs font-black uppercase tracking-wider">E-Ticket</span>
+            <div class="w-full flex flex-col gap-2.5">
+                <div class="grid grid-cols-2 gap-2.5 w-full">
+                    <!-- 1. E-TICKET -->
+                    <button type="button" onclick="closeBookingDetailModal(); openETicket('${bTicketId}')" class="flex items-center justify-center gap-2 py-3 px-3 bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 text-white rounded-xl shadow-xs transition-all text-center min-h-[44px] select-none font-black text-xs uppercase tracking-wider">
+                        <i class="fas fa-ticket-alt text-base text-indigo-200"></i>
+                        <span>E-Ticket</span>
                     </button>
 
-                    <!-- 3. STATUS PEMBAYARAN -->
-                    <button type="button" onclick="toggleBookingPaymentStatus('${bTicketId}')" class="flex items-center justify-center gap-1.5 py-2.5 px-2 ${statusBtnClass} rounded-xl shadow-xs transition-all text-center min-h-[42px] select-none" title="Klik untuk mengubah status pembayaran">
-                        <i class="${statusBtnIcon} text-sm sm:text-base"></i>
-                        <span class="text-[11px] sm:text-xs font-black uppercase tracking-wider leading-tight">${statusBtnText}</span>
-                    </button>
-
-                    <!-- 4. EDIT -->
-                    <button type="button" onclick="closeBookingDetailModal(); openEditBookingModal('${bTicketId}')" class="flex items-center justify-center gap-1.5 py-2.5 px-2 bg-amber-500 hover:bg-amber-600 active:bg-amber-700 text-white rounded-xl shadow-xs transition-all text-center min-h-[42px] select-none">
-                        <i class="fas fa-edit text-sm sm:text-base"></i>
-                        <span class="text-[11px] sm:text-xs font-black uppercase tracking-wider">Edit</span>
+                    <!-- 2. EDIT -->
+                    <button type="button" onclick="closeBookingDetailModal(); openEditBookingModal('${bTicketId}')" class="flex items-center justify-center gap-2 py-3 px-3 bg-amber-500 hover:bg-amber-600 active:bg-amber-700 text-slate-900 rounded-xl shadow-xs transition-all text-center min-h-[44px] select-none font-black text-xs uppercase tracking-wider">
+                        <i class="fas fa-edit text-base text-amber-900"></i>
+                        <span>Edit Pesanan</span>
                     </button>
                 </div>
 
-                <div class="flex justify-between items-center pt-1.5 border-t border-slate-200/70">
+                <div class="flex justify-between items-center pt-2 border-t border-slate-200/70">
                     <button type="button" onclick="closeBookingDetailModal(); openDeleteModal('${bTicketId}')" class="text-red-500 hover:text-red-700 hover:bg-red-50 active:bg-red-100 px-2.5 py-1.5 rounded-lg text-xs font-bold transition-colors flex items-center gap-1.5">
                         <i class="fas fa-trash text-xs"></i> <span>Hapus</span>
                     </button>
