@@ -4209,58 +4209,82 @@ function updateChartColors(isDark) {
             // Urutkan dari yang terbaru (bisa pakai createdAt)
             let html = '';
             data.forEach((item, index) => {
+                const isPlane = item.tipe === 'PESAWAT';
                 const isLunas = item.statusPembayaran === 'LUNAS';
                 const statusColor = isLunas ? 'bg-emerald-100 text-emerald-700 border-emerald-200' : 'bg-amber-100 text-amber-700 border-amber-200';
                 const pnpList = parseEkstraPnp(item);
-                const icon = item.tipe === 'PESAWAT' ? 'fa-plane' : 'fa-ship';
+                const icon = isPlane ? 'fa-plane' : 'fa-ship';
+                const pnpNamesSummary = pnpList.map(p => p.nama).join(', ') || 'Tanpa Nama';
                 
+                // Mobile View: 2-Baris Presisi seperti Manifest (OnClick to Detail)
                 html += `
-                    <tr class="block lg:table-row hover:bg-slate-50/80 transition-colors group p-4 lg:p-0 mb-4 lg:mb-0 bg-white border border-slate-100 lg:border-none rounded-2xl lg:rounded-none shadow-sm lg:shadow-none">
-                        <td class="block lg:table-cell p-3 lg:p-4 border-b border-dashed border-slate-100 lg:border-none">
+                    <div onclick="openEkstraDetailModal('${item.id}')" class="block lg:hidden bg-white p-3 rounded-2xl border border-slate-200/80 shadow-xs hover:bg-blue-50/70 active:bg-blue-100/60 cursor-pointer transition-all select-none">
+                        <!-- Baris 1: Vendor & Rute (Kiri) | Status (Kanan) -->
+                        <div class="flex items-center justify-between gap-2">
+                            <div class="flex items-center gap-1.5 min-w-0 flex-1">
+                                <div class="w-6 h-6 rounded-lg ${isPlane ? 'bg-blue-100 text-blue-600' : 'bg-teal-100 text-teal-600'} flex items-center justify-center text-[10px] shrink-0">
+                                    <i class="fas ${icon}"></i>
+                                </div>
+                                <span class="text-xs font-black text-slate-800 uppercase tracking-tight truncate">${item.vendor}</span>
+                                <span class="text-[10px] font-extrabold text-blue-600 uppercase tracking-wider truncate">• ${item.rute}</span>
+                            </div>
+                            <div class="flex items-center gap-1.5 shrink-0">
+                                <span class="inline-block px-2 py-0.5 rounded-full text-[8px] font-black uppercase tracking-wider shadow-2xs border ${statusColor}">${item.statusPembayaran}</span>
+                                <div class="w-5 h-5 rounded-full bg-slate-100 flex items-center justify-center text-slate-400">
+                                    <i class="fas fa-chevron-right text-[8px]"></i>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Baris 2: Nama Penumpang (Kiri) | Total Bayar (Kanan) -->
+                        <div class="flex items-center justify-between gap-2 mt-1.5 pt-1.5 border-t border-slate-100/80">
+                            <div class="min-w-0 flex-1 pr-2">
+                                <span class="font-bold text-xs text-slate-700 truncate block">
+                                    <i class="fas fa-users text-slate-400 text-[10px] mr-1"></i>${pnpNamesSummary} <span class="text-[10px] text-slate-400 font-semibold">(${pnpList.length} Org)</span>
+                                </span>
+                                <span class="text-[9px] font-bold text-slate-400 block mt-0.5">
+                                    <i class="far fa-calendar-alt mr-1"></i>${item.tanggalBerangkat} • ${item.jamBerangkat}
+                                </span>
+                            </div>
+                            <div class="text-right shrink-0">
+                                <span class="font-black text-sm text-slate-900 block">${formatRupiah(item.totalHarga)}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Desktop View: Table Row (OnClick to Detail) -->
+                    <tr onclick="openEkstraDetailModal('${item.id}')" class="hidden lg:table-row hover:bg-blue-50/70 transition-colors group cursor-pointer border-b border-slate-100 select-none">
+                        <td class="p-3.5">
                             <div class="flex items-center gap-3">
-                                <div class="w-12 h-12 lg:w-10 lg:h-10 rounded-2xl lg:rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center flex-shrink-0">
-                                    <i class="fas ${icon} text-lg lg:text-base"></i>
+                                <div class="w-10 h-10 rounded-xl ${isPlane ? 'bg-blue-50 text-blue-600' : 'bg-teal-50 text-teal-600'} flex items-center justify-center flex-shrink-0">
+                                    <i class="fas ${icon} text-base"></i>
                                 </div>
                                 <div>
-                                    <div class="lg:hidden text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-0.5">Maskapai/Vendor</div>
-                                    <div class="font-black text-slate-800 text-base lg:text-sm">${item.vendor}</div>
-                                    <div class="text-[11px] lg:text-[10px] font-bold text-slate-400 uppercase mt-0.5 lg:mt-0">${item.tipe}</div>
+                                    <div class="font-black text-slate-800 text-sm group-hover:text-blue-600 transition-colors">${item.vendor}</div>
+                                    <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">${item.tipe}</div>
                                 </div>
                             </div>
                         </td>
-                        <td class="block lg:table-cell p-3 lg:p-4 border-b border-dashed border-slate-100 lg:border-none">
-                            <div class="lg:hidden text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Waktu & Rute</div>
-                            <div class="font-bold text-slate-700">${item.rute}</div>
-                            <div class="text-xs text-slate-500 mt-1"><i class="far fa-calendar-alt mr-1"></i>${item.tanggalBerangkat} | <i class="far fa-clock mr-1"></i>${item.jamBerangkat}</div>
+                        <td class="p-3.5">
+                            <div class="font-bold text-slate-700 text-xs">${item.rute}</div>
+                            <div class="text-[11px] text-slate-400 mt-0.5"><i class="far fa-calendar-alt mr-1"></i>${item.tanggalBerangkat} | <i class="far fa-clock mr-1"></i>${item.jamBerangkat}</div>
                         </td>
-                        <td class="flex lg:table-cell items-center justify-between lg:justify-start p-3 lg:p-4 border-b border-dashed border-slate-100 lg:border-none">
-                            <div class="lg:hidden text-[10px] font-bold text-slate-400 uppercase tracking-widest">Penumpang</div>
-                            <div>
-                                <div class="font-black text-blue-600">${pnpList.map(p => p.nama).join(', ')} <span class="text-xs text-slate-400 font-bold ml-1">(${pnpList.length} Org)</span></div>
-                                <div class="text-[10px] font-bold text-slate-400 mt-0.5"><i class="fas fa-phone mr-1"></i> ${parseEkstraHp(item)}</div>
-                            </div>
+                        <td class="p-3.5">
+                            <div class="font-black text-blue-600 text-xs">${pnpNamesSummary} <span class="text-[10px] text-slate-400 font-bold">(${pnpList.length} Org)</span></div>
+                            <div class="text-[10px] font-bold text-slate-400 mt-0.5"><i class="fas fa-phone mr-1"></i> ${parseEkstraHp(item)}</div>
                         </td>
-                        <td class="flex lg:table-cell items-center justify-between lg:text-right p-3 lg:p-4 border-b border-dashed border-slate-100 lg:border-none">
-                            <div class="lg:hidden text-[10px] font-bold text-slate-400 uppercase tracking-widest">Total Bayar</div>
-                            <div class="font-bold text-slate-700 text-right">${formatRupiah(item.totalHarga)}</div>
+                        <td class="p-3.5 text-right font-black text-xs text-slate-800 whitespace-nowrap">
+                            ${formatRupiah(item.totalHarga)}
                         </td>
-                        <td class="flex lg:table-cell items-center justify-between lg:text-center p-3 lg:p-4 border-b border-dashed border-slate-100 lg:border-none">
-                            <div class="lg:hidden text-[10px] font-bold text-slate-400 uppercase tracking-widest">Status</div>
-                            <span class="inline-flex px-2 py-1 text-[10px] font-black uppercase tracking-wider rounded-lg border ${statusColor}">
+                        <td class="p-3.5 text-center">
+                            <span class="inline-flex px-2.5 py-0.5 text-[9px] font-black uppercase tracking-wider rounded-full border ${statusColor}">
                                 ${item.statusPembayaran}
                             </span>
                         </td>
-                        <td class="block lg:table-cell p-3 lg:p-4 lg:text-center">
-                            <div class="flex items-center lg:justify-center gap-2 opacity-100 lg:opacity-0 group-hover:opacity-100 transition-opacity justify-end">
-                                <button onclick='printStrukEkstra(${JSON.stringify(item)})' class="w-10 h-10 lg:w-8 lg:h-8 rounded-xl lg:rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white transition-colors flex items-center justify-center" title="Cetak Struk">
-                                    <i class="fas fa-print"></i>
-                                </button>
-                                <button onclick='openEditEkstraModal(${JSON.stringify(item)})' class="w-10 h-10 lg:w-8 lg:h-8 rounded-xl lg:rounded-lg bg-amber-50 text-amber-600 hover:bg-amber-600 hover:text-white transition-colors flex items-center justify-center" title="Edit">
-                                    <i class="fas fa-edit"></i>
-                                </button>
-                                <button onclick="deleteEkstra('${item.id}')" class="w-10 h-10 lg:w-8 lg:h-8 rounded-xl lg:rounded-lg bg-red-50 text-red-600 hover:bg-red-600 hover:text-white transition-colors flex items-center justify-center" title="Hapus">
-                                    <i class="fas fa-trash"></i>
-                                </button>
+                        <td class="p-3.5 text-right">
+                            <div class="flex items-center justify-end gap-1.5 text-slate-400 group-hover:text-blue-600 transition-colors">
+                                <span class="text-[10px] font-black uppercase tracking-wider">Detail</span>
+                                <i class="fas fa-chevron-right text-[10px] transform group-hover:translate-x-0.5 transition-transform"></i>
                             </div>
                         </td>
                     </tr>
@@ -4269,7 +4293,7 @@ function updateChartColors(isDark) {
             tbody.innerHTML = html;
         }
 
-        // =========================================================
+                // =========================================================
         // EKSTRA BOOKING (PESAWAT & KAPAL) LOGIC WITH FULL ROUTES
         // =========================================================
         function onEkstraTipeChanged() {
@@ -5094,7 +5118,259 @@ async function submitEditPo(e) {
     if (typeof toggleHkGroup !== 'undefined') window.toggleHkGroup = toggleHkGroup;
     if (typeof toggleEditBiayaTambahan !== 'undefined') window.toggleEditBiayaTambahan = toggleEditBiayaTambahan;
     
-        if (typeof onEkstraTipeChanged !== 'undefined') window.onEkstraTipeChanged = onEkstraTipeChanged;
+        
+        // =========================================================
+        // DETAIL PESANAN PESAWAT & KAPAL (ON-CLICK ELEGAN & PREMIUM)
+        // =========================================================
+        function openEkstraDetailModal(id) {
+            const data = getEkstraBookings() || [];
+            const item = data.find(x => String(x.id) === String(id));
+            if (!item) {
+                console.error('Tiket tidak ditemukan:', id);
+                return;
+            }
+
+            const isPlane = item.tipe === 'PESAWAT';
+            const isPaid = item.statusPembayaran === 'LUNAS';
+            const statusColor = isPaid ? 'bg-emerald-100 text-emerald-700 border-emerald-300' : 'bg-amber-100 text-amber-700 border-amber-300';
+            const pnpList = parseEkstraPnp(item);
+            const rawHp = parseEkstraHp(item);
+            const formatHp = String(rawHp).replace(/[^0-9]/g, '').replace(/^0/, '62');
+
+            // Header UI update
+            const badge = document.getElementById('ekstraDetailBadge');
+            const icon = document.getElementById('ekstraDetailIcon');
+            const title = document.getElementById('ekstraDetailTitle');
+            const subtitle = document.getElementById('ekstraDetailSubtitle');
+
+            if (badge) {
+                badge.className = isPlane 
+                    ? 'w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 text-white flex items-center justify-center text-lg shadow-sm shrink-0'
+                    : 'w-10 h-10 rounded-xl bg-gradient-to-br from-teal-500 to-cyan-600 text-white flex items-center justify-center text-lg shadow-sm shrink-0';
+            }
+            if (icon) icon.className = isPlane ? 'fas fa-plane' : 'fas fa-ship';
+            if (title) title.innerText = isPlane ? 'Detail Tiket Pesawat' : 'Detail Tiket Kapal Laut';
+            if (subtitle) subtitle.innerText = isPlane ? 'Rincian data penerbangan & penumpang' : 'Rincian data pelayaran kapal & penumpang';
+
+            // Calculate fare breakdown
+            const totalAdmin = (pnpList.length || 1) * 25000;
+            const sumTiket = Math.max(0, (parseInt(item.totalHarga) || 0) - totalAdmin);
+
+            // Origin and Destination parsing
+            const ruteParts = (item.rute || '').split(' - ');
+            const ruteAsal = ruteParts[0] || item.rute || '-';
+            const ruteTujuan = ruteParts.slice(1).join(' - ') || ruteAsal;
+
+            // Generate WhatsApp formatted message
+            const pnpTextList = pnpList.map((p, idx) => `${idx + 1}. ${p.nama} (${formatRupiah(p.harga || 0)})`).join('\n');
+            const waMsg = `Halo Sdr/i *${pnpList[0]?.nama || 'Penumpang'}*,\n\n` +
+                `Berikut rincian tiket *${isPlane ? 'PESAWAT' : 'KAPAL LAUT'}* Anda melalui *Agen DAMRI Kawunganten*:\n\n` +
+                `🎫 *Operator:* ${item.vendor}\n` +
+                `📍 *Rute:* ${item.rute}\n` +
+                `📅 *Tanggal:* ${item.tanggalBerangkat}\n` +
+                `⏰ *Waktu:* ${item.jamBerangkat} WIB\n` +
+                `👥 *Penumpang (${pnpList.length} Org):*\n${pnpTextList}\n\n` +
+                `💰 *Total Bayar:* ${formatRupiah(item.totalHarga)}\n` +
+                `📌 *Status:* ${item.statusPembayaran}\n\n` +
+                `Terima kasih telah memesan tiket bersama Agen DAMRI Kawunganten!`;
+            const waLink = `https://wa.me/${formatHp}?text=${encodeURIComponent(waMsg)}`;
+
+            // Body Content HTML (Boarding Pass & Maritime Style)
+            const contentEl = document.getElementById('ekstraDetailContent');
+            if (contentEl) {
+                contentEl.innerHTML = `
+                    <div class="flex flex-col gap-3">
+                        <!-- Boarding Pass / Maritime Voyage Card -->
+                        <div class="bg-gradient-to-br ${isPlane ? 'from-blue-50/90 via-indigo-50/60 to-blue-50/40 border-blue-200/90' : 'from-teal-50/90 via-cyan-50/60 to-teal-50/40 border-teal-200/90'} p-3.5 sm:p-4 rounded-2xl border shadow-xs relative overflow-hidden">
+                            <!-- Background watermark icon -->
+                            <i class="fas ${isPlane ? 'fa-plane' : 'fa-ship'} absolute -right-4 -bottom-4 text-7xl ${isPlane ? 'text-blue-500/10' : 'text-teal-500/10'} pointer-events-none"></i>
+                            
+                            <!-- Top row: Badge Tipe & Status -->
+                            <div class="flex items-center justify-between gap-2 mb-2">
+                                <span class="px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase tracking-widest ${isPlane ? 'bg-blue-600 text-white shadow-2xs' : 'bg-teal-600 text-white shadow-2xs'}">
+                                    ${isPlane ? '✈️ TIKET PESAWAT' : '🚢 TIKET KAPAL LAUT'}
+                                </span>
+                                <span class="px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider border shadow-2xs ${statusColor}">
+                                    ${item.statusPembayaran}
+                                </span>
+                            </div>
+
+                            <!-- Vendor Name -->
+                            <div class="mt-1">
+                                <p class="text-[9px] font-bold text-slate-400 uppercase tracking-wider">${isPlane ? 'Maskapai Pesawat' : 'Operator Kapal'}</p>
+                                <h4 class="text-base sm:text-lg font-black text-slate-800 tracking-tight leading-snug">${item.vendor}</h4>
+                            </div>
+
+                            <!-- Route Visual: Asal -> Tujuan -->
+                            <div class="flex items-center justify-between gap-2 mt-3 pt-2.5 border-t border-slate-200/70">
+                                <div class="min-w-0 flex-1">
+                                    <p class="text-[9px] font-bold text-slate-400 uppercase tracking-wider">${isPlane ? 'Bandara Asal' : 'Pelabuhan Asal'}</p>
+                                    <p class="text-xs sm:text-sm font-black text-slate-800 truncate" title="${ruteAsal}">${ruteAsal}</p>
+                                </div>
+                                <div class="flex flex-col items-center px-2 shrink-0">
+                                    <i class="fas ${isPlane ? 'fa-plane' : 'fa-ship'} ${isPlane ? 'text-blue-600' : 'text-teal-600'} text-xs"></i>
+                                    <div class="w-10 sm:w-14 h-0.5 ${isPlane ? 'bg-blue-300' : 'bg-teal-300'} mt-1 relative">
+                                        <div class="w-1.5 h-1.5 ${isPlane ? 'bg-blue-600' : 'bg-teal-600'} rounded-full absolute -top-0.5 right-0"></div>
+                                    </div>
+                                </div>
+                                <div class="min-w-0 flex-1 text-right">
+                                    <p class="text-[9px] font-bold text-slate-400 uppercase tracking-wider">${isPlane ? 'Bandara Tujuan' : 'Pelabuhan Tujuan'}</p>
+                                    <p class="text-xs sm:text-sm font-black ${isPlane ? 'text-blue-600' : 'text-teal-700'} truncate" title="${ruteTujuan}">${ruteTujuan}</p>
+                                </div>
+                            </div>
+
+                            <!-- Jadwal Berangkat -->
+                            <div class="grid grid-cols-2 gap-2 mt-3 pt-2.5 border-t border-slate-200/70 text-xs">
+                                <div class="flex items-center gap-1.5 text-slate-700">
+                                    <i class="far fa-calendar-alt text-amber-500 text-xs"></i>
+                                    <span class="font-bold text-[11px] truncate">${item.tanggalBerangkat || '-'}</span>
+                                </div>
+                                <div class="flex items-center gap-1.5 text-slate-700 justify-end">
+                                    <i class="far fa-clock text-blue-500 text-xs"></i>
+                                    <span class="font-black text-[11px]">${item.jamBerangkat || '-'} WIB</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Data Penumpang -->
+                        <div class="bg-slate-50/80 p-3 sm:p-3.5 rounded-2xl border border-slate-100">
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="text-[10px] font-black text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
+                                    <i class="fas fa-users text-indigo-500"></i> Rincian Penumpang
+                                </span>
+                                <span class="text-[10px] font-black text-indigo-600 bg-indigo-50 border border-indigo-200 px-2 py-0.5 rounded-md">${pnpList.length} Orang</span>
+                            </div>
+                            <div class="space-y-1.5">
+                                ${pnpList.map((p, idx) => `
+                                    <div class="flex items-center justify-between p-2.5 bg-white rounded-xl border border-slate-200/70 text-xs shadow-2xs">
+                                        <div class="flex items-center gap-2 min-w-0 flex-1 pr-2">
+                                            <span class="w-5 h-5 rounded-full bg-indigo-50 text-indigo-600 font-black text-[10px] flex items-center justify-center shrink-0">${idx+1}</span>
+                                            <span class="font-bold text-slate-800 uppercase truncate">${p.nama || '-'}</span>
+                                        </div>
+                                        <span class="font-black text-slate-700 shrink-0 text-right">${formatRupiah(p.harga || 0)}</span>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+
+                        <!-- Kontak Pemesan & WhatsApp -->
+                        <div class="bg-slate-50/80 p-3 sm:p-3.5 rounded-2xl border border-slate-100 flex items-center justify-between gap-2">
+                            <div>
+                                <p class="text-[9px] font-bold text-slate-400 uppercase tracking-wider">Kontak Pemesan</p>
+                                <p class="font-bold text-slate-800 text-xs sm:text-sm mt-0.5">${rawHp || '-'}</p>
+                            </div>
+                            ${formatHp ? `
+                                <a href="${waLink}" target="_blank" class="px-3 py-1.5 bg-emerald-100 text-emerald-700 hover:bg-emerald-200 active:scale-95 text-xs font-black rounded-xl border border-emerald-300 shadow-2xs transition-all flex items-center gap-1.5 shrink-0" title="Chat WhatsApp Langsung">
+                                    <i class="fab fa-whatsapp text-sm text-emerald-600"></i> Chat WA
+                                </a>
+                            ` : ''}
+                        </div>
+
+                        <!-- Rincian Biaya -->
+                        <div class="bg-gradient-to-br from-indigo-50 to-blue-50/70 p-3.5 rounded-2xl border border-indigo-100/90 shadow-2xs">
+                            <div class="flex justify-between items-center mb-1 text-xs">
+                                <span class="font-bold text-indigo-500 uppercase tracking-wider text-[10px]">Total Tiket Dasar</span>
+                                <span class="font-black text-indigo-900">${formatRupiah(sumTiket)}</span>
+                            </div>
+                            <div class="flex justify-between items-center mb-1.5 pb-1.5 border-b border-indigo-200/60 text-xs">
+                                <span class="font-bold text-indigo-500 uppercase tracking-wider text-[10px]">Biaya Layanan Admin (${formatRupiah(25000)} x ${pnpList.length})</span>
+                                <span class="font-black text-indigo-900">${formatRupiah(totalAdmin)}</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-xs font-black text-indigo-950 uppercase tracking-widest">TOTAL BAYAR</span>
+                                <span class="text-base sm:text-lg font-black text-indigo-700">${formatRupiah(item.totalHarga)}</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            // Footer Actions HTML (All Shortcuts)
+            const actionsEl = document.getElementById('ekstraDetailActions');
+            if (actionsEl) {
+                actionsEl.innerHTML = `
+                    <div class="w-full flex flex-col gap-2.5">
+                        <!-- Grid 3 Shortcut Utama: WhatsApp, Cetak Tiket, Edit Data -->
+                        <div class="grid grid-cols-3 gap-2 w-full">
+                            <!-- 1. WHATSAPP -->
+                            <a href="${waLink}" target="_blank" class="flex items-center justify-center gap-1.5 py-2.5 sm:py-3 px-1.5 bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white rounded-xl shadow-xs transition-all text-center min-h-[44px] font-black text-[11px] sm:text-xs uppercase tracking-wider select-none" title="Kirim E-Tiket via WhatsApp">
+                                <i class="fab fa-whatsapp text-sm sm:text-base text-emerald-200"></i>
+                                <span>WhatsApp</span>
+                            </a>
+
+                            <!-- 2. CETAK TIKET -->
+                            <button type="button" onclick="printStrukEkstraById('${item.id}')" class="flex items-center justify-center gap-1.5 py-2.5 sm:py-3 px-1.5 bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 text-white rounded-xl shadow-xs transition-all text-center min-h-[44px] font-black text-[11px] sm:text-xs uppercase tracking-wider select-none" title="Cetak Struk Thermal">
+                                <i class="fas fa-print text-sm sm:text-base text-indigo-200"></i>
+                                <span>Cetak</span>
+                            </button>
+
+                            <!-- 3. EDIT DATA -->
+                            <button type="button" onclick="closeEkstraDetailModal(); openEditEkstraModalById('${item.id}')" class="flex items-center justify-center gap-1.5 py-2.5 sm:py-3 px-1.5 bg-amber-500 hover:bg-amber-600 active:bg-amber-700 text-slate-900 rounded-xl shadow-xs transition-all text-center min-h-[44px] font-black text-[11px] sm:text-xs uppercase tracking-wider select-none" title="Edit Data Tiket">
+                                <i class="fas fa-edit text-sm sm:text-base text-amber-900"></i>
+                                <span>Edit</span>
+                            </button>
+                        </div>
+
+                        <!-- Baris Bawah: Hapus & Tutup -->
+                        <div class="flex justify-between items-center pt-2 border-t border-slate-200/70">
+                            <button type="button" onclick="closeEkstraDetailModal(); deleteEkstra('${item.id}')" class="text-red-500 hover:text-red-700 hover:bg-red-50 active:bg-red-100 px-3 py-1.5 rounded-lg text-xs font-bold transition-colors flex items-center gap-1.5">
+                                <i class="fas fa-trash text-xs"></i> <span>Hapus Tiket</span>
+                            </button>
+                            <button type="button" onclick="closeEkstraDetailModal()" class="bg-slate-200 hover:bg-slate-300 text-slate-700 px-5 py-1.5 rounded-lg text-xs font-bold transition-colors">
+                                Tutup
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }
+
+            // Open Modal with smooth transition
+            const modal = document.getElementById('ekstraDetailModal');
+            const inner = document.getElementById('ekstraDetailModalInner');
+            if (modal) {
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+                setTimeout(() => {
+                    if (inner) {
+                        inner.classList.remove('scale-95', 'opacity-0');
+                        inner.classList.add('scale-100', 'opacity-100');
+                    }
+                }, 10);
+            }
+        }
+
+        function closeEkstraDetailModal() {
+            const modal = document.getElementById('ekstraDetailModal');
+            const inner = document.getElementById('ekstraDetailModalInner');
+            if (inner) {
+                inner.classList.remove('scale-100', 'opacity-100');
+                inner.classList.add('scale-95', 'opacity-0');
+            }
+            setTimeout(() => {
+                if (modal) {
+                    modal.classList.remove('flex');
+                    modal.classList.add('hidden');
+                }
+            }, 300);
+        }
+
+        function printStrukEkstraById(id) {
+            const data = getEkstraBookings() || [];
+            const item = data.find(x => String(x.id) === String(id));
+            if (item) printStrukEkstra(item);
+        }
+
+        function openEditEkstraModalById(id) {
+            const data = getEkstraBookings() || [];
+            const item = data.find(x => String(x.id) === String(id));
+            if (item) openEditEkstraModal(item);
+        }
+
+        if (typeof openEkstraDetailModal !== 'undefined') window.openEkstraDetailModal = openEkstraDetailModal;
+    if (typeof closeEkstraDetailModal !== 'undefined') window.closeEkstraDetailModal = closeEkstraDetailModal;
+    if (typeof printStrukEkstraById !== 'undefined') window.printStrukEkstraById = printStrukEkstraById;
+    if (typeof openEditEkstraModalById !== 'undefined') window.openEditEkstraModalById = openEditEkstraModalById;
+    if (typeof onEkstraTipeChanged !== 'undefined') window.onEkstraTipeChanged = onEkstraTipeChanged;
     if (typeof onRouteSelectChanged !== 'undefined') window.onRouteSelectChanged = onRouteSelectChanged;
     if (typeof openAddEkstraModal !== 'undefined') window.openAddEkstraModal = openAddEkstraModal;
     if (typeof openEditEkstraModal !== 'undefined') window.openEditEkstraModal = openEditEkstraModal;

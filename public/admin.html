@@ -2200,6 +2200,39 @@
         </div>
     </div>
 
+    <!-- ======================================= -->
+    <!-- DETAIL PESANAN PESAWAT & KAPAL MODAL   -->
+    <!-- ======================================= -->
+    <div id="ekstraDetailModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-[160] hidden items-center justify-center p-2.5 sm:p-4 overscroll-none" onclick="if(event.target === this) closeEkstraDetailModal()">
+        <div id="ekstraDetailModalInner" class="bg-white rounded-2xl sm:rounded-3xl shadow-2xl w-full max-w-lg overflow-hidden transform scale-95 opacity-0 transition-all duration-300 flex flex-col max-h-[94dvh] sm:max-h-[90vh] relative border border-slate-100" onclick="event.stopPropagation()">
+            <!-- Clean Header with dynamic icon and close button -->
+            <div class="flex items-center justify-between p-3.5 sm:p-4 border-b border-slate-100 shrink-0 bg-slate-50/90">
+                <div class="flex items-center gap-2.5 sm:gap-3 min-w-0">
+                    <div id="ekstraDetailBadge" class="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 text-white flex items-center justify-center text-lg shadow-sm shrink-0">
+                        <i id="ekstraDetailIcon" class="fas fa-plane"></i>
+                    </div>
+                    <div class="min-w-0">
+                        <h3 id="ekstraDetailTitle" class="text-base sm:text-lg font-black text-slate-800 tracking-tight leading-tight truncate">Detail Tiket</h3>
+                        <p id="ekstraDetailSubtitle" class="text-[9px] sm:text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-0.5 truncate">Rincian data pesanan</p>
+                    </div>
+                </div>
+                <button type="button" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-800 flex items-center justify-center text-sm transition-colors shrink-0" onclick="closeEkstraDetailModal()" title="Tutup">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <!-- Body Content (Scrollable) -->
+            <div class="p-3 sm:p-5 overflow-y-auto flex-1 overscroll-contain">
+                <div id="ekstraDetailContent" class="text-sm text-slate-700">
+                    <!-- content generated dynamically -->
+                </div>
+            </div>
+            <!-- Footer Actions (All shortcuts: WhatsApp, Cetak Tiket, Edit Data, Hapus) -->
+            <div class="border-t border-slate-100 p-3 sm:p-4 shrink-0 bg-slate-50/90" id="ekstraDetailActions">
+                <!-- buttons generated dynamically -->
+            </div>
+        </div>
+    </div>
+
     <!-- Script Logic Ekstra Booking -->    <!-- ======================================= -->
     <!-- BOOKING DETAIL MODAL -->
     <!-- ======================================= -->
