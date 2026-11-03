@@ -145,6 +145,38 @@ if (!fs.existsSync(DATA_DIR)) {
     try { fs.mkdirSync(DATA_DIR, { recursive: true }); } catch(e) {}
 }
 
+const TIPE_ARMADA_FILE = path.join(DATA_DIR, 'tipe-armada.json');
+const DEFAULT_TIPE_ARMADA = [
+    { id: 'tipe-1', nama: 'Hiace' },
+    { id: 'tipe-2', nama: 'Bus Besar' },
+    { id: 'tipe-3', nama: 'Long Elf' },
+    { id: 'tipe-4', nama: 'Medium Bus' },
+    { id: 'tipe-5', nama: 'Elf Short' },
+    { id: 'tipe-6', nama: 'Innova / MPV' }
+];
+
+function loadTipeArmadaData() {
+    try {
+        if (fs.existsSync(TIPE_ARMADA_FILE)) {
+            const raw = fs.readFileSync(TIPE_ARMADA_FILE, 'utf-8');
+            if (raw && raw.trim()) return JSON.parse(raw);
+        }
+        fs.writeFileSync(TIPE_ARMADA_FILE, JSON.stringify(DEFAULT_TIPE_ARMADA, null, 2));
+        return DEFAULT_TIPE_ARMADA;
+    } catch (e) {
+        console.error('Error loading tipe armada file:', e);
+        return DEFAULT_TIPE_ARMADA;
+    }
+}
+
+function saveTipeArmadaData(list) {
+    try {
+        fs.writeFileSync(TIPE_ARMADA_FILE, JSON.stringify(list, null, 2));
+    } catch (e) {
+        console.error('Error saving tipe armada file:', e);
+    }
+}
+
 function loadDefaultDenah() {
     try {
         if (fs.existsSync(CUSTOM_DENAH_FILE)) {
@@ -285,13 +317,18 @@ app.get('/api', async (req, res) => {
     const action = req.query.action;
 
     try {
-        const publicActions = ['getArmada', 'getDenahArmada', 'getTakenSeats', 'getBookingById', 'getPelangganTable', 'getHargaKhusus', 'getPopupIklan'];
+        const publicActions = ['getArmada', 'getDenahArmada', 'getTipeArmada', 'getTakenSeats', 'getBookingById', 'getPelangganTable', 'getHargaKhusus', 'getPopupIklan'];
         if (!publicActions.includes(action) && !req.user) {
             return res.status(401).json({ status: 'error', message: 'Unauthorized' });
         }
 
         if (action === 'getDenahArmada') {
             const list = await getAllDenah();
+            return res.json({ status: 'success', data: list });
+        }
+
+        if (action === 'getTipeArmada') {
+            const list = loadTipeArmadaData();
             return res.json({ status: 'success', data: list });
         }
 
@@ -725,8 +762,108 @@ app.post('/api', async (req, res) => {
             return res.json({ status: 'success', message: 'Data pesanan berhasil diperbarui' });
         }
 
+        if (action === 'getTipeArmada') {
+            const list = loadTipeArmadaData();
+            return res.json({ status: 'success', data: list });
+        }
+
+        if (action === 'addTipeArmada') {
+            const { nama } = payload;
+            const cleanName = String(nama || '').trim();
+            if (!cleanName) return res.status(400).json({ status: 'error', message: 'Nama tipe armada wajib diisi' });
+            const list = loadTipeArmadaData();
+            if (list.some(t => t.nama.toLowerCase() === cleanName.toLowerCase())) {
+                return res.status(400).json({ status: 'error', message: 'Tipe armada sudah ada' });
+            }
+            const newItem = {
+                id: 'tipe-' + Date.now().toString(36),
+                nama: cleanName
+            };
+            list.push(newItem);
+            saveTipeArmadaData(list);
+            return res.json({ status: 'success', message: 'Tipe armada berhasil ditambahkan', data: newItem });
+        }
+
+        if (action === 'editTipeArmada') {
+            const { old_nama, new_nama } = payload;
+            const oldClean = String(old_nama || '').trim();
+            const newClean = String(new_nama || '').trim();
+            if (!oldClean || !newClean) return res.status(400).json({ status: 'error', message: 'Nama lama dan baru wajib diisi' });
+            
+            const list = loadTipeArmadaData();
+            const idx = list.findIndex(t => t.nama.toLowerCase() === oldClean.toLowerCase());
+            if (idx === -1) return res.status(404).json({ status: 'error', message: 'Tipe armada tidak ditemukan' });
+            
+            list[idx].nama = newClean;
+            saveTipeArmadaData(list);
+
+            try {
+                await prisma.denahArmada.updateMany({
+                    where: { kategori: oldClean },
+                    data: { kategori: newClean }
+                });
+                await prisma.armada.updateMany({
+                    where: { tipeArmada: oldClean },
+                    data: { tipeArmada: newClean }
+                });
+            } catch (err) {
+                console.warn('Sync tipe armada error:', err.message);
+            }
+
+            return res.json({ status: 'success', message: `Nama tipe armada berhasil diubah menjadi ${newClean}` });
+        }
+
+        if (action === 'deleteTipeArmada') {
+            const { nama } = payload;
+            const cleanName = String(nama || '').trim();
+            let list = loadTipeArmadaData();
+            list = list.filter(t => t.nama.toLowerCase() !== cleanName.toLowerCase());
+            saveTipeArmadaData(list);
+            return res.json({ status: 'success', message: 'Tipe armada berhasil dihapus' });
+        }
+
+        if (action === 'setPoType') {
+            const { nama_armada, tipe_armada, denah_id } = payload;
+            let computedSeat = 0;
+            if (denah_id) {
+                const d = await prisma.denahArmada.findUnique({ where: { id: denah_id } });
+                if (d && d.totalKursi) computedSeat = d.totalKursi;
+            }
+            
+            const updateData = { 
+                tipeArmada: tipe_armada || 'Bus Besar', 
+                denahId: denah_id || null 
+            };
+            if (computedSeat > 0) updateData.seat = computedSeat;
+
+            await prisma.armada.updateMany({
+                where: { namaArmada: nama_armada },
+                data: updateData
+            });
+
+            return res.json({ status: 'success', message: `Tipe bus PO ${nama_armada} berhasil diperbarui untuk seluruh rute!` });
+        }
+
         if (action === 'addArmada') {
-            const { nama_armada, tujuan_armada, jam, harga, seat, tipe_armada, denah_id } = payload;
+            let { nama_armada, tujuan_armada, jam, harga, seat, tipe_armada, denah_id } = payload;
+            
+            // Cek apakah PO sudah ada rute sebelumnya: jika sudah ada, warisi tipe armada dan denahnya!
+            const existingPo = await prisma.armada.findFirst({
+                where: { namaArmada: nama_armada }
+            });
+            if (existingPo) {
+                tipe_armada = existingPo.tipeArmada || tipe_armada;
+                denah_id = existingPo.denahId || denah_id;
+                seat = existingPo.seat || seat;
+            }
+
+            let computedSeat = parseInt(seat) || 0;
+            if (!computedSeat && denah_id) {
+                const d = await prisma.denahArmada.findUnique({ where: { id: denah_id } });
+                if (d && d.totalKursi) computedSeat = d.totalKursi;
+            }
+            if (!computedSeat) computedSeat = 40;
+
             const newArmada = await prisma.armada.create({
                 data: {
                     idArmada: 'ARM' + Math.floor(Math.random() * 1000000).toString().padStart(6, '0'),
@@ -734,7 +871,7 @@ app.post('/api', async (req, res) => {
                     tujuanArmada: tujuan_armada,
                     jam: jam,
                     harga: harga.toString(),
-                    seat: parseInt(seat) || 40,
+                    seat: computedSeat,
                     tipeArmada: tipe_armada || 'Bus Besar',
                     denahId: denah_id || null
                 }
@@ -744,12 +881,20 @@ app.post('/api', async (req, res) => {
 
         if (action === 'editArmadaData') {
             const { id_armada, nama_armada, tujuan_armada, jam, harga, seat, tipe_armada, denah_id } = payload;
+            
+            let computedSeat = parseInt(seat) || 0;
+            if (!computedSeat && denah_id) {
+                const d = await prisma.denahArmada.findUnique({ where: { id: denah_id } });
+                if (d && d.totalKursi) computedSeat = d.totalKursi;
+            }
+            if (!computedSeat) computedSeat = 40;
+
             const updatePayload = {
                 namaArmada: nama_armada,
                 tujuanArmada: tujuan_armada,
                 jam: jam,
                 harga: harga.toString(),
-                seat: parseInt(seat) || 40
+                seat: computedSeat
             };
             if (tipe_armada !== undefined) updatePayload.tipeArmada = tipe_armada;
             if (denah_id !== undefined) updatePayload.denahId = denah_id || null;
@@ -758,6 +903,20 @@ app.post('/api', async (req, res) => {
                 where: { idArmada: id_armada },
                 data: updatePayload
             });
+
+            // PO konsisten: update tipe armada dan denah ke semua rute PO ini
+            if (nama_armada && (tipe_armada !== undefined || denah_id !== undefined)) {
+                const poSync = {};
+                if (tipe_armada !== undefined) poSync.tipeArmada = tipe_armada;
+                if (denah_id !== undefined) poSync.denahId = denah_id || null;
+                if (computedSeat > 0) poSync.seat = computedSeat;
+
+                await prisma.armada.updateMany({
+                    where: { namaArmada: nama_armada },
+                    data: poSync
+                });
+            }
+
             return res.json({ status: 'success', message: 'Data armada berhasil diperbarui' });
         }
 

@@ -550,9 +550,14 @@
                                 <h3 class="text-xl font-black tracking-tight text-white">Kelola Denah Tempat Duduk Tiap Tipe Armada</h3>
                                 <p class="text-xs text-slate-300 mt-1 max-w-xl">Atur posisi kursi, supir, pintu, dan lorong untuk setiap tipe armada (Hiace, Bus Besar, Long Elf, Medium Bus, dll). Perubahan otomatis dipakai saat booking tiket.</p>
                             </div>
-                            <button onclick="openDenahEditor()" class="bg-amber-500 hover:bg-amber-600 text-slate-900 font-black text-xs uppercase tracking-widest px-5 py-3 rounded-2xl shadow-lg shadow-amber-500/30 transition-all flex items-center gap-2 flex-shrink-0">
-                                <i class="fas fa-plus"></i> Tambah Format Denah
-                            </button>
+                            <div class="flex items-center gap-2 flex-wrap">
+                                <button type="button" onclick="openKelolaTipeModal()" class="bg-slate-800 hover:bg-slate-700 text-white font-black text-xs uppercase tracking-widest px-4 py-3 rounded-2xl shadow-lg transition-all flex items-center gap-2 flex-shrink-0 border border-slate-700">
+                                    <i class="fas fa-tags text-amber-400"></i> Kelola Tipe Armada
+                                </button>
+                                <button onclick="openDenahEditor()" class="bg-amber-500 hover:bg-amber-600 text-slate-900 font-black text-xs uppercase tracking-widest px-5 py-3 rounded-2xl shadow-lg shadow-amber-500/30 transition-all flex items-center gap-2 flex-shrink-0">
+                                    <i class="fas fa-plus"></i> Tambah Format Denah
+                                </button>
+                            </div>
                         </div>
 
                         <!-- Filter Kategori / Tipe Armada -->
@@ -1811,9 +1816,8 @@
                         </select>
                     </div>
                 </div>
-                <div>
-                    <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Kapasitas Kursi</label>
-                    <input type="number" id="editArmadaSeat" min="1" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-base md:text-sm font-bold text-slate-700 outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-200 transition-colors" required>
+                <div id="editArmadaPoHint" class="hidden text-xs font-bold text-amber-800 bg-amber-50 px-3.5 py-2 rounded-xl border border-amber-200">
+                    <!-- PO type info hint -->
                 </div>
                 
                 <div class="mt-4 border-t border-slate-100 pt-4">
@@ -1887,9 +1891,8 @@
                         </select>
                     </div>
                 </div>
-                <div>
-                    <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Kapasitas Kursi</label>
-                    <input type="number" id="addArmadaSeat" min="1" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-base md:text-sm font-bold text-slate-700 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-colors" required placeholder="Contoh: 14">
+                <div id="addArmadaPoHint" class="hidden text-xs font-bold text-blue-700 bg-blue-50 px-3.5 py-2 rounded-xl border border-blue-200">
+                    <!-- PO type info hint -->
                 </div>
                 
                 <div class="mt-4 border-t border-slate-100 pt-4">
@@ -1904,6 +1907,109 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
 <script src="bluetooth-printer.js"></script>
+
+
+<!-- ======================================= -->
+<!-- MODAL KELOLA TIPE ARMADA               -->
+<!-- ======================================= -->
+<div id="modalKelolaTipe" class="fixed inset-0 bg-gray-900/50 backdrop-blur-xs z-[170] hidden items-center justify-center p-3 sm:p-4" onclick="if(event.target === this) closeKelolaTipeModal()">
+    <div id="modalKelolaTipeContent" class="bg-white rounded-3xl shadow-2xl w-full max-w-lg overflow-hidden transform scale-95 opacity-0 transition-all duration-300 flex flex-col max-h-[92vh] border border-slate-100">
+        <!-- Header -->
+        <div class="p-4 sm:p-5 border-b border-slate-100 flex items-center justify-between bg-slate-50/80 shrink-0">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-amber-100 text-amber-600 flex items-center justify-center text-lg shrink-0">
+                    <i class="fas fa-tags"></i>
+                </div>
+                <div>
+                    <h3 class="text-base sm:text-lg font-black text-slate-800 tracking-tight leading-tight">Kelola Tipe Armada</h3>
+                    <p class="text-[9px] sm:text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-0.5">Tambah tipe baru atau ubah nama tipe armada</p>
+                </div>
+            </div>
+            <button type="button" onclick="closeKelolaTipeModal()" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center text-sm transition-colors shrink-0">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+
+        <!-- Body -->
+        <div class="p-4 sm:p-5 overflow-y-auto flex-1 space-y-4">
+            <!-- Form Tambah Tipe Baru -->
+            <div class="bg-amber-50/60 p-3.5 sm:p-4 rounded-2xl border border-amber-200/70">
+                <p class="text-xs font-black text-amber-900 uppercase tracking-wider mb-2 flex items-center gap-1.5">
+                    <i class="fas fa-plus-circle text-amber-600"></i> Tambah Tipe Armada Baru
+                </p>
+                <form id="formAddTipeArmada" onsubmit="submitAddTipeArmada(event)" class="flex gap-2">
+                    <input type="text" id="inputNewTipeNama" placeholder="Nama tipe (misal: Sleeper Bus, Hiace Premio)" class="flex-1 bg-white border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs font-bold text-slate-800 outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-200 transition-all" required>
+                    <button type="submit" id="btnSubmitAddTipe" class="px-4 py-2.5 bg-amber-500 hover:bg-amber-600 text-slate-900 font-black text-xs uppercase tracking-wider rounded-xl shadow-xs transition-all flex items-center gap-1.5 shrink-0">
+                        <i class="fas fa-plus"></i> Tambah
+                    </button>
+                </form>
+            </div>
+
+            <!-- List Tipe Armada -->
+            <div>
+                <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Daftar Tipe Armada Tersedia</p>
+                <div id="tipeArmadaListContainer" class="space-y-2">
+                    <!-- Populated dynamically -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="p-3.5 sm:p-4 border-t border-slate-100 bg-slate-50 flex justify-end shrink-0">
+            <button type="button" onclick="closeKelolaTipeModal()" class="px-5 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 text-xs font-bold rounded-xl transition-colors">
+                Tutup
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- ======================================= -->
+<!-- MODAL ATUR TIPE BUS PO                 -->
+<!-- ======================================= -->
+<div id="modalEditPo" class="fixed inset-0 bg-gray-900/50 backdrop-blur-xs z-[170] hidden items-center justify-center p-3 sm:p-4" onclick="if(event.target === this) closeEditPoModal()">
+    <div id="modalEditPoContent" class="bg-white rounded-3xl shadow-2xl w-full max-w-md overflow-hidden transform scale-95 opacity-0 transition-all duration-300 flex flex-col border border-slate-100">
+        <div class="p-4 sm:p-5 border-b border-slate-100 flex items-center justify-between bg-amber-50/70 shrink-0">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-amber-500 text-white flex items-center justify-center text-lg shadow-sm shrink-0">
+                    <i class="fas fa-bus"></i>
+                </div>
+                <div>
+                    <h3 class="text-base font-black text-slate-800 tracking-tight leading-tight">Atur Tipe Bus PO</h3>
+                    <p id="modalEditPoSubtitle" class="text-[10px] font-bold text-amber-700 uppercase tracking-widest mt-0.5">PO: -</p>
+                </div>
+            </div>
+            <button type="button" onclick="closeEditPoModal()" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center text-sm transition-colors shrink-0">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <form id="formEditPo" onsubmit="submitEditPo(event)" class="p-4 sm:p-5 space-y-4">
+            <input type="hidden" id="editPoNama">
+            <div class="bg-blue-50 p-3 rounded-xl border border-blue-100 text-xs text-blue-800 leading-snug">
+                <i class="fas fa-info-circle text-blue-600 mr-1"></i> Pengaturan Tipe Bus dan Format Denah ini akan <b>otomatis diterapkan ke seluruh rute</b> milik PO ini.
+            </div>
+            <div>
+                <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Tipe Armada</label>
+                <select id="editPoTipe" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-xs font-bold text-slate-800 outline-none focus:border-amber-500 transition-colors" onchange="onEditPoTipeChange()">
+                    <!-- Options populated dynamically -->
+                </select>
+            </div>
+            <div>
+                <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Format Denah Tempat Duduk</label>
+                <select id="editPoDenah" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-xs font-bold text-slate-800 outline-none focus:border-amber-500 transition-colors">
+                    <!-- Options populated dynamically -->
+                </select>
+            </div>
+            <div class="pt-2 border-t border-slate-100 flex gap-2 justify-end">
+                <button type="button" onclick="closeEditPoModal()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-600 text-xs font-bold rounded-xl transition-colors">
+                    Batal
+                </button>
+                <button type="submit" id="btnSubmitEditPo" class="px-5 py-2 bg-amber-500 hover:bg-amber-600 text-slate-900 text-xs font-black uppercase tracking-wider rounded-xl shadow-md transition-all">
+                    Simpan Tipe PO
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
 
 <!-- MODALS UNTUK ADMIN AKUN -->
 <div id="adminModal" class="fixed inset-0 bg-gray-900/40  z-[150] hidden items-center justify-center p-4">

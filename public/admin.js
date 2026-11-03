@@ -48,6 +48,7 @@
 
         isDataLoaded = false;
         await initData();
+        if (typeof populateTipeArmadaDropdowns === 'function') populateTipeArmadaDropdowns();
         
         // Populate static dropdowns globally
         const armadas = getArmadas();
@@ -1358,16 +1359,30 @@
             const hiddenClass = isSearching ? '' : 'hidden';
             const iconRotate = isSearching ? 'rotate(180deg)' : 'rotate(0deg)';
 
+            const rutes = groups[key];
+            const firstA = rutes[0] || {};
+            const poTipe = firstA.tipeArmada || 'Bus Besar';
+            const poDenah = firstA.denahId && typeof getDenah === 'function' ? getDenah(firstA.denahId) : null;
+            const poSeat = poDenah?.totalKursi || firstA.capacity || 40;
+
             html += `
-                <tr class="cursor-pointer bg-blue-50 hover:bg-blue-100 transition-colors border-b border-blue-200" onclick="toggleArmada('${index}')">
-                    <td colspan="5" class="px-4 py-3">
-                        <div class="flex items-center justify-between">
-                            <div class="flex items-center gap-2">
+                <tr class="cursor-pointer bg-blue-50/80 hover:bg-blue-100/90 transition-colors border-b border-blue-200" onclick="toggleArmada('${index}')">
+                    <td colspan="5" class="px-3 sm:px-4 py-3">
+                        <div class="flex items-center justify-between gap-2 flex-wrap sm:flex-nowrap">
+                            <div class="flex items-center gap-2 flex-wrap">
                                 <i class="fas fa-bus text-blue-600"></i>
-                                <span class="font-black text-sm text-blue-900 uppercase">${key}</span>
-                                <span class="text-[10px] font-bold text-blue-600 bg-blue-100 px-2 py-0.5 rounded-md ml-2">${groups[key].length} Rute</span>
+                                <span class="font-black text-sm sm:text-base text-blue-900 uppercase">${key}</span>
+                                <span class="text-[10px] font-extrabold text-amber-800 bg-amber-100/80 border border-amber-300 px-2 py-0.5 rounded-lg flex items-center gap-1 shadow-2xs">
+                                    <i class="fas fa-shuttle-van text-[9px] text-amber-600"></i> ${poTipe} • ${poSeat} Kursi
+                                </span>
+                                <span class="text-[10px] font-bold text-blue-600 bg-blue-100 px-2 py-0.5 rounded-md">${rutes.length} Rute</span>
                             </div>
-                            <i class="fas fa-chevron-down text-blue-600 transition-transform duration-300" id="icon-armada-${index}" style="transform: ${iconRotate};"></i>
+                            <div class="flex items-center gap-2 shrink-0">
+                                <button type="button" onclick="event.stopPropagation(); openEditPoModal('${key}')" class="px-2.5 py-1.5 bg-white hover:bg-amber-500 hover:text-white text-slate-700 text-[10px] font-black rounded-xl border border-slate-200 shadow-xs transition-all flex items-center gap-1 active:scale-95" title="Atur tipe bus & denah untuk seluruh rute PO ${key}">
+                                    <i class="fas fa-sliders-h text-amber-500"></i> Atur Tipe PO
+                                </button>
+                                <i class="fas fa-chevron-down text-blue-600 text-xs transition-transform duration-300 ml-1" id="icon-armada-${index}" style="transform: ${iconRotate};"></i>
+                            </div>
                         </div>
                     </td>
                 </tr>
@@ -3134,15 +3149,28 @@
         const btn = document.getElementById('btnSubmitEditArmada');
         btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> MENYIMPAN...'; btn.disabled = true;
 
+        const tipeVal = document.getElementById('editArmadaTipe')?.value || 'Bus Besar';
+        const denahVal = document.getElementById('editArmadaDenah')?.value || null;
+        
+        let calculatedSeat = 0;
+        if (denahVal && typeof getDenah === 'function') {
+            const dObj = getDenah(denahVal);
+            if (dObj && dObj.totalKursi) calculatedSeat = dObj.totalKursi;
+        }
+        if (!calculatedSeat) {
+            const defaultSeatsByType = { 'Hiace': 14, 'Bus Besar': 40, 'Long Elf': 19, 'Medium Bus': 31, 'Elf Short': 12, 'Innova / MPV': 7 };
+            calculatedSeat = defaultSeatsByType[tipeVal] || 40;
+        }
+
         const payload = {
             id_armada: document.getElementById('editArmadaId').value,
             nama_armada: document.getElementById('editArmadaNama').value,
             tujuan_armada: document.getElementById('editArmadaTujuan').value,
             jam: document.getElementById('editArmadaJam').value,
             harga: document.getElementById('editArmadaHarga').value,
-            seat: document.getElementById('editArmadaSeat').value,
-            tipe_armada: document.getElementById('editArmadaTipe')?.value || 'Bus Besar',
-            denah_id: document.getElementById('editArmadaDenah')?.value || null
+            seat: calculatedSeat,
+            tipe_armada: tipeVal,
+            denah_id: denahVal
         };
 
         try {
@@ -3219,17 +3247,34 @@
                 // Auto select the first destination if available
                 if (uniqueDestinations.length > 0) {
                     tujuanSelect.value = uniqueDestinations[0];
-                    
-                    // Optional: auto-fill harga and seat based on the first match
                     const match = relatedArmadas.find(a => a.destination === uniqueDestinations[0]);
                     if (match) {
                         document.getElementById('addArmadaHarga').value = match.price;
-                        document.getElementById('addArmadaSeat').value = match.capacity;
                     }
                 } else {
                     tujuanSelect.value = 'LAIN';
                 }
                 toggleAddArmadaTujuanInput();
+
+                // Auto-sync Tipe Armada and Denah to match the selected PO!
+                if (relatedArmadas.length > 0) {
+                    const poArmada = relatedArmadas[0];
+                    const poTipe = poArmada.tipeArmada || 'Bus Besar';
+                    const poDenah = poArmada.denahId && typeof getDenah === 'function' ? getDenah(poArmada.denahId) : null;
+                    const poSeat = poDenah?.totalKursi || poArmada.capacity || 40;
+
+                    const tipeSelect = document.getElementById('addArmadaTipe');
+                    if (tipeSelect) tipeSelect.value = poTipe;
+
+                    const denahSelect = document.getElementById('addArmadaDenah');
+                    if (denahSelect && poArmada.denahId) denahSelect.value = poArmada.denahId;
+
+                    const hintEl = document.getElementById('addArmadaPoHint');
+                    if (hintEl) {
+                        hintEl.classList.remove('hidden');
+                        hintEl.innerHTML = `<i class="fas fa-check-circle text-emerald-600 mr-1"></i> PO <b>${select.value}</b>: Tipe <b>${poTipe}</b> (${poSeat} Kursi) — Otomatis mengikuti PO.`;
+                    }
+                }
             } else if (tujuanSelect) {
                 tujuanSelect.innerHTML = '<option value="">Pilih Tujuan...</option><option value="LAIN">+ Tujuan Lain</option>';
                 tujuanSelect.value = '';
@@ -3338,14 +3383,27 @@
         const btn = document.getElementById('btnSubmitAddArmada');
         btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> MENYIMPAN...'; btn.disabled = true;
 
+        const tipeVal = document.getElementById('addArmadaTipe')?.value || 'Bus Besar';
+        const denahVal = document.getElementById('addArmadaDenah')?.value || null;
+        
+        let calculatedSeat = 0;
+        if (denahVal && typeof getDenah === 'function') {
+            const dObj = getDenah(denahVal);
+            if (dObj && dObj.totalKursi) calculatedSeat = dObj.totalKursi;
+        }
+        if (!calculatedSeat) {
+            const defaultSeatsByType = { 'Hiace': 14, 'Bus Besar': 40, 'Long Elf': 19, 'Medium Bus': 31, 'Elf Short': 12, 'Innova / MPV': 7 };
+            calculatedSeat = defaultSeatsByType[tipeVal] || 40;
+        }
+
         const payload = {
             nama_armada: armadaName,
             tujuan_armada: armadaTujuan,
             jam: document.getElementById('addArmadaJam').value,
             harga: document.getElementById('addArmadaHarga').value,
-            seat: document.getElementById('addArmadaSeat').value,
-            tipe_armada: document.getElementById('addArmadaTipe')?.value || 'Bus Besar',
-            denah_id: document.getElementById('addArmadaDenah')?.value || null
+            seat: calculatedSeat,
+            tipe_armada: tipeVal,
+            denah_id: denahVal
         };
 
         try {
@@ -4562,6 +4620,332 @@ function updateChartColors(isDark) {
     window.promptRefresh = promptRefresh;
     window.closePromptRefresh = closePromptRefresh;
     window.executeRefresh = executeRefresh;
+
+
+// ============================================
+// TIPE ARMADA & PO MANAGEMENT
+// ============================================
+
+function populateTipeArmadaDropdowns() {
+    const list = typeof getTipeArmadaList === 'function' ? getTipeArmadaList() : [];
+    const tipeNames = list.map(t => t.nama || t);
+    
+    // 1. Populate addArmadaTipe
+    const addSel = document.getElementById('addArmadaTipe');
+    if (addSel) {
+        const cur = addSel.value;
+        addSel.innerHTML = tipeNames.map(n => `<option value="${n}">${n}</option>`).join('');
+        if (cur && tipeNames.includes(cur)) addSel.value = cur;
+    }
+
+    // 2. Populate editArmadaTipe
+    const editSel = document.getElementById('editArmadaTipe');
+    if (editSel) {
+        const cur = editSel.value;
+        editSel.innerHTML = tipeNames.map(n => `<option value="${n}">${n}</option>`).join('');
+        if (cur && tipeNames.includes(cur)) editSel.value = cur;
+    }
+
+    // 3. Populate editPoTipe
+    const poSel = document.getElementById('editPoTipe');
+    if (poSel) {
+        const cur = poSel.value;
+        poSel.innerHTML = tipeNames.map(n => `<option value="${n}">${n}</option>`).join('');
+        if (cur && tipeNames.includes(cur)) poSel.value = cur;
+    }
+
+    // 4. Populate denahEditorKategori
+    const katSel = document.getElementById('denahEditorKategori');
+    if (katSel) {
+        const cur = katSel.value;
+        katSel.innerHTML = tipeNames.map(n => `<option value="${n}">${n}</option>`).join('') + '<option value="CUSTOM">+ Tipe Armada Lainnya...</option>';
+        if (cur && (tipeNames.includes(cur) || cur === 'CUSTOM')) katSel.value = cur;
+    }
+
+    // 5. Render Filter Pills in subtabArmadaDenah
+    const pillsWrap = document.getElementById('denahFilterPills');
+    if (pillsWrap) {
+        let pillsHtml = `<button onclick="filterDenahKategori('ALL')" class="denah-cat-pill ${currentDenahKategori === 'ALL' ? 'active px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider bg-slate-900 text-amber-400 shadow-sm transition-all' : 'px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider bg-white text-slate-600 border border-slate-200 hover:border-amber-400 shadow-sm transition-all'}" data-cat="ALL">Semua Tipe</button>`;
+        tipeNames.forEach(n => {
+            const isActive = currentDenahKategori.toLowerCase() === n.toLowerCase();
+            pillsHtml += `<button onclick="filterDenahKategori('${n}')" class="denah-cat-pill ${isActive ? 'active px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider bg-slate-900 text-amber-400 shadow-sm transition-all' : 'px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider bg-white text-slate-600 border border-slate-200 hover:border-amber-400 shadow-sm transition-all'}" data-cat="${n}">${n}</button>`;
+        });
+        pillsWrap.innerHTML = pillsHtml;
+    }
+}
+
+// Modal Kelola Tipe Armada
+function openKelolaTipeModal() {
+    renderTipeArmadaList();
+    const m = document.getElementById('modalKelolaTipe');
+    const c = document.getElementById('modalKelolaTipeContent');
+    if (m) {
+        m.classList.remove('hidden');
+        m.classList.add('flex');
+        setTimeout(() => {
+            if (c) {
+                c.classList.remove('scale-95', 'opacity-0');
+                c.classList.add('scale-100', 'opacity-100');
+            }
+        }, 10);
+    }
+}
+
+function closeKelolaTipeModal() {
+    const m = document.getElementById('modalKelolaTipe');
+    const c = document.getElementById('modalKelolaTipeContent');
+    if (c) {
+        c.classList.remove('scale-100', 'opacity-100');
+        c.classList.add('scale-95', 'opacity-0');
+    }
+    setTimeout(() => {
+        if (m) {
+            m.classList.remove('flex');
+            m.classList.add('hidden');
+        }
+    }, 300);
+}
+
+function renderTipeArmadaList() {
+    const container = document.getElementById('tipeArmadaListContainer');
+    if (!container) return;
+
+    const list = typeof getTipeArmadaList === 'function' ? getTipeArmadaList() : [];
+    const armadas = typeof getArmadas === 'function' ? getArmadas() : [];
+    const denahs = typeof getDenahList === 'function' ? getDenahList() : [];
+
+    if (!list.length) {
+        container.innerHTML = '<p class="text-xs text-slate-400 italic py-3 text-center">Belum ada tipe armada</p>';
+        return;
+    }
+
+    let html = '';
+    list.forEach(item => {
+        const nama = item.nama || item;
+        const countArmada = armadas.filter(a => (a.tipeArmada || '').toLowerCase() === nama.toLowerCase()).length;
+        const countDenah = denahs.filter(d => (d.kategori || '').toLowerCase() === nama.toLowerCase()).length;
+
+        html += `
+            <div class="flex items-center justify-between p-3 bg-white rounded-2xl border border-slate-200/80 shadow-xs hover:border-amber-300 transition-all">
+                <div class="flex items-center gap-3 min-w-0 flex-1 pr-2">
+                    <div class="w-8 h-8 rounded-xl bg-slate-100 flex items-center justify-center text-slate-600 shrink-0 text-xs">
+                        <i class="fas fa-bus"></i>
+                    </div>
+                    <div class="min-w-0 flex-1">
+                        <p class="font-black text-xs sm:text-sm text-slate-800 uppercase truncate">${nama}</p>
+                        <p class="text-[10px] font-bold text-slate-400">${countDenah} Denah Kursi • ${countArmada} Rute Armada</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-1.5 shrink-0">
+                    <button type="button" onclick="editTipeArmadaName('${nama}')" class="px-2.5 py-1.5 bg-amber-50 hover:bg-amber-500 hover:text-white text-amber-700 rounded-lg text-xs font-bold transition-all flex items-center gap-1" title="Ubah Nama Tipe">
+                        <i class="fas fa-edit"></i> <span class="hidden sm:inline">Ubah Nama</span>
+                    </button>
+                    <button type="button" onclick="deleteTipeArmadaAction('${nama}')" class="w-7 h-7 bg-red-50 hover:bg-red-500 hover:text-white text-red-600 rounded-lg text-xs font-bold transition-all flex items-center justify-center" title="Hapus Tipe">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+            </div>
+        `;
+    });
+
+    container.innerHTML = html;
+}
+
+async function submitAddTipeArmada(e) {
+    e.preventDefault();
+    const input = document.getElementById('inputNewTipeNama');
+    const nama = input?.value.trim();
+    if (!nama) return;
+
+    const btn = document.getElementById('btnSubmitAddTipe');
+    if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>'; }
+
+    try {
+        const res = await postToSheets('addTipeArmada', { nama });
+        if (res && res.status === 'success') {
+            if (typeof showMessage === 'function') showMessage(`Tipe armada '${nama}' berhasil ditambahkan!`);
+            input.value = '';
+            await refreshData();
+            renderTipeArmadaList();
+            populateTipeArmadaDropdowns();
+        } else {
+            alert(res?.message || 'Gagal menambahkan tipe armada');
+        }
+    } catch(err) {
+        alert(err.message);
+    } finally {
+        if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fas fa-plus"></i> Tambah'; }
+    }
+}
+
+async function editTipeArmadaName(oldName) {
+    let newName = '';
+    if (typeof Swal !== 'undefined') {
+        const { value: formValue } = await Swal.fire({
+            title: 'Ubah Nama Tipe Armada',
+            input: 'text',
+            inputValue: oldName,
+            inputLabel: 'Nama tipe baru:',
+            inputPlaceholder: 'Ketik nama tipe...',
+            showCancelButton: true,
+            confirmButtonColor: '#f59e0b',
+            cancelButtonColor: '#64748b',
+            confirmButtonText: 'Simpan',
+            cancelButtonText: 'Batal',
+            inputValidator: (value) => {
+                if (!value || !value.trim()) return 'Nama tipe tidak boleh kosong!';
+            }
+        });
+        if (!formValue) return;
+        newName = formValue.trim();
+    } else {
+        const res = prompt('Ubah nama tipe armada "' + oldName + '" menjadi:', oldName);
+        if (res === null) return;
+        newName = res.trim();
+    }
+
+    if (!newName || newName === oldName) return;
+
+    try {
+        const res = await postToSheets('editTipeArmada', { old_nama: oldName, new_nama: newName });
+        if (res && res.status === 'success') {
+            if (typeof showMessage === 'function') showMessage(`Nama tipe armada berhasil diubah menjadi '${newName}'!`);
+            await refreshData();
+            renderTipeArmadaList();
+            populateTipeArmadaDropdowns();
+            renderArmada();
+            renderDenahCards();
+        } else {
+            alert(res?.message || 'Gagal mengubah nama tipe armada');
+        }
+    } catch(err) {
+        alert(err.message);
+    }
+}
+
+async function deleteTipeArmadaAction(name) {
+    if (!confirm(`Yakin ingin menghapus tipe armada '${name}'?`)) return;
+
+    try {
+        const res = await postToSheets('deleteTipeArmada', { nama: name });
+        if (res && res.status === 'success') {
+            if (typeof showMessage === 'function') showMessage(`Tipe armada '${name}' berhasil dihapus`);
+            await refreshData();
+            renderTipeArmadaList();
+            populateTipeArmadaDropdowns();
+        } else {
+            alert(res?.message || 'Gagal menghapus tipe armada');
+        }
+    } catch(err) {
+        alert(err.message);
+    }
+}
+
+// Modal Atur Tipe Bus PO
+function openEditPoModal(poName) {
+    const armadas = typeof getArmadas === 'function' ? getArmadas() : [];
+    const rutes = armadas.filter(a => a.name.toUpperCase() === poName.toUpperCase());
+    if (!rutes.length) {
+        alert('Data PO tidak ditemukan');
+        return;
+    }
+
+    const firstA = rutes[0];
+    document.getElementById('editPoNama').value = poName;
+    document.getElementById('modalEditPoSubtitle').textContent = `PO: ${poName} (${rutes.length} Rute)`;
+
+    populateTipeArmadaDropdowns();
+    const tipeSel = document.getElementById('editPoTipe');
+    if (tipeSel) tipeSel.value = firstA.tipeArmada || 'Bus Besar';
+
+    populateDenahDropdown('editPoDenah', firstA.denahId);
+
+    const m = document.getElementById('modalEditPo');
+    const c = document.getElementById('modalEditPoContent');
+    if (m) {
+        m.classList.remove('hidden');
+        m.classList.add('flex');
+        setTimeout(() => {
+            if (c) {
+                c.classList.remove('scale-95', 'opacity-0');
+                c.classList.add('scale-100', 'opacity-100');
+            }
+        }, 10);
+    }
+}
+
+function closeEditPoModal() {
+    const m = document.getElementById('modalEditPo');
+    const c = document.getElementById('modalEditPoContent');
+    if (c) {
+        c.classList.remove('scale-100', 'opacity-100');
+        c.classList.add('scale-95', 'opacity-0');
+    }
+    setTimeout(() => {
+        if (m) {
+            m.classList.remove('flex');
+            m.classList.add('hidden');
+        }
+    }, 300);
+}
+
+function onEditPoTipeChange() {
+    const tipe = document.getElementById('editPoTipe')?.value;
+    const denahSelect = document.getElementById('editPoDenah');
+    if (!denahSelect || !tipe) return;
+
+    const denahList = typeof getDenahList === 'function' ? getDenahList() : [];
+    const bestMatch = denahList.find(d => (d.kategori || '').toLowerCase() === tipe.toLowerCase());
+    if (bestMatch) {
+        denahSelect.value = bestMatch.id;
+    }
+}
+
+async function submitEditPo(e) {
+    e.preventDefault();
+    const poNama = document.getElementById('editPoNama')?.value;
+    const tipe = document.getElementById('editPoTipe')?.value;
+    const denahId = document.getElementById('editPoDenah')?.value || null;
+
+    if (!poNama || !tipe) return;
+
+    const btn = document.getElementById('btnSubmitEditPo');
+    if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menyimpan...'; }
+
+    try {
+        const payload = {
+            nama_armada: poNama,
+            tipe_armada: tipe,
+            denah_id: denahId
+        };
+        const res = await postToSheets('setPoType', payload);
+        if (res && res.status === 'success') {
+            if (typeof showMessage === 'function') showMessage(`Tipe bus PO ${poNama} berhasil diubah ke ${tipe} untuk seluruh rute!`);
+            closeEditPoModal();
+            await refreshData();
+            renderArmada();
+            renderDenahCards();
+        } else {
+            alert(res?.message || 'Gagal mengubah tipe bus PO');
+        }
+    } catch(err) {
+        alert(err.message);
+    } finally {
+        if (btn) { btn.disabled = false; btn.innerHTML = 'Simpan Tipe PO'; }
+    }
+}
+
+
+    if (typeof openKelolaTipeModal !== 'undefined') window.openKelolaTipeModal = openKelolaTipeModal;
+    if (typeof closeKelolaTipeModal !== 'undefined') window.closeKelolaTipeModal = closeKelolaTipeModal;
+    if (typeof submitAddTipeArmada !== 'undefined') window.submitAddTipeArmada = submitAddTipeArmada;
+    if (typeof editTipeArmadaName !== 'undefined') window.editTipeArmadaName = editTipeArmadaName;
+    if (typeof deleteTipeArmadaAction !== 'undefined') window.deleteTipeArmadaAction = deleteTipeArmadaAction;
+    if (typeof openEditPoModal !== 'undefined') window.openEditPoModal = openEditPoModal;
+    if (typeof closeEditPoModal !== 'undefined') window.closeEditPoModal = closeEditPoModal;
+    if (typeof onEditPoTipeChange !== 'undefined') window.onEditPoTipeChange = onEditPoTipeChange;
+    if (typeof submitEditPo !== 'undefined') window.submitEditPo = submitEditPo;
+    if (typeof populateTipeArmadaDropdowns !== 'undefined') window.populateTipeArmadaDropdowns = populateTipeArmadaDropdowns;
 
     // Export modals globally to ensure HTML onclick can access them
     if (typeof openETicket !== 'undefined') window.openETicket = openETicket;

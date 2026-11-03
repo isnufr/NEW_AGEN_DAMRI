@@ -32,6 +32,7 @@ let cachedBookings = [];
 let cachedLaporan = [];
 let cachedEkstraBookings = [];
 let cachedDenah = [];
+let cachedTipeArmada = [];
 let isDataLoaded = false;
 
 // ==========================================
@@ -90,7 +91,8 @@ async function initData() {
         const promises = [
             fetchFromSheets('getArmada'),
             fetchFromSheets('getHargaKhusus'),
-            fetchFromSheets('getDenahArmada')
+            fetchFromSheets('getDenahArmada'),
+            fetchFromSheets('getTipeArmada')
         ];
         
         if (isAdmin) {
@@ -106,12 +108,33 @@ async function initData() {
         const aData = results[0];
         const hData = results[1];
         const dData = results[2];
+        const tData = results[3];
         let bData = [], lData = [], eData = [];
         
         if (isAdmin) {
-            bData = results[3];
-            lData = results[4];
-            eData = results[5];
+            bData = results[4];
+            lData = results[5];
+            eData = results[6];
+        }
+
+        if (tData && Array.isArray(tData)) {
+            cachedTipeArmada = tData;
+            localStorage.setItem("app_tipe_armada", JSON.stringify(cachedTipeArmada));
+        } else {
+            try {
+                const rawT = localStorage.getItem("app_tipe_armada");
+                if (rawT) cachedTipeArmada = JSON.parse(rawT);
+            } catch(e) {}
+            if (!cachedTipeArmada || !cachedTipeArmada.length) {
+                cachedTipeArmada = [
+                    { id: 'tipe-1', nama: 'Hiace' },
+                    { id: 'tipe-2', nama: 'Bus Besar' },
+                    { id: 'tipe-3', nama: 'Long Elf' },
+                    { id: 'tipe-4', nama: 'Medium Bus' },
+                    { id: 'tipe-5', nama: 'Elf Short' },
+                    { id: 'tipe-6', nama: 'Innova / MPV' }
+                ];
+            }
         }
 
         if (dData && Array.isArray(dData)) {
@@ -272,6 +295,10 @@ async function initData() {
 // ==========================================
 function getArmadas() {
     return cachedArmadas;
+}
+
+function getTipeArmadaList() {
+    return cachedTipeArmada;
 }
 
 function getDenahList() {
