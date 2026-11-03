@@ -590,27 +590,29 @@
             const rowClass = isOpen ? 'bg-white' : 'hidden bg-white';
             const iconTransform = isOpen ? 'rotate(180deg)' : 'rotate(0deg)';
 
-            // Header Row (Clickable)
+            // Header Row (Clickable, Mobile Optimized)
             html += `
                 <tr class="cursor-pointer group" onclick="toggleManifest('${safeId}')">
-                    <td class="p-2 sm:p-4 border-b-8 border-transparent">
-                        <div class="bg-white rounded-3xl p-4 sm:p-5 text-slate-800 shadow-xl shadow-slate-200/50 border-2 border-amber-400 transition-all group-hover:-translate-y-1 group-hover:shadow-2xl group-hover:shadow-amber-200/50 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                            <div class="flex items-center gap-4 w-full sm:w-auto">
-                                <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-amber-400 to-amber-500 flex items-center justify-center text-white shadow-md shrink-0">
-                                    <i class="fas fa-calendar-alt text-xl"></i>
+                    <td class="p-1 sm:p-3 border-b-3 sm:border-b-6 border-transparent">
+                        <div class="bg-white rounded-2xl sm:rounded-3xl p-3 sm:p-5 text-slate-800 shadow-md sm:shadow-xl shadow-slate-200/50 border-2 border-amber-400 transition-all group-hover:-translate-y-0.5 sm:group-hover:-translate-y-1 group-hover:shadow-lg sm:group-hover:shadow-2xl group-hover:shadow-amber-200/50 flex items-center justify-between gap-2.5 sm:gap-4">
+                            <!-- Left: Date info -->
+                            <div class="flex items-center gap-2.5 sm:gap-4 min-w-0 flex-1">
+                                <div class="w-9 h-9 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-br from-amber-400 to-amber-500 flex items-center justify-center text-white shadow-sm shrink-0">
+                                    <i class="fas fa-calendar-alt text-sm sm:text-xl"></i>
                                 </div>
                                 <div class="min-w-0 flex-1">
-                                    <p class="text-[10px] font-black text-amber-600 uppercase tracking-widest leading-tight mb-1">Waktu Pemberangkatan</p>
-                                    <p class="font-black text-sm sm:text-base text-slate-900 uppercase truncate">${formattedDate}</p>
+                                    <p class="text-[8px] sm:text-[10px] font-black text-amber-600 uppercase tracking-widest leading-none mb-0.5 sm:mb-1">Keberangkatan</p>
+                                    <p class="font-black text-xs sm:text-base text-slate-900 uppercase truncate">${formattedDate}</p>
                                 </div>
                             </div>
-                            <div class="flex items-center justify-between sm:justify-end w-full sm:w-auto gap-4 border-t border-slate-200 sm:border-0 pt-3 sm:pt-0">
-                                <div class="text-left sm:text-right flex-1 sm:flex-none">
-                                    <p class="font-black text-lg sm:text-xl text-transparent bg-clip-text bg-gradient-to-r from-amber-500 to-amber-600">${totalPnp} PNP</p>
-                                    <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest leading-tight">${g.bookings.length} Pesanan</p>
+                            <!-- Right: Total PNP & Arrow -->
+                            <div class="flex items-center gap-2 sm:gap-3 shrink-0">
+                                <div class="text-right">
+                                    <p class="font-black text-sm sm:text-xl text-transparent bg-clip-text bg-gradient-to-r from-amber-500 to-amber-600 leading-tight">${totalPnp} PNP</p>
+                                    <p class="text-[8px] sm:text-[10px] font-bold text-slate-400 uppercase tracking-wider">${g.bookings.length} Pesanan</p>
                                 </div>
-                                <div class="w-8 h-8 rounded-full bg-amber-50 border border-amber-200 flex items-center justify-center text-amber-600 group-hover:bg-amber-500 group-hover:text-white transition-colors shrink-0">
-                                    <i class="fas fa-chevron-down transition-transform duration-300" id="icon-${safeId}" style="transform: ${iconTransform}"></i>
+                                <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-amber-50 border border-amber-200 flex items-center justify-center text-amber-600 group-hover:bg-amber-500 group-hover:text-white transition-colors shrink-0">
+                                    <i class="fas fa-chevron-down text-[10px] sm:text-xs transition-transform duration-300" id="icon-${safeId}" style="transform: ${iconTransform}"></i>
                                 </div>
                             </div>
                         </div>
@@ -727,35 +729,35 @@
                     const waNumber = String(bHp).replace(/\D/g, '').replace(/^0/, '62');
 
                     html += `
-                                    <div onclick="openBookingDetailModal('${bId}')" class="group flex items-center justify-between p-3.5 border-b border-slate-100 last:border-0 hover:bg-blue-50/60 active:bg-blue-100/50 cursor-pointer transition-all gap-3 w-full overflow-hidden select-none" title="Klik untuk lihat Detail Data Pesanan">
+                                    <div onclick="openBookingDetailModal('${bId}')" class="group flex items-center justify-between p-3 sm:p-3.5 border-b border-slate-100 last:border-0 hover:bg-blue-50/70 active:bg-blue-100/60 cursor-pointer transition-all gap-2.5 sm:gap-3 w-full overflow-hidden select-none" title="Klik untuk lihat Detail Data Pesanan">
                                         <!-- Left: Data Penumpang -->
                                         <div class="flex-1 min-w-0 flex flex-col pr-1">
                                             <!-- Row 1: ID Tiket & Tujuan -->
-                                            <div class="flex items-center gap-2 mb-1">
-                                                <span class="text-[10px] font-black text-blue-600 truncate uppercase tracking-wider">${bId} • ${bTujuan}</span>
+                                            <div class="flex items-center gap-1.5 mb-0.5 sm:mb-1">
+                                                <span class="text-[10px] font-black text-blue-600 uppercase tracking-wider truncate">${bId} • ${bTujuan}</span>
                                             </div>
                                             
                                             <!-- Row 2: Nama Penumpang -->
-                                            <div class="mb-1 w-full">
-                                                <span class="font-black text-sm text-slate-800 uppercase tracking-tight truncate block group-hover:text-blue-700 transition-colors">${bName}</span>
+                                            <div class="mb-0.5 sm:mb-1 w-full">
+                                                <span class="font-black text-xs sm:text-sm text-slate-800 uppercase tracking-tight truncate block group-hover:text-blue-700 transition-colors">${bName}</span>
                                             </div>
                                             
                                             <!-- Row 3: Qty & Kursi -->
-                                            <div class="flex items-center gap-3 text-[11px] font-bold text-slate-600">
-                                                <span class="flex items-center gap-1.5"><i class="fas fa-users text-slate-400 text-xs"></i> ${bQty} PNP</span>
-                                                <span class="flex items-center gap-1.5"><i class="fas fa-chair text-amber-500 text-xs"></i> Kursi: <span class="text-slate-800 font-extrabold">${bKursi}</span></span>
+                                            <div class="flex items-center gap-2.5 sm:gap-3 text-[10px] sm:text-[11px] font-bold text-slate-600">
+                                                <span class="flex items-center gap-1"><i class="fas fa-users text-slate-400 text-[10px]"></i> ${bQty} PNP</span>
+                                                <span class="flex items-center gap-1"><i class="fas fa-chair text-amber-500 text-[10px]"></i> Kursi: <span class="text-slate-900 font-extrabold">${bKursi}</span></span>
                                             </div>
 
                                             <!-- Row 4: Keterangan & Warning (if any) -->
-                                            ${ket ? `<div class="mt-1.5 text-[9px] text-amber-700 bg-amber-50 px-2 py-0.5 rounded border border-amber-100 max-w-full truncate inline-block w-fit"><i class="fas fa-info-circle mr-1"></i>${ket}</div>` : ''}
+                                            ${ket ? `<div class="mt-1 text-[9px] text-amber-700 bg-amber-50 px-2 py-0.5 rounded border border-amber-100 max-w-full truncate inline-block w-fit"><i class="fas fa-info-circle mr-1"></i>${ket}</div>` : ''}
                                             ${warningHtml ? `<div class="mt-1">${warningHtml}</div>` : ''}
                                         </div>
 
-                                        <!-- Right: Status Badge & Chevron Icon (Ringkas & Menghemat Space) -->
-                                        <div class="flex items-center gap-2.5 shrink-0">
-                                            <span class="inline-block px-2.5 py-1 rounded-full text-[9px] font-black uppercase tracking-wider shadow-xs ${badgeClass}">${badgeText}</span>
-                                            <div class="w-7 h-7 rounded-full bg-slate-100 group-hover:bg-blue-600 group-hover:text-white flex items-center justify-center text-slate-400 transition-all shadow-xs">
-                                                <i class="fas fa-chevron-right text-[10px] transform group-hover:translate-x-0.5 transition-transform"></i>
+                                        <!-- Right: Status Badge & Chevron Icon (Sleek & Space-Saving) -->
+                                        <div class="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
+                                            <span class="inline-block px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-full text-[8px] sm:text-[9px] font-black uppercase tracking-wider shadow-xs ${badgeClass}">${badgeText}</span>
+                                            <div class="w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-slate-100 group-hover:bg-blue-600 group-hover:text-white flex items-center justify-center text-slate-400 transition-all shadow-xs">
+                                                <i class="fas fa-chevron-right text-[9px] sm:text-[10px] transform group-hover:translate-x-0.5 transition-transform"></i>
                                             </div>
                                         </div>
                                     </div>
@@ -1019,96 +1021,126 @@
         }
 
         content.innerHTML = `
-            <div class="grid grid-cols-2 gap-y-3.5 gap-x-4">
-                <div class="col-span-2 flex justify-between items-center pb-2.5 border-b border-slate-100">
-                    <div>
-                        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">ID Tiket</p>
-                        <p class="font-black text-blue-600 text-xl tracking-tight">${bTicketId}</p>
+            <div class="flex flex-col gap-2.5 sm:gap-3">
+                <!-- Boarding Ticket Header Card -->
+                <div class="bg-gradient-to-r from-blue-50 to-indigo-50/70 p-3 sm:p-4 rounded-xl sm:rounded-2xl border border-blue-100/90 flex items-center justify-between gap-2 shadow-xs">
+                    <div class="min-w-0 flex-1">
+                        <p class="text-[9px] font-black text-blue-500 uppercase tracking-widest leading-none mb-1">KODE BOOKING / TIKET</p>
+                        <p class="font-black text-blue-900 text-base sm:text-xl tracking-tight leading-none truncate">${bTicketId}</p>
                     </div>
-                    <span class="px-3.5 py-1.5 rounded-full text-xs font-black uppercase tracking-wider ${badgeClass}">${badgeText}</span>
+                    <span class="px-2.5 sm:px-3.5 py-1 sm:py-1.5 rounded-full text-[10px] sm:text-xs font-black uppercase tracking-wider shrink-0 ${badgeClass}">${badgeText}</span>
                 </div>
-                <div class="col-span-2 sm:col-span-1">
-                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Nama Penumpang</p>
-                    <p class="font-bold text-slate-800 uppercase text-sm">${b.name || '-'}</p>
+
+                <!-- 2-Column Grid Info -->
+                <div class="grid grid-cols-2 gap-2 sm:gap-3 text-xs">
+                    <!-- Nama Penumpang -->
+                    <div class="col-span-2 sm:col-span-1 bg-slate-50/80 p-2.5 sm:p-3 rounded-xl border border-slate-100">
+                        <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-0.5">Nama Penumpang</p>
+                        <p class="font-bold text-slate-800 uppercase text-xs sm:text-sm truncate">${b.name || '-'}</p>
+                    </div>
+
+                    <!-- Nomor HP -->
+                    <div class="col-span-2 sm:col-span-1 bg-slate-50/80 p-2.5 sm:p-3 rounded-xl border border-slate-100">
+                        <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-0.5">Nomor HP</p>
+                        <div class="flex items-center justify-between gap-2">
+                            <span class="font-bold text-slate-800 text-xs sm:text-sm truncate">${b.hp || '-'}</span>
+                            ${formatHp ? `<a href="${waLink}" target="_blank" class="text-emerald-700 bg-emerald-100/80 hover:bg-emerald-200 px-2 py-0.5 rounded text-[10px] font-bold flex items-center gap-1 transition-colors shrink-0" title="Chat WA Langsung"><i class="fab fa-whatsapp"></i> Chat</a>` : ''}
+                        </div>
+                    </div>
+
+                    <!-- Alamat / Titik Jemput -->
+                    <div class="col-span-2 bg-slate-50/80 p-2.5 sm:p-3 rounded-xl border border-slate-100">
+                        <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-0.5">Alamat / Titik Jemput</p>
+                        <p class="font-bold text-slate-700 text-xs sm:text-sm leading-snug">${bAlamat}</p>
+                    </div>
+
+                    <!-- Armada & Tujuan -->
+                    <div class="col-span-2 bg-slate-50/80 p-2.5 sm:p-3 rounded-xl border border-slate-100">
+                        <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-0.5">Armada & Rute Tujuan</p>
+                        <p class="font-bold text-slate-800 text-xs sm:text-sm flex items-center gap-1.5 flex-wrap">
+                            <span>${armadaName}</span>
+                            <i class="fas fa-arrow-right text-[9px] text-blue-500"></i>
+                            <span class="text-blue-600 font-extrabold uppercase">${tujuan}</span>
+                        </p>
+                    </div>
+
+                    <!-- Tanggal & Jam -->
+                    <div class="col-span-1 bg-slate-50/80 p-2.5 sm:p-3 rounded-xl border border-slate-100">
+                        <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-0.5">Jadwal Berangkat</p>
+                        <p class="font-bold text-slate-800 text-xs sm:text-sm truncate">${b.dateTravel || '-'}</p>
+                        <p class="text-blue-600 font-black text-xs mt-0.5">${b.waktu || '-'}</p>
+                    </div>
+
+                    <!-- Kursi & Penumpang -->
+                    <div class="col-span-1 bg-slate-50/80 p-2.5 sm:p-3 rounded-xl border border-slate-100">
+                        <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-0.5">Kursi / PNP</p>
+                        <p class="font-extrabold text-amber-600 text-xs sm:text-sm">Kursi: ${bKursi}</p>
+                        <p class="text-slate-600 font-bold text-[11px] mt-0.5">${bQty} Orang</p>
+                    </div>
+
+                    <!-- Total Bayar -->
+                    <div class="col-span-1 bg-amber-50/70 p-2.5 sm:p-3 rounded-xl border border-amber-200/80">
+                        <p class="text-[9px] font-bold text-amber-600 uppercase tracking-widest mb-0.5">Total Bayar</p>
+                        <p class="font-black text-orange-600 text-xs sm:text-base">${formatRupiah(total)}</p>
+                    </div>
+
+                    <!-- Metode Bayar -->
+                    <div class="col-span-1 bg-slate-50/80 p-2.5 sm:p-3 rounded-xl border border-slate-100">
+                        <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-0.5">Metode Bayar</p>
+                        <p class="font-bold text-slate-800 text-xs sm:text-sm uppercase truncate">${b.pembayaran || '-'}</p>
+                    </div>
+
+                    <!-- Keterangan jika ada -->
+                    ${rawKet !== '-' ? `
+                    <div class="col-span-2 bg-slate-50/80 p-2.5 sm:p-3 rounded-xl border border-slate-100">
+                        <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-0.5">Keterangan</p>
+                        <p class="font-bold text-slate-600 text-xs leading-snug">${rawKet}</p>
+                    </div>` : ''}
+
+                    ${biayaTambahanHtml}
                 </div>
-                <div class="col-span-2 sm:col-span-1">
-                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Nomor HP</p>
-                    <p class="font-bold text-slate-800 text-sm flex items-center gap-2">
-                        <span>${b.hp || '-'}</span>
-                        ${formatHp ? `<a href="${waLink}" target="_blank" class="text-emerald-600 hover:text-emerald-700 text-xs" title="Chat WhatsApp"><i class="fab fa-whatsapp"></i></a>` : ''}
-                    </p>
-                </div>
-                <div class="col-span-2">
-                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Alamat / Titik Jemput</p>
-                    <p class="font-bold text-slate-700 text-xs">${bAlamat}</p>
-                </div>
-                <div class="col-span-2">
-                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Armada & Tujuan</p>
-                    <p class="font-bold text-slate-800 uppercase text-sm">${armadaName} &rarr; <span class="text-blue-600">${tujuan}</span></p>
-                </div>
-                <div class="col-span-2 sm:col-span-1">
-                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Tanggal & Waktu</p>
-                    <p class="font-bold text-slate-800 text-sm">${b.dateTravel || '-'} <span class="text-blue-600 ml-1 font-black">(${b.waktu || '-'})</span></p>
-                </div>
-                <div class="col-span-2 sm:col-span-1">
-                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Jumlah / Kursi</p>
-                    <p class="font-bold text-slate-800 text-sm">${bQty} Orang <span class="text-slate-300 mx-1">|</span> Kursi: <span class="font-black text-amber-600">${bKursi}</span></p>
-                </div>
-                <div class="col-span-2 sm:col-span-1">
-                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Total Bayar</p>
-                    <p class="font-black text-orange-600 text-base">${formatRupiah(total)}</p>
-                </div>
-                <div class="col-span-2 sm:col-span-1">
-                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Metode Bayar</p>
-                    <p class="font-bold text-slate-800 text-sm uppercase">${b.pembayaran || '-'}</p>
-                </div>
-                <div class="col-span-2 bg-slate-50 p-3 rounded-xl border border-slate-100 mt-1">
-                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Keterangan</p>
-                    <p class="font-bold text-slate-700 text-xs">${rawKet}</p>
-                </div>
-                ${biayaTambahanHtml}
             </div>
         `;
 
         // Shortcut buttons styling:
         // Status toggle button:
-        const statusBtnClass = isPaid ? 'bg-amber-600 hover:bg-amber-700 text-white' : 'bg-emerald-600 hover:bg-emerald-700 text-white';
+        const statusBtnClass = isPaid ? 'bg-amber-600 hover:bg-amber-700 active:bg-amber-800 text-white' : 'bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white';
         const statusBtnIcon = isPaid ? 'fas fa-undo-alt' : 'fas fa-check-circle';
         const statusBtnText = isPaid ? 'Set Belum Lunas' : 'Tandai Lunas';
 
         actions.innerHTML = `
-            <div class="w-full flex flex-col gap-2.5">
+            <div class="w-full flex flex-col gap-2">
                 <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 w-full">
                     <!-- 1. WHATSAPP -->
-                    <a href="${waLink}" target="_blank" class="flex flex-col sm:flex-row items-center justify-center gap-1.5 py-2.5 px-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl shadow-xs transition-all text-center">
-                        <i class="fab fa-whatsapp text-base"></i>
-                        <span class="text-[11px] font-black uppercase tracking-wider">WhatsApp</span>
+                    <a href="${waLink}" target="_blank" class="flex items-center justify-center gap-1.5 py-2.5 px-2 bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white rounded-xl shadow-xs transition-all text-center min-h-[42px] select-none">
+                        <i class="fab fa-whatsapp text-sm sm:text-base"></i>
+                        <span class="text-[11px] sm:text-xs font-black uppercase tracking-wider">WhatsApp</span>
                     </a>
 
                     <!-- 2. E-TICKET -->
-                    <button type="button" onclick="closeBookingDetailModal(); openETicket('${bTicketId}')" class="flex flex-col sm:flex-row items-center justify-center gap-1.5 py-2.5 px-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl shadow-xs transition-all text-center">
-                        <i class="fas fa-ticket-alt text-base"></i>
-                        <span class="text-[11px] font-black uppercase tracking-wider">E-Ticket</span>
+                    <button type="button" onclick="closeBookingDetailModal(); openETicket('${bTicketId}')" class="flex items-center justify-center gap-1.5 py-2.5 px-2 bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 text-white rounded-xl shadow-xs transition-all text-center min-h-[42px] select-none">
+                        <i class="fas fa-ticket-alt text-sm sm:text-base"></i>
+                        <span class="text-[11px] sm:text-xs font-black uppercase tracking-wider">E-Ticket</span>
                     </button>
 
                     <!-- 3. STATUS PEMBAYARAN -->
-                    <button type="button" onclick="toggleBookingPaymentStatus('${bTicketId}')" class="flex flex-col sm:flex-row items-center justify-center gap-1.5 py-2.5 px-2 ${statusBtnClass} rounded-xl shadow-xs transition-all text-center" title="Klik untuk mengubah status pembayaran">
-                        <i class="${statusBtnIcon} text-base"></i>
-                        <span class="text-[11px] font-black uppercase tracking-wider leading-tight">${statusBtnText}</span>
+                    <button type="button" onclick="toggleBookingPaymentStatus('${bTicketId}')" class="flex items-center justify-center gap-1.5 py-2.5 px-2 ${statusBtnClass} rounded-xl shadow-xs transition-all text-center min-h-[42px] select-none" title="Klik untuk mengubah status pembayaran">
+                        <i class="${statusBtnIcon} text-sm sm:text-base"></i>
+                        <span class="text-[11px] sm:text-xs font-black uppercase tracking-wider leading-tight">${statusBtnText}</span>
                     </button>
 
                     <!-- 4. EDIT -->
-                    <button type="button" onclick="closeBookingDetailModal(); openEditBookingModal('${bTicketId}')" class="flex flex-col sm:flex-row items-center justify-center gap-1.5 py-2.5 px-2 bg-amber-500 hover:bg-amber-600 text-white rounded-xl shadow-xs transition-all text-center">
-                        <i class="fas fa-edit text-base"></i>
-                        <span class="text-[11px] font-black uppercase tracking-wider">Edit</span>
+                    <button type="button" onclick="closeBookingDetailModal(); openEditBookingModal('${bTicketId}')" class="flex items-center justify-center gap-1.5 py-2.5 px-2 bg-amber-500 hover:bg-amber-600 active:bg-amber-700 text-white rounded-xl shadow-xs transition-all text-center min-h-[42px] select-none">
+                        <i class="fas fa-edit text-sm sm:text-base"></i>
+                        <span class="text-[11px] sm:text-xs font-black uppercase tracking-wider">Edit</span>
                     </button>
                 </div>
 
-                <div class="flex justify-between items-center pt-2 border-t border-slate-200/70">
-                    <button type="button" onclick="closeBookingDetailModal(); openDeleteModal('${bTicketId}')" class="text-red-500 hover:text-red-700 hover:bg-red-50 px-2.5 py-1.5 rounded-lg text-xs font-bold transition-colors flex items-center gap-1.5">
-                        <i class="fas fa-trash"></i> Hapus Pesanan
+                <div class="flex justify-between items-center pt-1.5 border-t border-slate-200/70">
+                    <button type="button" onclick="closeBookingDetailModal(); openDeleteModal('${bTicketId}')" class="text-red-500 hover:text-red-700 hover:bg-red-50 active:bg-red-100 px-2.5 py-1.5 rounded-lg text-xs font-bold transition-colors flex items-center gap-1.5">
+                        <i class="fas fa-trash text-xs"></i> <span>Hapus</span>
                     </button>
-                    <button type="button" onclick="closeBookingDetailModal()" class="bg-slate-200 hover:bg-slate-300 text-slate-700 px-4 py-1.5 rounded-lg text-xs font-bold transition-colors">
+                    <button type="button" onclick="closeBookingDetailModal()" class="bg-slate-200 hover:bg-slate-300 active:bg-slate-400 text-slate-700 px-4 py-1.5 rounded-lg text-xs font-bold transition-colors">
                         Tutup
                     </button>
                 </div>

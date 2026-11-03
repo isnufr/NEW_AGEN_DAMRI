@@ -712,3 +712,15 @@ body.dark-mode .wizard-step.completed {
     color: #d97706;
     font-weight: 900;
 }
+
+
+/* Mobile Device Optimization */
+@media (max-width: 640px) {
+    .chart-card {
+        padding: 14px 12px !important;
+        border-radius: 16px !important;
+    }
+    body {
+        -webkit-tap-highlight-color: transparent;
+    }
+}
