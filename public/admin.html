@@ -2053,8 +2053,8 @@
     <!-- Script Logic Ekstra Booking -->    <!-- ======================================= -->
     <!-- BOOKING DETAIL MODAL -->
     <!-- ======================================= -->
-    <div id="bookingDetailModal" class="fixed inset-0 bg-slate-900/50  z-50 hidden items-center justify-center p-4">
-        <div id="bookingDetailModalInner" class="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden transform scale-95 opacity-0 transition-all duration-300 flex flex-col max-h-[90vh]">
+    <div id="bookingDetailModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 hidden items-center justify-center p-4" onclick="if(event.target === this) closeBookingDetailModal()">
+        <div id="bookingDetailModalInner" class="bg-white rounded-3xl shadow-2xl w-full max-w-lg overflow-hidden transform scale-95 opacity-0 transition-all duration-300 flex flex-col max-h-[90vh] relative border border-slate-100">
             <div class="absolute top-4 right-4 w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center text-white text-lg shadow-lg cursor-pointer hover:bg-blue-600 transition-colors z-10" onclick="closeBookingDetailModal()">
                 <i class="fas fa-times"></i>
             </div>

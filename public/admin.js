@@ -727,49 +727,35 @@
                     const waNumber = String(bHp).replace(/\D/g, '').replace(/^0/, '62');
 
                     html += `
-                                    <div class="flex items-center justify-between p-3 border-b border-slate-100 last:border-0 hover:bg-slate-50 transition-colors gap-3 w-full overflow-hidden">
-                                        <!-- Left: Data -->
+                                    <div onclick="openBookingDetailModal('${bId}')" class="group flex items-center justify-between p-3.5 border-b border-slate-100 last:border-0 hover:bg-blue-50/60 active:bg-blue-100/50 cursor-pointer transition-all gap-3 w-full overflow-hidden select-none" title="Klik untuk lihat Detail Data Pesanan">
+                                        <!-- Left: Data Penumpang -->
                                         <div class="flex-1 min-w-0 flex flex-col pr-1">
-                                            <!-- Row 1: ID, Tujuan & Status (Mobile) -->
-                                            <div class="flex items-center justify-between mb-1 gap-2">
-                                                <span class="text-[10px] font-black text-blue-600 truncate flex-1 min-w-0">${bId} - ${bTujuan}</span>
-                                                <span class="sm:hidden inline-block px-1.5 py-0.5 rounded text-[8px] font-black shrink-0 ${badgeClass}">${badgeText}</span>
+                                            <!-- Row 1: ID Tiket & Tujuan -->
+                                            <div class="flex items-center gap-2 mb-1">
+                                                <span class="text-[10px] font-black text-blue-600 truncate uppercase tracking-wider">${bId} • ${bTujuan}</span>
                                             </div>
                                             
-                                            <!-- Row 2: Name & WA -->
-                                            <div class="flex items-center gap-2 mb-1.5 w-full">
-                                                <span class="font-bold text-sm text-slate-800 uppercase truncate flex-1 min-w-0">${bName}</span>
-                                                <a href="https://wa.me/${waNumber}" target="_blank" class="shrink-0 bg-green-100 text-green-600 hover:bg-green-200 w-6 h-6 rounded flex items-center justify-center transition-colors" title="Hubungi via WhatsApp">
-                                                    <i class="fab fa-whatsapp"></i>
-                                                </a>
+                                            <!-- Row 2: Nama Penumpang -->
+                                            <div class="mb-1 w-full">
+                                                <span class="font-black text-sm text-slate-800 uppercase tracking-tight truncate block group-hover:text-blue-700 transition-colors">${bName}</span>
                                             </div>
                                             
                                             <!-- Row 3: Qty & Kursi -->
-                                            <div class="flex items-center gap-3 text-[10px] font-bold text-slate-600">
-                                                <span class="flex items-center gap-1"><i class="fas fa-users text-slate-400"></i> ${bQty} PNP</span>
-                                                <span class="flex items-center gap-1"><i class="fas fa-chair text-slate-400"></i> ${bKursi}</span>
+                                            <div class="flex items-center gap-3 text-[11px] font-bold text-slate-600">
+                                                <span class="flex items-center gap-1.5"><i class="fas fa-users text-slate-400 text-xs"></i> ${bQty} PNP</span>
+                                                <span class="flex items-center gap-1.5"><i class="fas fa-chair text-amber-500 text-xs"></i> Kursi: <span class="text-slate-800 font-extrabold">${bKursi}</span></span>
                                             </div>
 
                                             <!-- Row 4: Keterangan & Warning (if any) -->
-                                            ${ket ? `<div class="mt-2 text-[9px] text-amber-700 bg-amber-50 px-2 py-1 rounded border border-amber-100 max-w-full truncate inline-block w-fit"><i class="fas fa-info-circle mr-1"></i>${ket}</div>` : ''}
+                                            ${ket ? `<div class="mt-1.5 text-[9px] text-amber-700 bg-amber-50 px-2 py-0.5 rounded border border-amber-100 max-w-full truncate inline-block w-fit"><i class="fas fa-info-circle mr-1"></i>${ket}</div>` : ''}
                                             ${warningHtml ? `<div class="mt-1">${warningHtml}</div>` : ''}
                                         </div>
 
-                                        <!-- Right: Actions (Desktop Status & Buttons) -->
-                                        <div class="flex flex-col sm:flex-row items-end sm:items-center gap-3 shrink-0">
-                                            <!-- Desktop Status -->
-                                            <div class="hidden sm:block">
-                                                <span class="inline-block px-2 py-1 rounded text-[10px] font-black ${badgeClass}">${badgeText}</span>
-                                            </div>
-                                            
-                                            <!-- Actions -->
-                                            <div class="flex gap-2">
-                                                <button onclick="openETicket('${bId}')" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-600 w-8 h-8 rounded-lg flex items-center justify-center transition-colors shadow-sm" title="E-Tiket">
-                                                    <i class="fas fa-ticket-alt"></i>
-                                                </button>
-                                                <button onclick="openEditBookingModal('${bId}')" class="bg-slate-100 hover:bg-slate-200 text-slate-700 w-8 h-8 rounded-lg flex items-center justify-center transition-colors shadow-sm" title="Edit">
-                                                    <i class="fas fa-edit"></i>
-                                                </button>
+                                        <!-- Right: Status Badge & Chevron Icon (Ringkas & Menghemat Space) -->
+                                        <div class="flex items-center gap-2.5 shrink-0">
+                                            <span class="inline-block px-2.5 py-1 rounded-full text-[9px] font-black uppercase tracking-wider shadow-xs ${badgeClass}">${badgeText}</span>
+                                            <div class="w-7 h-7 rounded-full bg-slate-100 group-hover:bg-blue-600 group-hover:text-white flex items-center justify-center text-slate-400 transition-all shadow-xs">
+                                                <i class="fas fa-chevron-right text-[10px] transform group-hover:translate-x-0.5 transition-transform"></i>
                                             </div>
                                         </div>
                                     </div>
@@ -967,7 +953,7 @@
     }
 
     // ========================================
-    // BOOKING DETAIL MODAL
+    // BOOKING DETAIL MODAL & ON-CLICK ACTIONS
     // ========================================
     window.openBookingDetailModal = function(id, showAccBtn) {
         const allBookings = getBookings();
@@ -982,7 +968,7 @@
         const actions = document.getElementById('bookingDetailActions');
 
         const isPaid = (b.status === 'paid' || String(b.status).toUpperCase() === 'LUNAS' || String(b.status).toUpperCase() === 'ACC');
-        const badgeClass = isPaid ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700';
+        const badgeClass = isPaid ? 'bg-emerald-100 text-emerald-700 border border-emerald-300' : 'bg-amber-100 text-amber-700 border border-amber-300';
         const badgeText = isPaid ? 'LUNAS' : 'BELUM LUNAS';
 
         const armada = b.armadaId !== 'UNKNOWN' ? getArmada(b.armadaId) : null;
@@ -1003,27 +989,43 @@
         const expectedTotal = armada ? parseInt(armada.price) * (parseInt(b.qty) || 1) : 0;
         const total = Math.max(parseInt(b.totalPrice) || 0, expectedTotal + nominalBiayaTambahan);
 
-        const formatHp = String(b.hp || "").replace(/[^0-9]/g, '').replace(/^0/, '62');
-        const waLink = `https://wa.me/${formatHp}?text=${encodeURIComponent('Halo ' + b.name + ', ')}`;
+        const bTicketId = b.bookingId || b.id || id;
+        const bAlamat = b.alamat || b['ALAMAT'] || b['Alamat'] || b.titikKumpul || b['TITIK KUMPUL'] || '-';
+        const bKursi = b.kursi || '-';
+        const bQty = b.qty || b['JUMLAH PNP'] || 1;
+
+        const formatHp = String(b.hp || b['NOMOR HP'] || "").replace(/[^0-9]/g, '').replace(/^0/, '62');
+        const waMsgText = `Halo Sdr/i *${b.name || 'Penumpang'}*,\n\nBerikut rincian tiket perjalanan Anda di *Agen DAMRI Kawunganten*:\n` +
+            `🎫 *No Tiket:* ${bTicketId}\n` +
+            `🚌 *Armada:* ${armadaName}\n` +
+            `📍 *Tujuan:* ${tujuan}\n` +
+            `📅 *Tanggal:* ${b.dateTravel || '-'}\n` +
+            `⏰ *Jam:* ${b.waktu || '-'}\n` +
+            `👥 *Penumpang:* ${bQty} Orang\n` +
+            `🪑 *Kursi:* ${bKursi}\n` +
+            `💰 *Total:* ${formatRupiah(total)}\n` +
+            `📌 *Status:* ${badgeText}\n\n` +
+            `Terima kasih telah menggunakan layanan kami.`;
+        const waLink = `https://wa.me/${formatHp}?text=${encodeURIComponent(waMsgText)}`;
         
         let biayaTambahanHtml = '';
         if (nominalBiayaTambahan > 0) {
             biayaTambahanHtml = `
-                <div class="col-span-2 bg-amber-50 p-3 rounded-lg border border-amber-100 mt-2">
-                    <p class="text-[10px] font-bold text-amber-500 uppercase tracking-widest mb-1">Biaya Tambahan</p>
-                    <p class="font-bold text-amber-700 text-xs">${formatRupiah(nominalBiayaTambahan)} <span class="font-normal text-amber-600">(${ketTambahan})</span></p>
+                <div class="col-span-2 bg-amber-50 p-3 rounded-xl border border-amber-200 mt-1">
+                    <p class="text-[10px] font-bold text-amber-600 uppercase tracking-widest mb-1">Biaya Tambahan</p>
+                    <p class="font-bold text-amber-800 text-xs">${formatRupiah(nominalBiayaTambahan)} <span class="font-normal text-amber-600">(${ketTambahan})</span></p>
                 </div>
             `;
         }
 
         content.innerHTML = `
-            <div class="grid grid-cols-2 gap-y-3 gap-x-4">
-                <div class="col-span-2 flex justify-between items-center pb-2 border-b border-slate-100">
+            <div class="grid grid-cols-2 gap-y-3.5 gap-x-4">
+                <div class="col-span-2 flex justify-between items-center pb-2.5 border-b border-slate-100">
                     <div>
                         <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">ID Tiket</p>
-                        <p class="font-black text-blue-600 text-lg">${b.bookingId || '-'}</p>
+                        <p class="font-black text-blue-600 text-xl tracking-tight">${bTicketId}</p>
                     </div>
-                    <span class="px-3 py-1.5 rounded-lg text-[10px] font-black ${badgeClass}">${badgeText}</span>
+                    <span class="px-3.5 py-1.5 rounded-full text-xs font-black uppercase tracking-wider ${badgeClass}">${badgeText}</span>
                 </div>
                 <div class="col-span-2 sm:col-span-1">
                     <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Nama Penumpang</p>
@@ -1031,19 +1033,26 @@
                 </div>
                 <div class="col-span-2 sm:col-span-1">
                     <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Nomor HP</p>
-                    <p class="font-bold text-slate-800 text-sm">${b.hp || '-'}</p>
+                    <p class="font-bold text-slate-800 text-sm flex items-center gap-2">
+                        <span>${b.hp || '-'}</span>
+                        ${formatHp ? `<a href="${waLink}" target="_blank" class="text-emerald-600 hover:text-emerald-700 text-xs" title="Chat WhatsApp"><i class="fab fa-whatsapp"></i></a>` : ''}
+                    </p>
+                </div>
+                <div class="col-span-2">
+                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Alamat / Titik Jemput</p>
+                    <p class="font-bold text-slate-700 text-xs">${bAlamat}</p>
                 </div>
                 <div class="col-span-2">
                     <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Armada & Tujuan</p>
-                    <p class="font-bold text-slate-800 uppercase text-sm">${armadaName} &rarr; ${tujuan}</p>
+                    <p class="font-bold text-slate-800 uppercase text-sm">${armadaName} &rarr; <span class="text-blue-600">${tujuan}</span></p>
                 </div>
                 <div class="col-span-2 sm:col-span-1">
                     <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Tanggal & Waktu</p>
-                    <p class="font-bold text-slate-800 text-sm">${b.dateTravel || '-'} <span class="text-blue-500 ml-1">(${b.waktu || '-'})</span></p>
+                    <p class="font-bold text-slate-800 text-sm">${b.dateTravel || '-'} <span class="text-blue-600 ml-1 font-black">(${b.waktu || '-'})</span></p>
                 </div>
                 <div class="col-span-2 sm:col-span-1">
                     <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Jumlah / Kursi</p>
-                    <p class="font-bold text-slate-800 text-sm">${b.qty || 1} Orang <span class="text-slate-400 mx-1">|</span> Kursi: ${b.kursi || '-'}</p>
+                    <p class="font-bold text-slate-800 text-sm">${bQty} Orang <span class="text-slate-300 mx-1">|</span> Kursi: <span class="font-black text-amber-600">${bKursi}</span></p>
                 </div>
                 <div class="col-span-2 sm:col-span-1">
                     <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Total Bayar</p>
@@ -1053,7 +1062,7 @@
                     <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Metode Bayar</p>
                     <p class="font-bold text-slate-800 text-sm uppercase">${b.pembayaran || '-'}</p>
                 </div>
-                <div class="col-span-2 bg-slate-50 p-3 rounded-lg border border-slate-100 mt-2">
+                <div class="col-span-2 bg-slate-50 p-3 rounded-xl border border-slate-100 mt-1">
                     <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Keterangan</p>
                     <p class="font-bold text-slate-700 text-xs">${rawKet}</p>
                 </div>
@@ -1061,17 +1070,49 @@
             </div>
         `;
 
+        // Shortcut buttons styling:
+        // Status toggle button:
+        const statusBtnClass = isPaid ? 'bg-amber-600 hover:bg-amber-700 text-white' : 'bg-emerald-600 hover:bg-emerald-700 text-white';
+        const statusBtnIcon = isPaid ? 'fas fa-undo-alt' : 'fas fa-check-circle';
+        const statusBtnText = isPaid ? 'Set Belum Lunas' : 'Tandai Lunas';
+
         actions.innerHTML = `
-            <a href="${waLink}" target="_blank" class="px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg text-xs font-black uppercase tracking-widest shadow-md transition-colors flex items-center gap-2">
-                <i class="fab fa-whatsapp"></i> Hubungi
-            </a>
-            ${(!isPaid && showAccBtn) ? `<button onclick="closeBookingDetailModal(); openConfirmModal('${b.bookingId}')" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-black uppercase tracking-widest shadow-md transition-colors flex items-center gap-2"><i class="fas fa-check"></i> ACC</button>` : ''}
-            <button onclick="closeBookingDetailModal(); openEditBookingModal('${b.bookingId}')" class="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white rounded-lg text-xs font-black uppercase tracking-widest shadow-md transition-colors flex items-center gap-2">
-                <i class="fas fa-edit"></i> Edit
-            </button>
-            <button onclick="closeBookingDetailModal(); openDeleteModal('${b.bookingId}')" class="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg text-xs font-black uppercase tracking-widest shadow-md transition-colors flex items-center gap-2">
-                <i class="fas fa-trash"></i> Hapus
-            </button>
+            <div class="w-full flex flex-col gap-2.5">
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 w-full">
+                    <!-- 1. WHATSAPP -->
+                    <a href="${waLink}" target="_blank" class="flex flex-col sm:flex-row items-center justify-center gap-1.5 py-2.5 px-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl shadow-xs transition-all text-center">
+                        <i class="fab fa-whatsapp text-base"></i>
+                        <span class="text-[11px] font-black uppercase tracking-wider">WhatsApp</span>
+                    </a>
+
+                    <!-- 2. E-TICKET -->
+                    <button type="button" onclick="closeBookingDetailModal(); openETicket('${bTicketId}')" class="flex flex-col sm:flex-row items-center justify-center gap-1.5 py-2.5 px-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl shadow-xs transition-all text-center">
+                        <i class="fas fa-ticket-alt text-base"></i>
+                        <span class="text-[11px] font-black uppercase tracking-wider">E-Ticket</span>
+                    </button>
+
+                    <!-- 3. STATUS PEMBAYARAN -->
+                    <button type="button" onclick="toggleBookingPaymentStatus('${bTicketId}')" class="flex flex-col sm:flex-row items-center justify-center gap-1.5 py-2.5 px-2 ${statusBtnClass} rounded-xl shadow-xs transition-all text-center" title="Klik untuk mengubah status pembayaran">
+                        <i class="${statusBtnIcon} text-base"></i>
+                        <span class="text-[11px] font-black uppercase tracking-wider leading-tight">${statusBtnText}</span>
+                    </button>
+
+                    <!-- 4. EDIT -->
+                    <button type="button" onclick="closeBookingDetailModal(); openEditBookingModal('${bTicketId}')" class="flex flex-col sm:flex-row items-center justify-center gap-1.5 py-2.5 px-2 bg-amber-500 hover:bg-amber-600 text-white rounded-xl shadow-xs transition-all text-center">
+                        <i class="fas fa-edit text-base"></i>
+                        <span class="text-[11px] font-black uppercase tracking-wider">Edit</span>
+                    </button>
+                </div>
+
+                <div class="flex justify-between items-center pt-2 border-t border-slate-200/70">
+                    <button type="button" onclick="closeBookingDetailModal(); openDeleteModal('${bTicketId}')" class="text-red-500 hover:text-red-700 hover:bg-red-50 px-2.5 py-1.5 rounded-lg text-xs font-bold transition-colors flex items-center gap-1.5">
+                        <i class="fas fa-trash"></i> Hapus Pesanan
+                    </button>
+                    <button type="button" onclick="closeBookingDetailModal()" class="bg-slate-200 hover:bg-slate-300 text-slate-700 px-4 py-1.5 rounded-lg text-xs font-bold transition-colors">
+                        Tutup
+                    </button>
+                </div>
+            </div>
         `;
 
         modal.classList.remove('hidden');
@@ -1080,18 +1121,90 @@
             inner.classList.remove('scale-95', 'opacity-0');
             inner.classList.add('scale-100', 'opacity-100');
         }, 10);
-    }
+    };
 
     window.closeBookingDetailModal = function() {
         const modal = document.getElementById('bookingDetailModal');
         const inner = document.getElementById('bookingDetailModalInner');
+        if (!modal || !inner) return;
         inner.classList.remove('scale-100', 'opacity-100');
         inner.classList.add('scale-95', 'opacity-0');
         setTimeout(() => {
             modal.classList.add('hidden');
             modal.classList.remove('flex');
         }, 300);
-    }
+    };
+
+    // Toggle Payment Status directly from Detail Pesanan
+    window.toggleBookingPaymentStatus = async function(id) {
+        const allBookings = getBookings();
+        const b = allBookings.find(x => String(x.bookingId) === String(id) || String(x.id) === String(id));
+        if (!b) {
+            alert("Data pesanan tidak ditemukan.");
+            return;
+        }
+
+        const isPaid = (b.status === 'paid' || String(b.status).toUpperCase() === 'LUNAS' || String(b.status).toUpperCase() === 'ACC');
+        const newStatus = isPaid ? 'BELUM LUNAS' : 'LUNAS';
+
+        if (typeof Swal !== 'undefined') {
+            const result = await Swal.fire({
+                title: isPaid ? 'Ubah ke Belum Lunas?' : 'Tandai Sebagai Lunas?',
+                text: `Pesanan ${b.bookingId || b.id} (${b.name}) akan diubah statusnya menjadi ${newStatus}.`,
+                icon: isPaid ? 'warning' : 'question',
+                showCancelButton: true,
+                confirmButtonColor: isPaid ? '#d97706' : '#10b981',
+                cancelButtonColor: '#64748b',
+                confirmButtonText: isPaid ? 'Ya, Jadikan Belum Lunas' : 'Ya, Tandai Lunas',
+                cancelButtonText: 'Batal'
+            });
+            if (!result.isConfirmed) return;
+        } else {
+            if (!confirm(`Ubah status pembayaran pesanan ${b.bookingId || b.id} menjadi ${newStatus}?`)) return;
+        }
+
+        const overlay = document.getElementById('loadingOverlay');
+        if (overlay) overlay.classList.remove('hidden');
+
+        try {
+            const payload = { 
+                id_tiket: b.bookingId || b.id, 
+                status: newStatus, 
+                pembayaran: newStatus 
+            };
+            const res = await postToSheets('updateStatus', payload);
+
+            if (res && res.status === "success") {
+                const bIndex = cachedBookings.findIndex(x => String(x.bookingId) === String(b.bookingId || b.id) || String(x.id) === String(b.bookingId || b.id));
+                if (bIndex !== -1) {
+                    cachedBookings[bIndex].status = (newStatus === 'LUNAS' ? 'paid' : 'BELUM LUNAS');
+                    cachedBookings[bIndex].pembayaran = newStatus;
+                    localStorage.setItem("app_bookings", JSON.stringify(cachedBookings));
+                }
+                if (typeof showMessage === 'function') {
+                    showMessage(`Status berhasil diubah menjadi ${newStatus}!`);
+                }
+                
+                // Refresh modal if open
+                const detailModal = document.getElementById('bookingDetailModal');
+                if (detailModal && !detailModal.classList.contains('hidden')) {
+                    openBookingDetailModal(b.bookingId || b.id);
+                }
+                
+                // Re-render views
+                if (typeof renderTodayTable === 'function') renderTodayTable();
+                if (typeof renderPesanan === 'function') renderPesanan();
+                if (typeof updateNotifications === 'function') updateNotifications();
+            } else {
+                alert('Gagal update status: ' + (res ? res.message : 'Unknown error'));
+            }
+        } catch (e) {
+            console.error(e);
+            alert('Terjadi kesalahan koneksi saat update status.');
+        } finally {
+            if (overlay) overlay.classList.add('hidden');
+        }
+    };
 
 
     let activeDeleteId = null;
