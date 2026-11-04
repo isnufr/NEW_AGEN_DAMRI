@@ -1376,22 +1376,28 @@
             const poTipe = firstA.tipeArmada || 'Bus Besar';
             const poDenah = firstA.denahId && typeof getDenah === 'function' ? getDenah(firstA.denahId) : null;
             const poSeat = poDenah?.totalKursi || firstA.capacity || 40;
+            const poProf = typeof getPoProfile === 'function' ? getPoProfile(key) : null;
+            const poImg = poProf?.image || 'damri.webp';
+            const poTagline = poProf?.tagline ? `<span class="hidden md:inline-block text-[10px] font-bold text-slate-500 italic bg-white/80 px-2 py-0.5 rounded-md border border-slate-200">${poProf.tagline}</span>` : '';
 
             html += `
                 <tr class="cursor-pointer bg-blue-50/80 hover:bg-blue-100/90 transition-colors border-b border-blue-200" onclick="toggleArmada('${index}')">
                     <td colspan="5" class="px-3 sm:px-4 py-3">
                         <div class="flex items-center justify-between gap-2 flex-wrap sm:flex-nowrap">
-                            <div class="flex items-center gap-2 flex-wrap">
-                                <i class="fas fa-bus text-blue-600"></i>
-                                <span class="font-black text-sm sm:text-base text-blue-900 uppercase">${key}</span>
-                                <span class="text-[10px] font-extrabold text-amber-800 bg-amber-100/80 border border-amber-300 px-2 py-0.5 rounded-lg flex items-center gap-1 shadow-2xs">
-                                    <i class="fas fa-shuttle-van text-[9px] text-amber-600"></i> ${poTipe} • ${poSeat} Kursi
-                                </span>
-                                <span class="text-[10px] font-bold text-blue-600 bg-blue-100 px-2 py-0.5 rounded-md">${rutes.length} Rute</span>
+                            <div class="flex items-center gap-2.5 flex-wrap">
+                                <img src="${poImg}" alt="${key}" class="w-9 h-9 rounded-xl object-cover border border-amber-300 shadow-2xs shrink-0" onerror="this.src='damri.webp'">
+                                <div class="flex items-center gap-2 flex-wrap">
+                                    <span class="font-black text-sm sm:text-base text-blue-900 uppercase">${key}</span>
+                                    <span class="text-[10px] font-extrabold text-amber-800 bg-amber-100/80 border border-amber-300 px-2 py-0.5 rounded-lg flex items-center gap-1 shadow-2xs">
+                                        <i class="fas fa-shuttle-van text-[9px] text-amber-600"></i> ${poTipe} • ${poSeat} Kursi
+                                    </span>
+                                    <span class="text-[10px] font-bold text-blue-600 bg-blue-100 px-2 py-0.5 rounded-md">${rutes.length} Rute</span>
+                                    ${poTagline}
+                                </div>
                             </div>
                             <div class="flex items-center gap-2 shrink-0">
-                                <button type="button" onclick="event.stopPropagation(); openEditPoModal('${key}')" class="px-2.5 py-1.5 bg-white hover:bg-amber-500 hover:text-white text-slate-700 text-[10px] font-black rounded-xl border border-slate-200 shadow-xs transition-all flex items-center gap-1 active:scale-95" title="Atur tipe bus & denah untuk seluruh rute PO ${key}">
-                                    <i class="fas fa-sliders-h text-amber-500"></i> Atur Tipe PO
+                                <button type="button" onclick="event.stopPropagation(); openEditPoModal('${key}')" class="px-2.5 py-1.5 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-slate-900 text-[10px] font-black rounded-xl shadow-xs transition-all flex items-center gap-1.5 active:scale-95" title="Kelola informasi PO, foto armada & tipe bus ${key}">
+                                    <i class="fas fa-sliders-h"></i> Kelola Info & Foto PO
                                 </button>
                                 <i class="fas fa-chevron-down text-blue-600 text-xs transition-transform duration-300 ml-1" id="icon-armada-${index}" style="transform: ${iconRotate};"></i>
                             </div>
@@ -4995,7 +5001,135 @@ async function deleteTipeArmadaAction(name) {
     }
 }
 
-// Modal Atur Tipe Bus PO
+// ==========================================
+// PENGELOLAAN INFORMASI PO & FOTO ARMADA
+// ==========================================
+const COMMON_PO_FACILITIES = [
+    "Full AC",
+    "Reclining Seat",
+    "USB Charger",
+    "Audio Musik",
+    "TV / Hiburan",
+    "Air Mineral",
+    "Snack",
+    "Toilet",
+    "Bagasi Luas",
+    "Bantal & Selimut",
+    "Lampu Baca"
+];
+
+function renderFacilityChips(activeList = []) {
+    const container = document.getElementById('facilityChipsContainer');
+    if (!container) return;
+    const lowerActives = (activeList || []).map(x => String(x).trim().toLowerCase());
+
+    container.innerHTML = COMMON_PO_FACILITIES.map(fac => {
+        const isAct = lowerActives.includes(fac.toLowerCase());
+        const cls = isAct
+            ? 'bg-amber-500 text-slate-900 border-amber-600 font-black shadow-xs'
+            : 'bg-white hover:bg-slate-100 text-slate-600 border-slate-200 font-bold';
+        const icon = isAct ? '<i class="fas fa-check text-[9px]"></i> ' : '<i class="fas fa-plus text-[9px] text-slate-400"></i> ';
+        return `<button type="button" onclick="toggleFacilityChip('${fac}')" class="px-2.5 py-1 text-[10px] rounded-lg border transition-all flex items-center gap-1 ${cls}">${icon}${fac}</button>`;
+    }).join('');
+}
+
+function toggleFacilityChip(facName) {
+    const input = document.getElementById('editPoFacilities');
+    if (!input) return;
+    let list = input.value.split(',').map(s => s.trim()).filter(Boolean);
+    const idx = list.findIndex(x => x.toLowerCase() === facName.toLowerCase());
+    if (idx >= 0) {
+        list.splice(idx, 1);
+    } else {
+        list.push(facName);
+    }
+    input.value = list.join(', ');
+    renderFacilityChips(list);
+}
+
+function selectPoPresetImage(imgUrl) {
+    const urlInput = document.getElementById('editPoImageUrl');
+    const preview = document.getElementById('editPoImagePreview');
+    const badge = document.getElementById('editPoImageBadge');
+    const fileInput = document.getElementById('editPoImageFile');
+    if (fileInput) fileInput.value = '';
+    if (urlInput) urlInput.value = imgUrl;
+    if (preview) preview.src = imgUrl;
+    if (badge) badge.innerHTML = `<i class="fas fa-check-circle text-emerald-400"></i> Preset: ${imgUrl}`;
+}
+
+function updatePoImagePreviewFromInput(val) {
+    const preview = document.getElementById('editPoImagePreview');
+    const badge = document.getElementById('editPoImageBadge');
+    const clean = val.trim() || 'damri.webp';
+    if (preview) preview.src = clean;
+    if (badge) badge.innerHTML = `<i class="fas fa-link text-amber-400"></i> Custom URL / Path`;
+}
+
+function onPoImageFileSelected(input) {
+    if (input.files && input.files[0]) {
+        const file = input.files[0];
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            const preview = document.getElementById('editPoImagePreview');
+            if (preview) preview.src = e.target.result;
+            const badge = document.getElementById('editPoImageBadge');
+            if (badge) badge.innerHTML = `<i class="fas fa-file-image text-amber-400"></i> File: ${file.name} (Siap diunggah)`;
+        };
+        reader.readAsDataURL(file);
+    }
+}
+
+// LOGO PO HELPERS
+function onPoLogoFileSelected(input) {
+    if (input.files && input.files[0]) {
+        const file = input.files[0];
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            const preview = document.getElementById('editPoLogoPreview');
+            const placeholder = document.getElementById('editPoLogoPlaceholder');
+            const badge = document.getElementById('editPoLogoBadge');
+            if (preview) {
+                preview.src = e.target.result;
+                preview.style.display = 'block';
+            }
+            if (placeholder) placeholder.classList.add('hidden');
+            if (badge) badge.textContent = `File: ${file.name} (Siap diunggah)`;
+        };
+        reader.readAsDataURL(file);
+    }
+}
+
+function updatePoLogoPreviewFromInput(val) {
+    const preview = document.getElementById('editPoLogoPreview');
+    const placeholder = document.getElementById('editPoLogoPlaceholder');
+    const badge = document.getElementById('editPoLogoBadge');
+    const clean = (val || '').trim();
+    if (clean) {
+        if (preview) { preview.src = clean; preview.style.display = 'block'; }
+        if (placeholder) placeholder.classList.add('hidden');
+        if (badge) badge.textContent = 'Custom URL/Path';
+    } else {
+        if (preview) preview.style.display = 'none';
+        if (placeholder) placeholder.classList.remove('hidden');
+        if (badge) badge.textContent = 'Badge Teks Bawaan';
+    }
+}
+
+function clearPoLogo() {
+    const fileInput = document.getElementById('editPoLogoFile');
+    const urlInput = document.getElementById('editPoLogoUrl');
+    const preview = document.getElementById('editPoLogoPreview');
+    const placeholder = document.getElementById('editPoLogoPlaceholder');
+    const badge = document.getElementById('editPoLogoBadge');
+    if (fileInput) fileInput.value = '';
+    if (urlInput) urlInput.value = '';
+    if (preview) preview.style.display = 'none';
+    if (placeholder) placeholder.classList.remove('hidden');
+    if (badge) badge.textContent = 'Badge Teks Bawaan';
+}
+
+// Modal Atur Tipe Bus & Informasi PO
 function openEditPoModal(poName) {
     const armadas = typeof getArmadas === 'function' ? getArmadas() : [];
     const rutes = armadas.filter(a => a.name.toUpperCase() === poName.toUpperCase());
@@ -5007,6 +5141,63 @@ function openEditPoModal(poName) {
     const firstA = rutes[0];
     document.getElementById('editPoNama').value = poName;
     document.getElementById('modalEditPoSubtitle').textContent = `PO: ${poName} (${rutes.length} Rute)`;
+
+    // Ambil profil PO saat ini
+    const poProf = typeof getPoProfile === 'function' ? getPoProfile(poName) : null;
+    const currentImg = poProf?.image || 'damri.webp';
+    const currentTagline = poProf?.tagline || '';
+    const currentDesc = poProf?.description || '';
+    const currentFacilities = poProf?.facilities || ["Full AC", "Reclining Seat", "Bagasi Luas"];
+
+    // Set nilai form profil
+    const urlInput = document.getElementById('editPoImageUrl');
+    const preview = document.getElementById('editPoImagePreview');
+    const badge = document.getElementById('editPoImageBadge');
+    const fileInput = document.getElementById('editPoImageFile');
+    const quickPick = document.getElementById('editPoImageQuickPick');
+    if (quickPick) quickPick.classList.add('hidden');
+    if (fileInput) fileInput.value = '';
+    if (urlInput) urlInput.value = currentImg;
+    if (preview) preview.src = currentImg;
+    if (badge) badge.innerHTML = `<i class="fas fa-image text-amber-400"></i> Foto Saat Ini`;
+
+    // Set nilai Logo PO
+    const currentLogo = poProf?.logo || '';
+    const logoUrlInput = document.getElementById('editPoLogoUrl');
+    const logoPreview = document.getElementById('editPoLogoPreview');
+    const logoBadge = document.getElementById('editPoLogoBadge');
+    const logoPlaceholder = document.getElementById('editPoLogoPlaceholder');
+    const logoFileInput = document.getElementById('editPoLogoFile');
+    if (logoFileInput) logoFileInput.value = '';
+    if (logoUrlInput) logoUrlInput.value = currentLogo;
+    if (logoPreview) {
+        if (currentLogo) {
+            logoPreview.src = currentLogo;
+            logoPreview.style.display = 'block';
+            if (logoPlaceholder) logoPlaceholder.classList.add('hidden');
+            if (logoBadge) logoBadge.textContent = 'Logo Terpasang';
+        } else {
+            logoPreview.style.display = 'none';
+            if (logoPlaceholder) logoPlaceholder.classList.remove('hidden');
+            if (logoBadge) logoBadge.textContent = 'Badge Teks Bawaan';
+        }
+    }
+
+    const taglineInput = document.getElementById('editPoTagline');
+    if (taglineInput) taglineInput.value = currentTagline;
+
+    const descInput = document.getElementById('editPoDesc');
+    if (descInput) descInput.value = currentDesc;
+
+    const facInput = document.getElementById('editPoFacilities');
+    if (facInput) {
+        facInput.value = currentFacilities.join(', ');
+        facInput.oninput = () => {
+            const list = facInput.value.split(',').map(s => s.trim()).filter(Boolean);
+            renderFacilityChips(list);
+        };
+    }
+    renderFacilityChips(currentFacilities);
 
     populateTipeArmadaDropdowns();
     const tipeSel = document.getElementById('editPoTipe');
@@ -5060,6 +5251,12 @@ async function submitEditPo(e) {
     const poNama = document.getElementById('editPoNama')?.value;
     const tipe = document.getElementById('editPoTipe')?.value;
     const denahId = document.getElementById('editPoDenah')?.value || null;
+    let imgUrl = document.getElementById('editPoImageUrl')?.value?.trim() || 'damri.webp';
+    let logoUrl = document.getElementById('editPoLogoUrl')?.value?.trim() || '';
+    const tagline = document.getElementById('editPoTagline')?.value?.trim() || '';
+    const desc = document.getElementById('editPoDesc')?.value?.trim() || '';
+    const facStr = document.getElementById('editPoFacilities')?.value || '';
+    const facilities = facStr.split(',').map(s => s.trim()).filter(Boolean);
 
     if (!poNama || !tipe) return;
 
@@ -5067,25 +5264,75 @@ async function submitEditPo(e) {
     if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menyimpan...'; }
 
     try {
+        const token = localStorage.getItem('adminToken');
+
+        // Cek jika ada file foto armada baru yang diunggah
+        const fileInput = document.getElementById('editPoImageFile');
+        if (fileInput && fileInput.files && fileInput.files[0]) {
+            if (btn) btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Mengunggah Foto Armada...';
+            const formData = new FormData();
+            formData.append('image', fileInput.files[0]);
+
+            const uploadRes = await fetch('/api/upload-armada', {
+                method: 'POST',
+                headers: token ? { 'Authorization': `Bearer ${token}` } : {},
+                body: formData
+            });
+            const uploadJson = await uploadRes.json();
+            if (uploadJson && uploadJson.status === 'success' && uploadJson.url) {
+                imgUrl = uploadJson.url;
+            } else {
+                throw new Error(uploadJson?.message || 'Gagal mengunggah foto armada');
+            }
+        }
+
+        // Cek jika ada file logo PO baru yang diunggah
+        const logoFileInput = document.getElementById('editPoLogoFile');
+        if (logoFileInput && logoFileInput.files && logoFileInput.files[0]) {
+            if (btn) btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Mengunggah Logo PO...';
+            const formDataLogo = new FormData();
+            formDataLogo.append('logo', logoFileInput.files[0]);
+
+            const uploadLogoRes = await fetch('/api/upload-logo', {
+                method: 'POST',
+                headers: token ? { 'Authorization': `Bearer ${token}` } : {},
+                body: formDataLogo
+            });
+            const uploadLogoJson = await uploadLogoRes.json();
+            if (uploadLogoJson && uploadLogoJson.status === 'success' && uploadLogoJson.url) {
+                logoUrl = uploadLogoJson.url;
+            } else {
+                throw new Error(uploadLogoJson?.message || 'Gagal mengunggah logo PO');
+            }
+        }
+
+        if (btn) btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menyimpan Data...';
+
         const payload = {
             nama_armada: poNama,
             tipe_armada: tipe,
-            denah_id: denahId
+            denah_id: denahId,
+            image: imgUrl,
+            logo: logoUrl,
+            tagline: tagline,
+            description: desc,
+            facilities: facilities
         };
-        const res = await postToSheets('setPoType', payload);
+
+        const res = await postToSheets('savePoProfile', payload);
         if (res && res.status === 'success') {
-            if (typeof showMessage === 'function') showMessage(`Tipe bus PO ${poNama} berhasil diubah ke ${tipe} untuk seluruh rute!`);
+            if (typeof showMessage === 'function') showMessage(`Informasi, logo, dan foto armada PO ${poNama} berhasil disimpan!`);
             closeEditPoModal();
             await refreshData();
             renderArmada();
             renderDenahCards();
         } else {
-            alert(res?.message || 'Gagal mengubah tipe bus PO');
+            alert(res?.message || 'Gagal menyimpan profil PO');
         }
     } catch(err) {
-        alert(err.message);
+        alert(err.message || 'Terjadi kesalahan');
     } finally {
-        if (btn) { btn.disabled = false; btn.innerHTML = 'Simpan Tipe PO'; }
+        if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fas fa-check"></i> Simpan Informasi & Foto PO'; }
     }
 }
 
@@ -5100,6 +5347,14 @@ async function submitEditPo(e) {
     if (typeof onEditPoTipeChange !== 'undefined') window.onEditPoTipeChange = onEditPoTipeChange;
     if (typeof submitEditPo !== 'undefined') window.submitEditPo = submitEditPo;
     if (typeof populateTipeArmadaDropdowns !== 'undefined') window.populateTipeArmadaDropdowns = populateTipeArmadaDropdowns;
+    if (typeof selectPoPresetImage !== 'undefined') window.selectPoPresetImage = selectPoPresetImage;
+    if (typeof updatePoImagePreviewFromInput !== 'undefined') window.updatePoImagePreviewFromInput = updatePoImagePreviewFromInput;
+    if (typeof onPoImageFileSelected !== 'undefined') window.onPoImageFileSelected = onPoImageFileSelected;
+    if (typeof renderFacilityChips !== 'undefined') window.renderFacilityChips = renderFacilityChips;
+    if (typeof toggleFacilityChip !== 'undefined') window.toggleFacilityChip = toggleFacilityChip;
+    if (typeof onPoLogoFileSelected !== 'undefined') window.onPoLogoFileSelected = onPoLogoFileSelected;
+    if (typeof updatePoLogoPreviewFromInput !== 'undefined') window.updatePoLogoPreviewFromInput = updatePoLogoPreviewFromInput;
+    if (typeof clearPoLogo !== 'undefined') window.clearPoLogo = clearPoLogo;
 
     // Export modals globally to ensure HTML onclick can access them
     if (typeof openETicket !== 'undefined') window.openETicket = openETicket;

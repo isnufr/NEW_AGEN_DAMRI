@@ -1,0 +1,104 @@
+{
+  "77 TRANS": {
+    "image": "77trans.webp",
+    "logo": "",
+    "tagline": "Eksekutif & Nyaman",
+    "description": "Layanan bus eksekutif full AC, nyaman dan terpercaya melayani rute Jawa Tengah & sekitarnya.",
+    "facilities": [
+      "Full AC",
+      "Reclining Seat",
+      "USB Charger",
+      "Bagasi Luas",
+      "Audio / Musik"
+    ]
+  },
+  "ESTU TRANS": {
+    "image": "estutrans.webp",
+    "logo": "",
+    "tagline": "Cepat, Aman & Tepat Waktu",
+    "description": "Perjalanan door-to-door dengan armada terawat dan supir berpengalaman.",
+    "facilities": [
+      "Full AC",
+      "Reclining Seat",
+      "Audio Musik",
+      "Air Mineral",
+      "USB Charger"
+    ]
+  },
+  "DAMRI": {
+    "image": "damri.webp",
+    "logo": "logo.png",
+    "tagline": "Pelopor Angkutan Nasional",
+    "description": "Layanan bus antar kota dan antar pulau BUMN terpercaya dengan rute terlengkap dan armada standar keselamatan tinggi.",
+    "facilities": [
+      "Full AC",
+      "Reclining Seat",
+      "Bagasi Luas",
+      "Charging Port",
+      "Toilet"
+    ]
+  },
+  "BEST PREMIUM": {
+    "image": "bestpremium.webp",
+    "logo": "",
+    "tagline": "Luxury Travel Experience",
+    "description": "Layanan travel eksekutif dengan kenyamanan kelas premium dan privasi maksimal sepanjang perjalanan.",
+    "facilities": [
+      "Captain Seat",
+      "Full AC",
+      "USB Charger",
+      "Audio Video",
+      "Air Mineral"
+    ]
+  },
+  "EFISIENSI": {
+    "image": "efisiensi.webp",
+    "logo": "",
+    "tagline": "Cepat, Tepat & Terpercaya",
+    "description": "Bus cepat eksekutif antar kota dengan armada modern, interior bersih, dan ketepatan waktu tinggi.",
+    "facilities": [
+      "Full AC",
+      "Reclining Seat",
+      "Snack & Minum",
+      "Audio TV",
+      "Bagasi Luas"
+    ]
+  },
+  "QYTA TRANS": {
+    "image": "qyta.webp",
+    "logo": "",
+    "tagline": "Sahabat Perjalanan Anda",
+    "description": "Shuttle dan travel antar kota dengan armada bersih, nyaman, dan pelayanan ramah keluarga.",
+    "facilities": [
+      "Full AC",
+      "Comfort Seat",
+      "Musik / Hiburan",
+      "Driver Berpengalaman",
+      "USB Charger"
+    ]
+  },
+  "RIYAN": {
+    "image": "riyan.webp",
+    "logo": "",
+    "tagline": "Perjalanan Menyenangkan",
+    "description": "Layanan bus reguler dan pariwisata terbaik dengan tarif bersahabat dan armada prima.",
+    "facilities": [
+      "Full AC",
+      "Reclining Seat",
+      "Bagasi Luas",
+      "Sound System"
+    ]
+  },
+  "ARDY TRANS": {
+    "image": "riyan.webp",
+    "logo": "",
+    "tagline": "Pelayanan Ramah & Aman",
+    "description": "Travel dan shuttle antar kota yang handal dengan pelayanan prima dan armada selalu prima.",
+    "facilities": [
+      "Full AC",
+      "Reclining Seat",
+      "USB Charger",
+      "Musik"
+    ]
+  }
+}

@@ -837,7 +837,7 @@
                         Partner
                         :</span>
 
-                    <div class="flex flex-wrap items-center justify-center gap-x-3 gap-y-2">
+                    <div id="officialPartnerList" class="flex flex-wrap items-center justify-center gap-x-3 gap-y-2">
                         <!-- Logo DAMRI -->
                         <button onclick="scrollToArmada('damri-jkt')"
                             class="flex items-center shrink-0 hover:scale-110 transition-transform active:scale-95">
@@ -1484,113 +1484,249 @@
             try {
                 // Memanggil fungsi initData dari app.js
                 await initData();
-
-                const armadas = getArmadas();
-                if (armadas && armadas.length > 0) {
-                    // Konversi data dari database ke struktur fleetData yang dibutuhkan index.html
-                    const grouped = {};
-                    armadas.forEach(a => {
-                        if (a.isActive === false) return; // Lewati armada yang dinonaktifkan
-                        if (!grouped[a.name]) {
-                            grouped[a.name] = { id: a.name.replace(/\s+/g, '-').toLowerCase(), name: a.name, routes: [], times: new Set() };
-                        }
-                        // Cek jika rute sudah ada
-                        const existingRoute = grouped[a.name].routes.find(r => r.dest === a.destination);
-                        if (!existingRoute) {
-                            grouped[a.name].routes.push({ dest: a.destination, price: parseInt(a.price) });
-                        }
-                        grouped[a.name].times.add(a.time);
-                    });
-
-                    fleetData = Object.values(grouped).map(g => ({
-                        ...g,
-                        times: Array.from(g.times).sort()
-                    }));
-
-                    // Update dropdown armada otomatis
-                    populateArmadaDropdown();
-                    renderArmadaGrid();
-                }
+                loadAndRenderPublicData();
             } catch (e) {
                 console.error("Gagal memuat data armada", e);
             }
         });
 
+        function loadAndRenderPublicData() {
+            const armadas = typeof getArmadas === 'function' ? getArmadas() : [];
+            if (armadas && armadas.length > 0) {
+                const grouped = {};
+                armadas.forEach(a => {
+                    if (a.isActive === false) return; // Lewati armada yang dinonaktifkan
+                    const poKey = (a.name || 'UNKNOWN').trim();
+                    if (!grouped[poKey]) {
+                        grouped[poKey] = {
+                            id: poKey.replace(/\s+/g, '-').toLowerCase(),
+                            name: poKey,
+                            routes: [],
+                            times: new Set(),
+                            tipeArmada: a.tipeArmada || 'Bus Besar',
+                            capacity: a.capacity || 40,
+                            denahId: a.denahId || null
+                        };
+                    }
+                    const existingRoute = grouped[poKey].routes.find(r => r.dest === a.destination);
+                    if (!existingRoute) {
+                        grouped[poKey].routes.push({ dest: a.destination, price: parseInt(a.price) });
+                    }
+                    if (a.time) grouped[poKey].times.add(a.time);
+                    if (a.capacity) grouped[poKey].capacity = a.capacity;
+                    if (a.tipeArmada) grouped[poKey].tipeArmada = a.tipeArmada;
+                });
+
+                fleetData = Object.values(grouped).map(g => ({
+                    ...g,
+                    times: Array.from(g.times).sort()
+                }));
+
+                populateArmadaDropdown();
+                renderArmadaGrid();
+                renderArmadaGallery();
+                renderPartnerLogos();
+            }
+        }
+        window.reloadPublicUI = loadAndRenderPublicData;
+
         function renderArmadaGrid() {
             const grid = document.getElementById('armadaGridBus');
             if (!grid) return;
 
+            if (!fleetData.length) {
+                grid.innerHTML = '<div class="col-span-full py-12 text-center text-slate-400 font-bold uppercase tracking-wider">Belum ada armada aktif yang tersedia</div>';
+                return;
+            }
+
             let html = '';
             fleetData.forEach(f => {
-                let colorClass = "text-blue-900";
-                let bgHover = "group-hover:bg-blue-600";
-                let spanClass = "";
-                let nameDisplay = f.name;
+                const profile = typeof getPoProfile === 'function' ? getPoProfile(f.name) : null;
+                const poImg = profile?.image || 'damri.webp';
+                const poLogo = profile?.logo || '';
+                const poTagline = profile?.tagline || '';
+                const poDesc = profile?.description || '';
+                const poFacilities = Array.isArray(profile?.facilities) ? profile.facilities : [];
+                const seatDisplay = f.capacity ? `${f.capacity} Kursi` : '';
 
-                if (f.name.toUpperCase().includes("ESTU")) { colorClass = "text-[#22c55e]"; bgHover = "group-hover:bg-green-600"; spanClass = "font-extrabold italic text-2xl text-[#22c55e] group-hover:text-white"; }
-                else if (f.name.toUpperCase().includes("EFISIENSI")) { colorClass = "text-[#00CED1]"; bgHover = "group-hover:bg-cyan-500"; spanClass = "font-black italic text-3xl tracking-[0.1em] text-[#00CED1] border-b-2 border-[#00CED1] group-hover:text-white group-hover:border-white"; }
-                else if (f.name.toUpperCase().includes("QYTA")) { colorClass = "text-orange-500"; bgHover = "group-hover:bg-orange-500"; spanClass = "font-black italic text-2xl text-orange-500 uppercase tracking-tighter group-hover:text-white"; }
-                else if (f.name.toUpperCase().includes("RIYAN") || f.name.toUpperCase().includes("ARDY")) { colorClass = "text-red-600"; bgHover = "group-hover:bg-red-600"; spanClass = "font-black italic text-3xl tracking-tighter text-red-600 group-hover:text-white"; }
-                else if (f.name.toUpperCase().includes("BEST") || f.name.toUpperCase().includes("77")) { colorClass = "text-yellow-500"; bgHover = "group-hover:bg-yellow-500"; spanClass = "font-black text-2xl text-yellow-500 border-2 border-yellow-500 px-4 py-1 rounded-lg group-hover:text-white group-hover:border-white"; }
-                else { colorClass = "text-[#003d79]"; bgHover = "group-hover:bg-blue-900"; spanClass = "font-black italic text-3xl tracking-tighter text-[#003d79] group-hover:text-white"; }
+                // Facility Pills
+                const facHtml = poFacilities.slice(0, 5).map(fac => `
+                    <span class="inline-flex items-center gap-1 bg-amber-50/90 text-amber-900 border border-amber-200/60 px-2.5 py-1 rounded-lg text-[10px] font-bold shadow-2xs">
+                        <i class="fas fa-check-circle text-amber-500 text-[9px]"></i> ${fac}
+                    </span>
+                `).join('');
 
-                let priceHtml = f.routes.map(r => `<div class="bg-gray-100/80 p-2 rounded-xl text-[10px] font-bold text-gray-700">${r.dest}: <span class="text-green-700">${formatRupiah(r.price)}</span></div>`).join('');
-                let destTags = f.routes.map(r => `<span class="destination-tag">${r.dest}</span>`).join('');
-                let timeTags = f.times.map(t => `<span class="time-badge"><i class="fas fa-clock"></i> ${t}</span>`).join('');
-
-                let bgImage = 'damri.webp';
-                let nameUpper = f.name.toUpperCase();
-                if (nameUpper.includes("77")) bgImage = "77trans.webp";
-                else if (nameUpper.includes("BEST")) bgImage = "bestpremium.webp";
-                else if (nameUpper.includes("JOGJA")) bgImage = "busjogja.webp";
-                else if (nameUpper.includes("EFISIENSI")) bgImage = "efisiensi.webp";
-                else if (nameUpper.includes("ESTU")) bgImage = "estutrans.webp";
-                else if (nameUpper.includes("QYTA")) bgImage = "qyta.webp";
-                else if (nameUpper.includes("RIYAN") || nameUpper.includes("ARDY")) bgImage = "riyan.webp";
-                else if (nameUpper.includes("SUMATRA")) bgImage = "damri2.webp";
-                else if (nameUpper.includes("JAKARTA")) bgImage = "damri.webp";
+                const minPrice = f.routes.length ? Math.min(...f.routes.map(r => r.price)) : 0;
+                const destTags = f.routes.map(r => `<span class="destination-tag">${r.dest}</span>`).join('');
+                const timeTags = f.times.map(t => `<span class="time-badge"><i class="fas fa-clock"></i> ${t}</span>`).join('');
+                const priceHtml = f.routes.map(r => `
+                    <div class="flex items-center justify-between bg-slate-50 p-2.5 rounded-xl border border-slate-100 text-xs">
+                        <span class="font-bold text-slate-700">${r.dest}</span>
+                        <span class="font-black text-emerald-600">${formatRupiah(r.price)}</span>
+                    </div>
+                `).join('');
 
                 html += `
-            <div class="modern-card overflow-hidden h-fit flex flex-col text-center relative group/card">
-                <div class="absolute inset-0 bg-cover bg-center opacity-[0.08] transition-opacity duration-300 group-hover/card:opacity-[0.15] pointer-events-none z-0" style="background-image: url('${bgImage}');"></div>
-                <div class="relative z-10 w-full flex flex-col">
-                    <button onclick="toggleRoute('${f.id}')" class="w-full px-8 py-8 flex flex-col items-center justify-center gap-4 focus:outline-none group text-center">
-                        <div class="h-20 px-6 bg-slate-50/90 backdrop-blur-sm rounded-2xl flex items-center justify-center ${bgHover} transition-all duration-300 text-center shadow-sm border border-slate-200">
-                            <span class="${spanClass}">${nameDisplay}</span>
+                <div class="modern-card overflow-hidden flex flex-col text-left bg-white rounded-3xl border border-slate-200/80 shadow-md hover:shadow-xl transition-all duration-300 group/card">
+                    <!-- Foto Armada Real dari Admin -->
+                    <div class="relative aspect-[16/10] overflow-hidden bg-slate-100">
+                        <img src="${poImg}" alt="${f.name}" class="w-full h-full object-cover transition-transform duration-700 group-hover/card:scale-105" onerror="this.src='damri.webp'">
+                        <div class="absolute inset-0 bg-gradient-to-t from-slate-900/60 via-transparent to-transparent"></div>
+                        <!-- Badges Floating -->
+                        <div class="absolute top-3 left-3 flex flex-wrap gap-1.5">
+                            <span class="bg-slate-900/85 backdrop-blur-xs text-white text-[10px] font-black px-2.5 py-1 rounded-lg uppercase tracking-wider shadow-sm flex items-center gap-1">
+                                <i class="fas fa-bus text-amber-400"></i> ${f.tipeArmada}
+                            </span>
+                            ${seatDisplay ? `<span class="bg-amber-500/90 backdrop-blur-xs text-slate-900 text-[10px] font-black px-2 py-1 rounded-lg uppercase tracking-wider shadow-sm">${seatDisplay}</span>` : ''}
                         </div>
-                        <div class="flex items-center justify-center gap-2 text-xs font-bold text-gray-400 uppercase tracking-widest italic text-center">
-                            Lihat Rute <i id="icon-${f.id}" class="fas fa-chevron-down rotate-icon"></i>
-                        </div>
-                    </button>
-                    <div id="${f.id}" class="route-content px-8 pb-8 text-center bg-white/95 backdrop-blur-md">
-                    <div class="mb-4">
-                        <button onclick="togglePrice('price-${f.id}')" class="btn-price mb-4">
-                            <i class="fas fa-tag"></i> KLIK CEK HARGA
-                        </button>
-                        <div id="price-${f.id}" class="price-content mb-4">
-                            <p class="text-[10px] font-black text-gray-500 uppercase mb-2 tracking-widest">Daftar Harga Tiket</p>
-                            <div class="grid grid-cols-1 gap-2 text-center">
-                                ${priceHtml}
+                        ${minPrice > 0 ? `
+                        <div class="absolute bottom-3 right-3 bg-emerald-600/90 backdrop-blur-xs text-white text-[11px] font-black px-3 py-1 rounded-xl shadow-md">
+                            Mulai ${formatRupiah(minPrice)}
+                        </div>` : ''}
+                    </div>
+
+                    <!-- Body Kartu -->
+                    <div class="p-5 sm:p-6 flex flex-col flex-1">
+                        <!-- Nama, Logo & Tagline PO -->
+                        <div class="mb-3">
+                            <div class="flex items-center justify-between gap-3">
+                                <h3 class="text-xl font-black text-slate-900 uppercase tracking-tight">${f.name}</h3>
+                                ${poLogo ? `<img src="${poLogo}" alt="Logo ${f.name}" class="h-7 max-w-[90px] object-contain shrink-0" onerror="this.style.display='none'">` : ''}
                             </div>
+                            ${poTagline ? `<p class="text-xs font-bold text-amber-600 italic mt-0.5">${poTagline}</p>` : ''}
                         </div>
-                        <p class="text-[10px] font-black text-gray-500 uppercase mb-2 tracking-widest">Kota Tujuan</p>
-                        <div class="flex flex-wrap gap-2 justify-center">
-                            ${destTags}
+
+                        <!-- Deskripsi Armada dari Admin -->
+                        ${poDesc ? `<p class="text-xs text-slate-500 font-medium leading-relaxed mb-4 line-clamp-3">${poDesc}</p>` : ''}
+
+                        <!-- Fasilitas Armada dari Admin -->
+                        ${facHtml ? `
+                        <div class="mb-4">
+                            <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1.5">Fasilitas Unggulan:</p>
+                            <div class="flex flex-wrap gap-1.5">
+                                ${facHtml}
+                            </div>
+                        </div>` : ''}
+
+                        <!-- Accordion Rute, Jadwal, & Cek Harga -->
+                        <div class="mt-auto pt-3 border-t border-slate-100 space-y-3">
+                            <div>
+                                <div class="flex items-center justify-between mb-1.5">
+                                    <span class="text-[10px] font-black text-slate-500 uppercase tracking-wider">Kota Tujuan</span>
+                                    <button type="button" onclick="togglePrice('price-${f.id}')" class="text-[10px] font-black text-amber-600 hover:text-amber-700 underline flex items-center gap-1">
+                                        <i class="fas fa-tag"></i> Cek Harga
+                                    </button>
+                                </div>
+                                <div class="flex flex-wrap gap-1.5">
+                                    ${destTags}
+                                </div>
+                            </div>
+
+                            <!-- Price Box Collapsible -->
+                            <div id="price-${f.id}" class="price-content space-y-1.5">
+                                <p class="text-[10px] font-black text-slate-500 uppercase tracking-wider mb-2">Daftar Tarif Tiket:</p>
+                                <div class="space-y-1.5">
+                                    ${priceHtml}
+                                </div>
+                            </div>
+
+                            <!-- Jam Keberangkatan -->
+                            <div>
+                                <span class="text-[10px] font-black text-slate-500 uppercase tracking-wider block mb-1.5">Keberangkatan</span>
+                                <div class="flex flex-wrap gap-1.5">
+                                    ${timeTags}
+                                </div>
+                            </div>
+
+                            <!-- Tombol Pesan -->
+                            <button onclick="openBookingWithArmada('${f.name}')" class="w-full bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-500 hover:to-amber-600 text-slate-900 py-3.5 rounded-2xl font-black text-xs uppercase tracking-wider shadow-md shadow-amber-500/20 hover:shadow-lg transition-all active:scale-95 flex items-center justify-center gap-2 mt-2">
+                                <i class="fas fa-ticket-alt"></i> Boking Tiket
+                            </button>
                         </div>
                     </div>
-                    <div class="mb-6 pt-4 border-t border-gray-100 text-center">
-                        <p class="text-[10px] font-black text-gray-500 uppercase mb-2 tracking-widest">Keberangkatan</p>
-                        <div class="flex flex-wrap gap-2 justify-center">
-                            ${timeTags}
-                        </div>
-                    </div>
-                    <button onclick="openBookingWithArmada('${f.name}')" class="w-full bg-yellow-400 text-blue-900 py-3.5 rounded-xl font-black text-xs uppercase tracking-widest shadow-lg hover:bg-yellow-500 transition-all">Boking Tiket</button>
                 </div>
-            </div>
-            </div>`;
+                `;
             });
 
             grid.innerHTML = html;
+        }
+
+        function renderArmadaGallery() {
+            const slider = document.getElementById('slider');
+            if (!slider || !fleetData || !fleetData.length) return;
+
+            slider.innerHTML = fleetData.map(f => {
+                const prof = typeof getPoProfile === 'function' ? getPoProfile(f.name) : null;
+                const img = prof?.image || 'damri.webp';
+                const tag = prof?.tagline || f.tipeArmada || 'Bus Eksekutif';
+                return `
+                    <div class="slide-item snap-center shrink-0 w-[280px] sm:w-[320px]">
+                        <div class="modern-card overflow-hidden group/item relative h-full bg-white rounded-3xl border border-slate-200/80 shadow-md flex flex-col">
+                            <div class="aspect-[16/10] overflow-hidden bg-gray-100 relative">
+                                <img src="${img}" alt="${f.name}" class="w-full h-full object-cover transition-transform duration-700 group-hover/item:scale-110" onerror="this.src='damri.webp'">
+                                <span class="absolute top-2.5 left-2.5 bg-slate-900/80 backdrop-blur-xs text-white text-[9px] font-black px-2 py-0.5 rounded-md uppercase tracking-wider">${f.tipeArmada || 'Bus'}</span>
+                            </div>
+                            <div class="p-5 text-center flex flex-col justify-between flex-1">
+                                <div>
+                                    <span class="bg-amber-100 text-amber-800 text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-wider mb-2 inline-block">${tag}</span>
+                                    <h4 class="text-slate-900 font-black italic uppercase tracking-tight text-base sm:text-lg">${f.name}</h4>
+                                </div>
+                                <button onclick="openBookingWithArmada('${f.name}')" class="mt-4 w-full bg-slate-900 hover:bg-amber-500 hover:text-slate-900 text-white text-xs font-black py-2.5 rounded-xl transition-all uppercase tracking-wider">
+                                    Pesan Tiket
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            if (typeof initDots === 'function') initDots();
+        }
+
+        function renderPartnerLogos() {
+            const partnerBox = document.getElementById('officialPartnerList');
+            if (!partnerBox || !fleetData || !fleetData.length) return;
+
+            partnerBox.innerHTML = fleetData.map(f => {
+                const profile = typeof getPoProfile === 'function' ? getPoProfile(f.name) : null;
+                const logoImg = profile?.logo;
+
+                if (logoImg) {
+                    return `
+                        <button type="button" onclick="openBookingWithArmada('${f.name}')" class="flex items-center justify-center shrink-0 hover:scale-110 transition-transform active:scale-95 bg-white/95 backdrop-blur-xs px-2.5 py-1 rounded-xl shadow-md border border-white/60 h-7 sm:h-8" title="Pesan tiket ${f.name}">
+                            <img src="${logoImg}" alt="${f.name}" class="max-h-5 sm:max-h-6 max-w-[85px] sm:max-w-[100px] object-contain">
+                        </button>
+                    `;
+                }
+
+                const nameUpper = f.name.toUpperCase();
+                let badgeHtml = '';
+                if (nameUpper.includes("DAMRI")) {
+                    badgeHtml = `<span class="font-black italic text-[11px] tracking-tighter text-[#003d79] bg-white px-2 py-0.5 rounded shadow-sm">DAMRI</span>`;
+                } else if (nameUpper.includes("BEST")) {
+                    badgeHtml = `<span class="font-black text-[11px] tracking-tight text-[#FFD700] uppercase bg-black/40 px-2 py-0.5 rounded border border-yellow-400/40">Best <span class="text-white">Premium</span></span>`;
+                } else if (nameUpper.includes("ESTU")) {
+                    badgeHtml = `<span class="font-extrabold italic text-[11px] text-[#22c55e] bg-black/40 px-2 py-0.5 rounded border border-emerald-500/40">ESTU <span class="text-white">TRANS</span></span>`;
+                } else if (nameUpper.includes("EFISIENSI")) {
+                    badgeHtml = `<span class="font-black italic text-[11px] tracking-[0.1em] text-[#00CED1] border-b-2 border-[#00CED1] bg-black/40 px-2 py-0.5 rounded">EFISIENSI</span>`;
+                } else if (nameUpper.includes("RIYAN")) {
+                    badgeHtml = `<span class="font-black italic text-[11px] text-red-600 bg-white px-2 py-0.5 rounded shadow-sm border border-red-600/20">RIYAN</span>`;
+                } else if (nameUpper.includes("ARDY")) {
+                    badgeHtml = `<span class="font-black text-[11px] text-red-500 bg-white/10 px-2 py-0.5 rounded border border-red-500/30">ARDY <span class="text-white">TRANS</span></span>`;
+                } else if (nameUpper.includes("QYTA")) {
+                    badgeHtml = `<span class="font-black italic text-[11px] text-orange-500 uppercase tracking-tighter bg-white/10 px-2 py-0.5 rounded">Qyta <span class="text-white">Trans</span></span>`;
+                } else if (nameUpper.includes("77")) {
+                    badgeHtml = `<span class="font-black text-[11px] text-yellow-400 border border-yellow-400 px-2 py-0.5 rounded shadow-lg shadow-yellow-400/10">77 <span class="text-white">TRANS</span></span>`;
+                } else {
+                    badgeHtml = `<span class="font-black text-[11px] tracking-tight text-white bg-white/15 px-2.5 py-0.5 rounded border border-white/30 backdrop-blur-xs uppercase">${f.name}</span>`;
+                }
+
+                return `
+                    <button type="button" onclick="openBookingWithArmada('${f.name}')" class="flex items-center shrink-0 hover:scale-110 transition-transform active:scale-95" title="Pesan tiket ${f.name}">
+                        ${badgeHtml}
+                    </button>
+                `;
+            }).join('');
         }
 
         function populateArmadaDropdown() {
@@ -2098,10 +2234,10 @@
 
         function downloadTicket(id, btn) { if (btn) { btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Memproses...'; btn.disabled = true; } const target = document.getElementById('eTicketOutput'); html2canvas(target, { scale: 4, backgroundColor: "#ffffff", borderRadius: 32, useCORS: true }).then(c => { const l = document.createElement('a'); l.download = `E-Ticket-${id}.png`; l.href = c.toDataURL('image/png', 1.0); l.click(); if (btn) { btn.innerHTML = '<i class="fas fa-download"></i> Unduh E-Ticket (HD)'; btn.disabled = false; } }).catch(err => { if (btn) { btn.innerHTML = '<i class="fas fa-download"></i> Unduh E-Ticket (HD)'; btn.disabled = false; } alert("Gagal mengunduh tiket."); }); }
         function toggleRoute(i) { const element = document.getElementById(i), icon = document.getElementById('icon-' + i); element.classList.toggle('show'); if (icon) icon.classList.toggle('active'); }
-        function togglePrice(i) { const element = document.getElementById(i); element.classList.toggle('show'); }
+        function togglePrice(i) { const element = document.getElementById(i); if (element) element.classList.toggle('show'); }
         function toggleFaq(id) { const c = document.getElementById(id), i = document.getElementById('icon-' + id); if (c.classList.contains('max-h-0')) { c.classList.remove('max-h-0', 'opacity-0'); c.classList.add('max-h-[500px]', 'opacity-100'); i.classList.add('rotate-180'); } else { c.classList.add('max-h-0', 'opacity-0'); c.classList.remove('max-h-[500px]', 'opacity-100'); i.classList.remove('rotate-180'); } }
         function toggleMobileMenu() { document.getElementById('mobileMenu').classList.toggle('open'); document.getElementById('mobileOverlay').classList.toggle('hidden'); }
-        function scrollToArmada(i) { document.getElementById('destSearch').value = ''; document.getElementById('heroResultsContainer').classList.add('hidden'); document.getElementById('produk').scrollIntoView({ behavior: 'smooth' }); setTimeout(() => { if (!document.getElementById(i).classList.contains('show')) toggleRoute(i); }, 800); }
+        function scrollToArmada(i) { document.getElementById('destSearch').value = ''; document.getElementById('heroResultsContainer').classList.add('hidden'); document.getElementById('produk').scrollIntoView({ behavior: 'smooth' }); setTimeout(() => { const el = document.getElementById(i); if (el && !el.classList.contains('show')) toggleRoute(i); }, 800); }
 
         function liveSearch() {
             const q = document.getElementById('destSearch').value.toLowerCase(), c = document.getElementById('heroResultsContainer'), l = document.getElementById('heroResultsList');

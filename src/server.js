@@ -146,6 +146,91 @@ if (!fs.existsSync(DATA_DIR)) {
 }
 
 const TIPE_ARMADA_FILE = path.join(DATA_DIR, 'tipe-armada.json');
+const PO_PROFILES_FILE = path.join(DATA_DIR, 'po-profiles.json');
+const DEFAULT_PO_PROFILES = {
+    "77 TRANS": {
+        "image": "77trans.webp",
+        "logo": "",
+        "tagline": "Eksekutif & Nyaman",
+        "description": "Layanan bus eksekutif full AC, nyaman dan terpercaya melayani rute Jawa Tengah & sekitarnya.",
+        "facilities": ["Full AC", "Reclining Seat", "USB Charger", "Bagasi Luas", "Audio / Musik"]
+    },
+    "ESTU TRANS": {
+        "image": "estutrans.webp",
+        "logo": "",
+        "tagline": "Cepat, Aman & Tepat Waktu",
+        "description": "Perjalanan door-to-door dengan armada terawat, supir berpengalaman, dan kenyamanan prima.",
+        "facilities": ["Full AC", "Reclining Seat", "Audio Musik", "Air Mineral", "USB Charger"]
+    },
+    "DAMRI": {
+        "image": "damri.webp",
+        "logo": "logo.png",
+        "tagline": "Pelopor Angkutan Nasional",
+        "description": "Layanan bus antar kota dan antar pulau BUMN terpercaya dengan rute terlengkap dan armada standar keselamatan tinggi.",
+        "facilities": ["Full AC", "Reclining Seat", "Bagasi Luas", "Charging Port", "Toilet"]
+    },
+    "BEST PREMIUM": {
+        "image": "bestpremium.webp",
+        "logo": "",
+        "tagline": "Luxury Travel Experience",
+        "description": "Layanan travel eksekutif dengan kenyamanan kelas premium dan privasi maksimal sepanjang perjalanan.",
+        "facilities": ["Captain Seat", "Full AC", "USB Charger", "Audio Video", "Air Mineral"]
+    },
+    "EFISIENSI": {
+        "image": "efisiensi.webp",
+        "logo": "",
+        "tagline": "Cepat, Tepat & Terpercaya",
+        "description": "Bus cepat eksekutif antar kota dengan armada modern, interior bersih, dan ketepatan waktu tinggi.",
+        "facilities": ["Full AC", "Reclining Seat", "Snack & Minum", "Audio TV", "Bagasi Luas"]
+    },
+    "QYTA TRANS": {
+        "image": "qyta.webp",
+        "logo": "",
+        "tagline": "Sahabat Perjalanan Anda",
+        "description": "Shuttle dan travel antar kota dengan armada bersih, nyaman, dan pelayanan ramah keluarga.",
+        "facilities": ["Full AC", "Comfort Seat", "Musik / Hiburan", "Driver Berpengalaman", "USB Charger"]
+    },
+    "RIYAN": {
+        "image": "riyan.webp",
+        "logo": "",
+        "tagline": "Perjalanan Menyenangkan",
+        "description": "Layanan bus reguler dan pariwisata terbaik dengan tarif bersahabat dan armada prima.",
+        "facilities": ["Full AC", "Reclining Seat", "Bagasi Luas", "Sound System"]
+    },
+    "ARDY TRANS": {
+        "image": "riyan.webp",
+        "logo": "",
+        "tagline": "Pelayanan Ramah & Aman",
+        "description": "Travel dan shuttle antar kota yang handal dengan pelayanan prima dan armada selalu prima.",
+        "facilities": ["Full AC", "Reclining Seat", "USB Charger", "Musik"]
+    }
+};
+
+function loadPoProfilesData() {
+    try {
+        if (fs.existsSync(PO_PROFILES_FILE)) {
+            const raw = fs.readFileSync(PO_PROFILES_FILE, 'utf-8');
+            if (raw && raw.trim()) {
+                const parsed = JSON.parse(raw);
+                return { ...DEFAULT_PO_PROFILES, ...parsed };
+            }
+        }
+        fs.writeFileSync(PO_PROFILES_FILE, JSON.stringify(DEFAULT_PO_PROFILES, null, 2));
+        return DEFAULT_PO_PROFILES;
+    } catch (e) {
+        console.error('Error loading po profiles file:', e);
+        return DEFAULT_PO_PROFILES;
+    }
+}
+
+function savePoProfilesData(data) {
+    try {
+        fs.writeFileSync(PO_PROFILES_FILE, JSON.stringify(data, null, 2));
+    } catch (e) {
+        console.error('Error saving po profiles file:', e);
+    }
+}
+
 const DEFAULT_TIPE_ARMADA = [
     { id: 'tipe-1', nama: 'Hiace' },
     { id: 'tipe-2', nama: 'Bus Besar' },
@@ -317,9 +402,14 @@ app.get('/api', async (req, res) => {
     const action = req.query.action;
 
     try {
-        const publicActions = ['getArmada', 'getDenahArmada', 'getTipeArmada', 'getTakenSeats', 'getBookingById', 'getPelangganTable', 'getHargaKhusus', 'getPopupIklan'];
+        const publicActions = ['getArmada', 'getDenahArmada', 'getTipeArmada', 'getPoProfiles', 'getTakenSeats', 'getBookingById', 'getPelangganTable', 'getHargaKhusus', 'getPopupIklan'];
         if (!publicActions.includes(action) && !req.user) {
             return res.status(401).json({ status: 'error', message: 'Unauthorized' });
+        }
+
+        if (action === 'getPoProfiles') {
+            const data = loadPoProfilesData();
+            return res.json({ status: 'success', data });
         }
 
         if (action === 'getDenahArmada') {
@@ -823,7 +913,7 @@ app.post('/api', async (req, res) => {
         }
 
         if (action === 'setPoType') {
-            const { nama_armada, tipe_armada, denah_id } = payload;
+            const { nama_armada, tipe_armada, denah_id, image, description, facilities, tagline } = payload;
             let computedSeat = 0;
             if (denah_id) {
                 const d = await prisma.denahArmada.findUnique({ where: { id: denah_id } });
@@ -841,7 +931,63 @@ app.post('/api', async (req, res) => {
                 data: updateData
             });
 
-            return res.json({ status: 'success', message: `Tipe bus PO ${nama_armada} berhasil diperbarui untuk seluruh rute!` });
+            // Update PO Profile if provided
+            if (image || logo !== undefined || description !== undefined || facilities !== undefined || tagline !== undefined) {
+                const profiles = loadPoProfilesData();
+                const cleanKey = String(nama_armada || '').trim().toUpperCase();
+                let foundKey = Object.keys(profiles).find(k => k.toUpperCase() === cleanKey) || String(nama_armada || '').trim();
+                profiles[foundKey] = {
+                    image: image || profiles[foundKey]?.image || 'damri.webp',
+                    logo: logo !== undefined ? logo : (profiles[foundKey]?.logo || ''),
+                    tagline: tagline !== undefined ? tagline : (profiles[foundKey]?.tagline || ''),
+                    description: description !== undefined ? description : (profiles[foundKey]?.description || ''),
+                    facilities: Array.isArray(facilities) ? facilities : (profiles[foundKey]?.facilities || [])
+                };
+                savePoProfilesData(profiles);
+            }
+
+            return res.json({ status: 'success', message: `Profil dan tipe bus PO ${nama_armada} berhasil diperbarui!` });
+        }
+
+        if (action === 'savePoProfile') {
+            const { nama_armada, image, logo, description, facilities, tagline, tipe_armada, denah_id } = payload;
+            if (!nama_armada) return res.status(400).json({ status: 'error', message: 'Nama PO wajib diisi' });
+
+            const profiles = loadPoProfilesData();
+            const cleanKey = String(nama_armada || '').trim().toUpperCase();
+            let foundKey = Object.keys(profiles).find(k => k.toUpperCase() === cleanKey) || String(nama_armada || '').trim();
+            profiles[foundKey] = {
+                image: image || profiles[foundKey]?.image || 'damri.webp',
+                logo: logo !== undefined ? logo : (profiles[foundKey]?.logo || ''),
+                tagline: tagline !== undefined ? tagline : (profiles[foundKey]?.tagline || ''),
+                description: description !== undefined ? description : (profiles[foundKey]?.description || ''),
+                facilities: Array.isArray(facilities) ? facilities : (profiles[foundKey]?.facilities || [])
+            };
+            savePoProfilesData(profiles);
+
+            // Also synchronize tipe_armada and denah_id to database if provided
+            if (tipe_armada || denah_id) {
+                try {
+                    let computedSeat = 0;
+                    if (denah_id) {
+                        const d = await prisma.denahArmada.findUnique({ where: { id: denah_id } });
+                        if (d && d.totalKursi) computedSeat = d.totalKursi;
+                    }
+                    const updateData = {};
+                    if (tipe_armada) updateData.tipeArmada = tipe_armada;
+                    if (denah_id) updateData.denahId = denah_id;
+                    if (computedSeat > 0) updateData.seat = computedSeat;
+
+                    await prisma.armada.updateMany({
+                        where: { namaArmada: nama_armada },
+                        data: updateData
+                    });
+                } catch (dbErr) {
+                    console.warn('Warning: Could not sync tipe_armada/denah to database:', dbErr.message);
+                }
+            }
+
+            return res.json({ status: 'success', message: `Informasi dan foto armada PO ${nama_armada} berhasil disimpan!`, data: profiles[foundKey] });
         }
 
         if (action === 'addArmada') {
@@ -1339,6 +1485,48 @@ app.put('/api/iklan/:id', (req, res, next) => {
     } catch (err) {
         console.error('Edit Iklan Error:', err);
         return res.status(500).json({ status: 'error', message: 'Gagal memperbarui iklan: ' + (err.message || 'Server error') });
+    }
+});
+
+// Endpoint upload foto armada PO (Admin)
+app.post('/api/upload-armada', (req, res, next) => {
+    upload.single('image')(req, res, (err) => {
+        if (err) return handleMulterError(err, req, res, next);
+        next();
+    });
+}, async (req, res) => {
+    try {
+        const token = req.headers['authorization']?.split(' ')[1];
+        if (!token) return res.status(401).json({ status: 'error', message: 'Unauthorized' });
+        try { jwt.verify(token, JWT_SECRET); } catch(e) { return res.status(401).json({ status: 'error', message: 'Token tidak valid' }); }
+
+        if (!req.file) return res.status(400).json({ status: 'error', message: 'File gambar wajib diupload' });
+        const imageUrl = '/uploads/' + req.file.filename;
+        return res.json({ status: 'success', url: imageUrl, message: 'Foto armada berhasil diunggah' });
+    } catch (err) {
+        console.error('Upload Armada Photo Error:', err);
+        return res.status(500).json({ status: 'error', message: 'Gagal mengunggah foto armada: ' + (err.message || 'Server error') });
+    }
+});
+
+// Endpoint upload logo PO (Admin)
+app.post('/api/upload-logo', (req, res, next) => {
+    upload.single('logo')(req, res, (err) => {
+        if (err) return handleMulterError(err, req, res, next);
+        next();
+    });
+}, async (req, res) => {
+    try {
+        const token = req.headers['authorization']?.split(' ')[1];
+        if (!token) return res.status(401).json({ status: 'error', message: 'Unauthorized' });
+        try { jwt.verify(token, JWT_SECRET); } catch(e) { return res.status(401).json({ status: 'error', message: 'Token tidak valid' }); }
+
+        if (!req.file) return res.status(400).json({ status: 'error', message: 'File logo wajib diupload' });
+        const logoUrl = '/uploads/' + req.file.filename;
+        return res.json({ status: 'success', url: logoUrl, message: 'Logo PO berhasil diunggah' });
+    } catch (err) {
+        console.error('Upload Logo Error:', err);
+        return res.status(500).json({ status: 'error', message: 'Gagal mengunggah logo PO: ' + (err.message || 'Server error') });
     }
 });
 

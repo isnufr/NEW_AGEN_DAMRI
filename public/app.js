@@ -33,6 +33,7 @@ let cachedLaporan = [];
 let cachedEkstraBookings = [];
 let cachedDenah = [];
 let cachedTipeArmada = [];
+let cachedPoProfiles = {};
 let isDataLoaded = false;
 
 // ==========================================
@@ -92,7 +93,8 @@ async function initData() {
             fetchFromSheets('getArmada'),
             fetchFromSheets('getHargaKhusus'),
             fetchFromSheets('getDenahArmada'),
-            fetchFromSheets('getTipeArmada')
+            fetchFromSheets('getTipeArmada'),
+            fetchFromSheets('getPoProfiles')
         ];
         
         if (isAdmin) {
@@ -109,12 +111,23 @@ async function initData() {
         const hData = results[1];
         const dData = results[2];
         const tData = results[3];
+        const pData = results[4];
         let bData = [], lData = [], eData = [];
         
         if (isAdmin) {
-            bData = results[4];
-            lData = results[5];
-            eData = results[6];
+            bData = results[5];
+            lData = results[6];
+            eData = results[7];
+        }
+
+        if (pData && typeof pData === 'object') {
+            cachedPoProfiles = pData;
+            localStorage.setItem("app_po_profiles", JSON.stringify(cachedPoProfiles));
+        } else {
+            try {
+                const rawP = localStorage.getItem("app_po_profiles");
+                if (rawP) cachedPoProfiles = JSON.parse(rawP);
+            } catch(e) {}
         }
 
         if (tData && Array.isArray(tData)) {
@@ -278,12 +291,14 @@ async function initData() {
         const localB = localStorage.getItem("app_bookings");
         const localL = localStorage.getItem("app_laporan");
         const localE = localStorage.getItem("app_ekstra");
+        const localP = localStorage.getItem("app_po_profiles");
         if (localA) cachedArmadas = JSON.parse(localA);
         if (localH) cachedHargaKhusus = JSON.parse(localH);
         if (localD) cachedDenah = JSON.parse(localD);
         if (localB) cachedBookings = JSON.parse(localB);
         if (localL) cachedLaporan = JSON.parse(localL);
         if (localE) cachedEkstraBookings = JSON.parse(localE);
+        if (localP) cachedPoProfiles = JSON.parse(localP);
         
         isDataLoaded = true;
         return false;
@@ -293,6 +308,45 @@ async function initData() {
 // ==========================================
 // 4. GETTERS
 // ==========================================
+function getPoProfiles() {
+    return cachedPoProfiles || {};
+}
+
+function getPoProfile(poName) {
+    if (!poName) return null;
+    const clean = String(poName).trim().toUpperCase();
+    const profiles = cachedPoProfiles || {};
+    const key = Object.keys(profiles).find(k => k.toUpperCase() === clean);
+    if (key && profiles[key]) {
+        return {
+            name: key,
+            image: profiles[key].image || 'damri.webp',
+            logo: profiles[key].logo || (clean.includes('DAMRI') ? 'logo.png' : ''),
+            tagline: profiles[key].tagline || 'Eksekutif & Nyaman',
+            description: profiles[key].description || `Layanan perjalanan terbaik dari ${poName}.`,
+            facilities: Array.isArray(profiles[key].facilities) ? profiles[key].facilities : ["Full AC", "Reclining Seat", "Bagasi Luas"]
+        };
+    }
+    // Fallback preset
+    let defaultImg = 'damri.webp';
+    if (clean.includes('77')) defaultImg = '77trans.webp';
+    else if (clean.includes('BEST')) defaultImg = 'bestpremium.webp';
+    else if (clean.includes('JOGJA')) defaultImg = 'busjogja.webp';
+    else if (clean.includes('EFISIENSI')) defaultImg = 'efisiensi.webp';
+    else if (clean.includes('ESTU')) defaultImg = 'estutrans.webp';
+    else if (clean.includes('QYTA')) defaultImg = 'qyta.webp';
+    else if (clean.includes('RIYAN') || clean.includes('ARDY')) defaultImg = 'riyan.webp';
+
+    return {
+        name: poName,
+        image: defaultImg,
+        logo: clean.includes('DAMRI') ? 'logo.png' : '',
+        tagline: 'Aman & Nyaman',
+        description: `Layanan transportasi perjalanan terpercaya dari ${poName}.`,
+        facilities: ["Full AC", "Reclining Seat", "Bagasi Luas", "USB Charger"]
+    };
+}
+
 function getArmadas() {
     return cachedArmadas;
 }
@@ -381,4 +435,9 @@ if (typeof io !== 'undefined') {
             window.reloadPublicUI();
         }
     });
+}
+
+if (typeof window !== 'undefined') {
+    window.getPoProfiles = getPoProfiles;
+    window.getPoProfile = getPoProfile;
 }
