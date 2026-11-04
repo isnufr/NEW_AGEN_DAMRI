@@ -1791,7 +1791,19 @@
             }
         }
 
-        function openBookingModal() { document.getElementById('bookingModal').classList.remove('hidden'); document.body.style.overflow = 'hidden'; }
+        function openBookingModal() { 
+            document.getElementById('bookingModal').classList.remove('hidden'); 
+            document.body.style.overflow = 'hidden'; 
+            const dateInput = document.getElementById('bookTanggal');
+            if (dateInput && !dateInput.value) {
+                const now = new Date();
+                const yyyy = now.getFullYear();
+                const mm = String(now.getMonth() + 1).padStart(2, '0');
+                const dd = String(now.getDate()).padStart(2, '0');
+                dateInput.value = `${yyyy}-${mm}-${dd}`;
+                if (typeof calculateBookingTotal === 'function') calculateBookingTotal();
+            }
+        }
         function openBookingWithArmada(name) { openBookingModal(); const aSelect = document.getElementById('bookArmada'); aSelect.value = name; updateBookingFields(); }
         function closeBookingModal() { document.getElementById('bookingModal').classList.add('hidden'); document.body.style.overflow = 'auto'; }
         function closeSuccessModal() { document.getElementById('successModal').classList.add('hidden'); document.body.style.overflow = 'auto'; }

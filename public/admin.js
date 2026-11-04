@@ -3772,6 +3772,10 @@
 
     function openBookingModal() {
         if (typeof resetAdminBooking === 'function') resetAdminBooking();
+        const dateInput = document.getElementById('adminBookingDate');
+        if (dateInput && !dateInput.value) {
+            dateInput.value = (typeof getLocalYYYYMMDD === 'function') ? getLocalYYYYMMDD(new Date()) : new Date().toISOString().split('T')[0];
+        }
         const modal = document.getElementById('bookingModal');
         modal.classList.remove('hidden');
         modal.classList.add('flex');
@@ -4430,6 +4434,9 @@ function updateChartColors(isDark) {
                 document.getElementById('ekstraTipe').value = 'PESAWAT';
                 document.getElementById('ekstraJumlahPnp').value = 1;
                 document.getElementById('ekstraHp').value = '';
+                const todayStr = (typeof getLocalYYYYMMDD === 'function') ? getLocalYYYYMMDD(new Date()) : new Date().toISOString().split('T')[0];
+                const tglEl = document.getElementById('ekstraTanggal');
+                if (tglEl) tglEl.value = todayStr;
                 
                 onEkstraTipeChanged();
                 generateEkstraPnpFields();
@@ -6763,6 +6770,14 @@ function updateAdminBookingSummary() {
 // Reset admin booking
 function resetAdminBooking() {
     document.getElementById('formAdminBooking').reset();
+    
+    // Set default tanggal keberangkatan ke hari ini (YYYY-MM-DD lokal)
+    const todayStr = (typeof getLocalYYYYMMDD === 'function') ? getLocalYYYYMMDD(new Date()) : new Date().toISOString().split('T')[0];
+    const dateInput = document.getElementById('adminBookingDate');
+    if (dateInput) {
+        dateInput.value = todayStr;
+    }
+
     adminBookingStep = 1;
     adminBookingSelectedSeats.clear();
     adminBookingTakenSeats = {};
