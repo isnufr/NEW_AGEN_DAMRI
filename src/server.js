@@ -516,17 +516,79 @@ app.get('/api', async (req, res) => {
             const armadas = await prisma.armada.findMany({
                 orderBy: { namaArmada: 'asc' }
             });
-            const formattedArmadas = armadas.map(a => ({
-                'id_armada': a.idArmada,
-                'nama_armada': a.namaArmada,
-                'tujuan_armada': a.tujuanArmada,
-                'jam': a.jam,
-                'harga': a.harga,
-                'Seat': a.seat,
-                'is_active': a.isActive,
-                'tipe_armada': a.tipeArmada || 'Bus Besar',
-                'denah_id': a.denahId || null
-            }));
+
+            // Ambil statistik pesanan riil untuk sorting armada paling ramai / laku
+            const bookingCounts = {};
+            try {
+                const grouped = await prisma.booking.groupBy({
+                    by: ['jenisKendaraan'],
+                    _count: { bookingId: true }
+                });
+                grouped.forEach(g => {
+                    if (g.jenisKendaraan) {
+                        const k = String(g.jenisKendaraan).trim().toUpperCase();
+                        bookingCounts[k] = (bookingCounts[k] || 0) + (g._count.bookingId || 0);
+                    }
+                });
+            } catch (e) {
+                console.warn('Booking stats groupBy notice:', e.message);
+            }
+
+            // Bobot prioritas armada populer agen Kawunganten sebagai acuan / tie-breaker
+            const POPULAR_RANKS = [
+                'DAMRI JAKARTA',
+                'DAMRI SUMATRA',
+                'DAMRI',
+                'EFISIENSI',
+                'BEST PREMIUM',
+                'ESTU TRANS',
+                '77 TRANS',
+                'QYTA TRANS',
+                'BUS JOGJA',
+                'ARDY TRANS',
+                'RIYAN',
+                'HANDOYO',
+                'MADU KISMO'
+            ];
+
+            const getArmadaRank = (nama) => {
+                const upper = String(nama || '').trim().toUpperCase();
+                const idx = POPULAR_RANKS.findIndex(p => upper === p || upper.includes(p) || p.includes(upper));
+                return idx === -1 ? 999 : idx;
+            };
+
+            const formattedArmadas = armadas.map(a => {
+                const cleanName = String(a.namaArmada || '').trim().toUpperCase();
+                const bCount = bookingCounts[cleanName] || 0;
+                return {
+                    'id_armada': a.idArmada,
+                    'nama_armada': a.namaArmada,
+                    'tujuan_armada': a.tujuanArmada,
+                    'jam': a.jam,
+                    'harga': a.harga,
+                    'Seat': a.seat,
+                    'is_active': a.isActive,
+                    'tipe_armada': a.tipeArmada || 'Bus Besar',
+                    'denah_id': a.denahId || null,
+                    'booking_count': bCount
+                };
+            });
+
+            // Urutkan armada:
+            // 1. Jumlah pesanan terbanyak (paling laku / ramai)
+            // 2. Prioritas armada populer (DAMRI, Efisiensi, Best Premium, Estu Trans, dst.)
+            // 3. Nama armada (abjad)
+            formattedArmadas.sort((a, b) => {
+                const countDiff = (b.booking_count || 0) - (a.booking_count || 0);
+                if (countDiff !== 0) return countDiff;
+
+                const rankA = getArmadaRank(a.nama_armada);
+                const rankB = getArmadaRank(b.nama_armada);
+                if (rankA !== rankB) return rankA - rankB;
+
+                return (a.nama_armada || '').localeCompare(b.nama_armada || '');
+            });
+
             return res.json({ status: 'success', data: formattedArmadas });
         }
         

@@ -40,7 +40,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
     <script src="/socket.io/socket.io.js"></script>
-    <script src="app.js?v=4" defer></script>
+    <script src="app.js?v=5" defer></script>
 
     <script>
         function handleLogoError(img) {
@@ -1515,12 +1515,45 @@
                     if (a.time) grouped[poKey].times.add(a.time);
                     if (a.capacity) grouped[poKey].capacity = a.capacity;
                     if (a.tipeArmada) grouped[poKey].tipeArmada = a.tipeArmada;
+                    if (a.bookingCount) grouped[poKey].bookingCount = (grouped[poKey].bookingCount || 0) + a.bookingCount;
                 });
+
+                // Prioritas armada paling laku & populer agen
+                const POPULAR_RANKS = [
+                    'DAMRI JAKARTA',
+                    'DAMRI SUMATRA',
+                    'DAMRI',
+                    'EFISIENSI',
+                    'BEST PREMIUM',
+                    'ESTU TRANS',
+                    '77 TRANS',
+                    'QYTA TRANS',
+                    'BUS JOGJA',
+                    'ARDY TRANS',
+                    'RIYAN',
+                    'HANDOYO',
+                    'MADU KISMO'
+                ];
+
+                const getArmadaRank = (nama) => {
+                    const upper = String(nama || '').trim().toUpperCase();
+                    const idx = POPULAR_RANKS.findIndex(p => upper === p || upper.includes(p) || p.includes(upper));
+                    return idx === -1 ? 999 : idx;
+                };
 
                 fleetData = Object.values(grouped).map(g => ({
                     ...g,
                     times: Array.from(g.times).sort()
-                }));
+                })).sort((a, b) => {
+                    const countDiff = (b.bookingCount || 0) - (a.bookingCount || 0);
+                    if (countDiff !== 0) return countDiff;
+
+                    const rankA = getArmadaRank(a.name);
+                    const rankB = getArmadaRank(b.name);
+                    if (rankA !== rankB) return rankA - rankB;
+
+                    return a.name.localeCompare(b.name);
+                });
 
                 populateArmadaDropdown();
                 renderArmadaGrid();
@@ -1733,8 +1766,41 @@
             const select = document.getElementById('bookArmada');
             if (!select) return;
 
+            // Prioritas armada paling laku & populer agen
+            const POPULAR_RANKS = [
+                'DAMRI JAKARTA',
+                'DAMRI SUMATRA',
+                'DAMRI',
+                'EFISIENSI',
+                'BEST PREMIUM',
+                'ESTU TRANS',
+                '77 TRANS',
+                'QYTA TRANS',
+                'BUS JOGJA',
+                'ARDY TRANS',
+                'RIYAN',
+                'HANDOYO',
+                'MADU KISMO'
+            ];
+
+            const getRank = (name) => {
+                const up = String(name || '').trim().toUpperCase();
+                const idx = POPULAR_RANKS.findIndex(p => up === p || up.includes(p) || p.includes(up));
+                return idx === -1 ? 999 : idx;
+            };
+
+            const sorted = [...fleetData].sort((a, b) => {
+                const countDiff = (b.bookingCount || 0) - (a.bookingCount || 0);
+                if (countDiff !== 0) return countDiff;
+
+                const rankDiff = getRank(a.name) - getRank(b.name);
+                if (rankDiff !== 0) return rankDiff;
+
+                return a.name.localeCompare(b.name);
+            });
+
             let html = '<option value="">-- Pilih Jenis Bus / Travel --</option>';
-            fleetData.forEach(f => {
+            sorted.forEach(f => {
                 html += `<option value="${f.name}">${f.name}</option>`;
             });
             select.innerHTML = html;

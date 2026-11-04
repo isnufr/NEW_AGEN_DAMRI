@@ -175,7 +175,8 @@ async function initData() {
                     capacity: parseInt(find(["Kapasitas", "Seat", "seat", "kapasitas", "KAPASITAS"])) || 40,
                     isActive: find(["is_active", "isActive"]) !== false, // Defaults to true if undefined
                     tipeArmada: String(find(["tipe_armada", "tipeArmada", "tipe", "Tipe"]) || "Bus Besar").trim(),
-                    denahId: find(["denah_id", "denahId", "id_denah"]) || null
+                    denahId: find(["denah_id", "denahId", "id_denah"]) || null,
+                    bookingCount: parseInt(find(["booking_count", "bookingCount", "total_booking"])) || 0
                 };
             });
             localStorage.setItem("app_armadas", JSON.stringify(cachedArmadas));

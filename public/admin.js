@@ -55,7 +55,38 @@
         const activeArmadas = armadas.filter(a => a.isActive !== false);
         const armadaNameSelect = document.getElementById('adminBookingArmadaName');
         if (armadaNameSelect) {
-            const uniqueNames = [...new Set(activeArmadas.map(a => a.name))];
+            const POPULAR_RANKS = [
+                'DAMRI JAKARTA',
+                'DAMRI SUMATRA',
+                'DAMRI',
+                'EFISIENSI',
+                'BEST PREMIUM',
+                'ESTU TRANS',
+                '77 TRANS',
+                'QYTA TRANS',
+                'BUS JOGJA',
+                'ARDY TRANS',
+                'RIYAN',
+                'HANDOYO',
+                'MADU KISMO'
+            ];
+            const getRank = (name) => {
+                const up = String(name || '').trim().toUpperCase();
+                const idx = POPULAR_RANKS.findIndex(p => up === p || up.includes(p) || p.includes(up));
+                return idx === -1 ? 999 : idx;
+            };
+
+            const uniqueNames = [...new Set(activeArmadas.map(a => a.name))].sort((a, b) => {
+                const bookings = typeof getBookings === 'function' ? getBookings() : [];
+                const countA = bookings.filter(bk => String(bk.jenisKendaraan || '').trim().toUpperCase() === a.trim().toUpperCase()).length;
+                const countB = bookings.filter(bk => String(bk.jenisKendaraan || '').trim().toUpperCase() === b.trim().toUpperCase()).length;
+                if (countB !== countA) return countB - countA;
+
+                const rankDiff = getRank(a) - getRank(b);
+                if (rankDiff !== 0) return rankDiff;
+
+                return a.localeCompare(b);
+            });
             armadaNameSelect.innerHTML = '<option value="">-- Pilih Armada --</option>' + uniqueNames.map(n => `<option value="${n}">${n}</option>`).join('');
             
             const timeSelect = document.getElementById('adminBookingTime');
