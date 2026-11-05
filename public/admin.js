@@ -2101,9 +2101,9 @@
         let armadaHtml = '';
         Array.from(armadas).sort().forEach(a => {
             armadaHtml += `
-                <label class="flex items-center gap-2 p-2 hover:bg-slate-50 rounded cursor-pointer transition-colors border border-transparent hover:border-slate-200">
-                    <input type="checkbox" name="customManifestArmada" value="${a}" class="w-4 h-4 text-blue-600 rounded border-slate-300 focus:ring-blue-500" onchange="updateCustomManifestTimes()">
-                    <span class="text-xs font-bold text-slate-700 uppercase">${a}</span>
+                <label class="flex items-center gap-2.5 px-3 py-2 bg-slate-50 hover:bg-amber-50/70 rounded-xl cursor-pointer transition-colors border border-slate-200/60 hover:border-amber-300">
+                    <input type="checkbox" name="customManifestArmada" value="${a}" class="w-4 h-4 text-amber-500 rounded border-slate-300 focus:ring-amber-400" onchange="updateCustomManifestTimes()">
+                    <span class="text-xs font-black text-slate-700 uppercase tracking-tight">${a}</span>
                 </label>
             `;
         });
@@ -2167,9 +2167,9 @@
         let timeHtml = '';
         Array.from(times).sort().forEach(t => {
             timeHtml += `
-                <label class="flex items-center gap-2 p-2 hover:bg-slate-50 rounded cursor-pointer transition-colors border border-transparent hover:border-slate-200">
+                <label class="flex items-center gap-2.5 px-3 py-2 bg-slate-50 hover:bg-blue-50/70 rounded-xl cursor-pointer transition-colors border border-slate-200/60 hover:border-blue-300">
                     <input type="checkbox" name="customManifestTime" value="${t}" class="w-4 h-4 text-blue-600 rounded border-slate-300 focus:ring-blue-500">
-                    <span class="text-xs font-bold text-slate-700 uppercase">${t}</span>
+                    <span class="text-xs font-black text-slate-700 uppercase">${t}</span>
                 </label>
             `;
         });
