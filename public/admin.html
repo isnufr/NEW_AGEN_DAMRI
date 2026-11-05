@@ -104,6 +104,10 @@
                     <i class="fas fa-bullhorn"></i>
                     <span>POP UP IKLAN</span>
                 </div>
+                                <div class="nav-item" data-menu="kontrol" onclick="switchMenu('kontrol')">
+                    <i class="fas fa-magic text-amber-400"></i>
+                    <span>KONTROL</span>
+                </div>
                 <div class="nav-item" data-menu="akun" onclick="switchMenu('akun')">
                     <i class="fas fa-users-cog"></i>
                     <span>KELOLA AKUN</span>
@@ -915,6 +919,344 @@
                         </div>
                     </div>
                 </section>
+
+                <!-- ======================= -->
+                <!-- MENU 7.5: KONTROL WEBSITE (MENU AJAIB) -->
+                <!-- ======================= -->
+                <section id="sec-kontrol" class="content-section">
+                    <!-- Page Header -->
+                    <div class="mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                        <div>
+                            <div class="flex items-center gap-2 mb-1">
+                                <span class="bg-amber-100 text-amber-800 text-[10px] font-black uppercase tracking-widest px-2.5 py-0.5 rounded-full flex items-center gap-1.5">
+                                    <i class="fas fa-magic text-amber-500"></i> Menu Ajaib
+                                </span>
+                                <span class="text-xs font-bold text-slate-400">• Kendali Penuh Halaman Pelanggan</span>
+                            </div>
+                            <h2 class="text-2xl font-black text-slate-800 tracking-tight">KONTROL Website Pelanggan</h2>
+                            <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mt-1">Ubah metode pembayaran, kontak WhatsApp, alamat, teks banner &amp; informasi website langsung dari sini</p>
+                        </div>
+                        <div class="flex items-center gap-2 flex-wrap">
+                            <a href="index.html" target="_blank" class="bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 px-4 py-2.5 rounded-xl text-xs font-black uppercase tracking-wider shadow-xs transition-all flex items-center justify-center gap-1.5 active:scale-95" title="Buka website pelanggan di tab baru">
+                                <i class="fas fa-external-link-alt text-amber-500"></i> <span>Lihat Website</span>
+                            </a>
+                            <button type="button" onclick="saveKontrolConfig()" id="btnSaveKontrol" class="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-slate-900 px-5 py-2.5 rounded-xl text-xs font-black uppercase tracking-wider shadow-md shadow-amber-500/25 transition-all flex items-center justify-center gap-1.5 active:scale-95">
+                                <i class="fas fa-save"></i> <span>Simpan Semua Perubahan</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Subtabs Header -->
+                    <div class="mb-6 flex items-center gap-2 overflow-x-auto pb-2 border-b border-slate-200/80">
+                        <button type="button" onclick="switchKontrolSubtab('profil')" id="tabBtnKontrolProfil" class="kontrol-subtab-btn px-4 py-2.5 rounded-xl font-black text-xs uppercase tracking-wider transition-all bg-slate-900 text-amber-400 shadow-sm flex items-center gap-2 whitespace-nowrap shrink-0">
+                            <i class="fas fa-store"></i> <span>Profil &amp; Kontak Agen</span>
+                        </button>
+                        <button type="button" onclick="switchKontrolSubtab('pembayaran')" id="tabBtnKontrolPembayaran" class="kontrol-subtab-btn px-4 py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider transition-all bg-white text-slate-600 hover:bg-slate-100 border border-slate-200 shadow-sm flex items-center gap-2 whitespace-nowrap shrink-0">
+                            <i class="fas fa-wallet"></i> <span>Metode Pembayaran &amp; QRIS</span>
+                        </button>
+                        <button type="button" onclick="switchKontrolSubtab('hero')" id="tabBtnKontrolHero" class="kontrol-subtab-btn px-4 py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider transition-all bg-white text-slate-600 hover:bg-slate-100 border border-slate-200 shadow-sm flex items-center gap-2 whitespace-nowrap shrink-0">
+                            <i class="fas fa-desktop"></i> <span>Hero &amp; Pengumuman</span>
+                        </button>
+                        <button type="button" onclick="switchKontrolSubtab('kebijakan')" id="tabBtnKontrolKebijakan" class="kontrol-subtab-btn px-4 py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider transition-all bg-white text-slate-600 hover:bg-slate-100 border border-slate-200 shadow-sm flex items-center gap-2 whitespace-nowrap shrink-0">
+                            <i class="fas fa-shield-alt"></i> <span>Kebijakan &amp; Syarat</span>
+                        </button>
+                        <button type="button" onclick="switchKontrolSubtab('footer')" id="tabBtnKontrolFooter" class="kontrol-subtab-btn px-4 py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider transition-all bg-white text-slate-600 hover:bg-slate-100 border border-slate-200 shadow-sm flex items-center gap-2 whitespace-nowrap shrink-0">
+                            <i class="fas fa-share-alt"></i> <span>Sosial Media &amp; Footer</span>
+                        </button>
+                    </div>
+
+                    <!-- ============================================== -->
+                    <!-- SUBTAB 1: PROFIL & KONTAK AGEN                 -->
+                    <!-- ============================================== -->
+                    <div id="subtabKontrolProfil" class="space-y-6">
+                        <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-xs space-y-5">
+                            <div class="border-b border-slate-100 pb-3 flex items-center justify-between">
+                                <h3 class="font-black text-slate-800 text-sm uppercase tracking-wide flex items-center gap-2">
+                                    <i class="fas fa-id-card text-amber-500"></i> Identitas Agen &amp; Brand
+                                </h3>
+                                <span class="text-[10px] bg-slate-100 text-slate-600 font-extrabold px-2.5 py-1 rounded-full">Tampil di Navbar &amp; Beranda</span>
+                            </div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Nama Agen Resmi *</label>
+                                    <input type="text" id="cfgNamaAgen" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-bold text-slate-700 outline-none focus:border-amber-500 focus:bg-white transition-all" placeholder="Contoh: AGEN DAMRI KAWUNGANTEN">
+                                    <p class="text-[10px] text-slate-400 mt-1">Nama resmi yang tampil di header dan tiket</p>
+                                </div>
+                                <div>
+                                    <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Nama Brand Singkat *</label>
+                                    <input type="text" id="cfgBrandName" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-bold text-slate-700 outline-none focus:border-amber-500 focus:bg-white transition-all" placeholder="Contoh: AGEN BUS KAWUNGANTEN">
+                                    <p class="text-[10px] text-slate-400 mt-1">Badge di atas judul hero halaman utama</p>
+                                </div>
+                                <div class="md:col-span-2">
+                                    <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Tagline / Slogan Agen</label>
+                                    <input type="text" id="cfgTagline" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-bold text-slate-700 outline-none focus:border-amber-500 focus:bg-white transition-all" placeholder="Contoh: Pusat Penjualan Tiket Bus, Travel, Pesawat &amp; Kapal">
+                                </div>
+                                <div class="md:col-span-2">
+                                    <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Deskripsi Singkat Agen</label>
+                                    <textarea id="cfgDeskripsi" rows="2" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-sm font-medium text-slate-700 outline-none focus:border-amber-500 focus:bg-white transition-all" placeholder="Deskripsi profil agen..."></textarea>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-xs space-y-5">
+                            <div class="border-b border-slate-100 pb-3 flex items-center justify-between">
+                                <h3 class="font-black text-slate-800 text-sm uppercase tracking-wide flex items-center gap-2">
+                                    <i class="fab fa-whatsapp text-green-500"></i> Kontak WhatsApp &amp; Jam Layanan
+                                </h3>
+                                <span class="text-[10px] bg-green-100 text-green-800 font-extrabold px-2.5 py-1 rounded-full">Sangat Penting</span>
+                            </div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <div>
+                                    <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Nomor WhatsApp Utama (Angka) *</label>
+                                    <div class="relative">
+                                        <input type="tel" id="cfgWhatsappUtama" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 pl-11 text-sm font-bold text-slate-700 outline-none focus:border-amber-500 focus:bg-white transition-all" placeholder="Contoh: 082133607759">
+                                        <i class="fab fa-whatsapp absolute left-4 top-1/2 -translate-y-1/2 text-green-500 text-sm"></i>
+                                    </div>
+                                    <p class="text-[10px] text-slate-400 mt-1">Dipakai otomatis untuk link wa.me dan pengiriman tiket</p>
+                                </div>
+                                <div>
+                                    <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Teks Tampilan WhatsApp</label>
+                                    <input type="text" id="cfgWhatsappDisplay" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-bold text-slate-700 outline-none focus:border-amber-500 focus:bg-white transition-all" placeholder="Contoh: 0821-3360-7759">
+                                    <p class="text-[10px] text-slate-400 mt-1">Format teks nomor yang dibaca pengunjung</p>
+                                </div>
+                                <div>
+                                    <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Jam Operasional / Layanan</label>
+                                    <input type="text" id="cfgJamLayanan" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-bold text-slate-700 outline-none focus:border-amber-500 focus:bg-white transition-all" placeholder="Contoh: Setiap Hari (06.00 - 21.00 WIB)">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-xs space-y-5">
+                            <div class="border-b border-slate-100 pb-3 flex items-center justify-between">
+                                <h3 class="font-black text-slate-800 text-sm uppercase tracking-wide flex items-center gap-2">
+                                    <i class="fas fa-map-marked-alt text-amber-500"></i> Alamat Fisik &amp; Peta Google Maps
+                                </h3>
+                                <span class="text-[10px] bg-slate-100 text-slate-600 font-extrabold px-2.5 py-1 rounded-full">Tampil di Bagian Kontak &amp; Footer</span>
+                            </div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Alamat Lengkap Kantor Agen *</label>
+                                    <textarea id="cfgAlamat" rows="3" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-sm font-bold text-slate-700 outline-none focus:border-amber-500 focus:bg-white transition-all" placeholder="Alamat lengkap kantor agen..."></textarea>
+                                </div>
+                                <div>
+                                    <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Link URL Google Maps *</label>
+                                    <textarea id="cfgGoogleMapsUrl" rows="3" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-sm font-medium text-slate-700 outline-none focus:border-amber-500 focus:bg-white transition-all" placeholder="Contoh: https://maps.app.goo.gl/..."></textarea>
+                                    <p class="text-[10px] text-slate-400 mt-1">Pengunjung diarahkan ke link ini saat klik tombol "Buka Google Maps"</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ============================================== -->
+                    <!-- SUBTAB 2: METODE PEMBAYARAN & QRIS             -->
+                    <!-- ============================================== -->
+                    <div id="subtabKontrolPembayaran" class="space-y-6 hidden">
+                        <div class="bg-gradient-to-r from-slate-900 to-slate-800 text-white p-6 rounded-3xl shadow-lg flex flex-col md:flex-row md:items-center justify-between gap-4">
+                            <div>
+                                <span class="bg-amber-400 text-slate-900 text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-full mb-2 inline-block">Integrasi Penuh Form Booking</span>
+                                <h3 class="text-xl font-black tracking-tight text-white">Kelola Rekening Bank, E-Wallet &amp; QRIS</h3>
+                                <p class="text-xs text-slate-300 mt-1 max-w-xl">Hanya metode pembayaran berstatus <b>Aktif</b> yang akan muncul di formulir pemesanan tiket pelanggan. Anda dapat mengubah nomor rekening, atas nama, maupun upload QRIS baru.</p>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <button type="button" onclick="openModalUploadQris()" class="bg-amber-500 hover:bg-amber-600 text-slate-900 font-black text-xs uppercase tracking-widest px-4 py-3 rounded-2xl shadow-lg shadow-amber-500/20 transition-all flex items-center gap-2 flex-shrink-0">
+                                    <i class="fas fa-qrcode"></i> Ganti Gambar QRIS
+                                </button>
+                                <button type="button" onclick="addNewPaymentMethodPrompt()" class="bg-slate-800 hover:bg-slate-700 text-white border border-slate-700 font-black text-xs uppercase tracking-widest px-4 py-3 rounded-2xl transition-all flex items-center gap-2 flex-shrink-0">
+                                    <i class="fas fa-plus"></i> Tambah Bank Lain
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Grid Daftar Kartu Metode Pembayaran -->
+                        <div id="kontrolPaymentsContainer" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <!-- Populated dynamically by renderKontrolPayments() -->
+                        </div>
+
+                        <!-- Catatan Instruksi Pembayaran -->
+                        <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-xs space-y-4">
+                            <div class="border-b border-slate-100 pb-3 flex items-center justify-between">
+                                <h3 class="font-black text-slate-800 text-sm uppercase tracking-wide flex items-center gap-2">
+                                    <i class="fas fa-exclamation-triangle text-amber-500"></i> Catatan Instruksi Pembayaran (Booking Modal)
+                                </h3>
+                                <span class="text-[10px] bg-amber-100 text-amber-800 font-extrabold px-2.5 py-1 rounded-full">Kotak Kuning Booking</span>
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1.5">Teks Peringatan Pembayaran</label>
+                                <textarea id="cfgCatatanPembayaran" rows="2" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-sm font-bold text-slate-700 outline-none focus:border-amber-500 focus:bg-white transition-all"></textarea>
+                                <p class="text-[10px] text-slate-400 mt-1">Peringatan agar penumpang mentransfer sebelum klik booking dan melampirkan bukti transfer via WhatsApp</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ============================================== -->
+                    <!-- SUBTAB 3: HERO & PENGUMUMAN BERJALAN           -->
+                    <!-- ============================================== -->
+                    <div id="subtabKontrolHero" class="space-y-6 hidden">
+                        <!-- Running Text Control -->
+                        <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-xs space-y-4">
+                            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 pb-3">
+                                <div>
+                                    <h3 class="font-black text-slate-800 text-sm uppercase tracking-wide flex items-center gap-2">
+                                        <i class="fas fa-bullhorn text-amber-500"></i> Teks Berjalan (Running Text / Marquee)
+                                    </h3>
+                                    <p class="text-[11px] text-slate-400 mt-0.5">Tampil sebagai pita pengumuman animasi di bagian atas halaman website pelanggan</p>
+                                </div>
+                                <label class="flex items-center gap-2 cursor-pointer select-none">
+                                    <input type="checkbox" id="cfgRunningTextActive" class="w-4 h-4 text-amber-600 rounded focus:ring-amber-500">
+                                    <span class="text-xs font-black text-slate-700 uppercase">Aktifkan Running Text</span>
+                                </label>
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Isi Teks Pengumuman</label>
+                                <textarea id="cfgRunningText" rows="2" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-sm font-bold text-slate-700 outline-none focus:border-amber-500 focus:bg-white transition-all" placeholder="Tulis pengumuman atau ucapan selamat datang..."></textarea>
+                            </div>
+                        </div>
+
+                        <!-- Hero Header Content -->
+                        <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-xs space-y-5">
+                            <div class="border-b border-slate-100 pb-3 flex items-center justify-between">
+                                <h3 class="font-black text-slate-800 text-sm uppercase tracking-wide flex items-center gap-2">
+                                    <i class="fas fa-heading text-amber-500"></i> Judul &amp; Teks Utama Banner Hero
+                                </h3>
+                                <span class="text-[10px] bg-slate-100 text-slate-600 font-extrabold px-2.5 py-1 rounded-full">Tampilan Depan</span>
+                            </div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div class="md:col-span-2">
+                                    <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Badge Kaca (Glass Badge)</label>
+                                    <input type="text" id="cfgHeroBadge" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-bold text-slate-700 outline-none focus:border-amber-500 focus:bg-white transition-all" placeholder="Contoh: AGEN BUS KAWUNGANTEN">
+                                </div>
+                                <div>
+                                    <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Judul Baris 1 *</label>
+                                    <input type="text" id="cfgHeroTitle1" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-bold text-slate-700 outline-none focus:border-amber-500 focus:bg-white transition-all" placeholder="Contoh: Perjalanan Nyaman">
+                                </div>
+                                <div>
+                                    <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Judul Baris 2 (Gradasi Emas) *</label>
+                                    <input type="text" id="cfgHeroTitle2" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-bold text-slate-700 outline-none focus:border-amber-500 focus:bg-white transition-all" placeholder="Contoh: Pesan Tiket Aman">
+                                </div>
+                                <div class="md:col-span-2">
+                                    <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Subtitle / Paragraf Hero *</label>
+                                    <textarea id="cfgHeroSubtitle" rows="2" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-sm font-medium text-slate-700 outline-none focus:border-amber-500 focus:bg-white transition-all" placeholder="Pusat Penjualan Tiket Bus, Travel, Pesawat &amp; Kapal Laut Resmi..."></textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ============================================== -->
+                    <!-- SUBTAB 4: KEBIJAKAN & SYARAT KETENTUAN         -->
+                    <!-- ============================================== -->
+                    <div id="subtabKontrolKebijakan" class="space-y-6 hidden">
+                        <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-xs space-y-4">
+                            <div class="border-b border-slate-100 pb-3 flex items-center justify-between">
+                                <h3 class="font-black text-slate-800 text-sm uppercase tracking-wide flex items-center gap-2">
+                                    <i class="fas fa-file-contract text-amber-500"></i> Syarat &amp; Kebijakan Pembatalan / Reschedule
+                                </h3>
+                                <span class="text-[10px] bg-slate-100 text-slate-600 font-extrabold px-2.5 py-1 rounded-full">Aturan Tiket</span>
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1.5">Kebijakan Pemesanan &amp; Batas Waktu Hadir</label>
+                                <textarea id="cfgSyaratKetentuan" rows="3" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-sm font-bold text-slate-700 outline-none focus:border-amber-500 focus:bg-white transition-all"></textarea>
+                                <p class="text-[10px] text-slate-400 mt-1">Tampil pada format pesan WhatsApp dan catatan ketentuan tiket resmi</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ============================================== -->
+                    <!-- SUBTAB 5: MEDIA SOSIAL & FOOTER                -->
+                    <!-- ============================================== -->
+                    <div id="subtabKontrolFooter" class="space-y-6 hidden">
+                        <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-xs space-y-5">
+                            <div class="border-b border-slate-100 pb-3 flex items-center justify-between">
+                                <h3 class="font-black text-slate-800 text-sm uppercase tracking-wide flex items-center gap-2">
+                                    <i class="fas fa-share-alt text-amber-500"></i> Akun Media Sosial
+                                </h3>
+                                <span class="text-[10px] bg-slate-100 text-slate-600 font-extrabold px-2.5 py-1 rounded-full">Ikon Footer</span>
+                            </div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Facebook URL</label>
+                                    <div class="relative">
+                                        <input type="url" id="cfgSocialFb" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 pl-11 text-sm font-bold text-slate-700 outline-none focus:border-amber-500 focus:bg-white transition-all" placeholder="https://facebook.com/...">
+                                        <i class="fab fa-facebook absolute left-4 top-1/2 -translate-y-1/2 text-blue-600 text-sm"></i>
+                                    </div>
+                                </div>
+                                <div>
+                                    <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Instagram URL</label>
+                                    <div class="relative">
+                                        <input type="url" id="cfgSocialIg" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 pl-11 text-sm font-bold text-slate-700 outline-none focus:border-amber-500 focus:bg-white transition-all" placeholder="https://instagram.com/...">
+                                        <i class="fab fa-instagram absolute left-4 top-1/2 -translate-y-1/2 text-pink-500 text-sm"></i>
+                                    </div>
+                                </div>
+                                <div>
+                                    <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">TikTok URL</label>
+                                    <div class="relative">
+                                        <input type="url" id="cfgSocialTiktok" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 pl-11 text-sm font-bold text-slate-700 outline-none focus:border-amber-500 focus:bg-white transition-all" placeholder="https://tiktok.com/@...">
+                                        <i class="fab fa-tiktok absolute left-4 top-1/2 -translate-y-1/2 text-slate-900 text-sm"></i>
+                                    </div>
+                                </div>
+                                <div>
+                                    <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Website URL Domain</label>
+                                    <div class="relative">
+                                        <input type="text" id="cfgSocialWebsite" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 pl-11 text-sm font-bold text-slate-700 outline-none focus:border-amber-500 focus:bg-white transition-all" placeholder="agendamrikawunganten.net">
+                                        <i class="fas fa-globe absolute left-4 top-1/2 -translate-y-1/2 text-indigo-500 text-sm"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-xs space-y-4">
+                            <div class="border-b border-slate-100 pb-3 flex items-center justify-between">
+                                <h3 class="font-black text-slate-800 text-sm uppercase tracking-wide flex items-center gap-2">
+                                    <i class="fas fa-copyright text-amber-500"></i> Teks Copyright Footer
+                                </h3>
+                                <span class="text-[10px] bg-slate-100 text-slate-600 font-extrabold px-2.5 py-1 rounded-full">Bawah Halaman</span>
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Teks Hak Cipta</label>
+                                <input type="text" id="cfgCopyright" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-bold text-slate-700 outline-none focus:border-amber-500 focus:bg-white transition-all" placeholder="AGEN DAMRI KAWUNGANTEN. ALL RIGHTS RESERVED.">
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ======================= -->
+                <!-- MODAL UPLOAD QRIS       -->
+                <!-- ======================= -->
+                <div id="modalUploadQris" class="fixed inset-0 bg-slate-900/60 z-[150] hidden items-center justify-center p-4">
+                    <div class="bg-white rounded-3xl p-6 sm:p-8 max-w-md w-full shadow-2xl border border-slate-100 animate-fade-in-up">
+                        <div class="flex items-center justify-between border-b border-slate-100 pb-3 mb-4">
+                            <div class="flex items-center gap-2">
+                                <div class="w-8 h-8 bg-amber-100 text-amber-700 rounded-xl flex items-center justify-center text-sm font-black">
+                                    <i class="fas fa-qrcode"></i>
+                                </div>
+                                <h3 class="font-black text-slate-800 text-sm uppercase">Upload Gambar QRIS Baru</h3>
+                            </div>
+                            <button type="button" onclick="closeModalUploadQris()" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center text-xs">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1.5">Pilih File Gambar (JPG, PNG, WebP)</label>
+                                <input type="file" id="inputQrisFile" accept="image/*" class="w-full text-xs font-bold text-slate-600 file:mr-3 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-black file:bg-amber-100 file:text-amber-800 hover:file:bg-amber-200" onchange="previewSelectedQris(this)">
+                            </div>
+                            <div id="previewQrisContainer" class="p-4 bg-slate-50 rounded-2xl border border-slate-200 flex flex-col items-center justify-center">
+                                <img id="imgQrisPreview" src="qris.webp" alt="Preview QRIS" class="max-h-56 w-auto object-contain rounded-xl shadow-xs border border-slate-200">
+                                <span class="text-[10px] font-bold text-slate-400 mt-2">Pratinjau gambar QRIS</span>
+                            </div>
+                            <div class="flex gap-2 pt-2">
+                                <button type="button" onclick="closeModalUploadQris()" class="flex-1 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs uppercase tracking-wider rounded-xl transition-all">Batal</button>
+                                <button type="button" onclick="submitUploadQris()" id="btnSubmitQris" class="flex-1 py-3 bg-amber-500 hover:bg-amber-600 text-slate-900 font-black text-xs uppercase tracking-wider rounded-xl shadow-md shadow-amber-500/20 transition-all flex items-center justify-center gap-1.5">
+                                    <i class="fas fa-cloud-upload-alt"></i> <span>Terapkan</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
                 <!-- ======================= -->
                 <!-- MENU 8: KELOLA AKUN     -->

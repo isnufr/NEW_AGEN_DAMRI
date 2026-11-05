@@ -34,6 +34,7 @@ let cachedEkstraBookings = [];
 let cachedDenah = [];
 let cachedTipeArmada = [];
 let cachedPoProfiles = {};
+let cachedSiteConfig = null;
 let isDataLoaded = false;
 
 // ==========================================
@@ -94,7 +95,8 @@ async function initData() {
             fetchFromSheets('getHargaKhusus'),
             fetchFromSheets('getDenahArmada'),
             fetchFromSheets('getTipeArmada'),
-            fetchFromSheets('getPoProfiles')
+            fetchFromSheets('getPoProfiles'),
+            fetchFromSheets('getSiteConfig')
         ];
         
         if (isAdmin) {
@@ -112,12 +114,23 @@ async function initData() {
         const dData = results[2];
         const tData = results[3];
         const pData = results[4];
+        const sData = results[5];
         let bData = [], lData = [], eData = [];
         
         if (isAdmin) {
-            bData = results[5];
-            lData = results[6];
-            eData = results[7];
+            bData = results[6];
+            lData = results[7];
+            eData = results[8];
+        }
+
+        if (sData && typeof sData === 'object') {
+            cachedSiteConfig = sData;
+            localStorage.setItem("app_site_config", JSON.stringify(cachedSiteConfig));
+        } else {
+            try {
+                const rawS = localStorage.getItem("app_site_config");
+                if (rawS) cachedSiteConfig = JSON.parse(rawS);
+            } catch(e) {}
         }
 
         if (pData && typeof pData === 'object') {
@@ -388,6 +401,16 @@ function getLaporan() {
     return cachedLaporan;
 }
 
+function getSiteConfig() {
+    if (!cachedSiteConfig) {
+        try {
+            const raw = localStorage.getItem('app_site_config');
+            if (raw) cachedSiteConfig = JSON.parse(raw);
+        } catch(e) {}
+    }
+    return cachedSiteConfig;
+}
+
 // ==========================================
 // 5. UTILITIES (Formatting)
 // ==========================================
@@ -436,9 +459,23 @@ if (typeof io !== 'undefined') {
             window.reloadPublicUI();
         }
     });
+
+    socket.on('site_config_updated', (newConfig) => {
+        cachedSiteConfig = newConfig;
+        try {
+            localStorage.setItem('app_site_config', JSON.stringify(newConfig));
+        } catch(e) {}
+        if (typeof applySiteConfig === 'function') {
+            applySiteConfig(newConfig);
+        }
+        if (typeof renderKontrol === 'function' && typeof currentMenu !== 'undefined' && currentMenu === 'kontrol') {
+            renderKontrol();
+        }
+    });
 }
 
 if (typeof window !== 'undefined') {
     window.getPoProfiles = getPoProfiles;
     window.getPoProfile = getPoProfile;
+    window.getSiteConfig = getSiteConfig;
 }

@@ -147,6 +147,131 @@ if (!fs.existsSync(DATA_DIR)) {
 
 const TIPE_ARMADA_FILE = path.join(DATA_DIR, 'tipe-armada.json');
 const PO_PROFILES_FILE = path.join(DATA_DIR, 'po-profiles.json');
+const SITE_CONFIG_FILE = path.join(DATA_DIR, 'site-config.json');
+
+const DEFAULT_SITE_CONFIG = {
+    general: {
+        namaAgen: "AGEN DAMRI KAWUNGANTEN",
+        brandName: "AGEN BUS KAWUNGANTEN",
+        tagline: "Pusat Penjualan Tiket Bus, Travel, Pesawat & Kapal",
+        deskripsi: "Layanan resmi pemesanan tiket bus DAMRI, Efisiensi, Estu Trans, Best Premium, 77 Trans, Pesawat dan Kapal Laut online di Kawunganten Cilacap.",
+        alamat: "Jl. Raya Kawunganten, Desa Kawunganten, Kec. Kawunganten, Kab. Cilacap, Jawa Tengah.",
+        googleMapsUrl: "https://maps.app.goo.gl/mFP2Nn4KUyworYe66",
+        whatsappUtama: "082133607759",
+        whatsappDisplay: "0821-3360-7759",
+        jamLayanan: "Setiap Hari (06.00 - 21.00 WIB)",
+        runningText: "Selamat Datang di Agen Bus Kawunganten! Melayani tiket resmi bus DAMRI, Efisiensi, Estu Trans, 77 Trans, Best Premium, Travel, Pesawat & Kapal Laut.",
+        runningTextActive: true
+    },
+    hero: {
+        badge: "AGEN BUS KAWUNGANTEN",
+        titleLine1: "Perjalanan Nyaman",
+        titleLine2: "Pesan Tiket Aman",
+        subtitle: "Pusat Penjualan Tiket Bus, Travel, Pesawat & Kapal Laut Resmi dan Terpercaya di Kawunganten Cilacap"
+    },
+    payments: [
+        {
+            id: "mandiri",
+            name: "Transfer Mandiri",
+            displayName: "BANK MANDIRI",
+            bankName: "Bank Mandiri",
+            nomorRekening: "1800013416526",
+            atasNama: "ISNU FADKHUL ROIS",
+            badgeColor: "#003d79",
+            icon: "fa-university",
+            isActive: true
+        },
+        {
+            id: "seabank",
+            name: "Transfer Seabank",
+            displayName: "SEABANK",
+            bankName: "SeaBank",
+            nomorRekening: "901528007687",
+            atasNama: "ISNU FADKHUL ROIS",
+            badgeColor: "#f05a28",
+            icon: "fa-shield-alt",
+            isActive: true
+        },
+        {
+            id: "dana",
+            name: "Saldo Dana",
+            displayName: "DANA (E-WALLET)",
+            bankName: "DANA",
+            nomorRekening: "082133607759",
+            atasNama: "ISNU FADKHUL ROIS",
+            badgeColor: "#118ee9",
+            icon: "fa-wallet",
+            isActive: true
+        },
+        {
+            id: "qris",
+            name: "QRIS AGEN",
+            displayName: "QRIS SCAN (OTOMATIS)",
+            bankName: "QRIS SCAN",
+            nomorRekening: "SCAN KODE QR DI ATAS",
+            atasNama: "AGEN DAMRI KAWUNGANTEN",
+            badgeColor: "#0f172a",
+            icon: "fa-qrcode",
+            qrisImage: "qris.webp",
+            isActive: true
+        },
+        {
+            id: "bca",
+            name: "Transfer BCA",
+            displayName: "BANK BCA",
+            bankName: "Bank BCA",
+            nomorRekening: "",
+            atasNama: "ISNU FADKHUL ROIS",
+            badgeColor: "#003d79",
+            icon: "fa-university",
+            isActive: false
+        },
+        {
+            id: "bri",
+            name: "Transfer BRI",
+            displayName: "BANK BRI",
+            bankName: "Bank BRI",
+            nomorRekening: "",
+            atasNama: "ISNU FADKHUL ROIS",
+            badgeColor: "#00529c",
+            icon: "fa-university",
+            isActive: false
+        }
+    ],
+    policy: {
+        catatanPembayaran: "PENTING: Dimohon untuk melakukan pembayaran sesuai total tagihan sebelum klik BOOKING, lalu sertakan bukti pembayaran saat chat WhatsApp.",
+        syaratKetentuan: "Hadir 30 menit sebelum keberangkatan. Tiket yang sudah dibooking tidak bisa dicancel mendadak (max 1x24 jam)."
+    },
+    social: {
+        facebook: "",
+        instagram: "",
+        tiktok: "",
+        website: "agendamrikawunganten.net",
+        copyright: "AGEN DAMRI KAWUNGANTEN. ALL RIGHTS RESERVED."
+    }
+};
+
+function getSiteConfigData() {
+    try {
+        if (fs.existsSync(SITE_CONFIG_FILE)) {
+            const raw = fs.readFileSync(SITE_CONFIG_FILE, 'utf-8');
+            if (raw && raw.trim()) return JSON.parse(raw);
+        }
+        fs.writeFileSync(SITE_CONFIG_FILE, JSON.stringify(DEFAULT_SITE_CONFIG, null, 2));
+        return DEFAULT_SITE_CONFIG;
+    } catch (e) {
+        console.error('Error reading site config:', e);
+        return DEFAULT_SITE_CONFIG;
+    }
+}
+
+function saveSiteConfigData(data) {
+    try {
+        fs.writeFileSync(SITE_CONFIG_FILE, JSON.stringify(data, null, 2));
+    } catch (e) {
+        console.error('Error saving site config:', e);
+    }
+}
 const DEFAULT_PO_PROFILES = {
     "77 TRANS": {
         "image": "77trans.webp",
@@ -489,9 +614,14 @@ app.get('/api', async (req, res) => {
     const action = req.query.action;
 
     try {
-        const publicActions = ['getArmada', 'getDenahArmada', 'getTipeArmada', 'getPoProfiles', 'getTakenSeats', 'getBookingById', 'getPelangganTable', 'getHargaKhusus', 'getPopupIklan'];
+        const publicActions = ['getArmada', 'getDenahArmada', 'getTipeArmada', 'getPoProfiles', 'getTakenSeats', 'getBookingById', 'getPelangganTable', 'getHargaKhusus', 'getPopupIklan', 'getSiteConfig'];
         if (!publicActions.includes(action) && !req.user) {
             return res.status(401).json({ status: 'error', message: 'Unauthorized' });
+        }
+
+        if (action === 'getSiteConfig') {
+            const data = getSiteConfigData();
+            return res.json({ status: 'success', data });
         }
 
         if (action === 'getPoProfiles') {
@@ -1534,6 +1664,14 @@ app.post('/api', async (req, res) => {
             return res.json({ status: 'success', message: 'Iklan berhasil dihapus' });
         }
 
+        if (action === 'saveSiteConfig') {
+            const newConfig = payload;
+            if (!newConfig) return res.status(400).json({ status: 'error', message: 'Payload konfigurasi kosong' });
+            saveSiteConfigData(newConfig);
+            io.emit('site_config_updated', newConfig);
+            return res.json({ status: 'success', message: 'Konfigurasi website berhasil disimpan', data: newConfig });
+        }
+
         return res.status(400).json({ status: 'error', message: 'Action not found' });
     } catch (error) {
         console.error(error);
@@ -1676,6 +1814,30 @@ app.post('/api/upload-logo', (req, res, next) => {
     } catch (err) {
         console.error('Upload Logo Error:', err);
         return res.status(500).json({ status: 'error', message: 'Gagal mengunggah logo PO: ' + (err.message || 'Server error') });
+    }
+});
+
+// Endpoint upload gambar QRIS pembayaran (Admin)
+app.post('/api/upload-qris', (req, res, next) => {
+    upload.fields([{ name: 'qris', maxCount: 1 }, { name: 'qrisImage', maxCount: 1 }])(req, res, (err) => {
+        if (err) return handleMulterError(err, req, res, next);
+        if (req.files) {
+            req.file = req.files['qris']?.[0] || req.files['qrisImage']?.[0];
+        }
+        next();
+    });
+}, async (req, res) => {
+    try {
+        const token = req.headers['authorization']?.split(' ')[1];
+        if (!token) return res.status(401).json({ status: 'error', message: 'Unauthorized' });
+        try { jwt.verify(token, JWT_SECRET); } catch(e) { return res.status(401).json({ status: 'error', message: 'Token tidak valid' }); }
+
+        if (!req.file) return res.status(400).json({ status: 'error', message: 'File QRIS wajib diupload' });
+        const qrisUrl = '/uploads/' + req.file.filename;
+        return res.json({ status: 'success', success: true, url: qrisUrl, message: 'Gambar QRIS berhasil diunggah' });
+    } catch (err) {
+        console.error('Upload QRIS Error:', err);
+        return res.status(500).json({ status: 'error', message: 'Gagal mengunggah gambar QRIS: ' + (err.message || 'Server error') });
     }
 });
 

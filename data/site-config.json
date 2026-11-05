@@ -1,0 +1,101 @@
+{
+  "general": {
+    "namaAgen": "AGEN DAMRI KAWUNGANTEN",
+    "brandName": "AGEN BUS KAWUNGANTEN",
+    "tagline": "Pusat Penjualan Tiket Bus, Travel, Pesawat & Kapal",
+    "deskripsi": "Layanan resmi pemesanan tiket bus DAMRI, Efisiensi, Estu Trans, Best Premium, 77 Trans, Pesawat dan Kapal Laut online di Kawunganten Cilacap.",
+    "alamat": "Jl. Raya Kawunganten, Desa Kawunganten, Kec. Kawunganten, Kab. Cilacap, Jawa Tengah.",
+    "googleMapsUrl": "https://maps.app.goo.gl/mFP2Nn4KUyworYe66",
+    "whatsappUtama": "082133607759",
+    "whatsappDisplay": "0821-3360-7759",
+    "jamLayanan": "Setiap Hari (06.00 - 21.00 WIB)",
+    "runningText": "Selamat Datang di Agen Bus Kawunganten! Melayani tiket resmi bus DAMRI, Efisiensi, Estu Trans, 77 Trans, Best Premium, Travel, Pesawat & Kapal Laut.",
+    "runningTextActive": true
+  },
+  "hero": {
+    "badge": "AGEN BUS KAWUNGANTEN",
+    "titleLine1": "Perjalanan Nyaman",
+    "titleLine2": "Pesan Tiket Aman",
+    "subtitle": "Pusat Penjualan Tiket Bus, Travel, Pesawat & Kapal Laut Resmi dan Terpercaya di Kawunganten Cilacap"
+  },
+  "payments": [
+    {
+      "id": "mandiri",
+      "name": "Transfer Mandiri",
+      "displayName": "BANK MANDIRI",
+      "bankName": "Bank Mandiri",
+      "nomorRekening": "1800013416526",
+      "atasNama": "ISNU FADKHUL ROIS",
+      "badgeColor": "#003d79",
+      "icon": "fa-university",
+      "isActive": true
+    },
+    {
+      "id": "seabank",
+      "name": "Transfer Seabank",
+      "displayName": "SEABANK",
+      "bankName": "SeaBank",
+      "nomorRekening": "901528007687",
+      "atasNama": "ISNU FADKHUL ROIS",
+      "badgeColor": "#f05a28",
+      "icon": "fa-shield-alt",
+      "isActive": true
+    },
+    {
+      "id": "dana",
+      "name": "Saldo Dana",
+      "displayName": "DANA (E-WALLET)",
+      "bankName": "DANA",
+      "nomorRekening": "082133607759",
+      "atasNama": "ISNU FADKHUL ROIS",
+      "badgeColor": "#118ee9",
+      "icon": "fa-wallet",
+      "isActive": true
+    },
+    {
+      "id": "qris",
+      "name": "QRIS AGEN",
+      "displayName": "QRIS SCAN (OTOMATIS)",
+      "bankName": "QRIS SCAN",
+      "nomorRekening": "SCAN KODE QR DI ATAS",
+      "atasNama": "AGEN DAMRI KAWUNGANTEN",
+      "badgeColor": "#0f172a",
+      "icon": "fa-qrcode",
+      "qrisImage": "qris.webp",
+      "isActive": true
+    },
+    {
+      "id": "bca",
+      "name": "Transfer BCA",
+      "displayName": "BANK BCA",
+      "bankName": "Bank BCA",
+      "nomorRekening": "",
+      "atasNama": "ISNU FADKHUL ROIS",
+      "badgeColor": "#003d79",
+      "icon": "fa-university",
+      "isActive": false
+    },
+    {
+      "id": "bri",
+      "name": "Transfer BRI",
+      "displayName": "BANK BRI",
+      "bankName": "Bank BRI",
+      "nomorRekening": "",
+      "atasNama": "ISNU FADKHUL ROIS",
+      "badgeColor": "#00529c",
+      "icon": "fa-university",
+      "isActive": false
+    }
+  ],
+  "policy": {
+    "catatanPembayaran": "PENTING: Dimohon untuk melakukan pembayaran sesuai total tagihan sebelum klik BOOKING, lalu sertakan bukti pembayaran saat chat WhatsApp.",
+    "syaratKetentuan": "Hadir 30 menit sebelum keberangkatan. Tiket yang sudah dibooking tidak bisa dicancel mendadak (max 1x24 jam)."
+  },
+  "social": {
+    "facebook": "",
+    "instagram": "",
+    "tiktok": "",
+    "website": "agendamrikawunganten.net",
+    "copyright": "AGEN DAMRI KAWUNGANTEN. ALL RIGHTS RESERVED."
+  }
+}

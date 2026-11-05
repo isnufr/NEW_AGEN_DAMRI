@@ -306,6 +306,7 @@
         else if (currentMenu === 'laporan') renderLaporan();
         else if (currentMenu === 'akun') renderAkun();
         else if (currentMenu === 'iklan') renderIklan();
+        else if (currentMenu === 'kontrol') renderKontrol();
     }
 
     // ========================================
@@ -6224,6 +6225,9 @@ window.switchMenu = function(menuId) {
     if (menuId === 'iklan') {
         renderIklan();
     }
+    if (menuId === 'kontrol') {
+        renderKontrol();
+    }
 };
 
 // ========================================
@@ -7505,3 +7509,537 @@ function clearEditBookingSeats() {
 }
 
     if (typeof toggleDashboardNominal !== 'undefined') window.toggleDashboardNominal = toggleDashboardNominal;
+
+// ========================================
+// MENU AJAIB: KONTROL WEBSITE PELANGGAN
+// ========================================
+let kontrolConfigData = null;
+let currentKontrolSubtab = 'profil';
+
+function switchKontrolSubtab(tabKey) {
+    currentKontrolSubtab = tabKey;
+    const tabs = ['profil', 'pembayaran', 'hero', 'kebijakan', 'footer'];
+    tabs.forEach(t => {
+        const btn = document.getElementById('tabBtnKontrol' + t.charAt(0).toUpperCase() + t.slice(1));
+        const pane = document.getElementById('subtabKontrol' + t.charAt(0).toUpperCase() + t.slice(1));
+        if (btn) {
+            if (t === tabKey) {
+                btn.className = 'kontrol-subtab-btn px-4 py-2.5 rounded-xl font-black text-xs uppercase tracking-wider transition-all bg-slate-900 text-amber-400 shadow-sm flex items-center gap-2 whitespace-nowrap shrink-0';
+            } else {
+                btn.className = 'kontrol-subtab-btn px-4 py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider transition-all bg-white text-slate-600 hover:bg-slate-100 border border-slate-200 shadow-sm flex items-center gap-2 whitespace-nowrap shrink-0';
+            }
+        }
+        if (pane) {
+            pane.classList.toggle('hidden', t !== tabKey);
+        }
+    });
+}
+
+async function renderKontrol() {
+    const section = document.getElementById('sec-kontrol');
+    if (!section) return;
+
+    let cfg = typeof getSiteConfig === 'function' ? getSiteConfig() : null;
+    if (!cfg) {
+        try {
+            cfg = await fetchFromSheets('getSiteConfig');
+        } catch(e) {
+            console.error('Gagal mengambil site config:', e);
+        }
+    }
+    if (!cfg) {
+        cfg = {
+            general: {
+                agencyName: "AGEN DAMRI KAWUNGANTEN",
+                brandName: "AGEN BUS KAWUNGANTEN",
+                tagline: "Pusat Penjualan Tiket Bus, Travel, Pesawat & Kapal",
+                description: "Pusat Penjualan Tiket Bus, Travel, Pesawat & Kapal Laut Resmi dan Terpercaya di Kawunganten Cilacap.",
+                whatsapp: "082133607759",
+                whatsappDisplay: "0821-3360-7759",
+                operatingHours: "Setiap Hari (06.00 - 21.00 WIB)",
+                address: "Jl. Raya Kawunganten, Desa Kawunganten, Kec. Kawunganten, Kab. Cilacap, Jawa Tengah.",
+                googleMapsUrl: "https://maps.app.goo.gl/mFP2Nn4KUyworYe66"
+            },
+            hero: {
+                marqueeActive: true,
+                marqueeText: "Selamat Datang di Agen Bus Kawunganten! Pesan tiket bus, travel, pesawat & kapal resmi dengan mudah, aman, dan bergaransi.",
+                heroBadge: "AGEN BUS KAWUNGANTEN",
+                heroTitleLine1: "Perjalanan Nyaman",
+                heroTitleLine2: "Pesan Tiket Aman",
+                heroSubtitle: "Pusat Penjualan Tiket Bus, Travel, Pesawat & Kapal Laut Resmi dan Terpercaya di Kawunganten Cilacap"
+            },
+            paymentsInstruction: "PENTING: Dimohon untuk melakukan pembayaran sesuai total harga sebelum klik BOOKING, lalu sertakan bukti pembayaran saat chat WhatsApp.",
+            payments: [
+                { id: "mandiri", name: "Bank Mandiri", type: "bank", accountNumber: "1800013416526", accountName: "ISNU FADKHUL ROIS", isActive: true },
+                { id: "seabank", name: "SeaBank", type: "bank", accountNumber: "901528007687", accountName: "ISNU FADKHUL ROIS", isActive: true },
+                { id: "dana", name: "DANA", type: "ewallet", accountNumber: "082133607759", accountName: "ISNU FADKHUL ROIS", isActive: true },
+                { id: "qris", name: "QRIS SCAN (Semua Bank / E-Wallet)", type: "qris", qrImage: "qris.webp", accountName: "AGEN DAMRI KAWUNGANTEN", isActive: true }
+            ],
+            policy: {
+                cancellationPolicy: "HADIR 30 MENIT SEBELUM PEMBERANGKATAN\nTIKET YANG SUDAH DIBOOKING TIDAK BISA DICANCEL MENDAK (MAX 1x24jam)",
+                seatSelectionNotice: "Pemilihan kursi dilakukan oleh Admin Agen saat verifikasi pesanan. Nomor kursi resmi akan tertera pada E-Ticket Anda."
+            },
+            social: {
+                facebook: "https://facebook.com",
+                instagram: "https://instagram.com",
+                tiktok: "https://tiktok.com",
+                website: "agendamrikawunganten.net",
+                copyrightText: "AGEN DAMRI KAWUNGANTEN. ALL RIGHTS RESERVED."
+            }
+        };
+    }
+
+    kontrolConfigData = JSON.parse(JSON.stringify(cfg));
+
+    // Subtab 1: Profil
+    const elNama = document.getElementById('cfgNamaAgen');
+    const elBrand = document.getElementById('cfgBrandName');
+    const elTagline = document.getElementById('cfgTagline');
+    const elDesc = document.getElementById('cfgDeskripsi');
+    const elWa = document.getElementById('cfgWhatsappUtama');
+    const elWaDisp = document.getElementById('cfgWhatsappDisplay');
+    const elJam = document.getElementById('cfgJamLayanan');
+    const elAlamat = document.getElementById('cfgAlamat');
+    const elMaps = document.getElementById('cfgGoogleMapsUrl');
+
+    if (elNama) elNama.value = kontrolConfigData.general?.namaAgen || kontrolConfigData.general?.agencyName || '';
+    if (elBrand) elBrand.value = kontrolConfigData.general?.brandName || '';
+    if (elTagline) elTagline.value = kontrolConfigData.general?.tagline || '';
+    if (elDesc) elDesc.value = kontrolConfigData.general?.deskripsi || kontrolConfigData.general?.description || '';
+    if (elWa) elWa.value = kontrolConfigData.general?.whatsappUtama || kontrolConfigData.general?.whatsapp || '';
+    if (elWaDisp) elWaDisp.value = kontrolConfigData.general?.whatsappDisplay || '';
+    if (elJam) elJam.value = kontrolConfigData.general?.jamLayanan || kontrolConfigData.general?.operatingHours || '';
+    if (elAlamat) elAlamat.value = kontrolConfigData.general?.alamat || kontrolConfigData.general?.address || '';
+    if (elMaps) elMaps.value = kontrolConfigData.general?.googleMapsUrl || '';
+
+    // Subtab 2: Pembayaran
+    const elCatatanBayar = document.getElementById('cfgCatatanPembayaran');
+    if (elCatatanBayar) elCatatanBayar.value = kontrolConfigData.policy?.catatanPembayaran || kontrolConfigData.paymentsInstruction || '';
+    renderKontrolPayments();
+
+    // Subtab 3: Hero & Marquee
+    const elMarqueeActive = document.getElementById('cfgRunningTextActive');
+    const elMarqueeText = document.getElementById('cfgRunningText');
+    const elHeroBadge = document.getElementById('cfgHeroBadge');
+    const elHeroT1 = document.getElementById('cfgHeroTitle1');
+    const elHeroT2 = document.getElementById('cfgHeroTitle2');
+    const elHeroSub = document.getElementById('cfgHeroSubtitle');
+
+    const isMarqActive = kontrolConfigData.general?.runningTextActive !== undefined ? !!kontrolConfigData.general.runningTextActive : (kontrolConfigData.hero?.marqueeActive !== undefined ? !!kontrolConfigData.hero.marqueeActive : true);
+    if (elMarqueeActive) elMarqueeActive.checked = isMarqActive;
+    if (elMarqueeText) elMarqueeText.value = kontrolConfigData.general?.runningText || kontrolConfigData.hero?.marqueeText || '';
+    if (elHeroBadge) elHeroBadge.value = kontrolConfigData.hero?.badge || kontrolConfigData.hero?.heroBadge || '';
+    if (elHeroT1) elHeroT1.value = kontrolConfigData.hero?.titleLine1 || kontrolConfigData.hero?.heroTitleLine1 || '';
+    if (elHeroT2) elHeroT2.value = kontrolConfigData.hero?.titleLine2 || kontrolConfigData.hero?.heroTitleLine2 || '';
+    if (elHeroSub) elHeroSub.value = kontrolConfigData.hero?.subtitle || kontrolConfigData.hero?.heroSubtitle || '';
+
+    // Subtab 4: Kebijakan
+    const elSyarat = document.getElementById('cfgSyaratKetentuan');
+    if (elSyarat) elSyarat.value = kontrolConfigData.policy?.syaratKetentuan || kontrolConfigData.policy?.cancellationPolicy || '';
+
+    // Subtab 5: Sosial Media & Footer
+    const elFb = document.getElementById('cfgSocialFb');
+    const elIg = document.getElementById('cfgSocialIg');
+    const elTiktok = document.getElementById('cfgSocialTiktok');
+    const elWeb = document.getElementById('cfgSocialWebsite');
+    const elCopy = document.getElementById('cfgCopyright');
+
+    if (elFb) elFb.value = kontrolConfigData.social?.facebook || '';
+    if (elIg) elIg.value = kontrolConfigData.social?.instagram || '';
+    if (elTiktok) elTiktok.value = kontrolConfigData.social?.tiktok || '';
+    if (elWeb) elWeb.value = kontrolConfigData.social?.website || '';
+    if (elCopy) elCopy.value = kontrolConfigData.social?.copyright || kontrolConfigData.social?.copyrightText || '';
+}
+
+function renderKontrolPayments() {
+    const container = document.getElementById('kontrolPaymentsContainer');
+    if (!container || !kontrolConfigData || !kontrolConfigData.payments) return;
+
+    container.innerHTML = kontrolConfigData.payments.map((p) => {
+        const isQris = p.type === 'qris' || p.id === 'qris' || (p.name && p.name.toUpperCase().includes('QRIS'));
+        const isActive = !!p.isActive;
+        const pTitle = p.displayName || p.bankName || p.name;
+        const pNoRek = p.nomorRekening || p.accountNumber || '';
+        const pAtasNama = p.atasNama || p.accountName || '';
+        const pQrImg = p.qrisImage || p.qrImage || 'qris.webp';
+
+        let iconClass = 'fa-university text-blue-600';
+        if (isQris) iconClass = 'fa-qrcode text-amber-500';
+        else if (p.type === 'ewallet' || p.id === 'dana') iconClass = 'fa-wallet text-sky-500';
+
+        return `
+            <div class="bg-white p-5 rounded-3xl border ${isActive ? 'border-amber-300 shadow-md shadow-amber-500/5' : 'border-slate-200 opacity-75'} transition-all space-y-4">
+                <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-2xl ${isActive ? 'bg-amber-100 text-amber-700' : 'bg-slate-100 text-slate-400'} flex items-center justify-center text-lg font-black shrink-0">
+                            <i class="fas ${iconClass}"></i>
+                        </div>
+                        <div>
+                            <h4 class="font-black text-slate-800 text-sm tracking-tight">${pTitle}</h4>
+                            <span class="text-[10px] font-bold uppercase tracking-wider ${isQris ? 'text-amber-600' : 'text-slate-400'}">${isQris ? 'SCAN QRIS RESMI' : (p.type === 'ewallet' ? 'E-WALLET' : 'TRANSFER BANK')}</span>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" class="sr-only peer" ${isActive ? 'checked' : ''} onchange="toggleKontrolPaymentStatus('${p.id}')">
+                            <div class="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-amber-500"></div>
+                        </label>
+                        <span class="text-[10px] font-black uppercase px-2 py-0.5 rounded-md ${isActive ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-400'}">
+                            ${isActive ? 'AKTIF' : 'NONAKTIF'}
+                        </span>
+                    </div>
+                </div>
+
+                ${isQris ? `
+                    <div class="flex flex-col sm:flex-row items-center gap-4 bg-slate-50 p-3.5 rounded-2xl border border-slate-200">
+                        <img src="${pQrImg}" alt="QRIS" class="w-24 h-24 object-contain rounded-xl border border-slate-200 bg-white p-1 shrink-0" onerror="this.src='qris.webp'">
+                        <div class="flex-1 w-full space-y-2">
+                            <div>
+                                <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Nama Usaha / Merchant (a.n) *</label>
+                                <input type="text" value="${pAtasNama}" onchange="updateKontrolPaymentField('${p.id}', 'atasNama', this.value)" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold text-slate-700 outline-none focus:border-amber-500" placeholder="Contoh: AGEN DAMRI KAWUNGANTEN">
+                            </div>
+                            <button type="button" onclick="openModalUploadQris()" class="w-full py-2 bg-amber-500 hover:bg-amber-600 text-slate-900 rounded-xl text-[10px] font-black uppercase tracking-wider shadow-xs transition-all flex items-center justify-center gap-1.5">
+                                <i class="fas fa-camera"></i> Ganti Gambar QRIS
+                            </button>
+                        </div>
+                    </div>
+                ` : `
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Nomor Rekening / No. HP *</label>
+                            <input type="text" value="${pNoRek}" onchange="updateKontrolPaymentField('${p.id}', 'nomorRekening', this.value)" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-xs font-bold text-slate-700 outline-none focus:border-amber-500 focus:bg-white" placeholder="Contoh: 1800013416526">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Atas Nama (Pemilik) *</label>
+                            <input type="text" value="${pAtasNama}" onchange="updateKontrolPaymentField('${p.id}', 'atasNama', this.value)" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-xs font-bold text-slate-700 outline-none focus:border-amber-500 focus:bg-white" placeholder="Contoh: ISNU FADKHUL ROIS">
+                        </div>
+                    </div>
+                `}
+
+                ${!['mandiri', 'seabank', 'dana', 'qris'].includes(p.id) ? `
+                    <div class="flex justify-end pt-1">
+                        <button type="button" onclick="deleteKontrolPaymentMethod('${p.id}')" class="text-xs font-bold text-red-500 hover:text-red-700 flex items-center gap-1">
+                            <i class="fas fa-trash-alt"></i> Hapus Metode Ini
+                        </button>
+                    </div>
+                ` : ''}
+            </div>
+        `;
+    }).join('');
+}
+
+function toggleKontrolPaymentStatus(id) {
+    if (!kontrolConfigData || !kontrolConfigData.payments) return;
+    const p = kontrolConfigData.payments.find(item => item.id === id);
+    if (p) {
+        p.isActive = !p.isActive;
+        renderKontrolPayments();
+    }
+}
+
+function updateKontrolPaymentField(id, field, val) {
+    if (!kontrolConfigData || !kontrolConfigData.payments) return;
+    const p = kontrolConfigData.payments.find(item => item.id === id);
+    if (p) {
+        if (field === 'accountName' || field === 'atasNama') {
+            p.atasNama = val;
+            p.accountName = val;
+        } else if (field === 'accountNumber' || field === 'nomorRekening') {
+            p.nomorRekening = val;
+            p.accountNumber = val;
+        } else {
+            p[field] = val;
+        }
+    }
+}
+
+async function addNewPaymentMethodPrompt() {
+    if (!kontrolConfigData) return;
+    if (typeof Swal !== 'undefined') {
+        const { value: formValues } = await Swal.fire({
+            title: 'Tambah Rekening / E-Wallet Baru',
+            html: `
+                <div class="text-left space-y-3 pt-2">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-600 mb-1">Nama Bank / E-Wallet *</label>
+                        <input id="swal-bank-name" class="swal2-input !m-0 !w-full !text-sm" placeholder="Contoh: Bank BCA / OVO / GoPay">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-600 mb-1">Nomor Rekening / No. HP *</label>
+                        <input id="swal-bank-num" class="swal2-input !m-0 !w-full !text-sm" placeholder="Contoh: 0123456789">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-600 mb-1">Atas Nama (Pemilik Rekening) *</label>
+                        <input id="swal-bank-owner" class="swal2-input !m-0 !w-full !text-sm" placeholder="Contoh: ISNU FADKHUL ROIS">
+                    </div>
+                </div>
+            `,
+            focusConfirm: false,
+            showCancelButton: true,
+            confirmButtonText: 'Tambahkan',
+            cancelButtonText: 'Batal',
+            confirmButtonColor: '#f59e0b',
+            preConfirm: () => {
+                const name = document.getElementById('swal-bank-name').value.trim();
+                const num = document.getElementById('swal-bank-num').value.trim();
+                const owner = document.getElementById('swal-bank-owner').value.trim();
+                if (!name || !num || !owner) {
+                    Swal.showValidationMessage('Semua kolom wajib diisi!');
+                    return false;
+                }
+                return { name, num, owner };
+            }
+        });
+
+        if (formValues) {
+            const newId = 'custom_' + Date.now();
+            kontrolConfigData.payments.push({
+                id: newId,
+                name: formValues.name,
+                type: 'bank',
+                accountNumber: formValues.num,
+                accountName: formValues.owner,
+                isActive: true
+            });
+            renderKontrolPayments();
+            Swal.fire({
+                icon: 'success',
+                title: 'Ditambahkan',
+                text: 'Metode ' + formValues.name + ' berhasil ditambahkan. Klik "Simpan Semua Perubahan" untuk mempublikasikan.',
+                timer: 2000,
+                showConfirmButton: false
+            });
+        }
+    } else {
+        const name = prompt('Masukkan Nama Bank / E-Wallet (misal: Bank BCA):');
+        if (!name) return;
+        const num = prompt('Masukkan Nomor Rekening / HP:');
+        if (!num) return;
+        const owner = prompt('Masukkan Atas Nama:');
+        if (!owner) return;
+        const newId = 'custom_' + Date.now();
+        kontrolConfigData.payments.push({
+            id: newId,
+            name: name,
+            type: 'bank',
+            accountNumber: num,
+            accountName: owner,
+            isActive: true
+        });
+        renderKontrolPayments();
+    }
+}
+
+function deleteKontrolPaymentMethod(id) {
+    if (!kontrolConfigData || !kontrolConfigData.payments) return;
+    if (confirm('Yakin ingin menghapus metode pembayaran ini?')) {
+        kontrolConfigData.payments = kontrolConfigData.payments.filter(p => p.id !== id);
+        renderKontrolPayments();
+    }
+}
+
+// Modal QRIS
+function openModalUploadQris() {
+    const modal = document.getElementById('modalUploadQris');
+    if (!modal) return;
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+    const qrisObj = kontrolConfigData?.payments?.find(p => p.id === 'qris');
+    const preview = document.getElementById('imgQrisPreview');
+    if (preview && qrisObj?.qrImage) {
+        preview.src = qrisObj.qrImage;
+    }
+}
+
+function closeModalUploadQris() {
+    const modal = document.getElementById('modalUploadQris');
+    if (!modal) return;
+    modal.classList.add('hidden');
+    modal.classList.remove('flex');
+}
+
+function previewSelectedQris(input) {
+    if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const preview = document.getElementById('imgQrisPreview');
+            if (preview) preview.src = e.target.result;
+        };
+        reader.readAsDataURL(input.files[0]);
+    }
+}
+
+async function submitUploadQris() {
+    const fileInput = document.getElementById('inputQrisFile');
+    if (!fileInput || !fileInput.files || !fileInput.files[0]) {
+        alert('Pilih file gambar QRIS terlebih dahulu!');
+        return;
+    }
+
+    const btn = document.getElementById('btnSubmitQris');
+    if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Mengunggah...';
+    }
+
+    const formData = new FormData();
+    formData.append('qris', fileInput.files[0]);
+    formData.append('qrisImage', fileInput.files[0]);
+
+    const headers = {};
+    const token = localStorage.getItem('adminToken');
+    if (token) headers['Authorization'] = `Bearer ${token}`;
+
+    try {
+        const resp = await fetch('/api/upload-qris', {
+            method: 'POST',
+            headers: headers,
+            body: formData
+        });
+        const res = await resp.json();
+        if ((res.success || res.status === 'success') && res.url) {
+            if (kontrolConfigData && kontrolConfigData.payments) {
+                const qrisObj = kontrolConfigData.payments.find(p => p.id === 'qris');
+                if (qrisObj) {
+                    qrisObj.qrisImage = res.url;
+                    qrisObj.qrImage = res.url;
+                }
+            }
+            renderKontrolPayments();
+            closeModalUploadQris();
+            if (typeof Swal !== 'undefined') {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'QRIS Diunggah',
+                    text: 'Gambar QRIS baru berhasil diterapkan. Jangan lupa klik "Simpan Semua Perubahan"!',
+                    timer: 2500,
+                    showConfirmButton: false
+                });
+            } else {
+                alert('Gambar QRIS baru berhasil diterapkan! Jangan lupa klik Simpan Semua Perubahan.');
+            }
+        } else {
+            alert('Gagal mengunggah QRIS: ' + (res.error || 'Unknown error'));
+        }
+    } catch(err) {
+        console.error(err);
+        alert('Terjadi kesalahan saat mengunggah QRIS.');
+    } finally {
+        if (btn) {
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fas fa-cloud-upload-alt"></i> <span>Terapkan</span>';
+        }
+    }
+}
+
+async function saveKontrolConfig() {
+    if (!kontrolConfigData) return;
+
+    // Collect profil
+    kontrolConfigData.general = {
+        namaAgen: document.getElementById('cfgNamaAgen')?.value.trim() || '',
+        agencyName: document.getElementById('cfgNamaAgen')?.value.trim() || '',
+        brandName: document.getElementById('cfgBrandName')?.value.trim() || '',
+        tagline: document.getElementById('cfgTagline')?.value.trim() || '',
+        deskripsi: document.getElementById('cfgDeskripsi')?.value.trim() || '',
+        description: document.getElementById('cfgDeskripsi')?.value.trim() || '',
+        alamat: document.getElementById('cfgAlamat')?.value.trim() || '',
+        address: document.getElementById('cfgAlamat')?.value.trim() || '',
+        googleMapsUrl: document.getElementById('cfgGoogleMapsUrl')?.value.trim() || '',
+        whatsappUtama: document.getElementById('cfgWhatsappUtama')?.value.trim() || '',
+        whatsapp: document.getElementById('cfgWhatsappUtama')?.value.trim() || '',
+        whatsappDisplay: document.getElementById('cfgWhatsappDisplay')?.value.trim() || '',
+        jamLayanan: document.getElementById('cfgJamLayanan')?.value.trim() || '',
+        operatingHours: document.getElementById('cfgJamLayanan')?.value.trim() || '',
+        runningText: document.getElementById('cfgRunningText')?.value.trim() || '',
+        runningTextActive: !!document.getElementById('cfgRunningTextActive')?.checked
+    };
+
+    // Collect hero
+    kontrolConfigData.hero = {
+        badge: document.getElementById('cfgHeroBadge')?.value.trim() || '',
+        heroBadge: document.getElementById('cfgHeroBadge')?.value.trim() || '',
+        titleLine1: document.getElementById('cfgHeroTitle1')?.value.trim() || '',
+        heroTitleLine1: document.getElementById('cfgHeroTitle1')?.value.trim() || '',
+        titleLine2: document.getElementById('cfgHeroTitle2')?.value.trim() || '',
+        heroTitleLine2: document.getElementById('cfgHeroTitle2')?.value.trim() || '',
+        subtitle: document.getElementById('cfgHeroSubtitle')?.value.trim() || '',
+        heroSubtitle: document.getElementById('cfgHeroSubtitle')?.value.trim() || '',
+        marqueeActive: !!document.getElementById('cfgRunningTextActive')?.checked,
+        marqueeText: document.getElementById('cfgRunningText')?.value.trim() || ''
+    };
+
+    // Collect payments note
+    kontrolConfigData.paymentsInstruction = document.getElementById('cfgCatatanPembayaran')?.value.trim() || '';
+
+    // Collect policy
+    kontrolConfigData.policy = {
+        catatanPembayaran: document.getElementById('cfgCatatanPembayaran')?.value.trim() || '',
+        syaratKetentuan: document.getElementById('cfgSyaratKetentuan')?.value.trim() || '',
+        cancellationPolicy: document.getElementById('cfgSyaratKetentuan')?.value.trim() || '',
+        seatSelectionNotice: "Pemilihan kursi dilakukan oleh Admin Agen saat verifikasi pesanan. Nomor kursi resmi akan tertera pada E-Ticket Anda."
+    };
+
+    // Collect social
+    kontrolConfigData.social = {
+        facebook: document.getElementById('cfgSocialFb')?.value.trim() || '',
+        instagram: document.getElementById('cfgSocialIg')?.value.trim() || '',
+        tiktok: document.getElementById('cfgSocialTiktok')?.value.trim() || '',
+        website: document.getElementById('cfgSocialWebsite')?.value.trim() || '',
+        copyright: document.getElementById('cfgCopyright')?.value.trim() || '',
+        copyrightText: document.getElementById('cfgCopyright')?.value.trim() || ''
+    };
+
+    const saveBtn = document.getElementById('btnSaveKontrol');
+    if (saveBtn) {
+        saveBtn.disabled = true;
+        saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> <span>Menyimpan...</span>';
+    }
+
+    try {
+        const result = await postToSheets('saveSiteConfig', kontrolConfigData);
+        if (result && (result.status === 'success' || result.success)) {
+            localStorage.setItem('app_site_config', JSON.stringify(kontrolConfigData));
+            if (typeof cachedSiteConfig !== 'undefined') {
+                cachedSiteConfig = kontrolConfigData;
+            }
+            if (typeof Swal !== 'undefined') {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Berhasil Disimpan!',
+                    text: 'Pengaturan KONTROL telah diperbarui dan langsung aktif di halaman website pelanggan.',
+                    confirmButtonColor: '#f59e0b',
+                    confirmButtonText: 'Selesai'
+                });
+            } else {
+                alert('Berhasil! Pengaturan website telah disimpan dan aktif.');
+            }
+        } else {
+            alert('Gagal menyimpan: ' + (result?.message || result?.error || 'Koneksi bermasalah'));
+        }
+    } catch(err) {
+        console.error(err);
+        alert('Terjadi kesalahan saat menyimpan pengaturan KONTROL.');
+    } finally {
+        if (saveBtn) {
+            saveBtn.disabled = false;
+            saveBtn.innerHTML = '<i class="fas fa-save"></i> <span>Simpan Semua Perubahan</span>';
+        }
+    }
+}
+
+// Window bindings
+if (typeof window !== 'undefined') {
+    window.switchKontrolSubtab = switchKontrolSubtab;
+    window.renderKontrol = renderKontrol;
+    window.renderKontrolPayments = renderKontrolPayments;
+    window.toggleKontrolPaymentStatus = toggleKontrolPaymentStatus;
+    window.updateKontrolPaymentField = updateKontrolPaymentField;
+    window.addNewPaymentMethodPrompt = addNewPaymentMethodPrompt;
+    window.deleteKontrolPaymentMethod = deleteKontrolPaymentMethod;
+    window.openModalUploadQris = openModalUploadQris;
+    window.closeModalUploadQris = closeModalUploadQris;
+    window.previewSelectedQris = previewSelectedQris;
+    window.submitUploadQris = submitUploadQris;
+    window.saveKontrolConfig = saveKontrolConfig;
+}

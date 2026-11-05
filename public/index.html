@@ -834,7 +834,7 @@
                         <!-- Catatan Pembayaran -->
                         <div class="bg-amber-50 border-l-4 border-amber-400 p-3 sm:p-4 rounded-xl shadow-xs flex gap-3">
                             <i class="fas fa-info-circle text-amber-600 mt-0.5 text-base shrink-0"></i>
-                            <p class="text-[10px] sm:text-[11px] font-bold text-amber-900 uppercase italic leading-relaxed">
+                            <p id="bookPaymentNoticeText" class="text-[10px] sm:text-[11px] font-bold text-amber-900 uppercase italic leading-relaxed">
                                 PENTING: Dimohon untuk melakukan pembayaran sesuai total harga sebelum klik BOOKING, lalu sertakan bukti pembayaran saat chat WhatsApp.
                             </p>
                         </div>
@@ -890,6 +890,16 @@
         class="bg-red-600 text-white px-6 py-3 rounded-2xl shadow-2xl font-bold flex items-center gap-3 text-center">
         <i class="fas fa-exclamation-circle"></i>
         <span id="alertText"></span>
+    </div>
+
+    <!-- Top Announcement Marquee Banner (Dikontrol dari Admin KONTROL) -->
+    <div id="marqueeBanner" class="hidden bg-gradient-to-r from-amber-500 via-amber-400 to-amber-500 text-slate-950 py-2 px-4 shadow-sm relative z-[105] select-none border-b border-amber-600/20">
+        <div class="container mx-auto flex items-center gap-3">
+            <span class="bg-slate-900 text-amber-400 text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full shrink-0 flex items-center gap-1.5 shadow-xs">
+                <i class="fas fa-bullhorn text-amber-400"></i> <span class="hidden sm:inline">PENGUMUMAN</span>
+            </span>
+            <marquee id="marqueeBannerText" scrollamount="6" class="font-extrabold text-xs tracking-wide uppercase text-slate-900"></marquee>
+        </div>
     </div>
 
     <!-- Navigation -->
@@ -966,16 +976,16 @@
         </div>
 
         <div class="container mx-auto px-4 relative z-10 text-center">
-            <span
+            <span id="heroBadgeEl"
                 class="inline-block glass-badge px-5 py-2 rounded-full text-xs font-black mb-6 uppercase tracking-[0.2em] italic text-center">AGEN
                 BUS KAWUNGANTEN</span>
-            <h2
+            <h2 id="heroTitleEl"
                 class="text-4xl md:text-5xl lg:text-6xl font-black mb-5 leading-[1.15] text-center tracking-tight text-white">
-                Perjalanan <span
-                    class="text-transparent bg-clip-text bg-gradient-to-r from-amber-200 to-white">Nyaman</span><br><span
+                <span id="heroTitleLine1El">Perjalanan <span
+                    class="text-transparent bg-clip-text bg-gradient-to-r from-amber-200 to-white">Nyaman</span></span><br><span id="heroTitleLine2El"
                     class="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-amber-600">Pesan Tiket
                     Aman</span></h2>
-            <p
+            <p id="heroSubtitleEl"
                 class="text-slate-300 text-sm md:text-lg mb-10 font-medium uppercase tracking-wide text-center max-w-2xl mx-auto leading-relaxed">
                 Pusat Penjualan Tiket Bus, Travel, Pesawat & Kapal Laut <br>
                 Resmi dan Terpercaya di Kawunganten Cilacap</p>
@@ -1563,11 +1573,11 @@
                                 <i class="fas fa-map-marker-alt text-2xl"></i>
                             </div>
                             <h4 class="font-black uppercase text-blue-900 italic mb-2 text-center">Lokasi Agen</h4>
-                            <p class="text-gray-500 font-bold text-sm italic mb-6 text-center">Jl. Raya Kawunganten,
+                            <p id="lokasiAlamatText" class="text-gray-500 font-bold text-sm italic mb-6 text-center">Jl. Raya Kawunganten,
                                 Desa
                                 Kawunganten, Kec. Kawunganten, Kab. Cilacap, Jawa Tengah.</p>
                         </div>
-                        <a href="https://maps.app.goo.gl/mFP2Nn4KUyworYe66" target="_blank"
+                        <a id="lokasiGmapsLink" href="https://maps.app.goo.gl/mFP2Nn4KUyworYe66" target="_blank"
                             class="w-full bg-blue-700 text-white py-4 rounded-xl font-black uppercase tracking-widest text-sm shadow-lg hover:bg-blue-800 transition-all text-center">
                             <i class="fas fa-directions mr-2 text-center"></i> Buka Google Maps
                         </a>
@@ -1579,11 +1589,11 @@
                                 <i class="fab fa-whatsapp text-2xl"></i>
                             </div>
                             <h4 class="font-black uppercase text-blue-900 italic mb-2 text-center">WhatsApp Admin</h4>
-                            <p class="text-gray-500 font-bold text-sm mb-6 italic text-center">Konsultasi tiket & boking
+                            <p id="kontakWaSubtext" class="text-gray-500 font-bold text-sm mb-6 italic text-center">Konsultasi tiket & boking
                                 24
                                 Jam via chat WhatsApp.</p>
                         </div>
-                        <a href="https://wa.me/6282133607759" target="_blank"
+                        <a id="kontakWaLink" href="https://wa.me/6282133607759" target="_blank"
                             class="w-full bg-green-600 text-white py-4 rounded-xl font-black uppercase tracking-widest text-sm shadow-lg hover:bg-green-700 transition-all text-center">
                             <i class="fab fa-whatsapp mr-2 text-center"></i> Chat Admin Sekarang
                         </a>
@@ -1594,7 +1604,7 @@
     </section>
 
     <!-- Floating WhatsApp Button -->
-    <a href="https://wa.me/6282133607759" target="_blank"
+    <a id="floatingWaLink" href="https://wa.me/6282133607759" target="_blank"
         class="fixed bottom-6 right-6 z-[200] bg-[#25D366] text-white w-14 h-14 rounded-full flex items-center justify-center shadow-[0_10px_20px_rgba(37,211,102,0.3)] hover:scale-110 transition-transform duration-300 group">
         <i class="fab fa-whatsapp text-3xl"></i>
         <span
@@ -1605,20 +1615,20 @@
     <!-- Footer -->
     <footer class="bg-slate-900 py-12 text-center text-white border-t-4 border-amber-500 text-center">
         <div class="container mx-auto px-4 text-center">
-            <h2 class="font-black uppercase tracking-tighter text-3xl mb-4 text-amber-500 text-center">AGEN DAMRI
+            <h2 id="footerAgencyName" class="font-black uppercase tracking-tighter text-3xl mb-4 text-amber-500 text-center">AGEN DAMRI
                 KAWUNGANTEN</h2>
-            <p class="text-xs font-bold text-white/80 uppercase italic px-4 mb-8 text-center">Jalan Raya Kawunganten,
+            <p id="footerAgencyAddress" class="text-xs font-bold text-white/80 uppercase italic px-4 mb-8 text-center">Jalan Raya Kawunganten,
                 Desa
                 Kawunganten, Cilacap - Jawa Tengah.</p>
-            <div class="hidden justify-center gap-6 text-xl mb-8 text-center">
-                <a href="#" class="text-white/60 hover:text-amber-500 transition-all text-center"><i
+            <div id="footerSocialContainer" class="flex justify-center gap-6 text-xl mb-8 text-center">
+                <a id="footerSocialFb" href="#" target="_blank" class="text-white/60 hover:text-amber-500 transition-all text-center"><i
                         class="fab fa-facebook text-center"></i></a>
-                <a href="#" class="text-white/60 hover:text-amber-500 transition-all text-center"><i
+                <a id="footerSocialIg" href="#" target="_blank" class="text-white/60 hover:text-amber-500 transition-all text-center"><i
                         class="fab fa-instagram text-center"></i></a>
-                <a href="#" class="text-white/60 hover:text-amber-500 transition-all text-center"><i
+                <a id="footerSocialTiktok" href="#" target="_blank" class="text-white/60 hover:text-amber-500 transition-all text-center"><i
                         class="fab fa-tiktok text-center"></i></a>
             </div>
-            <p class="text-[10px] font-bold text-white/40 uppercase tracking-widest text-center">© <span
+            <p id="footerCopyrightText" class="text-[10px] font-bold text-white/40 uppercase tracking-widest text-center">© <span
                     id="currentYear"></span> AGEN DAMRI
                 KAWUNGANTEN. ALL RIGHTS RESERVED.</p>
         </div>
@@ -1644,10 +1654,18 @@
                 dateInput.value = today;
             }
 
+            // Terapkan konfigurasi cache awal segera
+            if (typeof applySiteConfig === 'function') {
+                applySiteConfig();
+            }
+
             try {
                 // Memanggil fungsi initData dari app.js
                 await initData();
                 loadAndRenderPublicData();
+                if (typeof applySiteConfig === 'function') {
+                    applySiteConfig();
+                }
             } catch (e) {
                 console.error("Gagal memuat data armada", e);
             }
@@ -1724,7 +1742,12 @@
                 renderPartnerLogos();
             }
         }
-        window.reloadPublicUI = loadAndRenderPublicData;
+        window.reloadPublicUI = function() {
+            loadAndRenderPublicData();
+            if (typeof applySiteConfig === 'function') {
+                applySiteConfig();
+            }
+        };
 
         function renderArmadaGrid() {
             const grid = document.getElementById('armadaGridBus');
@@ -2001,12 +2024,154 @@
             document.body.removeChild(input);
         }
 
+        // ==========================================
+        // KONTROL INTEGRASI DENGAN ADMIN (SITE CONFIG)
+        // ==========================================
+        function applySiteConfig(cfg) {
+            if (!cfg) {
+                cfg = typeof getSiteConfig === 'function' ? getSiteConfig() : null;
+            }
+            if (!cfg) return;
+
+            // 1. Marquee Banner
+            const marqueeBanner = document.getElementById('marqueeBanner');
+            const marqueeText = document.getElementById('marqueeBannerText');
+            if (marqueeBanner && marqueeText) {
+                if (cfg.hero?.marqueeActive && cfg.hero?.marqueeText) {
+                    marqueeText.innerText = cfg.hero.marqueeText;
+                    marqueeBanner.classList.remove('hidden');
+                } else {
+                    marqueeBanner.classList.add('hidden');
+                }
+            }
+
+            // 2. Hero Elements
+            const heroBadge = document.getElementById('heroBadgeEl');
+            if (heroBadge && cfg.hero?.heroBadge) {
+                heroBadge.innerText = cfg.hero.heroBadge;
+            }
+            const heroT1 = document.getElementById('heroTitleLine1El');
+            if (heroT1 && cfg.hero?.heroTitleLine1) {
+                heroT1.innerHTML = cfg.hero.heroTitleLine1;
+            }
+            const heroT2 = document.getElementById('heroTitleLine2El');
+            if (heroT2 && cfg.hero?.heroTitleLine2) {
+                heroT2.innerHTML = cfg.hero.heroTitleLine2;
+            }
+            const heroSub = document.getElementById('heroSubtitleEl');
+            if (heroSub && cfg.hero?.heroSubtitle) {
+                heroSub.innerText = cfg.hero.heroSubtitle;
+            }
+
+            // 3. Contact & WhatsApp
+            const rawWa = cfg.general?.whatsapp || '082133607759';
+            const cleanWa = rawWa.replace(/[^0-9]/g, '').replace(/^0/, '62');
+            const waDisplay = cfg.general?.whatsappDisplay || rawWa;
+            const gmapsUrl = cfg.general?.googleMapsUrl || 'https://maps.app.goo.gl/mFP2Nn4KUyworYe66';
+            const address = cfg.general?.address || '';
+
+            const lokasiAlamat = document.getElementById('lokasiAlamatText');
+            if (lokasiAlamat && address) lokasiAlamat.innerText = address;
+
+            const lokasiGmaps = document.getElementById('lokasiGmapsLink');
+            if (lokasiGmaps && gmapsUrl) lokasiGmaps.href = gmapsUrl;
+
+            const kontakWaLink = document.getElementById('kontakWaLink');
+            if (kontakWaLink) kontakWaLink.href = `https://wa.me/${cleanWa}`;
+
+            const floatingWaLink = document.getElementById('floatingWaLink');
+            if (floatingWaLink) floatingWaLink.href = `https://wa.me/${cleanWa}`;
+
+            const kontakSub = document.getElementById('kontakWaSubtext');
+            if (kontakSub && cfg.general?.operatingHours) {
+                kontakSub.innerText = `Layanan WhatsApp (${waDisplay}) • ${cfg.general.operatingHours}`;
+            }
+
+            // 4. Footer
+            const footName = document.getElementById('footerAgencyName');
+            if (footName && cfg.general?.agencyName) footName.innerText = cfg.general.agencyName;
+
+            const footAddr = document.getElementById('footerAgencyAddress');
+            if (footAddr && address) footAddr.innerText = address;
+
+            const footCopy = document.getElementById('footerCopyrightText');
+            if (footCopy && cfg.social?.copyrightText) {
+                const y = new Date().getFullYear();
+                footCopy.innerHTML = `© <span id="currentYear">${y}</span> ${cfg.social.copyrightText}`;
+            }
+
+            // Social Media
+            const socFb = document.getElementById('footerSocialFb');
+            if (socFb) {
+                if (cfg.social?.facebook) {
+                    socFb.href = cfg.social.facebook;
+                    socFb.classList.remove('hidden');
+                } else {
+                    socFb.classList.add('hidden');
+                }
+            }
+            const socIg = document.getElementById('footerSocialIg');
+            if (socIg) {
+                if (cfg.social?.instagram) {
+                    socIg.href = cfg.social.instagram;
+                    socIg.classList.remove('hidden');
+                } else {
+                    socIg.classList.add('hidden');
+                }
+            }
+            const socTiktok = document.getElementById('footerSocialTiktok');
+            if (socTiktok) {
+                if (cfg.social?.tiktok) {
+                    socTiktok.href = cfg.social.tiktok;
+                    socTiktok.classList.remove('hidden');
+                } else {
+                    socTiktok.classList.add('hidden');
+                }
+            }
+
+            // 5. Booking Notice Text
+            const noticeEl = document.getElementById('bookPaymentNoticeText');
+            if (noticeEl && cfg.paymentsInstruction) {
+                noticeEl.innerText = cfg.paymentsInstruction;
+            }
+
+            // 6. Dynamic Payment Select Options
+            updatePaymentOptionsFromConfig(cfg);
+        }
+
+        function updatePaymentOptionsFromConfig(cfg) {
+            const select = document.getElementById('bookMetodeBayar');
+            if (!select || !cfg || !cfg.payments) return;
+            const curVal = select.value;
+            select.innerHTML = '<option value="">-- Pilih Metode Pembayaran --</option>';
+
+            const activeList = cfg.payments.filter(p => p.isActive);
+            activeList.forEach(p => {
+                const opt = document.createElement('option');
+                opt.value = p.id;
+                opt.textContent = p.name.toUpperCase();
+                select.appendChild(opt);
+            });
+
+            if (curVal && activeList.some(p => p.id === curVal)) {
+                select.value = curVal;
+            } else {
+                const pDetails = document.getElementById('paymentDetails');
+                if (pDetails) pDetails.classList.add('hidden');
+            }
+        }
+
         function copyAccountInfo() {
-            const text = document.getElementById('paymentInfoText').innerText;
-            // Ambil hanya angka nomor rekening menggunakan regex
-            const accountNumber = text.match(/\d+/);
-            if (accountNumber) {
-                copyToClipboard(accountNumber[0]);
+            const c = document.getElementById('copyBtn');
+            let textToCopy = c?.dataset?.account;
+            if (!textToCopy) {
+                const text = document.getElementById('paymentInfoText').innerText;
+                const match = text.match(/\d+/);
+                if (match) textToCopy = match[0];
+            }
+            if (textToCopy) {
+                copyToClipboard(textToCopy);
+                showMessage("Nomor rekening berhasil disalin!");
             }
         }
 
@@ -2024,29 +2189,68 @@
             }
 
             p.classList.remove('hidden');
-            c.classList.remove('hidden');
             let logoHtml = "";
             let infoText = "";
 
-            if (m === "Transfer Mandiri") {
-                logoHtml = `<div class="bg-[#003d79] text-white px-4 py-2 rounded-xl font-black text-xs shadow-md flex items-center gap-2 italic">BANK MANDIRI <i class="fas fa-university"></i></div>`;
-                infoText = "Mandiri: 1800013416526\na.n ISNU FADKHUL ROIS";
-            } else if (m === "Transfer Seabank") {
-                logoHtml = `<div class="bg-[#f05a28] text-white px-4 py-2 rounded-xl font-black text-xs shadow-md flex items-center gap-2 italic">SeaBank <i class="fas fa-shield-alt"></i></div>`;
-                infoText = "Seabank: 901528007687\na.n ISNU FADKHUL ROIS";
-            } else if (m === "Saldo Dana") {
-                logoHtml = `<div class="bg-[#118ee9] text-white px-4 py-2 rounded-xl font-black text-xs shadow-md flex items-center gap-2 italic">DANA <i class="fas fa-wallet"></i></div>`;
-                infoText = "Dana: 082133607759\na.n ISNU FADKHUL ROIS";
-            } else if (m === "QRIS AGEN") {
-                c.classList.add('hidden'); // Sembunyikan tombol salin untuk QRIS
-                logoHtml = `
-                    <div class="flex flex-col items-center gap-4">
-                        <img src="qris.webp" alt="QRIS" class="w-64 h-auto mx-auto rounded-3xl shadow-xl border-4 border-white" onerror="this.src='https://placehold.co/300x300/eff6ff/1e40af?text=QRIS+SCAN+DISINI'">
-                        <a href="qris.webp" download="QRIS_AGEN_DAMRI.webp" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-2xl text-xs font-black uppercase tracking-widest flex items-center gap-3 shadow-lg transition-all active:scale-95">
-                            <i class="fas fa-download"></i> Simpan Gambar QRIS
-                        </a>
-                    </div>`;
-                infoText = "SILAKAN SCAN KODE QR DI ATAS";
+            const cfg = typeof getSiteConfig === 'function' ? getSiteConfig() : null;
+            const payment = cfg?.payments?.find(item => item.id === m);
+
+            if (payment) {
+                const isQris = payment.type === 'qris' || payment.id === 'qris';
+                if (isQris) {
+                    c.classList.add('hidden');
+                    const qrImgUrl = payment.qrImage || 'qris.webp';
+                    logoHtml = `
+                        <div class="flex flex-col items-center gap-4">
+                            <img src="${qrImgUrl}" alt="QRIS" class="w-64 h-auto mx-auto rounded-3xl shadow-xl border-4 border-white" onerror="this.src='qris.webp'">
+                            <a href="${qrImgUrl}" download="QRIS_PEMBAYARAN.webp" class="bg-amber-500 hover:bg-amber-600 text-slate-900 px-6 py-3 rounded-2xl text-xs font-black uppercase tracking-widest flex items-center gap-3 shadow-lg transition-all active:scale-95">
+                                <i class="fas fa-download"></i> Simpan Gambar QRIS
+                            </a>
+                        </div>`;
+                    infoText = `SILAKAN SCAN KODE QR DI ATAS\na.n ${payment.accountName || 'AGEN BUS'}`;
+                } else {
+                    c.classList.remove('hidden');
+                    let badgeBg = 'bg-[#003d79]';
+                    let icon = 'fa-university';
+                    if (payment.id === 'seabank') {
+                        badgeBg = 'bg-[#f05a28]';
+                        icon = 'fa-shield-alt';
+                    } else if (payment.id === 'dana' || payment.type === 'ewallet') {
+                        badgeBg = 'bg-[#118ee9]';
+                        icon = 'fa-wallet';
+                    }
+                    logoHtml = `<div class="${badgeBg} text-white px-4 py-2 rounded-xl font-black text-xs shadow-md flex items-center gap-2 italic">${payment.name.toUpperCase()} <i class="fas ${icon}"></i></div>`;
+                    infoText = `${payment.name}: ${payment.accountNumber}\na.n ${payment.accountName}`;
+                    c.dataset.account = payment.accountNumber;
+                }
+            } else {
+                // Fallback untuk opsi bawaan bila config belum termuat
+                if (m === "Transfer Mandiri") {
+                    c.classList.remove('hidden');
+                    logoHtml = `<div class="bg-[#003d79] text-white px-4 py-2 rounded-xl font-black text-xs shadow-md flex items-center gap-2 italic">BANK MANDIRI <i class="fas fa-university"></i></div>`;
+                    infoText = "Mandiri: 1800013416526\na.n ISNU FADKHUL ROIS";
+                    c.dataset.account = "1800013416526";
+                } else if (m === "Transfer Seabank") {
+                    c.classList.remove('hidden');
+                    logoHtml = `<div class="bg-[#f05a28] text-white px-4 py-2 rounded-xl font-black text-xs shadow-md flex items-center gap-2 italic">SeaBank <i class="fas fa-shield-alt"></i></div>`;
+                    infoText = "Seabank: 901528007687\na.n ISNU FADKHUL ROIS";
+                    c.dataset.account = "901528007687";
+                } else if (m === "Saldo Dana") {
+                    c.classList.remove('hidden');
+                    logoHtml = `<div class="bg-[#118ee9] text-white px-4 py-2 rounded-xl font-black text-xs shadow-md flex items-center gap-2 italic">DANA <i class="fas fa-wallet"></i></div>`;
+                    infoText = "Dana: 082133607759\na.n ISNU FADKHUL ROIS";
+                    c.dataset.account = "082133607759";
+                } else if (m === "QRIS AGEN") {
+                    c.classList.add('hidden');
+                    logoHtml = `
+                        <div class="flex flex-col items-center gap-4">
+                            <img src="qris.webp" alt="QRIS" class="w-64 h-auto mx-auto rounded-3xl shadow-xl border-4 border-white" onerror="this.src='qris.webp'">
+                            <a href="qris.webp" download="QRIS_AGEN_DAMRI.webp" class="bg-amber-500 hover:bg-amber-600 text-slate-900 px-6 py-3 rounded-2xl text-xs font-black uppercase tracking-widest flex items-center gap-3 shadow-lg transition-all active:scale-95">
+                                <i class="fas fa-download"></i> Simpan Gambar QRIS
+                            </a>
+                        </div>`;
+                    infoText = "SILAKAN SCAN KODE QR DI ATAS";
+                }
             }
 
             l.innerHTML = logoHtml;
@@ -2366,8 +2570,22 @@
 
             const numericTotal = parseInt(tot.replace(/[^0-9]/g, '')) || 0;
 
+            const cfg = typeof getSiteConfig === 'function' ? getSiteConfig() : null;
+            const waNumber = cfg?.general?.whatsapp || '082133607759';
+            const cleanWa = waNumber.replace(/[^0-9]/g, '').replace(/^0/, '62');
+            const agencyTitle = cfg?.general?.agencyName || 'Agen Damri Kawunganten';
+
+            let paymentDisplayName = mb;
             let rekInfo = "";
-            if (mb === "Transfer Mandiri") rekInfo = " (Mandiri: 1800013416526 a.n ISNU FADKHUL ROIS)";
+            const selPayment = cfg?.payments?.find(item => item.id === mb || item.name === mb);
+            if (selPayment) {
+                paymentDisplayName = selPayment.name;
+                if (selPayment.accountNumber) {
+                    rekInfo = ` (${selPayment.name}: ${selPayment.accountNumber} a.n ${selPayment.accountName || ''})`;
+                } else {
+                    rekInfo = ` (${selPayment.name})`;
+                }
+            } else if (mb === "Transfer Mandiri") rekInfo = " (Mandiri: 1800013416526 a.n ISNU FADKHUL ROIS)";
             else if (mb === "Transfer Seabank") rekInfo = " (Seabank: 901528007687 a.n ISNU FADKHUL ROIS)";
             else if (mb === "Saldo Dana") rekInfo = " (Dana: 082133607759 a.n ISNU FADKHUL ROIS)";
 
@@ -2382,7 +2600,7 @@
                 fd = new Date(d).toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
             }
 
-            let msg = `Halo Admin Agen Damri Kawunganten,\nsaya ingin boking tiket:\n\n*ID Booking:* \`${bookingId}\`\n*Armada:* ${a}\n*Tujuan:* ${t}\n*Tanggal:* ${fd}\n*Waktu:* ${w}\n\n*Nama:* ${n}\n*HP:* ${h}\n*Alamat:* ${alamat || '-'}\n\n*Jumlah Penumpang:* ${j} orang\n*Total Bayar:* ${tot}\n*Metode Pembayaran:* ${mb}${rekInfo}\n\n`;
+            let msg = `Halo Admin ${agencyTitle},\nsaya ingin boking tiket:\n\n*ID Booking:* \`${bookingId}\`\n*Armada:* ${a}\n*Tujuan:* ${t}\n*Tanggal:* ${fd}\n*Waktu:* ${w}\n\n*Nama:* ${n}\n*HP:* ${h}\n*Alamat:* ${alamat || '-'}\n\n*Jumlah Penumpang:* ${j} orang\n*Total Bayar:* ${tot}\n*Metode Pembayaran:* ${paymentDisplayName}${rekInfo}\n\n`;
             if (k.trim()) msg += `*Notes:* ${k}\n`;
 
             // POST Data ke Database
@@ -2405,7 +2623,7 @@
                 "ALAMAT": alamat || "-",
                 "Harga": parseInt(document.getElementById('bookHargaSatuan').value.replace(/[^0-9]/g, '')) || 0,
                 "Total Harga": numericTotal,
-                "PEMBAYARAN": mb,
+                "PEMBAYARAN": paymentDisplayName,
                 "Status": "Belum ACC"
             };
 
@@ -2417,7 +2635,7 @@
 
             if (submitBtn) { submitBtn.innerHTML = '<i class="fab fa-whatsapp text-base mr-2"></i> BOOKING'; submitBtn.disabled = false; }
 
-            window.open(`https://wa.me/6282133607759?text=${encodeURIComponent(msg)}`, '_blank');
+            window.open(`https://wa.me/${cleanWa}?text=${encodeURIComponent(msg)}`, '_blank');
             closeBookingModal();
             setTimeout(() => document.getElementById('successModal').classList.remove('hidden'), 500);
         }
