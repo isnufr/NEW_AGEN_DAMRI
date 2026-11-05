@@ -40,7 +40,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
     <script src="/socket.io/socket.io.js"></script>
-    <script src="app.js?v=5" defer></script>
+    <script src="app.js?v=6" defer></script>
 
     <script>
         function handleLogoError(img) {
@@ -164,6 +164,34 @@
 
         .rotate-icon.active {
             transform: rotate(180deg);
+        }
+
+        /* Smooth Accordion for Armada Cards */
+        .armada-collapse-wrapper {
+            display: grid;
+            grid-template-rows: 0fr;
+            transition: grid-template-rows 0.45s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+
+        .armada-collapse-wrapper.expanded {
+            grid-template-rows: 1fr;
+        }
+
+        .armada-collapse-inner {
+            overflow: hidden;
+            min-height: 0;
+            opacity: 0;
+            transform: translateY(-8px);
+            transition: opacity 0.35s ease, transform 0.35s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+
+        .armada-collapse-wrapper.expanded .armada-collapse-inner {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .armada-chevron-icon {
+            transition: transform 0.35s cubic-bezier(0.25, 1, 0.5, 1);
         }
 
         #mobileMenu {
@@ -1600,9 +1628,9 @@
                 `).join('');
 
                 html += `
-                <div class="modern-card overflow-hidden flex flex-col text-left bg-white rounded-3xl border border-slate-200/80 shadow-md hover:shadow-xl transition-all duration-300 group/card">
-                    <!-- Foto Armada Real dari Admin -->
-                    <div class="relative aspect-[16/10] overflow-hidden bg-slate-100">
+                <div class="armada-card-item modern-card overflow-hidden flex flex-col text-left bg-white rounded-3xl border border-slate-200/80 shadow-md hover:shadow-xl transition-all duration-300 group/card" id="card-armada-${f.id}">
+                    <!-- Foto Armada Real dari Admin (Click to Toggle) -->
+                    <div class="relative aspect-[16/10] overflow-hidden bg-slate-100 cursor-pointer select-none" onclick="toggleArmadaCard('${f.id}')" title="Klik untuk buka/tutup detail ${f.name}">
                         <img src="${poImg}" alt="${f.name}" class="w-full h-full object-cover transition-transform duration-700 group-hover/card:scale-105" onerror="this.src='damri.webp'">
                         <div class="absolute inset-0 bg-gradient-to-t from-slate-900/60 via-transparent to-transparent"></div>
                         <!-- Badges Floating -->
@@ -1620,8 +1648,8 @@
 
                     <!-- Body Kartu -->
                     <div class="p-5 sm:p-6 flex flex-col flex-1">
-                        <!-- Nama, Logo & Tagline PO -->
-                        <div class="mb-3">
+                        <!-- Nama, Logo & Tagline PO (Click to Toggle) -->
+                        <div class="cursor-pointer select-none" onclick="toggleArmadaCard('${f.id}')" title="Klik untuk buka/tutup detail ${f.name}">
                             <div class="flex items-center justify-between gap-3">
                                 <h3 class="text-xl font-black text-slate-900 uppercase tracking-tight">${f.name}</h3>
                                 ${poLogo ? `<img src="${poLogo}" alt="Logo ${f.name}" class="h-7 max-w-[90px] object-contain shrink-0" onerror="this.style.display='none'">` : ''}
@@ -1629,52 +1657,66 @@
                             ${poTagline ? `<p class="text-xs font-bold text-amber-600 italic mt-0.5">${poTagline}</p>` : ''}
                         </div>
 
-                        <!-- Deskripsi Armada dari Admin -->
-                        ${poDesc ? `<p class="text-xs text-slate-500 font-medium leading-relaxed mb-4 line-clamp-3">${poDesc}</p>` : ''}
+                        <!-- Tombol Buka/Tutup Rute & Detail Armada -->
+                        <button type="button" id="armada-btn-${f.id}" onclick="event.stopPropagation(); toggleArmadaCard('${f.id}')" class="armada-toggle-btn w-full mt-3.5 py-2.5 px-4 bg-slate-50 hover:bg-slate-100 text-slate-700 border border-slate-200/90 rounded-2xl text-xs font-black uppercase tracking-wider flex items-center justify-between transition-all duration-300 shadow-2xs group-hover/card:border-amber-300 active:scale-98">
+                            <span id="armada-btn-text-${f.id}" class="armada-btn-text flex items-center gap-1.5">
+                                <i class="fas fa-list-ul text-amber-500 text-[11px]"></i>
+                                <span>Buka Rute &amp; Detail</span>
+                            </span>
+                            <i id="armada-chevron-${f.id}" class="fas fa-chevron-down armada-chevron-icon text-xs text-slate-400"></i>
+                        </button>
 
-                        <!-- Fasilitas Armada dari Admin -->
-                        ${facHtml ? `
-                        <div class="mb-4">
-                            <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1.5">Fasilitas Unggulan:</p>
-                            <div class="flex flex-wrap gap-1.5">
-                                ${facHtml}
-                            </div>
-                        </div>` : ''}
+                        <!-- Konten Detail Kolapsibel (Animasi Buka Tutup Halus) -->
+                        <div id="armada-collapse-${f.id}" class="armada-collapse-wrapper">
+                            <div class="armada-collapse-inner">
+                                <div class="pt-4 mt-3 border-t border-slate-100 space-y-3.5">
+                                    <!-- Deskripsi Armada dari Admin -->
+                                    ${poDesc ? `<p class="text-xs text-slate-500 font-medium leading-relaxed">${poDesc}</p>` : ''}
 
-                        <!-- Accordion Rute, Jadwal, & Cek Harga -->
-                        <div class="mt-auto pt-3 border-t border-slate-100 space-y-3">
-                            <div>
-                                <div class="flex items-center justify-between mb-1.5">
-                                    <span class="text-[10px] font-black text-slate-500 uppercase tracking-wider">Kota Tujuan</span>
-                                    <button type="button" onclick="togglePrice('price-${f.id}')" class="text-[10px] font-black text-amber-600 hover:text-amber-700 underline flex items-center gap-1">
-                                        <i class="fas fa-tag"></i> Cek Harga
+                                    <!-- Fasilitas Armada dari Admin -->
+                                    ${facHtml ? `
+                                    <div>
+                                        <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1.5">Fasilitas Unggulan:</p>
+                                        <div class="flex flex-wrap gap-1.5">
+                                            ${facHtml}
+                                        </div>
+                                    </div>` : ''}
+
+                                    <!-- Kota Tujuan & Cek Harga -->
+                                    <div>
+                                        <div class="flex items-center justify-between mb-1.5">
+                                            <span class="text-[10px] font-black text-slate-500 uppercase tracking-wider">Kota Tujuan</span>
+                                            <button type="button" onclick="event.stopPropagation(); togglePrice('price-${f.id}')" class="text-[10px] font-black text-amber-600 hover:text-amber-700 underline flex items-center gap-1">
+                                                <i class="fas fa-tag"></i> Cek Harga
+                                            </button>
+                                        </div>
+                                        <div class="flex flex-wrap gap-1.5">
+                                            ${destTags}
+                                        </div>
+                                    </div>
+
+                                    <!-- Price Box Collapsible -->
+                                    <div id="price-${f.id}" class="price-content space-y-1.5">
+                                        <p class="text-[10px] font-black text-slate-500 uppercase tracking-wider mb-2">Daftar Tarif Tiket:</p>
+                                        <div class="space-y-1.5">
+                                            ${priceHtml}
+                                        </div>
+                                    </div>
+
+                                    <!-- Jam Keberangkatan -->
+                                    <div>
+                                        <span class="text-[10px] font-black text-slate-500 uppercase tracking-wider block mb-1.5">Keberangkatan</span>
+                                        <div class="flex flex-wrap gap-1.5">
+                                            ${timeTags}
+                                        </div>
+                                    </div>
+
+                                    <!-- Tombol Pesan -->
+                                    <button onclick="event.stopPropagation(); openBookingWithArmada('${f.name}')" class="w-full bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-500 hover:to-amber-600 text-slate-900 py-3.5 rounded-2xl font-black text-xs uppercase tracking-wider shadow-md shadow-amber-500/20 hover:shadow-lg transition-all active:scale-95 flex items-center justify-center gap-2 mt-2">
+                                        <i class="fas fa-ticket-alt"></i> Boking Tiket
                                     </button>
                                 </div>
-                                <div class="flex flex-wrap gap-1.5">
-                                    ${destTags}
-                                </div>
                             </div>
-
-                            <!-- Price Box Collapsible -->
-                            <div id="price-${f.id}" class="price-content space-y-1.5">
-                                <p class="text-[10px] font-black text-slate-500 uppercase tracking-wider mb-2">Daftar Tarif Tiket:</p>
-                                <div class="space-y-1.5">
-                                    ${priceHtml}
-                                </div>
-                            </div>
-
-                            <!-- Jam Keberangkatan -->
-                            <div>
-                                <span class="text-[10px] font-black text-slate-500 uppercase tracking-wider block mb-1.5">Keberangkatan</span>
-                                <div class="flex flex-wrap gap-1.5">
-                                    ${timeTags}
-                                </div>
-                            </div>
-
-                            <!-- Tombol Pesan -->
-                            <button onclick="openBookingWithArmada('${f.name}')" class="w-full bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-500 hover:to-amber-600 text-slate-900 py-3.5 rounded-2xl font-black text-xs uppercase tracking-wider shadow-md shadow-amber-500/20 hover:shadow-lg transition-all active:scale-95 flex items-center justify-center gap-2 mt-2">
-                                <i class="fas fa-ticket-alt"></i> Boking Tiket
-                            </button>
                         </div>
                     </div>
                 </div>
@@ -2299,11 +2341,80 @@
         }
 
         function downloadTicket(id, btn) { if (btn) { btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Memproses...'; btn.disabled = true; } const target = document.getElementById('eTicketOutput'); html2canvas(target, { scale: 4, backgroundColor: "#ffffff", borderRadius: 32, useCORS: true }).then(c => { const l = document.createElement('a'); l.download = `E-Ticket-${id}.png`; l.href = c.toDataURL('image/png', 1.0); l.click(); if (btn) { btn.innerHTML = '<i class="fas fa-download"></i> Unduh E-Ticket (HD)'; btn.disabled = false; } }).catch(err => { if (btn) { btn.innerHTML = '<i class="fas fa-download"></i> Unduh E-Ticket (HD)'; btn.disabled = false; } alert("Gagal mengunduh tiket."); }); }
-        function toggleRoute(i) { const element = document.getElementById(i), icon = document.getElementById('icon-' + i); element.classList.toggle('show'); if (icon) icon.classList.toggle('active'); }
+        window.toggleArmadaCard = function(armadaId) {
+            const targetWrapper = document.getElementById('armada-collapse-' + armadaId);
+            const targetChevron = document.getElementById('armada-chevron-' + armadaId);
+            const targetBtnText = document.getElementById('armada-btn-text-' + armadaId);
+            const targetBtn = document.getElementById('armada-btn-' + armadaId);
+            const targetCard = document.getElementById('card-armada-' + armadaId);
+
+            if (!targetWrapper) return;
+
+            const isAlreadyOpen = targetWrapper.classList.contains('expanded');
+
+            // Smoothly close all other armada cards
+            document.querySelectorAll('.armada-collapse-wrapper').forEach(wrapper => {
+                wrapper.classList.remove('expanded');
+            });
+            document.querySelectorAll('.armada-chevron-icon').forEach(icon => {
+                icon.style.transform = 'rotate(0deg)';
+                icon.classList.remove('text-amber-400');
+                icon.classList.add('text-slate-400');
+            });
+            document.querySelectorAll('.armada-toggle-btn').forEach(btn => {
+                btn.classList.remove('bg-slate-900', 'text-amber-400', 'border-slate-900');
+                btn.classList.add('bg-slate-50', 'text-slate-700', 'border-slate-200/90');
+            });
+            document.querySelectorAll('.armada-btn-text').forEach(txt => {
+                txt.innerHTML = '<i class="fas fa-list-ul text-amber-500 text-[11px]"></i><span>Buka Rute &amp; Detail</span>';
+            });
+            document.querySelectorAll('.armada-card-item').forEach(card => {
+                card.classList.remove('border-amber-400', 'shadow-xl', 'ring-2', 'ring-amber-400/20');
+                card.classList.add('border-slate-200/80');
+            });
+
+            // If it was not already open, open it
+            if (!isAlreadyOpen) {
+                targetWrapper.classList.add('expanded');
+                if (targetChevron) {
+                    targetChevron.style.transform = 'rotate(180deg)';
+                    targetChevron.classList.remove('text-slate-400');
+                    targetChevron.classList.add('text-amber-400');
+                }
+                if (targetBtnText) {
+                    targetBtnText.innerHTML = '<i class="fas fa-chevron-up text-amber-400 text-[11px]"></i><span>Tutup Detail</span>';
+                }
+                if (targetBtn) {
+                    targetBtn.classList.remove('bg-slate-50', 'text-slate-700', 'border-slate-200/90');
+                    targetBtn.classList.add('bg-slate-900', 'text-amber-400', 'border-slate-900');
+                }
+                if (targetCard) {
+                    targetCard.classList.remove('border-slate-200/80');
+                    targetCard.classList.add('border-amber-400', 'shadow-xl', 'ring-2', 'ring-amber-400/20');
+                }
+            }
+        };
+
+        function toggleRoute(i) { toggleArmadaCard(i); }
         function togglePrice(i) { const element = document.getElementById(i); if (element) element.classList.toggle('show'); }
         function toggleFaq(id) { const c = document.getElementById(id), i = document.getElementById('icon-' + id); if (c.classList.contains('max-h-0')) { c.classList.remove('max-h-0', 'opacity-0'); c.classList.add('max-h-[500px]', 'opacity-100'); i.classList.add('rotate-180'); } else { c.classList.add('max-h-0', 'opacity-0'); c.classList.remove('max-h-[500px]', 'opacity-100'); i.classList.remove('rotate-180'); } }
         function toggleMobileMenu() { document.getElementById('mobileMenu').classList.toggle('open'); document.getElementById('mobileOverlay').classList.toggle('hidden'); }
-        function scrollToArmada(i) { document.getElementById('destSearch').value = ''; document.getElementById('heroResultsContainer').classList.add('hidden'); document.getElementById('produk').scrollIntoView({ behavior: 'smooth' }); setTimeout(() => { const el = document.getElementById(i); if (el && !el.classList.contains('show')) toggleRoute(i); }, 800); }
+        function scrollToArmada(i) {
+            document.getElementById('destSearch').value = '';
+            document.getElementById('heroResultsContainer').classList.add('hidden');
+            const card = document.getElementById('card-armada-' + i);
+            if (card) {
+                card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                setTimeout(() => {
+                    const wrapper = document.getElementById('armada-collapse-' + i);
+                    if (wrapper && !wrapper.classList.contains('expanded')) {
+                        toggleArmadaCard(i);
+                    }
+                }, 500);
+            } else {
+                document.getElementById('produk').scrollIntoView({ behavior: 'smooth' });
+            }
+        }
 
         function liveSearch() {
             const q = document.getElementById('destSearch').value.toLowerCase(), c = document.getElementById('heroResultsContainer'), l = document.getElementById('heroResultsList');
