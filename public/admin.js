@@ -2020,7 +2020,9 @@
     }
 
     function renderLaporan() {
-        populateCustomManifestFilters();
+        if (currentReportSubtab === 'manifest' && typeof populateCustomManifestFilters === 'function') {
+            populateCustomManifestFilters();
+        }
     }
 
     // ============================================
@@ -2825,7 +2827,8 @@
         const waNum = String(hp).replace(/[^0-9]/g, '').replace(/^0/, '62');
         const textWa = `AGEN DAMRI KAWUNGANTEN\nPusat Penjualan Tiket\n\n` +
             `Halo ${b.name}, ini adalah rincian tiket perjalanan Anda:\n\n` +
-            `Kode Booking: ${b.bookingId}\n` +
+            `Kode Booking (Ketuk untuk salin):\n` +
+            `\`${b.bookingId}\`\n\n` +
             `Armada: ${armadaName}\n` +
             `Asal: ${asalText}\n` +
             `Tujuan: ${tujuan}\n` +
@@ -3870,7 +3873,8 @@
                 const waNum = String(hp).replace(/[^0-9]/g, '').replace(/^0/, '62');
                 const textWa = `AGEN DAMRI KAWUNGANTEN\nPusat Penjualan Tiket\n\n` +
                     `Halo ${name}, ini adalah rincian tiket perjalanan Anda:\n\n` +
-                    `Kode Booking: ${idTiket}\n` +
+                    `Kode Booking (Ketuk untuk salin):\n` +
+                    `\`${idTiket}\`\n\n` +
                     `Armada: ${payload['JENIS KENDARAAN']}\n` +
                     `Asal: ${visualAsal}\n` +
                     `Tujuan: ${visualTujuan}\n` +
@@ -6632,6 +6636,36 @@ function filterDenahKategori(cat) {
     });
     renderDenahCards();
 }
+
+// State Subtab Report & Manifest & AP/3
+let currentReportSubtab = 'laporan';
+
+function switchReportSubtab(sub) {
+    currentReportSubtab = sub;
+    const tabLaporan = document.getElementById('tabBtnReportLaporan');
+    const tabManifest = document.getElementById('tabBtnReportManifest');
+    const tabAp3 = document.getElementById('tabBtnReportAp3');
+
+    const paneLaporan = document.getElementById('subtabReportLaporan');
+    const paneManifest = document.getElementById('subtabReportManifest');
+    const paneAp3 = document.getElementById('subtabReportAp3');
+
+    const activeClass = 'px-4 py-2.5 rounded-xl font-black text-xs uppercase tracking-wider transition-all bg-slate-900 text-amber-400 shadow-sm flex items-center justify-center gap-2 whitespace-nowrap active:scale-95';
+    const inactiveClass = 'px-4 py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider transition-all bg-transparent hover:bg-slate-200/60 text-slate-500 hover:text-slate-800 flex items-center justify-center gap-2 whitespace-nowrap active:scale-95';
+
+    if (tabLaporan) tabLaporan.className = (sub === 'laporan') ? activeClass : inactiveClass;
+    if (tabManifest) tabManifest.className = (sub === 'manifest') ? activeClass : inactiveClass;
+    if (tabAp3) tabAp3.className = (sub === 'ap3') ? activeClass : inactiveClass;
+
+    if (paneLaporan) paneLaporan.classList.toggle('hidden', sub !== 'laporan');
+    if (paneManifest) paneManifest.classList.toggle('hidden', sub !== 'manifest');
+    if (paneAp3) paneAp3.classList.toggle('hidden', sub !== 'ap3');
+
+    if (sub === 'manifest' && typeof populateCustomManifestFilters === 'function') {
+        populateCustomManifestFilters();
+    }
+}
+window.switchReportSubtab = switchReportSubtab;
 
 // Seat Map DOM Generator
 function buildSeatMapElement(layout, { taken = {}, selected = new Set(), onSeat = null, compact = false, currentUserSeat = '' } = {}) {

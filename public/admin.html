@@ -633,7 +633,7 @@
                 <!-- ======================= -->
                 <section id="sec-laporan" class="content-section">
                     <!-- Page Header -->
-                    <div class="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                    <div class="mb-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                         <div>
                             <div class="flex items-center gap-2 mb-1.5">
                                 <span class="px-2.5 py-0.5 rounded-full text-[10px] font-black tracking-widest uppercase bg-amber-100 text-amber-800 border border-amber-200 shadow-2xs">Financial &amp; Compliance Hub</span>
@@ -643,216 +643,275 @@
                         </div>
                     </div>
 
-                    <!-- 1. Grid 4 Kartu Laporan Finansial & Data -->
-                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5 mb-6">
-                        <!-- Card 1: Bulanan -->
-                        <div class="bg-white rounded-3xl p-5 border border-slate-200/90 shadow-sm hover:shadow-md transition-all flex flex-col relative overflow-hidden group">
-                            <div class="absolute -right-6 -top-6 w-24 h-24 bg-blue-50/80 rounded-full group-hover:scale-150 transition-transform duration-500 pointer-events-none"></div>
-                            <div class="relative z-10 flex flex-col flex-1">
-                                <div class="flex items-center justify-between gap-2 mb-3">
-                                    <div class="w-11 h-11 bg-blue-100 text-blue-600 rounded-2xl flex items-center justify-center text-lg shadow-2xs">
-                                        <i class="fas fa-calendar-alt"></i>
+                    <!-- Subtabs Header / Segmented Pill Control -->
+                    <div class="mb-6 border-b border-slate-200/80 pb-4">
+                        <div class="inline-flex items-center bg-slate-100 p-1.5 rounded-2xl border border-slate-200/80 overflow-x-auto max-w-full">
+                            <button id="tabBtnReportLaporan" onclick="switchReportSubtab('laporan')" class="px-4 py-2.5 rounded-xl font-black text-xs uppercase tracking-wider transition-all bg-slate-900 text-amber-400 shadow-sm flex items-center justify-center gap-2 whitespace-nowrap active:scale-95">
+                                <i class="fas fa-file-invoice-dollar text-xs"></i> <span>Rekap &amp; Pajak</span>
+                            </button>
+                            <button id="tabBtnReportManifest" onclick="switchReportSubtab('manifest')" class="px-4 py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider transition-all bg-transparent hover:bg-slate-200/60 text-slate-500 hover:text-slate-800 flex items-center justify-center gap-2 whitespace-nowrap active:scale-95">
+                                <i class="fas fa-sliders-h text-xs"></i> <span>Manifes Kustom</span>
+                            </button>
+                            <button id="tabBtnReportAp3" onclick="switchReportSubtab('ap3')" class="px-4 py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider transition-all bg-transparent hover:bg-slate-200/60 text-slate-500 hover:text-slate-800 flex items-center justify-center gap-2 whitespace-nowrap active:scale-95">
+                                <i class="fas fa-calculator text-xs"></i> <span>Kalkulator AP/3</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- SUBTAB 1: REKAP LAPORAN & PAJAK (4 KARTU) -->
+                    <div id="subtabReportLaporan">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5 mb-6">
+                            <!-- Card 1: Bulanan -->
+                            <div class="bg-white rounded-3xl p-5 border border-slate-200/90 shadow-sm hover:shadow-md transition-all flex flex-col relative overflow-hidden group">
+                                <div class="absolute -right-6 -top-6 w-24 h-24 bg-blue-50/80 rounded-full group-hover:scale-150 transition-transform duration-500 pointer-events-none"></div>
+                                <div class="relative z-10 flex flex-col flex-1">
+                                    <div class="flex items-center justify-between gap-2 mb-3">
+                                        <div class="w-11 h-11 bg-blue-100 text-blue-600 rounded-2xl flex items-center justify-center text-lg shadow-2xs">
+                                            <i class="fas fa-calendar-alt"></i>
+                                        </div>
+                                        <span class="text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md bg-blue-50 text-blue-700 border border-blue-100">Bulanan</span>
                                     </div>
-                                    <span class="text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md bg-blue-50 text-blue-700 border border-blue-100">Bulanan</span>
+                                    <h3 class="text-base font-black text-slate-800">Laporan Bulanan</h3>
+                                    <p class="text-[11px] text-slate-400 font-medium mt-0.5 mb-3">Rekap transaksi &amp; statistik omzet bulanan</p>
+                                    
+                                    <div class="mt-auto">
+                                        <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Pilih Bulan &amp; Tahun</label>
+                                        <input type="month" id="laporanBulanInput" class="w-full bg-slate-50 hover:bg-slate-100/80 border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold text-slate-700 outline-none focus:border-blue-500 focus:bg-white transition-all shadow-2xs mb-3">
+                                        <div class="grid grid-cols-2 gap-2">
+                                            <button onclick="downloadReport('bulanan', 'pdf')" class="py-2.5 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-black uppercase tracking-wider transition-all flex items-center justify-center gap-1.5 shadow-2xs active:scale-95">
+                                                <i class="fas fa-file-pdf text-rose-400"></i> PDF
+                                            </button>
+                                            <button onclick="downloadReport('bulanan', 'csv')" class="py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-black uppercase tracking-wider transition-all flex items-center justify-center gap-1.5 shadow-2xs shadow-emerald-500/20 active:scale-95">
+                                                <i class="fas fa-file-excel text-emerald-200"></i> CSV
+                                            </button>
+                                        </div>
+                                    </div>
                                 </div>
-                                <h3 class="text-base font-black text-slate-800">Laporan Bulanan</h3>
-                                <p class="text-[11px] text-slate-400 font-medium mt-0.5 mb-3">Rekap transaksi &amp; statistik omzet bulanan</p>
-                                
-                                <div class="mt-auto">
-                                    <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Pilih Bulan &amp; Tahun</label>
-                                    <input type="month" id="laporanBulanInput" class="w-full bg-slate-50 hover:bg-slate-100/80 border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold text-slate-700 outline-none focus:border-blue-500 focus:bg-white transition-all shadow-2xs mb-3">
-                                    <div class="grid grid-cols-2 gap-2">
-                                        <button onclick="downloadReport('bulanan', 'pdf')" class="py-2.5 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-black uppercase tracking-wider transition-all flex items-center justify-center gap-1.5 shadow-2xs active:scale-95">
-                                            <i class="fas fa-file-pdf text-rose-400"></i> PDF
-                                        </button>
-                                        <button onclick="downloadReport('bulanan', 'csv')" class="py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-black uppercase tracking-wider transition-all flex items-center justify-center gap-1.5 shadow-2xs shadow-emerald-500/20 active:scale-95">
-                                            <i class="fas fa-file-excel text-emerald-200"></i> CSV
+                            </div>
+
+                            <!-- Card 2: Tahunan -->
+                            <div class="bg-white rounded-3xl p-5 border border-slate-200/90 shadow-sm hover:shadow-md transition-all flex flex-col relative overflow-hidden group">
+                                <div class="absolute -right-6 -top-6 w-24 h-24 bg-indigo-50/80 rounded-full group-hover:scale-150 transition-transform duration-500 pointer-events-none"></div>
+                                <div class="relative z-10 flex flex-col flex-1">
+                                    <div class="flex items-center justify-between gap-2 mb-3">
+                                        <div class="w-11 h-11 bg-indigo-100 text-indigo-600 rounded-2xl flex items-center justify-center text-lg shadow-2xs">
+                                            <i class="fas fa-calendar-check"></i>
+                                        </div>
+                                        <span class="text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md bg-indigo-50 text-indigo-700 border border-indigo-100">Tahunan</span>
+                                    </div>
+                                    <h3 class="text-base font-black text-slate-800">Laporan Tahunan</h3>
+                                    <p class="text-[11px] text-slate-400 font-medium mt-0.5 mb-4">Ringkasan performa omzet tahun berjalan</p>
+                                    
+                                    <div class="mt-auto">
+                                        <div class="p-2.5 bg-indigo-50/60 rounded-xl border border-indigo-100/80 mb-3 text-center">
+                                            <span class="text-[10px] font-bold text-indigo-700 uppercase tracking-wider">Tahun Berjalan (Kumulatif)</span>
+                                        </div>
+                                        <div class="grid grid-cols-2 gap-2">
+                                            <button onclick="downloadReport('tahunan', 'pdf')" class="py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-black uppercase tracking-wider transition-all flex items-center justify-center gap-1.5 shadow-2xs shadow-indigo-500/20 active:scale-95">
+                                                <i class="fas fa-file-pdf text-rose-300"></i> PDF
+                                            </button>
+                                            <button onclick="downloadReport('tahunan', 'csv')" class="py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-black uppercase tracking-wider transition-all flex items-center justify-center gap-1.5 shadow-2xs shadow-emerald-500/20 active:scale-95">
+                                                <i class="fas fa-file-excel text-emerald-200"></i> CSV
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Card 3: Pajak -->
+                            <div class="bg-white rounded-3xl p-5 border border-slate-200/90 shadow-sm hover:shadow-md transition-all flex flex-col relative overflow-hidden group">
+                                <div class="absolute -right-6 -top-6 w-24 h-24 bg-rose-50/80 rounded-full group-hover:scale-150 transition-transform duration-500 pointer-events-none"></div>
+                                <div class="relative z-10 flex flex-col flex-1">
+                                    <div class="flex items-center justify-between gap-2 mb-3">
+                                        <div class="w-11 h-11 bg-rose-100 text-rose-600 rounded-2xl flex items-center justify-center text-lg shadow-2xs">
+                                            <i class="fas fa-file-invoice-dollar"></i>
+                                        </div>
+                                        <span class="text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md bg-rose-50 text-rose-700 border border-rose-100">Perpajakan</span>
+                                    </div>
+                                    <h3 class="text-base font-black text-slate-800">Laporan Pajak</h3>
+                                    <p class="text-[11px] text-slate-400 font-medium mt-0.5 mb-4">Estimasi kalkulasi PPh omzet tahunan</p>
+                                    
+                                    <div class="mt-auto">
+                                        <div class="p-2.5 bg-rose-50/60 rounded-xl border border-rose-100/80 mb-3 text-center">
+                                            <span class="text-[10px] font-bold text-rose-700 uppercase tracking-wider">PPh Final Usaha / UMKM</span>
+                                        </div>
+                                        <div class="grid grid-cols-2 gap-2">
+                                            <button onclick="downloadReport('pajak', 'pdf')" class="py-2.5 bg-rose-600 hover:bg-rose-700 text-white rounded-xl text-xs font-black uppercase tracking-wider transition-all flex items-center justify-center gap-1.5 shadow-2xs shadow-rose-500/20 active:scale-95">
+                                                <i class="fas fa-file-pdf text-white"></i> PDF
+                                            </button>
+                                            <button onclick="downloadReport('pajak', 'csv')" class="py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-black uppercase tracking-wider transition-all flex items-center justify-center gap-1.5 shadow-2xs shadow-emerald-500/20 active:scale-95">
+                                                <i class="fas fa-file-excel text-emerald-200"></i> CSV
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Card 4: Backup DB -->
+                            <div class="bg-white rounded-3xl p-5 border border-slate-200/90 shadow-sm hover:shadow-md transition-all flex flex-col relative overflow-hidden group">
+                                <div class="absolute -right-6 -top-6 w-24 h-24 bg-teal-50/80 rounded-full group-hover:scale-150 transition-transform duration-500 pointer-events-none"></div>
+                                <div class="relative z-10 flex flex-col flex-1">
+                                    <div class="flex items-center justify-between gap-2 mb-3">
+                                        <div class="w-11 h-11 bg-teal-100 text-teal-600 rounded-2xl flex items-center justify-center text-lg shadow-2xs">
+                                            <i class="fas fa-database"></i>
+                                        </div>
+                                        <span class="text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md bg-teal-50 text-teal-700 border border-teal-100">Data Master</span>
+                                    </div>
+                                    <h3 class="text-base font-black text-slate-800">Backup Database</h3>
+                                    <p class="text-[11px] text-slate-400 font-medium mt-0.5 mb-4">Unduh seluruh master pesanan &amp; pelanggan</p>
+                                    
+                                    <div class="mt-auto">
+                                        <div class="p-2.5 bg-teal-50/60 rounded-xl border border-teal-100/80 mb-3 text-center">
+                                            <span class="text-[10px] font-bold text-teal-700 uppercase tracking-wider">Format Microsoft Excel (.xlsx)</span>
+                                        </div>
+                                        <button onclick="window.location.href='/api/export?token=' + localStorage.getItem('adminToken')" class="w-full py-2.5 bg-teal-600 hover:bg-teal-700 text-white rounded-xl text-xs font-black uppercase tracking-wider transition-all flex items-center justify-center gap-2 shadow-2xs shadow-teal-500/20 active:scale-95">
+                                            <i class="fas fa-file-excel text-teal-200"></i>
+                                            <span>Download Excel (.xlsx)</span>
                                         </button>
                                     </div>
                                 </div>
                             </div>
                         </div>
+                    </div>
 
-                        <!-- Card 2: Tahunan -->
-                        <div class="bg-white rounded-3xl p-5 border border-slate-200/90 shadow-sm hover:shadow-md transition-all flex flex-col relative overflow-hidden group">
-                            <div class="absolute -right-6 -top-6 w-24 h-24 bg-indigo-50/80 rounded-full group-hover:scale-150 transition-transform duration-500 pointer-events-none"></div>
-                            <div class="relative z-10 flex flex-col flex-1">
-                                <div class="flex items-center justify-between gap-2 mb-3">
-                                    <div class="w-11 h-11 bg-indigo-100 text-indigo-600 rounded-2xl flex items-center justify-center text-lg shadow-2xs">
-                                        <i class="fas fa-calendar-check"></i>
+                    <!-- SUBTAB 2: GENERATOR MANIFES KUSTOM -->
+                    <div id="subtabReportManifest" class="hidden">
+                        <div class="bg-white rounded-3xl p-5 sm:p-6 border border-slate-200/90 shadow-sm relative overflow-hidden">
+                            <!-- Studio Header -->
+                            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-5 border-b border-slate-100">
+                                <div class="flex items-center gap-3.5">
+                                    <div class="w-11 h-11 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center text-lg shadow-2xs shrink-0 border border-blue-100">
+                                        <i class="fas fa-sliders-h"></i>
                                     </div>
-                                    <span class="text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md bg-indigo-50 text-indigo-700 border border-indigo-100">Tahunan</span>
-                                </div>
-                                <h3 class="text-base font-black text-slate-800">Laporan Tahunan</h3>
-                                <p class="text-[11px] text-slate-400 font-medium mt-0.5 mb-4">Ringkasan performa omzet tahun berjalan</p>
-                                
-                                <div class="mt-auto">
-                                    <div class="p-2.5 bg-indigo-50/60 rounded-xl border border-indigo-100/80 mb-3 text-center">
-                                        <span class="text-[10px] font-bold text-indigo-700 uppercase tracking-wider">Tahun Berjalan (Kumulatif)</span>
-                                    </div>
-                                    <div class="grid grid-cols-2 gap-2">
-                                        <button onclick="downloadReport('tahunan', 'pdf')" class="py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-black uppercase tracking-wider transition-all flex items-center justify-center gap-1.5 shadow-2xs shadow-indigo-500/20 active:scale-95">
-                                            <i class="fas fa-file-pdf text-rose-300"></i> PDF
-                                        </button>
-                                        <button onclick="downloadReport('tahunan', 'csv')" class="py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-black uppercase tracking-wider transition-all flex items-center justify-center gap-1.5 shadow-2xs shadow-emerald-500/20 active:scale-95">
-                                            <i class="fas fa-file-excel text-emerald-200"></i> CSV
-                                        </button>
+                                    <div>
+                                        <div class="flex items-center gap-2">
+                                            <span class="text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded-md bg-blue-50 text-blue-700 border border-blue-100">Custom Export Studio</span>
+                                        </div>
+                                        <h3 class="text-base sm:text-lg font-black text-slate-800 tracking-tight mt-0.5">Generator Manifes Penumpang Kustom</h3>
+                                        <p class="text-xs text-slate-400 mt-0.5">Saring dan cetak data penumpang sesuai pilihan armada dan waktu secara presisi</p>
                                     </div>
                                 </div>
                             </div>
-                        </div>
 
-                        <!-- Card 3: Pajak -->
-                        <div class="bg-white rounded-3xl p-5 border border-slate-200/90 shadow-sm hover:shadow-md transition-all flex flex-col relative overflow-hidden group">
-                            <div class="absolute -right-6 -top-6 w-24 h-24 bg-rose-50/80 rounded-full group-hover:scale-150 transition-transform duration-500 pointer-events-none"></div>
-                            <div class="relative z-10 flex flex-col flex-1">
-                                <div class="flex items-center justify-between gap-2 mb-3">
-                                    <div class="w-11 h-11 bg-rose-100 text-rose-600 rounded-2xl flex items-center justify-center text-lg shadow-2xs">
-                                        <i class="fas fa-file-invoice-dollar"></i>
-                                    </div>
-                                    <span class="text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md bg-rose-50 text-rose-700 border border-rose-100">Perpajakan</span>
+                            <!-- Studio Filter Controls -->
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 my-5">
+                                <!-- 1. Filter Tanggal -->
+                                <div class="bg-slate-50/80 rounded-2xl p-4 border border-slate-200/80 flex flex-col">
+                                    <label class="text-[10px] font-black text-slate-500 uppercase tracking-wider mb-2.5 flex items-center gap-1.5">
+                                        <i class="fas fa-calendar-day text-blue-500"></i>
+                                        <span>1. Periode Tanggal</span>
+                                    </label>
+                                    <select id="customManifestDateType" class="w-full bg-white border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs font-bold text-slate-700 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all shadow-2xs mb-2 cursor-pointer" onchange="toggleCustomManifestDate()">
+                                        <option value="today">Hari Ini</option>
+                                        <option value="custom">Pilih Tanggal Manual</option>
+                                    </select>
+                                    <input type="date" id="customManifestDateVal" class="w-full bg-white border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs font-bold text-slate-700 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all shadow-2xs hidden" onchange="populateCustomManifestFilters()">
+                                    <p class="text-[10px] text-slate-400 mt-auto pt-2 font-medium">Tentukan tanggal manifes yang ingin disaring.</p>
                                 </div>
-                                <h3 class="text-base font-black text-slate-800">Laporan Pajak</h3>
-                                <p class="text-[11px] text-slate-400 font-medium mt-0.5 mb-4">Estimasi kalkulasi PPh omzet tahunan</p>
-                                
-                                <div class="mt-auto">
-                                    <div class="p-2.5 bg-rose-50/60 rounded-xl border border-rose-100/80 mb-3 text-center">
-                                        <span class="text-[10px] font-bold text-rose-700 uppercase tracking-wider">PPh Final Usaha / UMKM</span>
+
+                                <!-- 2. Filter Armada -->
+                                <div class="bg-slate-50/80 rounded-2xl p-4 border border-slate-200/80 flex flex-col">
+                                    <div class="flex items-center justify-between mb-2.5">
+                                        <label class="text-[10px] font-black text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
+                                            <i class="fas fa-bus text-amber-500"></i>
+                                            <span>2. Pilih Armada</span>
+                                        </label>
+                                        <span class="text-[9px] font-bold text-slate-400">Multi-pilih</span>
                                     </div>
-                                    <div class="grid grid-cols-2 gap-2">
-                                        <button onclick="downloadReport('pajak', 'pdf')" class="py-2.5 bg-rose-600 hover:bg-rose-700 text-white rounded-xl text-xs font-black uppercase tracking-wider transition-all flex items-center justify-center gap-1.5 shadow-2xs shadow-rose-500/20 active:scale-95">
-                                            <i class="fas fa-file-pdf text-white"></i> PDF
-                                        </button>
-                                        <button onclick="downloadReport('pajak', 'csv')" class="py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-black uppercase tracking-wider transition-all flex items-center justify-center gap-1.5 shadow-2xs shadow-emerald-500/20 active:scale-95">
-                                            <i class="fas fa-file-excel text-emerald-200"></i> CSV
-                                        </button>
+                                    <div id="customManifestArmadaContainer" class="bg-white border border-slate-200 rounded-xl h-36 overflow-y-auto p-2 flex flex-col gap-1 custom-scroll shadow-inner">
+                                        <p class="text-[10px] text-slate-400 font-bold p-3 text-center uppercase tracking-widest my-auto">Pilih tanggal dahulu</p>
+                                    </div>
+                                </div>
+
+                                <!-- 3. Filter Jam Keberangkatan -->
+                                <div class="bg-slate-50/80 rounded-2xl p-4 border border-slate-200/80 flex flex-col">
+                                    <div class="flex items-center justify-between mb-2.5">
+                                        <label class="text-[10px] font-black text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
+                                            <i class="far fa-clock text-emerald-500"></i>
+                                            <span>3. Jam Keberangkatan</span>
+                                        </label>
+                                        <span class="text-[9px] font-bold text-slate-400">Sesuai armada</span>
+                                    </div>
+                                    <div id="customManifestTimeContainer" class="bg-white border border-slate-200 rounded-xl h-36 overflow-y-auto p-2 flex flex-col gap-1 custom-scroll shadow-inner">
+                                        <p class="text-[10px] text-slate-400 font-bold p-3 text-center uppercase tracking-widest my-auto">Pilih tanggal dahulu</p>
                                     </div>
                                 </div>
                             </div>
-                        </div>
 
-                        <!-- Card 4: Backup DB -->
-                        <div class="bg-white rounded-3xl p-5 border border-slate-200/90 shadow-sm hover:shadow-md transition-all flex flex-col relative overflow-hidden group">
-                            <div class="absolute -right-6 -top-6 w-24 h-24 bg-teal-50/80 rounded-full group-hover:scale-150 transition-transform duration-500 pointer-events-none"></div>
-                            <div class="relative z-10 flex flex-col flex-1">
-                                <div class="flex items-center justify-between gap-2 mb-3">
-                                    <div class="w-11 h-11 bg-teal-100 text-teal-600 rounded-2xl flex items-center justify-center text-lg shadow-2xs">
-                                        <i class="fas fa-database"></i>
+                            <!-- Studio Action Buttons -->
+                            <div class="pt-4 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-end gap-2.5">
+                                <button onclick="downloadCustomManifest('pdf')" class="w-full sm:w-auto py-2.5 px-5 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-black uppercase tracking-wider transition-all flex items-center justify-center gap-2 shadow-sm active:scale-95">
+                                    <i class="fas fa-file-pdf text-rose-400"></i>
+                                    <span>Buat PDF</span>
+                                </button>
+                                <button onclick="downloadCustomManifest('csv')" class="w-full sm:w-auto py-2.5 px-5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-black uppercase tracking-wider transition-all flex items-center justify-center gap-2 shadow-sm shadow-emerald-500/20 active:scale-95">
+                                    <i class="fas fa-file-excel text-emerald-200"></i>
+                                    <span>Ekspor Excel (CSV)</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- SUBTAB 3: KALKULATOR MANIFES FISIK (AP/3) -->
+                    <div id="subtabReportAp3" class="hidden">
+                        <div class="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/90 shadow-sm relative overflow-hidden">
+                            <!-- Hero Showcase -->
+                            <div class="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-950 text-white rounded-3xl p-6 sm:p-8 border border-slate-700/80 shadow-xl relative overflow-hidden mb-6">
+                                <div class="absolute -right-12 -bottom-12 w-56 h-56 bg-amber-500/15 rounded-full blur-3xl pointer-events-none"></div>
+                                <div class="absolute -left-12 -top-12 w-48 h-48 bg-blue-500/10 rounded-full blur-3xl pointer-events-none"></div>
+
+                                <div class="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
+                                    <div class="flex items-start gap-4 sm:gap-5">
+                                        <div class="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-gradient-to-br from-amber-400 via-amber-500 to-amber-600 text-slate-950 flex items-center justify-center text-2xl sm:text-3xl font-black shadow-lg shadow-amber-500/25 shrink-0">
+                                            <i class="fas fa-calculator"></i>
+                                        </div>
+                                        <div>
+                                            <div class="flex items-center gap-2 mb-2">
+                                                <span class="text-[9px] font-black uppercase tracking-widest px-3 py-0.5 rounded-full bg-amber-400/20 text-amber-300 border border-amber-400/30">Formulir Blangko Resmi PO DAMRI</span>
+                                            </div>
+                                            <h3 class="text-xl sm:text-2xl font-black tracking-tight text-white">Kalkulator Manifes Fisik (AP/3)</h3>
+                                            <p class="text-xs sm:text-sm text-slate-300 mt-1 max-w-xl leading-relaxed">
+                                                Hitung otomatis rincian setoran bruto, potongan operasional (BBM/Tol/Cuci), premi, dan komisi agen resmi untuk langsung dicatat pada kertas blangko fisik AP/3.
+                                            </p>
+                                        </div>
                                     </div>
-                                    <span class="text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md bg-teal-50 text-teal-700 border border-teal-100">Data Master</span>
-                                </div>
-                                <h3 class="text-base font-black text-slate-800">Backup Database</h3>
-                                <p class="text-[11px] text-slate-400 font-medium mt-0.5 mb-4">Unduh seluruh master pesanan &amp; pelanggan</p>
-                                
-                                <div class="mt-auto">
-                                    <div class="p-2.5 bg-teal-50/60 rounded-xl border border-teal-100/80 mb-3 text-center">
-                                        <span class="text-[10px] font-bold text-teal-700 uppercase tracking-wider">Format Microsoft Excel (.xlsx)</span>
-                                    </div>
-                                    <button onclick="window.location.href='/api/export?token=' + localStorage.getItem('adminToken')" class="w-full py-2.5 bg-teal-600 hover:bg-teal-700 text-white rounded-xl text-xs font-black uppercase tracking-wider transition-all flex items-center justify-center gap-2 shadow-2xs shadow-teal-500/20 active:scale-95">
-                                        <i class="fas fa-file-excel text-teal-200"></i>
-                                        <span>Download Excel (.xlsx)</span>
+                                    <button onclick="openAp3Modal()" class="w-full md:w-auto py-3.5 px-7 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-slate-950 font-black text-xs uppercase tracking-wider rounded-2xl shadow-lg shadow-amber-500/30 transition-all flex items-center justify-center gap-2.5 shrink-0 active:scale-95 cursor-pointer">
+                                        <i class="fas fa-calculator text-sm"></i>
+                                        <span>Buka Kalkulator AP/3</span>
                                     </button>
                                 </div>
                             </div>
-                        </div>
-                    </div>
 
-                    <!-- 2. Banner Kalkulator AP3 -->
-                    <div class="mb-6 bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 text-white rounded-3xl p-5 sm:p-6 shadow-lg border border-slate-700/60 relative overflow-hidden">
-                        <div class="absolute -right-10 -bottom-10 w-44 h-44 bg-amber-500/10 rounded-full blur-2xl pointer-events-none"></div>
-                        <div class="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-4">
-                            <div class="flex items-start sm:items-center gap-4">
-                                <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-amber-400 to-amber-600 text-slate-950 flex items-center justify-center text-xl font-bold shadow-md shadow-amber-500/20 shrink-0">
-                                    <i class="fas fa-calculator"></i>
-                                </div>
-                                <div>
-                                    <div class="flex items-center gap-2 mb-1">
-                                        <span class="text-[9px] font-black uppercase tracking-widest px-2.5 py-0.5 rounded-full bg-amber-400/20 text-amber-300 border border-amber-400/30">Formulir Blangko Fisik</span>
+                            <!-- Highlights Grid -->
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <div class="bg-slate-50/80 rounded-2xl p-4 sm:p-5 border border-slate-200/80 flex items-start gap-3.5">
+                                    <div class="w-10 h-10 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center text-base shrink-0">
+                                        <i class="fas fa-users"></i>
                                     </div>
-                                    <h3 class="text-base sm:text-lg font-black tracking-tight text-white">Kalkulator Manifes Fisik (AP/3)</h3>
-                                    <p class="text-xs text-slate-300 mt-0.5 max-w-xl">Hitung otomatis rincian setoran, potongan operasional, dan komisi agen untuk dicatat pada lembar blangko kertas AP/3 PO DAMRI.</p>
-                                </div>
-                            </div>
-                            <button onclick="openAp3Modal()" class="w-full md:w-auto py-2.5 px-5 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 text-slate-950 font-black text-xs uppercase tracking-wider rounded-xl shadow-md shadow-amber-500/20 transition-all flex items-center justify-center gap-2 shrink-0 active:scale-95">
-                                <i class="fas fa-calculator text-xs"></i>
-                                <span>Buka Kalkulator AP3</span>
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- 3. Generator Custom Manifest Studio -->
-                    <div class="bg-white rounded-3xl p-5 sm:p-6 border border-slate-200/90 shadow-sm relative overflow-hidden">
-                        <!-- Studio Header -->
-                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-5 border-b border-slate-100">
-                            <div class="flex items-center gap-3.5">
-                                <div class="w-11 h-11 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center text-lg shadow-2xs shrink-0 border border-blue-100">
-                                    <i class="fas fa-sliders-h"></i>
-                                </div>
-                                <div>
-                                    <div class="flex items-center gap-2">
-                                        <span class="text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded-md bg-blue-50 text-blue-700 border border-blue-100">Custom Export Studio</span>
+                                    <div>
+                                        <h4 class="text-xs font-black text-slate-800 uppercase tracking-wider mb-1">Otomasi Penumpang</h4>
+                                        <p class="text-[11px] text-slate-500 font-medium leading-relaxed">Menghitung jumlah penumpang riil dan total nominal tiket per armada tanggal terpilih secara otomatis.</p>
                                     </div>
-                                    <h3 class="text-base sm:text-lg font-black text-slate-800 tracking-tight mt-0.5">Generator Manifes Penumpang Kustom</h3>
-                                    <p class="text-xs text-slate-400 mt-0.5">Saring dan cetak data penumpang sesuai pilihan armada dan waktu secara presisi</p>
+                                </div>
+                                <div class="bg-slate-50/80 rounded-2xl p-4 sm:p-5 border border-slate-200/80 flex items-start gap-3.5">
+                                    <div class="w-10 h-10 rounded-xl bg-blue-100 text-blue-700 flex items-center justify-center text-base shrink-0">
+                                        <i class="fas fa-gas-pump"></i>
+                                    </div>
+                                    <div>
+                                        <h4 class="text-xs font-black text-slate-800 uppercase tracking-wider mb-1">Potongan Operasional</h4>
+                                        <p class="text-[11px] text-slate-500 font-medium leading-relaxed">Input biaya solar/BBM, tol, cuci bus, dan persentase komisi agen dengan kalkulasi setoran netto instan.</p>
+                                    </div>
+                                </div>
+                                <div class="bg-slate-50/80 rounded-2xl p-4 sm:p-5 border border-slate-200/80 flex items-start gap-3.5">
+                                    <div class="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center text-base shrink-0">
+                                        <i class="fas fa-print"></i>
+                                    </div>
+                                    <div>
+                                        <h4 class="text-xs font-black text-slate-800 uppercase tracking-wider mb-1">Penyalinan Akurat</h4>
+                                        <p class="text-[11px] text-slate-500 font-medium leading-relaxed">Hasil kalkulasi tertata rapi sesuai format kolom blangko fisik AP/3, meminimalkan salah hitung manual.</p>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-
-                        <!-- Studio Filter Controls -->
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 my-5">
-                            <!-- 1. Filter Tanggal -->
-                            <div class="bg-slate-50/80 rounded-2xl p-4 border border-slate-200/80 flex flex-col">
-                                <label class="text-[10px] font-black text-slate-500 uppercase tracking-wider mb-2.5 flex items-center gap-1.5">
-                                    <i class="fas fa-calendar-day text-blue-500"></i>
-                                    <span>1. Periode Tanggal</span>
-                                </label>
-                                <select id="customManifestDateType" class="w-full bg-white border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs font-bold text-slate-700 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all shadow-2xs mb-2 cursor-pointer" onchange="toggleCustomManifestDate()">
-                                    <option value="today">Hari Ini</option>
-                                    <option value="custom">Pilih Tanggal Manual</option>
-                                </select>
-                                <input type="date" id="customManifestDateVal" class="w-full bg-white border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs font-bold text-slate-700 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all shadow-2xs hidden" onchange="populateCustomManifestFilters()">
-                                <p class="text-[10px] text-slate-400 mt-auto pt-2 font-medium">Tentukan tanggal manifes yang ingin disaring.</p>
-                            </div>
-
-                            <!-- 2. Filter Armada -->
-                            <div class="bg-slate-50/80 rounded-2xl p-4 border border-slate-200/80 flex flex-col">
-                                <div class="flex items-center justify-between mb-2.5">
-                                    <label class="text-[10px] font-black text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
-                                        <i class="fas fa-bus text-amber-500"></i>
-                                        <span>2. Pilih Armada</span>
-                                    </label>
-                                    <span class="text-[9px] font-bold text-slate-400">Multi-pilih</span>
-                                </div>
-                                <div id="customManifestArmadaContainer" class="bg-white border border-slate-200 rounded-xl h-36 overflow-y-auto p-2 flex flex-col gap-1 custom-scroll shadow-inner">
-                                    <p class="text-[10px] text-slate-400 font-bold p-3 text-center uppercase tracking-widest my-auto">Pilih tanggal dahulu</p>
-                                </div>
-                            </div>
-
-                            <!-- 3. Filter Jam Keberangkatan -->
-                            <div class="bg-slate-50/80 rounded-2xl p-4 border border-slate-200/80 flex flex-col">
-                                <div class="flex items-center justify-between mb-2.5">
-                                    <label class="text-[10px] font-black text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
-                                        <i class="far fa-clock text-emerald-500"></i>
-                                        <span>3. Jam Keberangkatan</span>
-                                    </label>
-                                    <span class="text-[9px] font-bold text-slate-400">Sesuai armada</span>
-                                </div>
-                                <div id="customManifestTimeContainer" class="bg-white border border-slate-200 rounded-xl h-36 overflow-y-auto p-2 flex flex-col gap-1 custom-scroll shadow-inner">
-                                    <p class="text-[10px] text-slate-400 font-bold p-3 text-center uppercase tracking-widest my-auto">Pilih tanggal dahulu</p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Studio Action Buttons -->
-                        <div class="pt-4 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-end gap-2.5">
-                            <button onclick="downloadCustomManifest('pdf')" class="w-full sm:w-auto py-2.5 px-5 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-black uppercase tracking-wider transition-all flex items-center justify-center gap-2 shadow-sm active:scale-95">
-                                <i class="fas fa-file-pdf text-rose-400"></i>
-                                <span>Buat PDF</span>
-                            </button>
-                            <button onclick="downloadCustomManifest('csv')" class="w-full sm:w-auto py-2.5 px-5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-black uppercase tracking-wider transition-all flex items-center justify-center gap-2 shadow-sm shadow-emerald-500/20 active:scale-95">
-                                <i class="fas fa-file-excel text-emerald-200"></i>
-                                <span>Ekspor Excel (CSV)</span>
-                            </button>
                         </div>
                     </div>
                 </section>
@@ -2488,7 +2547,7 @@
 
     <!-- Custom script for admin dashboard -->
     <script src="routes-data.js"></script>
-    <script src="admin.js?v=2.40"></script>
+    <script src="admin.js?v=2.42"></script>
 
     <!-- Modal Edit Pelanggan -->
     <div id="modalEditPelanggan" class="fixed inset-0 bg-slate-900/50  z-[70] hidden items-center justify-center transition-opacity duration-300 opacity-0 p-4">
