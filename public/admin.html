@@ -1227,7 +1227,7 @@
                                 <div class="flex gap-3 pt-2">
                                     <button type="button" onclick="resetAdminBooking(); closeBookingModal();" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-600 font-black text-xs uppercase tracking-widest py-3.5 rounded-xl transition-all">BATAL</button>
                                     <button type="button" onclick="goToBookingStep(2)" class="flex-[2] bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-slate-900 font-black text-xs uppercase tracking-widest py-3.5 rounded-xl shadow-lg shadow-amber-500/30 transition-all flex items-center justify-center gap-2">
-                                        Lanjut ke Data &amp; Kursi (Tahap 2) <i class="fas fa-arrow-right"></i>
+                                        <span>NEXT</span> <i class="fas fa-arrow-right"></i>
                                     </button>
                                 </div>
                             </div>
@@ -1323,10 +1323,10 @@
 
                                 <div class="flex gap-3 pt-2">
                                     <button type="button" onclick="goToBookingStep(1)" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 font-black text-xs uppercase tracking-widest py-3.5 rounded-xl transition-all flex items-center justify-center gap-2">
-                                        <i class="fas fa-arrow-left"></i> Kembali ke Tahap 1
+                                        <i class="fas fa-arrow-left"></i> <span>BACK</span>
                                     </button>
                                     <button type="button" onclick="goToBookingStep(3)" class="flex-[2] bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-slate-900 font-black text-xs uppercase tracking-widest py-3.5 rounded-xl shadow-lg shadow-amber-500/30 transition-all flex items-center justify-center gap-2">
-                                        Lanjut ke Pembayaran (Tahap 3) <i class="fas fa-arrow-right"></i>
+                                        <span>NEXT</span> <i class="fas fa-arrow-right"></i>
                                     </button>
                                 </div>
                             </div>
@@ -1420,10 +1420,10 @@
 
                                 <div class="flex gap-3 pt-2">
                                     <button type="button" onclick="goToBookingStep(2)" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 font-black text-xs uppercase tracking-widest py-3.5 rounded-xl transition-all flex items-center justify-center gap-2">
-                                        <i class="fas fa-arrow-left"></i> Kembali ke Tahap 2
+                                        <i class="fas fa-arrow-left"></i> <span>BACK</span>
                                     </button>
                                     <button type="submit" id="btnSubmitAdminBooking" class="flex-[2] bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-slate-900 font-black text-xs uppercase tracking-widest py-3.5 rounded-xl shadow-lg shadow-amber-500/30 transition-all flex items-center justify-center gap-2">
-                                        <i class="fas fa-check-double"></i> SELESAIKAN BOOKING
+                                        <i class="fas fa-check-double"></i> <span>BOOKING</span>
                                     </button>
                                 </div>
                             </div>
@@ -2547,7 +2547,7 @@
 
     <!-- Custom script for admin dashboard -->
     <script src="routes-data.js"></script>
-    <script src="admin.js?v=2.42"></script>
+    <script src="admin.js?v=2.44"></script>
 
     <!-- Modal Edit Pelanggan -->
     <div id="modalEditPelanggan" class="fixed inset-0 bg-slate-900/50  z-[70] hidden items-center justify-center transition-opacity duration-300 opacity-0 p-4">

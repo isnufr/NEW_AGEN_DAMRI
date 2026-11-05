@@ -473,193 +473,338 @@
             color: white;
             border-style: solid;
         }
+
+        /* Customer Wizard Steps */
+        .cust-wizard-step {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            padding: 9px 8px;
+            border-radius: 12px;
+            background: #f1f5f9;
+            color: #64748b;
+            font-size: 11px;
+            font-weight: 800;
+            transition: all 0.25s ease;
+            user-select: none;
+        }
+
+        @media (min-width: 640px) {
+            .cust-wizard-step {
+                padding: 10px 14px;
+                font-size: 12px;
+                gap: 8px;
+                border-radius: 14px;
+            }
+        }
+
+        .cust-wizard-step.active {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            color: #ffffff;
+            box-shadow: 0 4px 14px rgba(245, 158, 11, 0.35);
+        }
+
+        .cust-wizard-step.completed {
+            background: #e0f2fe;
+            color: #0369a1;
+        }
+
+        .cust-wizard-num {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: rgba(0, 0, 0, 0.08);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            font-weight: 900;
+            flex-shrink: 0;
+        }
+
+        @media (min-width: 640px) {
+            .cust-wizard-num {
+                width: 22px;
+                height: 22px;
+                font-size: 11px;
+            }
+        }
+
+        .cust-wizard-step.active .cust-wizard-num {
+            background: #ffffff;
+            color: #d97706;
+        }
+
+        .cust-wizard-step.completed .cust-wizard-num {
+            background: #0284c7;
+            color: #ffffff;
+        }
     </style>
 </head>
 
 <body class="bg-gray-50/50 selection:bg-blue-600 selection:text-white overflow-x-hidden">
-    <!-- Pop-up Modal Booking (MODERN VERSION - MOBILE OPTIMIZED) -->
+    <!-- Pop-up Modal Booking (3 TAHAPAN INTERAKTIF) -->
     <div id="bookingModal"
-        class="hidden fixed inset-0 z-[300] bg-slate-900/90 backdrop-blur-md flex items-center justify-center p-2 sm:p-4">
+        class="hidden fixed inset-0 z-[300] bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-2 sm:p-4 overflow-y-auto">
         <div
-            class="bg-white w-[96%] md:w-full max-w-4xl rounded-[1.5rem] md:rounded-[2.5rem] shadow-2xl overflow-hidden animate-fade-in-up border border-white/20 booking-modal-container max-h-[90dvh] overflow-y-auto">
+            class="bg-white w-full max-w-2xl rounded-[1.75rem] sm:rounded-[2rem] shadow-2xl overflow-hidden animate-fade-in-up border border-slate-100 booking-modal-container max-h-[92dvh] overflow-y-auto my-auto relative">
 
-            <!-- Header Modal (Sticky/Fixed at Top) -->
-            <div class="bg-tertiary p-4 md:p-8 text-center relative shrink-0">
-                <div class="absolute top-4 right-5">
-                    <button onclick="closeBookingModal()" class="text-white/50 hover:text-white transition-colors p-2">
-                        <i class="fas fa-times text-lg"></i>
+            <!-- Header Modal -->
+            <div class="bg-gradient-to-r from-amber-500 via-amber-600 to-amber-700 px-5 py-4 sm:px-7 sm:py-5 text-white relative shrink-0">
+                <div class="absolute top-4 right-4">
+                    <button type="button" onclick="closeBookingModal()" class="w-8 h-8 sm:w-9 sm:h-9 bg-black/15 hover:bg-black/25 text-white rounded-full flex items-center justify-center transition-all active:scale-90" title="Tutup Modal">
+                        <i class="fas fa-times text-sm sm:text-base"></i>
                     </button>
                 </div>
-                <div
-                    class="w-10 h-10 md:w-16 md:h-16 bg-white/10 rounded-xl md:rounded-2xl flex items-center justify-center mx-auto mb-2 md:mb-3 border border-white/20">
-                    <i class="fas fa-ticket-alt text-white text-lg md:text-2xl"></i>
+                <div class="flex items-center gap-3 sm:gap-4 pr-10">
+                    <div class="w-10 h-10 sm:w-11 sm:h-11 bg-white/20 rounded-xl sm:rounded-2xl flex items-center justify-center border border-white/30 shadow-inner shrink-0">
+                        <i class="fas fa-ticket-alt text-white text-base sm:text-lg"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-black uppercase tracking-wider text-sm sm:text-lg leading-tight">Form Booking Tiket</h3>
+                        <p class="text-amber-100 text-[10px] sm:text-xs font-bold uppercase tracking-widest mt-0.5 opacity-90">Pemesanan Online Mudah 3 Tahap</p>
+                    </div>
                 </div>
-                <h3
-                    class="text-white font-black uppercase tracking-[0.1em] md:tracking-[0.15em] text-base md:text-xl italic leading-tight">
-                    Form Booking Tiket</h3>
-                <p
-                    class="text-blue-100 text-[8px] md:text-[9px] font-bold uppercase mt-1 opacity-70 tracking-widest text-center">
-                    Isi Data yang valid</p>
+            </div>
+
+            <!-- Stepper Indicator 3 Tahap -->
+            <div class="flex items-center gap-2 px-5 pt-4 sm:px-7 sm:pt-6">
+                <div id="custBookingStepBadge1" class="cust-wizard-step active">
+                    <span class="cust-wizard-num">1</span>
+                    <span class="truncate">Jadwal &amp; PO</span>
+                </div>
+                <div id="custBookingStepBadge2" class="cust-wizard-step">
+                    <span class="cust-wizard-num">2</span>
+                    <span class="truncate">Data Diri</span>
+                </div>
+                <div id="custBookingStepBadge3" class="cust-wizard-step">
+                    <span class="cust-wizard-num">3</span>
+                    <span class="truncate">Pembayaran</span>
+                </div>
             </div>
 
             <!-- Body Modal (Scrollable Area) -->
-            <div class="p-4 md:p-10 booking-modal-content">
-                <div class="space-y-6 md:space-y-10">
+            <div class="p-5 sm:p-7 booking-modal-content space-y-4">
 
-                    <!-- Section 1: Informasi Perjalanan -->
-                    <div>
-                        <div class="flex items-center gap-3 mb-4 md:mb-6">
-                            <span
-                                class="w-6 h-6 md:w-8 md:h-8 bg-blue-100 text-blue-700 rounded-full flex items-center justify-center font-black text-[10px] md:text-xs">01</span>
-                            <h4
-                                class="font-black text-gray-800 uppercase text-[10px] md:text-xs tracking-widest italic">
-                                Detail Perjalanan</h4>
-                            <div class="flex-1 h-[1px] bg-gray-100"></div>
+                <!-- ========================================== -->
+                <!-- TAHAPAN 1: JADWAL & PO                     -->
+                <!-- ========================================== -->
+                <div id="custBookingStepPane1" class="space-y-4">
+                    <div class="bg-slate-50 p-4 sm:p-5 rounded-2xl border border-slate-200/80 space-y-4">
+                        <div class="flex items-center justify-between border-b border-slate-200/80 pb-3">
+                            <h4 class="text-xs sm:text-sm font-black text-slate-700 uppercase tracking-wider flex items-center gap-2">
+                                <i class="fas fa-calendar-alt text-amber-500"></i> 1. Pemilihan Jadwal &amp; PO
+                            </h4>
+                            <span class="text-[10px] bg-amber-100 text-amber-800 font-extrabold px-2.5 py-0.5 rounded-full">Tahap 1 dari 3</span>
                         </div>
 
-                        <div class="grid grid-cols-1 gap-4 md:gap-5">
-                            <div>
-                                <label class="input-label">Tipe Perjalanan</label>
-                                <div class="flex gap-4">
-                                    <label class="flex items-center gap-2 cursor-pointer">
-                                        <input type="radio" name="bookTipePerjalanan" value="Berangkat"
-                                            class="w-4 h-4 text-blue-600 focus:ring-blue-500 border-gray-300" checked
-                                            onchange="document.getElementById('labelKotaTujuan').innerText = 'Kota Tujuan';">
-                                        <span class="text-xs md:text-sm font-bold text-gray-700">Berangkat (Dari
-                                            Kawunganten)</span>
-                                    </label>
-                                    <label class="flex items-center gap-2 cursor-pointer">
-                                        <input type="radio" name="bookTipePerjalanan" value="Pulang"
-                                            class="w-4 h-4 text-blue-600 focus:ring-blue-500 border-gray-300"
-                                            onchange="document.getElementById('labelKotaTujuan').innerText = 'Kota Asal';">
-                                        <span class="text-xs md:text-sm font-bold text-gray-700">Pulang (Menuju
-                                            Kawunganten)</span>
-                                    </label>
-                                </div>
+                        <div>
+                            <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1.5">Tipe Perjalanan</label>
+                            <div class="grid grid-cols-2 gap-2 p-1 bg-white border border-slate-200 rounded-xl">
+                                <label class="flex items-center justify-center gap-2 py-2 px-3 rounded-lg cursor-pointer transition-all has-[:checked]:bg-amber-500 has-[:checked]:text-white text-slate-700 font-bold text-xs sm:text-sm">
+                                    <input type="radio" name="bookTipePerjalanan" value="Berangkat" class="hidden" checked
+                                        onchange="document.getElementById('labelKotaTujuan').innerText = 'Kota Tujuan *'; calculateBookingTotal();">
+                                    <i class="fas fa-bus text-xs"></i>
+                                    <span>Berangkat</span>
+                                </label>
+                                <label class="flex items-center justify-center gap-2 py-2 px-3 rounded-lg cursor-pointer transition-all has-[:checked]:bg-amber-500 has-[:checked]:text-white text-slate-700 font-bold text-xs sm:text-sm">
+                                    <input type="radio" name="bookTipePerjalanan" value="Pulang" class="hidden"
+                                        onchange="document.getElementById('labelKotaTujuan').innerText = 'Kota Asal *'; calculateBookingTotal();">
+                                    <i class="fas fa-undo text-xs"></i>
+                                    <span>Pulang</span>
+                                </label>
                             </div>
+                        </div>
 
-                            <div>
-                                <label class="input-label">Tanggal Pemberangkatan</label>
-                                <div class="relative">
-                                    <input type="date" id="bookTanggal" onchange="calculateBookingTotal()"
-                                        class="w-full p-3 md:p-4 pl-10 md:pl-12 bg-gray-50 rounded-xl md:rounded-2xl font-bold text-gray-700 focus:outline-none form-input-focus text-xs md:text-sm">
-                                    <i
-                                        class="fas fa-calendar-alt absolute left-4 md:left-5 top-1/2 -translate-y-1/2 text-gray-400 text-xs md:text-base"></i>
-                                </div>
+                        <div>
+                            <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Tanggal Pemberangkatan *</label>
+                            <div class="relative">
+                                <input type="date" id="bookTanggal" onchange="calculateBookingTotal()"
+                                    class="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 pl-11 text-sm font-bold text-slate-700 outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-200/50 transition-all">
+                                <i class="fas fa-calendar-alt absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-sm pointer-events-none"></i>
                             </div>
+                        </div>
 
+                        <div>
+                            <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Pilih Armada / PO *</label>
+                            <div class="relative">
+                                <select id="bookArmada" onchange="updateBookingFields()"
+                                    class="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 pl-11 pr-10 text-sm font-bold text-slate-700 outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-200/50 appearance-none transition-all">
+                                    <option value="">-- Pilih Jenis Bus / Travel --</option>
+                                </select>
+                                <i class="fas fa-bus absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-sm pointer-events-none"></i>
+                                <i class="fas fa-chevron-down absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 text-xs pointer-events-none"></i>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div>
-                                <label class="input-label">Pilih Armada</label>
+                                <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1" id="labelKotaTujuan">Kota Tujuan *</label>
                                 <div class="relative">
-                                    <select id="bookArmada" onchange="updateBookingFields()"
-                                        class="w-full p-3 md:p-4 pl-10 md:pl-12 bg-gray-50 rounded-xl md:rounded-2xl font-bold text-gray-700 focus:outline-none form-input-focus appearance-none text-xs md:text-sm">
-                                        <option value="">-- Pilih Jenis Bus / Travel --</option>
+                                    <select id="bookTujuan" onchange="calculateBookingTotal()"
+                                        class="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 pl-11 pr-10 text-sm font-bold text-slate-700 outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-200/50 appearance-none transition-all">
+                                        <option value="">-- Pilih Armada Dahulu --</option>
                                     </select>
-                                    <i
-                                        class="fas fa-bus absolute left-4 md:left-5 top-1/2 -translate-y-1/2 text-gray-400 text-xs md:text-base"></i>
+                                    <i class="fas fa-map-marker-alt absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-sm pointer-events-none"></i>
+                                    <i class="fas fa-chevron-down absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 text-xs pointer-events-none"></i>
                                 </div>
                             </div>
+                            <div>
+                                <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Jam Keberangkatan *</label>
+                                <div class="relative">
+                                    <select id="bookWaktu"
+                                        class="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 pl-11 pr-10 text-sm font-bold text-slate-700 outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-200/50 appearance-none transition-all">
+                                        <option value="">-- Pilih Armada Dahulu --</option>
+                                    </select>
+                                    <i class="fas fa-clock absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-sm pointer-events-none"></i>
+                                    <i class="fas fa-chevron-down absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 text-xs pointer-events-none"></i>
+                                </div>
+                            </div>
+                        </div>
 
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5">
-                                <div>
-                                    <label class="input-label" id="labelKotaTujuan">Kota Tujuan</label>
-                                    <div class="relative">
-                                        <select id="bookTujuan" onchange="calculateBookingTotal()"
-                                            class="w-full p-3 md:p-4 pl-10 md:pl-12 bg-gray-50 rounded-xl md:rounded-2xl font-bold text-gray-700 focus:outline-none form-input-focus appearance-none text-xs md:text-sm">
-                                            <option value="">-- Pilih Armada Dahulu --</option>
-                                        </select>
-                                        <i
-                                            class="fas fa-map-marker-alt absolute left-4 md:left-5 top-1/2 -translate-y-1/2 text-gray-400 text-xs md:text-base"></i>
-                                    </div>
-                                </div>
-                                <div>
-                                    <label class="input-label">Jam Keberangkatan</label>
-                                    <div class="relative">
-                                        <select id="bookWaktu"
-                                            class="w-full p-3 md:p-4 pl-10 md:pl-12 bg-gray-50 rounded-xl md:rounded-2xl font-bold text-gray-700 focus:outline-none form-input-focus appearance-none text-xs md:text-sm">
-                                            <option value="">-- Pilih Armada Dahulu --</option>
-                                        </select>
-                                        <i
-                                            class="fas fa-clock absolute left-4 md:left-5 top-1/2 -translate-y-1/2 text-gray-400 text-xs md:text-base"></i>
-                                    </div>
-                                </div>
+                        <div id="custBookingTarifBanner" class="p-3 bg-amber-50 border border-amber-200/80 rounded-xl flex items-center justify-between text-xs">
+                            <div class="flex items-center gap-2 text-slate-700">
+                                <i class="fas fa-info-circle text-amber-600 text-sm"></i>
+                                <span id="custBookingInfoText" class="font-bold">Silakan pilih armada, jam, dan rute di atas</span>
                             </div>
+                            <span id="custBookingTarifBadge" class="font-black text-amber-700">Rp 0 / kursi</span>
                         </div>
                     </div>
 
-                    <!-- Section 2: Data Penumpang -->
-                    <div>
-                        <div class="flex items-center gap-3 mb-4 md:mb-6">
-                            <span
-                                class="w-6 h-6 md:w-8 md:h-8 bg-blue-100 text-blue-700 rounded-full flex items-center justify-center font-black text-[10px] md:text-xs">02</span>
-                            <h4
-                                class="font-black text-gray-800 uppercase text-[10px] md:text-xs tracking-widest italic">
-                                Data Penumpang</h4>
-                            <div class="flex-1 h-[1px] bg-gray-100"></div>
+                    <!-- Tombol Aksi Langkah 1: BATAL & NEXT -->
+                    <div class="flex gap-3 pt-2">
+                        <button type="button" onclick="closeBookingModal()" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-600 font-black text-xs uppercase tracking-widest py-3.5 sm:py-4 rounded-xl transition-all active:scale-95">
+                            BATAL
+                        </button>
+                        <button type="button" onclick="goToCustomerBookingStep(2)" class="flex-[2] bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-slate-900 font-black text-xs uppercase tracking-widest py-3.5 sm:py-4 rounded-xl shadow-lg shadow-amber-500/30 transition-all flex items-center justify-center gap-2 active:scale-95">
+                            <span>NEXT</span> <i class="fas fa-arrow-right"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- ========================================== -->
+                <!-- TAHAPAN 2: DATA PENUMPANG (TANPA KURSI)    -->
+                <!-- ========================================== -->
+                <div id="custBookingStepPane2" class="space-y-4 hidden">
+                    <div class="bg-slate-50 p-4 sm:p-5 rounded-2xl border border-slate-200/80 space-y-4">
+                        <div class="flex items-center justify-between border-b border-slate-200/80 pb-3">
+                            <h4 class="text-xs sm:text-sm font-black text-slate-700 uppercase tracking-wider flex items-center gap-2">
+                                <i class="fas fa-user-edit text-amber-500"></i> 2. Pengisian Data Diri Penumpang
+                            </h4>
+                            <span class="text-[10px] bg-amber-100 text-amber-800 font-extrabold px-2.5 py-0.5 rounded-full">Tahap 2 dari 3</span>
                         </div>
 
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5">
-                            <div class="md:col-span-2 relative">
-                                <label class="input-label">Nama Lengkap Sesuai KTP</label>
+                        <!-- Catatan: Pemilihan Kursi Dilakukan Admin -->
+                        <div class="p-3 bg-blue-50 border border-blue-200/80 rounded-xl flex items-center gap-2.5 text-blue-900 text-xs">
+                            <i class="fas fa-info-circle text-blue-600 text-sm shrink-0"></i>
+                            <span class="font-medium"><b>Catatan:</b> Pemilihan kursi dilakukan oleh <b>Admin Agen</b> saat verifikasi pesanan. Nomor kursi resmi akan tertera pada E-Ticket Anda.</span>
+                        </div>
+
+                        <div class="relative">
+                            <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Nama Lengkap Sesuai KTP *</label>
+                            <div class="relative">
                                 <input type="text" id="bookNama" placeholder="Contoh: Budi Santoso"
-                                    class="w-full p-3 md:p-4 bg-gray-50 rounded-xl md:rounded-2xl font-bold text-gray-700 focus:outline-none form-input-focus text-xs md:text-sm"
+                                    class="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 pl-11 text-sm font-bold text-slate-700 outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-200/50 transition-all"
                                     oninput="handlePelangganInput(this.value)" autocomplete="off">
-                                <div id="pelangganAutocomplete" class="absolute z-[400] w-full bg-white rounded-xl shadow-2xl border border-gray-100 hidden mt-1 max-h-48 overflow-y-auto">
+                                <i class="fas fa-user absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-sm pointer-events-none"></i>
+                            </div>
+                            <div id="pelangganAutocomplete" class="absolute z-[400] w-full bg-white rounded-xl shadow-2xl border border-gray-100 hidden mt-1 max-h-48 overflow-y-auto"></div>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Nomor WhatsApp *</label>
+                                <div class="relative">
+                                    <input type="tel" id="bookHp" placeholder="0821xxxx"
+                                        class="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 pl-11 text-sm font-bold text-slate-700 outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-200/50 transition-all">
+                                    <i class="fab fa-whatsapp absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-sm pointer-events-none"></i>
                                 </div>
                             </div>
                             <div>
-                                <label class="input-label">Nomor WhatsApp</label>
-                                <input type="tel" id="bookHp" placeholder="0821xxxx"
-                                    class="w-full p-3 md:p-4 bg-gray-50 rounded-xl md:rounded-2xl font-bold text-gray-700 focus:outline-none form-input-focus text-xs md:text-sm">
+                                <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Jumlah Penumpang *</label>
+                                <div class="flex items-center">
+                                    <button type="button" onclick="document.getElementById('bookJumlah').stepDown(); calculateBookingTotal();" class="bg-slate-200 text-slate-700 font-bold px-4 py-3 rounded-l-xl hover:bg-slate-300 transition-colors active:scale-95">-</button>
+                                    <input type="number" id="bookJumlah" min="1" value="1" oninput="calculateBookingTotal()"
+                                        class="w-full bg-white border-y border-slate-200 px-3 py-3 text-sm font-bold text-slate-700 outline-none text-center focus:border-amber-500 transition-colors">
+                                    <button type="button" onclick="document.getElementById('bookJumlah').stepUp(); calculateBookingTotal();" class="bg-slate-200 text-slate-700 font-bold px-4 py-3 rounded-r-xl hover:bg-slate-300 transition-colors active:scale-95">+</button>
+                                </div>
                             </div>
-                            <div>
-                                <label class="input-label">Jumlah Penumpang</label>
-                                <input type="number" id="bookJumlah" min="1" value="1" oninput="calculateBookingTotal()"
-                                    class="w-full p-3 md:p-4 bg-gray-50 rounded-xl md:rounded-2xl font-black text-gray-700 focus:outline-none form-input-focus text-center text-sm md:text-base">
-                            </div>
-                            <div class="md:col-span-2">
-                                <label class="input-label">Alamat Lengkap</label>
-                                <input type="text" id="bookAlamat" placeholder="Contoh: Jl. Merdeka No. 10 (Opsional)"
-                                    class="w-full p-3 md:p-4 bg-gray-50 rounded-xl md:rounded-2xl font-bold text-gray-700 focus:outline-none form-input-focus text-xs md:text-sm">
-                            </div>
+                        </div>
 
+                        <div>
+                            <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Alamat Lengkap / Titik Jemput (Opsional)</label>
+                            <div class="relative">
+                                <input type="text" id="bookAlamat" placeholder="Contoh: Jl. Merdeka No. 10 / Titik Kumpul"
+                                    class="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 pl-11 text-sm font-bold text-slate-700 outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-200/50 transition-all">
+                                <i class="fas fa-map-marker-alt absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-sm pointer-events-none"></i>
+                            </div>
                         </div>
                     </div>
 
-                    <!-- Section 3: Pembayaran -->
-                    <div
-                        class="bg-slate-50 p-4 md:p-10 rounded-[1.5rem] md:rounded-[2.5rem] border border-slate-100 shadow-inner">
-                        <div class="flex items-center gap-3 mb-6 md:mb-8">
-                            <span
-                                class="w-8 h-8 md:w-10 md:h-10 bg-blue-600 text-white rounded-full flex items-center justify-center font-black text-xs md:text-sm">03</span>
-                            <h4
-                                class="font-black text-slate-800 uppercase text-[10px] md:text-sm tracking-widest italic">
-                                Metode & Total Bayar</h4>
+                    <!-- Tombol Aksi Langkah 2: BACK & NEXT -->
+                    <div class="flex gap-3 pt-2">
+                        <button type="button" onclick="goToCustomerBookingStep(1)" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 font-black text-xs uppercase tracking-widest py-3.5 sm:py-4 rounded-xl transition-all flex items-center justify-center gap-2 active:scale-95">
+                            <i class="fas fa-arrow-left"></i> <span>BACK</span>
+                        </button>
+                        <button type="button" onclick="goToCustomerBookingStep(3)" class="flex-[2] bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-slate-900 font-black text-xs uppercase tracking-widest py-3.5 sm:py-4 rounded-xl shadow-lg shadow-amber-500/30 transition-all flex items-center justify-center gap-2 active:scale-95">
+                            <span>NEXT</span> <i class="fas fa-arrow-right"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- ========================================== -->
+                <!-- TAHAPAN 3: METODE PEMBAYARAN & KONFIRMASI  -->
+                <!-- ========================================== -->
+                <div id="custBookingStepPane3" class="space-y-4 hidden">
+                    <div class="bg-slate-50 p-4 sm:p-5 rounded-2xl border border-slate-200/80 space-y-4">
+                        <div class="flex items-center justify-between border-b border-slate-200/80 pb-3">
+                            <h4 class="text-xs sm:text-sm font-black text-slate-700 uppercase tracking-wider flex items-center gap-2">
+                                <i class="fas fa-money-check-alt text-amber-500"></i> 3. Metode Pembayaran &amp; Konfirmasi
+                            </h4>
+                            <span class="text-[10px] bg-amber-100 text-amber-800 font-extrabold px-2.5 py-0.5 rounded-full">Tahap 3 dari 3</span>
                         </div>
 
-                        <div class="space-y-4 md:space-y-6">
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
-                                <div class="bg-white p-4 md:p-6 rounded-2xl md:rounded-3xl border border-slate-200">
-                                    <p class="text-[9px] md:text-[10px] font-black text-slate-400 uppercase mb-1">Harga
-                                        Satuan</p>
-                                    <input type="text" id="bookHargaSatuan" readonly
-                                        class="w-full bg-transparent font-black text-blue-700 text-base md:text-xl focus:outline-none"
-                                        value="Rp 0">
-                                </div>
-                                <div
-                                    class="bg-blue-600 p-4 md:p-6 rounded-2xl md:rounded-3xl shadow-xl shadow-blue-200">
-                                    <p class="text-[9px] md:text-[10px] font-black text-blue-100 uppercase mb-1">Total
-                                        Pembayaran</p>
-                                    <input type="text" id="bookTotalBayar" readonly
-                                        class="w-full bg-transparent font-black text-white text-base md:text-xl focus:outline-none"
-                                        value="Rp 0">
+                        <!-- Ringkasan Tiket Card -->
+                        <div class="p-4 bg-white rounded-2xl border border-amber-200/80 shadow-xs space-y-2.5">
+                            <div class="flex items-center justify-between border-b border-slate-100 pb-2">
+                                <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Ringkasan Pemesanan</span>
+                                <span class="text-xs font-black text-amber-600 uppercase" id="custSummaryArmada">-</span>
+                            </div>
+                            <div class="grid grid-cols-2 gap-2 text-xs">
+                                <div><span class="text-slate-400">Rute Tujuan:</span> <b id="custSummaryRute" class="text-slate-800 block">-</b></div>
+                                <div><span class="text-slate-400">Jadwal:</span> <b id="custSummaryJadwal" class="text-slate-800 block">-</b></div>
+                                <div><span class="text-slate-400">Penumpang:</span> <b id="custSummaryNama" class="text-slate-800 block">-</b></div>
+                                <div><span class="text-slate-400">Jumlah:</span> <b id="custSummaryPnp" class="text-slate-800 block">1 Penumpang</b></div>
+                                <div class="col-span-2 pt-1 border-t border-slate-100 flex items-center justify-between">
+                                    <span class="text-slate-400">Kursi:</span>
+                                    <span class="text-[11px] font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded-full">Ditentukan oleh Admin</span>
                                 </div>
                             </div>
+                        </div>
 
-                            <div>
-                                <label class="input-label text-slate-500">Pilih Metode Pembayaran</label>
+                        <!-- Display Harga Satuan & Total Pembayaran -->
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+                            <div class="bg-white p-3.5 sm:p-4 rounded-xl border border-slate-200">
+                                <p class="text-[10px] font-black text-slate-400 uppercase tracking-wider mb-0.5">Harga Satuan</p>
+                                <input type="text" id="bookHargaSatuan" readonly
+                                    class="w-full bg-transparent font-black text-blue-700 text-base sm:text-lg focus:outline-none"
+                                    value="Rp 0">
+                            </div>
+                            <div class="bg-gradient-to-r from-blue-600 to-indigo-600 p-3.5 sm:p-4 rounded-xl text-white shadow-md shadow-blue-200">
+                                <p class="text-[10px] font-black text-blue-100 uppercase tracking-wider mb-0.5">Total Pembayaran</p>
+                                <input type="text" id="bookTotalBayar" readonly
+                                    class="w-full bg-transparent font-black text-white text-lg sm:text-xl focus:outline-none"
+                                    value="Rp 0">
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Pilih Metode Pembayaran *</label>
+                            <div class="relative">
                                 <select id="bookMetodeBayar" onchange="showPaymentDetails()"
-                                    class="w-full p-4 md:p-5 bg-white border-2 border-slate-200 rounded-xl md:rounded-[1.5rem] font-black text-slate-700 focus:outline-none focus:border-blue-600 transition-all text-center text-sm md:text-lg">
+                                    class="w-full p-3.5 sm:p-4 bg-white border-2 border-slate-200 rounded-xl font-black text-slate-700 focus:outline-none focus:border-amber-500 transition-all text-xs sm:text-sm">
                                     <option value="">-- Pilih Metode Pembayaran --</option>
                                     <option value="Transfer Mandiri">BANK MANDIRI</option>
                                     <option value="Transfer Seabank">SEABANK</option>
@@ -667,61 +812,51 @@
                                     <option value="QRIS AGEN">QRIS SCAN (OTOMATIS)</option>
                                 </select>
                             </div>
+                        </div>
 
-                            <!-- Payment Detail Box with Copy Function -->
-                            <div id="paymentDetails"
-                                class="hidden animate-fade-in-up bg-white p-4 md:p-8 rounded-xl md:rounded-[2rem] border-2 border-dashed border-blue-200 text-center relative overflow-hidden">
-                                <div id="paymentLogoArea" class="mb-3 md:mb-4 flex justify-center"></div>
-
-                                <div class="flex flex-col items-center gap-2">
-                                    <div id="accountContainer"
-                                        class="flex flex-col items-center justify-center gap-2 w-full">
-                                        <p id="paymentInfoText"
-                                            class="text-xs md:text-base font-black text-blue-900 uppercase italic tracking-wider whitespace-pre-line leading-relaxed">
-                                        </p>
-                                        <button id="copyBtn" onclick="copyAccountInfo()"
-                                            class="hidden bg-blue-100 hover:bg-blue-200 text-blue-700 px-4 py-2 rounded-lg md:rounded-xl text-[9px] md:text-[10px] font-black uppercase tracking-widest transition-all active:scale-90 flex items-center gap-2">
-                                            <i class="fas fa-copy"></i> SALIN NO. REK
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Catatan Pembayaran -->
-                            <div
-                                class="bg-yellow-50 border-l-4 border-yellow-400 p-4 md:p-5 rounded-xl md:rounded-2xl shadow-sm">
-                                <div class="flex gap-3">
-                                    <i class="fas fa-info-circle text-yellow-600 mt-0.5 text-base md:text-lg"></i>
-                                    <p
-                                        class="text-[9px] md:text-[12px] font-black text-yellow-900 uppercase italic leading-relaxed">
-                                        PENTING: Dimohon untuk melakukan pembayaran dahulu sesuai total harga sebelum
-                                        klik
-                                        boking, kemudian sertakan bukti pembayaran ketika klik boking.
+                        <!-- Payment Details Box -->
+                        <div id="paymentDetails"
+                            class="hidden animate-fade-in-up bg-white p-4 sm:p-6 rounded-2xl border-2 border-dashed border-amber-300 text-center relative overflow-hidden space-y-3">
+                            <div id="paymentLogoArea" class="flex justify-center"></div>
+                            <div class="flex flex-col items-center gap-2">
+                                <div id="accountContainer" class="flex flex-col items-center justify-center gap-2 w-full">
+                                    <p id="paymentInfoText"
+                                        class="text-xs sm:text-sm font-black text-slate-800 uppercase italic tracking-wider whitespace-pre-line leading-relaxed">
                                     </p>
+                                    <button type="button" id="copyBtn" onclick="copyAccountInfo()"
+                                        class="hidden bg-amber-100 hover:bg-amber-200 text-amber-800 px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all active:scale-95 flex items-center gap-2">
+                                        <i class="fas fa-copy"></i> SALIN NO. REK
+                                    </button>
                                 </div>
-                            </div>
-
-                            <div>
-                                <label class="input-label text-slate-500">Keterangan Tambahan (Opsional)</label>
-                                <input type="text" id="bookKeterangan" placeholder="Contoh: Dekat kursi depan"
-                                    class="w-full p-4 md:p-5 bg-white border border-slate-200 rounded-xl md:rounded-[1.5rem] font-bold text-slate-700 focus:outline-none form-input-focus text-xs md:text-sm">
                             </div>
                         </div>
+
+                        <!-- Catatan Pembayaran -->
+                        <div class="bg-amber-50 border-l-4 border-amber-400 p-3 sm:p-4 rounded-xl shadow-xs flex gap-3">
+                            <i class="fas fa-info-circle text-amber-600 mt-0.5 text-base shrink-0"></i>
+                            <p class="text-[10px] sm:text-[11px] font-bold text-amber-900 uppercase italic leading-relaxed">
+                                PENTING: Dimohon untuk melakukan pembayaran sesuai total harga sebelum klik BOOKING, lalu sertakan bukti pembayaran saat chat WhatsApp.
+                            </p>
+                        </div>
+
+                        <div>
+                            <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Keterangan Tambahan (Opsional)</label>
+                            <input type="text" id="bookKeterangan" placeholder="Contoh: Titik jemput khusus / catatan supir"
+                                class="w-full p-3 sm:p-3.5 bg-white border border-slate-200 rounded-xl font-bold text-slate-700 focus:outline-none focus:border-amber-500 text-xs sm:text-sm">
+                        </div>
+                    </div>
+
+                    <!-- Tombol Aksi Langkah 3: BACK & BOOKING -->
+                    <div class="flex gap-3 pt-2">
+                        <button type="button" onclick="goToCustomerBookingStep(2)" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 font-black text-xs uppercase tracking-widest py-3.5 sm:py-4 rounded-xl transition-all flex items-center justify-center gap-2 active:scale-95">
+                            <i class="fas fa-arrow-left"></i> <span>BACK</span>
+                        </button>
+                        <button type="button" onclick="submitBooking()" class="flex-[2] bg-green-600 hover:bg-green-700 text-white font-black text-xs uppercase tracking-widest py-3.5 sm:py-4 rounded-xl shadow-lg shadow-green-200 transition-all flex items-center justify-center gap-2 active:scale-95">
+                            <i class="fab fa-whatsapp text-base"></i> <span>BOOKING</span>
+                        </button>
                     </div>
                 </div>
-            </div>
 
-            <!-- Footer Modal Action (Sticky/Fixed at Bottom) -->
-            <div
-                class="p-4 md:p-6 border-t border-gray-100 flex flex-col sm:flex-row gap-2 md:gap-3 bg-gray-50/80 backdrop-blur-sm shrink-0">
-                <button onclick="submitBooking()"
-                    class="flex-[2] bg-green-600 hover:bg-green-700 text-white py-3.5 md:py-5 rounded-xl md:rounded-2xl font-black shadow-lg shadow-green-200 transition-all uppercase tracking-[0.1em] text-[11px] md:text-sm flex items-center justify-center gap-2 md:gap-3 active:scale-95">
-                    <i class="fab fa-whatsapp text-lg md:text-2xl"></i> BOKING
-                </button>
-                <button onclick="closeBookingModal()"
-                    class="flex-1 bg-white hover:bg-gray-100 text-gray-400 py-3.5 md:py-5 rounded-xl md:rounded-2xl font-black transition-all uppercase tracking-widest text-[9px] border border-gray-200 sm:order-first">
-                    Batal
-                </button>
             </div>
         </div>
     </div>
@@ -1977,13 +2112,19 @@
                 f.routes.forEach(r => { const o = document.createElement('option'); o.value = r.dest; o.innerText = r.dest; t.appendChild(o); });
                 f.times.forEach(tm => { const o = document.createElement('option'); o.value = tm; o.innerText = tm; w.appendChild(o); });
             }
+            if (typeof updateCustomerTarifPreview === 'function') updateCustomerTarifPreview();
         }
 
         function calculateBookingTotal() {
             const a = document.getElementById('bookArmada').value, t = document.getElementById('bookTujuan').value, j = parseInt(document.getElementById('bookJumlah').value) || 0;
             const d = document.getElementById('bookTanggal').value;
             const hDisplay = document.getElementById('bookHargaSatuan'), totDisplay = document.getElementById('bookTotalBayar');
-            if (!a || !t || !d) { hDisplay.value = "Rp 0"; totDisplay.value = "Rp 0"; return; }
+            if (!a || !t || !d) { 
+                hDisplay.value = "Rp 0"; 
+                totDisplay.value = "Rp 0"; 
+                if (typeof updateCustomerTarifPreview === 'function') updateCustomerTarifPreview();
+                return; 
+            }
 
             const armada = fleetData.find(f => f.name === a);
             if (armada) {
@@ -2033,11 +2174,153 @@
                     totDisplay.value = formatRupiah(total);
                 }
             }
+            if (typeof updateCustomerTarifPreview === 'function') updateCustomerTarifPreview();
+        }
+
+        let customerBookingStep = 1;
+
+        function goToCustomerBookingStep(step) {
+            // Validasi Step 1 -> Step 2
+            if (customerBookingStep === 1 && step > 1) {
+                const tgl = document.getElementById('bookTanggal').value;
+                const armada = document.getElementById('bookArmada').value;
+                const tujuan = document.getElementById('bookTujuan').value;
+                const waktu = document.getElementById('bookWaktu').value;
+
+                if (!tgl) {
+                    showMessage("Silakan pilih tanggal pemberangkatan!");
+                    document.getElementById('bookTanggal').focus();
+                    return;
+                }
+                if (!armada) {
+                    showMessage("Silakan pilih armada / PO terlebih dahulu!");
+                    document.getElementById('bookArmada').focus();
+                    return;
+                }
+                if (!tujuan) {
+                    showMessage("Silakan pilih rute tujuan / asal!");
+                    document.getElementById('bookTujuan').focus();
+                    return;
+                }
+                if (!waktu) {
+                    showMessage("Silakan pilih jam keberangkatan!");
+                    document.getElementById('bookWaktu').focus();
+                    return;
+                }
+            }
+
+            // Validasi Step 2 -> Step 3
+            if (customerBookingStep === 2 && step > 2) {
+                const nama = document.getElementById('bookNama').value.trim();
+                const hp = document.getElementById('bookHp').value.trim();
+                const jumlah = parseInt(document.getElementById('bookJumlah').value) || 0;
+
+                if (!nama) {
+                    showMessage("Silakan isi nama lengkap penumpang!");
+                    document.getElementById('bookNama').focus();
+                    return;
+                }
+                if (!hp) {
+                    showMessage("Silakan isi nomor WhatsApp!");
+                    document.getElementById('bookHp').focus();
+                    return;
+                }
+                if (jumlah < 1) {
+                    showMessage("Jumlah penumpang minimal 1 orang!");
+                    document.getElementById('bookJumlah').focus();
+                    return;
+                }
+            }
+
+            customerBookingStep = step;
+
+            for (let i = 1; i <= 3; i++) {
+                const badge = document.getElementById('custBookingStepBadge' + i);
+                const pane = document.getElementById('custBookingStepPane' + i);
+                if (badge) {
+                    badge.classList.remove('active', 'completed');
+                    if (i === step) badge.classList.add('active');
+                    else if (i < step) badge.classList.add('completed');
+                }
+                if (pane) {
+                    pane.classList.toggle('hidden', i !== step);
+                }
+            }
+
+            if (step === 3) {
+                updateCustomerBookingSummary();
+            }
+
+            const modalContainer = document.querySelector('.booking-modal-container');
+            if (modalContainer) modalContainer.scrollTop = 0;
+        }
+
+        function updateCustomerBookingSummary() {
+            const a = document.getElementById('bookArmada')?.value || '-';
+            const t = document.getElementById('bookTujuan')?.value || '-';
+            const w = document.getElementById('bookWaktu')?.value || '-';
+            const d = document.getElementById('bookTanggal')?.value || '';
+            const n = document.getElementById('bookNama')?.value || '-';
+            const j = document.getElementById('bookJumlah')?.value || '1';
+            const tot = document.getElementById('bookTotalBayar')?.value || 'Rp 0';
+            const tipe = document.querySelector('input[name="bookTipePerjalanan"]:checked')?.value || 'Berangkat';
+
+            let fd = d;
+            if (d && d.includes('-')) {
+                const [yyyy, mm, dd] = d.split('-');
+                const dObj = new Date(parseInt(yyyy), parseInt(mm) - 1, parseInt(dd));
+                const INDO_DAYS = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+                const INDO_MONTHS = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+                fd = INDO_DAYS[dObj.getDay()] + ', ' + dObj.getDate() + ' ' + INDO_MONTHS[dObj.getMonth()] + ' ' + dObj.getFullYear();
+            } else if (d) {
+                try {
+                    fd = new Date(d).toLocaleDateString('id-ID', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' });
+                } catch (e) {
+                    fd = d;
+                }
+            }
+
+            const sumArmada = document.getElementById('custSummaryArmada');
+            if (sumArmada) sumArmada.innerText = a + ' (' + tipe + ')';
+
+            const sumRute = document.getElementById('custSummaryRute');
+            if (sumRute) sumRute.innerText = t;
+
+            const sumJadwal = document.getElementById('custSummaryJadwal');
+            if (sumJadwal) sumJadwal.innerText = fd + ' • ' + w;
+
+            const sumNama = document.getElementById('custSummaryNama');
+            if (sumNama) sumNama.innerText = n;
+
+            const sumPnp = document.getElementById('custSummaryPnp');
+            if (sumPnp) sumPnp.innerText = j + ' Penumpang';
+        }
+
+        function updateCustomerTarifPreview() {
+            const a = document.getElementById('bookArmada')?.value;
+            const t = document.getElementById('bookTujuan')?.value;
+            const badge = document.getElementById('custBookingTarifBadge');
+            const text = document.getElementById('custBookingInfoText');
+            const hargaSatuan = document.getElementById('bookHargaSatuan')?.value || 'Rp 0';
+
+            if (badge && text) {
+                if (a && t && hargaSatuan !== 'Rp 0') {
+                    text.innerHTML = '<b>' + a + '</b> • Rute: <b>' + t + '</b>';
+                    badge.innerText = hargaSatuan + ' / kursi';
+                } else if (a) {
+                    text.innerHTML = 'Armada: <b>' + a + '</b> (Pilih rute tujuan & jam)';
+                    badge.innerText = 'Rp 0 / kursi';
+                } else {
+                    text.innerText = 'Silakan pilih armada, jam, dan rute di atas';
+                    badge.innerText = 'Rp 0 / kursi';
+                }
+            }
         }
 
         function openBookingModal() { 
             document.getElementById('bookingModal').classList.remove('hidden'); 
             document.body.style.overflow = 'hidden'; 
+            goToCustomerBookingStep(1);
             const dateInput = document.getElementById('bookTanggal');
             if (dateInput && !dateInput.value) {
                 const now = new Date();
@@ -2048,8 +2331,18 @@
                 if (typeof calculateBookingTotal === 'function') calculateBookingTotal();
             }
         }
-        function openBookingWithArmada(name) { openBookingModal(); const aSelect = document.getElementById('bookArmada'); aSelect.value = name; updateBookingFields(); }
-        function closeBookingModal() { document.getElementById('bookingModal').classList.add('hidden'); document.body.style.overflow = 'auto'; }
+        function openBookingWithArmada(name) { 
+            openBookingModal(); 
+            const aSelect = document.getElementById('bookArmada'); 
+            aSelect.value = name; 
+            updateBookingFields(); 
+            goToCustomerBookingStep(1);
+        }
+        function closeBookingModal() { 
+            document.getElementById('bookingModal').classList.add('hidden'); 
+            document.body.style.overflow = 'auto'; 
+            goToCustomerBookingStep(1);
+        }
         function closeSuccessModal() { document.getElementById('successModal').classList.add('hidden'); document.body.style.overflow = 'auto'; }
 
         async function submitBooking() {
@@ -2071,24 +2364,33 @@
                 bookingId += chars.charAt(Math.floor(Math.random() * chars.length));
             }
 
-            // Konversi string harga total (Rp x.xxx) ke angka murni untuk dikirim ke database (opsional tapi disarankan)
             const numericTotal = parseInt(tot.replace(/[^0-9]/g, '')) || 0;
 
-            // Tentukan data rekening berdasarkan pilihan bank
             let rekInfo = "";
             if (mb === "Transfer Mandiri") rekInfo = " (Mandiri: 1800013416526 a.n ISNU FADKHUL ROIS)";
             else if (mb === "Transfer Seabank") rekInfo = " (Seabank: 901528007687 a.n ISNU FADKHUL ROIS)";
             else if (mb === "Saldo Dana") rekInfo = " (Dana: 082133607759 a.n ISNU FADKHUL ROIS)";
 
-            const fd = new Date(d).toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+            let fd = d;
+            if (d && d.includes('-')) {
+                const [yyyy, mm, dd] = d.split('-');
+                const dObj = new Date(parseInt(yyyy), parseInt(mm) - 1, parseInt(dd));
+                const INDO_DAYS = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+                const INDO_MONTHS = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+                fd = INDO_DAYS[dObj.getDay()] + ', ' + dObj.getDate() + ' ' + INDO_MONTHS[dObj.getMonth()] + ' ' + dObj.getFullYear();
+            } else if (d) {
+                fd = new Date(d).toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+            }
+
             let msg = `Halo Admin Agen Damri Kawunganten,\nsaya ingin boking tiket:\n\n*ID Booking:* \`${bookingId}\`\n*Armada:* ${a}\n*Tujuan:* ${t}\n*Tanggal:* ${fd}\n*Waktu:* ${w}\n\n*Nama:* ${n}\n*HP:* ${h}\n*Alamat:* ${alamat || '-'}\n\n*Jumlah Penumpang:* ${j} orang\n*Total Bayar:* ${tot}\n*Metode Pembayaran:* ${mb}${rekInfo}\n\n`;
             if (k.trim()) msg += `*Notes:* ${k}\n`;
 
             // POST Data ke Database
             const submitBtn = document.querySelector('#bookingModal button[onclick="submitBooking()"]');
-            if (submitBtn) { submitBtn.innerText = "Memproses..."; submitBtn.disabled = true; }
+            if (submitBtn) { submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Memproses...'; submitBtn.disabled = true; }
 
             const payload = {
+                "Timestamp": new Date().toISOString(),
                 "TANGGAL PEMBERANGKATAN": fd,
                 "ID_TIKET": bookingId,
                 "JENIS KENDARAAN": a,
@@ -2099,6 +2401,7 @@
                 "WAKTU": w,
                 "NOMOR KURSI": "",
                 "KETERANGAN": k,
+                "Keterangan": k,
                 "ALAMAT": alamat || "-",
                 "Harga": parseInt(document.getElementById('bookHargaSatuan').value.replace(/[^0-9]/g, '')) || 0,
                 "Total Harga": numericTotal,
@@ -2106,9 +2409,13 @@
                 "Status": "Belum ACC"
             };
 
-            await postToSheets('addBooking', payload);
+            try {
+                await postToSheets('addBooking', payload);
+            } catch (err) {
+                console.error("Gagal simpan ke database:", err);
+            }
 
-            if (submitBtn) { submitBtn.innerText = "Kirim Permintaan Booking"; submitBtn.disabled = false; }
+            if (submitBtn) { submitBtn.innerHTML = '<i class="fab fa-whatsapp text-base mr-2"></i> BOOKING'; submitBtn.disabled = false; }
 
             window.open(`https://wa.me/6282133607759?text=${encodeURIComponent(msg)}`, '_blank');
             closeBookingModal();

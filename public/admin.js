@@ -113,6 +113,14 @@
         document.getElementById('sidebarOverlay').classList.toggle('show');
     }
 
+    function closeSidebar() {
+        const sb = document.getElementById('sidebar');
+        const ov = document.getElementById('sidebarOverlay');
+        if (sb) sb.classList.remove('open');
+        if (ov) ov.classList.remove('show');
+    }
+    window.closeSidebar = closeSidebar;
+
     // ========================================
     // MENU SWITCHING
     // ========================================
@@ -134,7 +142,7 @@
         if (target) target.classList.add('active');
 
         // Close sidebar on mobile
-        if (window.innerWidth < 1024) toggleSidebar();
+        if (window.innerWidth < 1024) closeSidebar();
 
         renderAll();
     }
@@ -3705,6 +3713,7 @@
         const name = document.getElementById('adminBookingNama').value;
         const ket = document.getElementById('adminBookingKeterangan').value;
         const alamat = document.getElementById('adminBookingAlamat').value;
+        const rawKet = ket ? ket.trim() : '';
         
         const hasBiayaTambahan = document.querySelector('input[name="adminBookingHasBiayaTambahan"]:checked').value === 'yes';
         const nominalBiayaTambahan = hasBiayaTambahan ? (parseInt(document.getElementById('adminBookingBiayaTambahanNominal').value) || 0) : 0;
@@ -3781,9 +3790,13 @@
 
         try {
             const res = await postToSheets('addBooking', payload);
-            if(res.status === 'success') {
+            if(res && res.status === 'success') {
                 showMessage('Booking berhasil dibuat!');
-                await refreshData(); // Tunggu data baru masuk
+                try {
+                    await refreshData(); // Tunggu data baru masuk
+                } catch(refErr) {
+                    console.warn('refreshData warning:', refErr);
+                }
                 resetAdminBooking();
                 closeBookingModal();
 
@@ -3799,16 +3812,17 @@
                 const now = new Date();
                 const tglBeli = String(now.getDate()).padStart(2, '0') + '/' + String(now.getMonth() + 1).padStart(2, '0') + '/' + now.getFullYear() + ' ' + String(now.getHours()).padStart(2, '0') + ':' + String(now.getMinutes()).padStart(2, '0');
 
-                document.getElementById('r_tgl_beli').innerText = tglBeli;
-                document.getElementById('r_id').innerText = idTiket;
-                document.getElementById('r_tgl').innerText = formattedDate;
-                document.getElementById('r_jam').innerText = payload['WAKTU'];
-                document.getElementById('r_nama').innerText = payload['NAMA'];
-                document.getElementById('r_pnp').innerText = payload['JUMLAH PNP'] + ' Orang';
-                document.getElementById('r_kursi').innerText = kursiString || '-';
-                document.getElementById('r_bus').innerText = payload['JENIS KENDARAAN'];
-                document.getElementById('r_rute').innerText = payload['Tujuan'];
-                document.getElementById('r_harga').innerText = formatRupiah(armada ? armada.price : 0);
+                if (document.getElementById('r_tgl_beli')) document.getElementById('r_tgl_beli').innerText = tglBeli;
+                if (document.getElementById('r_id')) document.getElementById('r_id').innerText = idTiket;
+                if (document.getElementById('r_tgl')) document.getElementById('r_tgl').innerText = formattedDate;
+                if (document.getElementById('r_jam')) document.getElementById('r_jam').innerText = payload['WAKTU'] || '-';
+                if (document.getElementById('r_nama')) document.getElementById('r_nama').innerText = payload['NAMA'] || '-';
+                if (document.getElementById('r_pnp')) document.getElementById('r_pnp').innerText = (payload['JUMLAH PNP'] || qty) + ' Orang';
+                if (document.getElementById('r_kursi')) document.getElementById('r_kursi').innerText = kursiString || '-';
+                if (document.getElementById('r_bus')) document.getElementById('r_bus').innerText = payload['JENIS KENDARAAN'] || '-';
+                if (document.getElementById('r_rute')) document.getElementById('r_rute').innerText = payload['Tujuan'] || '-';
+                if (document.getElementById('r_harga')) document.getElementById('r_harga').innerText = formatRupiah(armada ? armada.price : 0);
+                if (document.getElementById('r_keterangan')) document.getElementById('r_keterangan').innerText = rawKet || '-';
                 
                 if (hasBiayaTambahan && nominalBiayaTambahan > 0) {
                     if(document.getElementById('r_biaya_tambahan_container')) document.getElementById('r_biaya_tambahan_container').style.display = 'flex';
@@ -3818,18 +3832,18 @@
                     if(document.getElementById('r_biaya_tambahan_container')) document.getElementById('r_biaya_tambahan_container').style.display = 'none';
                 }
                 
-                document.getElementById('r_total').innerText = formatRupiah(total);
-                document.getElementById('r_rute_short').innerText = 'KWT - ' + String(payload['Tujuan']).substring(0,3).toUpperCase();
+                if (document.getElementById('r_total')) document.getElementById('r_total').innerText = formatRupiah(total);
+                if (document.getElementById('r_rute_short')) document.getElementById('r_rute_short').innerText = 'KWT - ' + String(payload['Tujuan'] || '').substring(0,3).toUpperCase();
                 
-                document.getElementById('r_bus_arsip').innerText = payload['JENIS KENDARAAN'];
-                document.getElementById('r_pnp_arsip_num').innerText = payload['JUMLAH PNP'];
-                document.getElementById('r_rute_arsip').innerText = payload['Tujuan'];
-                document.getElementById('r_nama_arsip').innerText = payload['NAMA'];
-                document.getElementById('r_tgl_arsip').innerText = formattedDate;
+                if (document.getElementById('r_bus_arsip')) document.getElementById('r_bus_arsip').innerText = payload['JENIS KENDARAAN'] || '-';
+                if (document.getElementById('r_pnp_arsip_num')) document.getElementById('r_pnp_arsip_num').innerText = String(payload['JUMLAH PNP'] || qty);
+                if (document.getElementById('r_rute_arsip')) document.getElementById('r_rute_arsip').innerText = payload['Tujuan'] || '-';
+                if (document.getElementById('r_nama_arsip')) document.getElementById('r_nama_arsip').innerText = payload['NAMA'] || '-';
+                if (document.getElementById('r_tgl_arsip')) document.getElementById('r_tgl_arsip').innerText = formattedDate;
 
                 // Populate E-Ticket Visual Modal (ticket*)
                 let visualAsal = 'Kawunganten';
-                let visualTujuan = payload['Tujuan'];
+                let visualTujuan = payload['Tujuan'] || '';
                 if (visualTujuan && String(visualTujuan).startsWith('[PULANG] ')) {
                     visualAsal = visualTujuan.replace('[PULANG] ', '');
                     visualTujuan = 'KAWUNGANTEN';
@@ -3837,13 +3851,14 @@
 
                 if(document.getElementById('ticketDate')) document.getElementById('ticketDate').innerText = formattedDate;
                 if(document.getElementById('ticketTime')) document.getElementById('ticketTime').innerText = payload['WAKTU'] || '-';
-                if(document.getElementById('ticketArmada')) document.getElementById('ticketArmada').innerText = payload['JENIS KENDARAAN'];
+                if(document.getElementById('ticketArmada')) document.getElementById('ticketArmada').innerText = payload['JENIS KENDARAAN'] || '-';
                 if(document.getElementById('ticketAsal')) document.getElementById('ticketAsal').innerText = visualAsal;
                 if(document.getElementById('ticketTujuan')) document.getElementById('ticketTujuan').innerText = visualTujuan;
                 if(document.getElementById('ticketKursi')) document.getElementById('ticketKursi').innerText = kursiString || '-';
-                if(document.getElementById('ticketQty')) document.getElementById('ticketQty').innerText = payload['JUMLAH PNP'];
+                if(document.getElementById('ticketKeterangan')) document.getElementById('ticketKeterangan').innerText = rawKet || '-';
+                if(document.getElementById('ticketQty')) document.getElementById('ticketQty').innerText = String(payload['JUMLAH PNP'] || qty);
                 if(document.getElementById('ticketId')) document.getElementById('ticketId').innerText = idTiket;
-                if(document.getElementById('ticketName')) document.getElementById('ticketName').innerText = payload['NAMA'];
+                if(document.getElementById('ticketName')) document.getElementById('ticketName').innerText = payload['NAMA'] || '-';
                 if(document.getElementById('ticketTglBeli')) document.getElementById('ticketTglBeli').innerText = "TGL BELI: " + tglBeli;
                 
                 if(document.getElementById('ticketHargaSatuan')) document.getElementById('ticketHargaSatuan').innerText = formatRupiah(armada ? armada.price : 0);
@@ -3863,10 +3878,10 @@
                     }
                 }
 
-                if(document.getElementById('ticketArmadaArsip')) document.getElementById('ticketArmadaArsip').innerText = payload['JENIS KENDARAAN'];
-                if(document.getElementById('ticketNameArsip')) document.getElementById('ticketNameArsip').innerText = payload['NAMA'];
-                if(document.getElementById('ticketQtyArsip')) document.getElementById('ticketQtyArsip').innerText = payload['JUMLAH PNP'];
-                if(document.getElementById('ticketTujuanArsip')) document.getElementById('ticketTujuanArsip').innerText = payload['Tujuan'];
+                if(document.getElementById('ticketArmadaArsip')) document.getElementById('ticketArmadaArsip').innerText = payload['JENIS KENDARAAN'] || '-';
+                if(document.getElementById('ticketNameArsip')) document.getElementById('ticketNameArsip').innerText = payload['NAMA'] || '-';
+                if(document.getElementById('ticketQtyArsip')) document.getElementById('ticketQtyArsip').innerText = String(payload['JUMLAH PNP'] || qty);
+                if(document.getElementById('ticketTujuanArsip')) document.getElementById('ticketTujuanArsip').innerText = payload['Tujuan'] || '-';
                 if(document.getElementById('ticketDateArsip')) document.getElementById('ticketDateArsip').innerText = formattedDate;
 
                 // Prepare WA Link
@@ -3909,18 +3924,20 @@
                     hargaSatuan: formatRupiah(armada ? armada.price : 0),
                     biayaTambahan: hasBiayaTambahan ? nominalBiayaTambahan : 0,
                     biayaTambahanKet: ketBiayaTambahan,
-                    status: statusPay
+                    status: statusPay,
+                    keterangan: rawKet || '-'
                 };
 
                 openEticketModal();
             } else {
-                showMessage('Gagal booking', true);
+                showMessage(res && res.message ? res.message : 'Gagal booking', true);
             }
         } catch(err) {
-            showMessage('Kesalahan jaringan', true);
+            console.error('Error in submitAdminBooking:', err);
+            showMessage('Terjadi kendala jaringan: ' + (err.message || ''), true);
         }
         
-        btn.innerText = 'BOOKING'; btn.disabled = false;
+        btn.innerHTML = '<i class="fas fa-check-double"></i> <span>BOOKING</span>'; btn.disabled = false;
     }
 
     function resetAdminBooking() {
