@@ -1654,9 +1654,12 @@
                 dateInput.value = today;
             }
 
-            // Terapkan konfigurasi cache awal segera
+            // Terapkan konfigurasi cache awal segera (0ms instant render)
             if (typeof applySiteConfig === 'function') {
                 applySiteConfig();
+            }
+            if (typeof loadAndRenderPublicData === 'function') {
+                loadAndRenderPublicData();
             }
 
             try {

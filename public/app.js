@@ -37,6 +37,22 @@ let cachedPoProfiles = {};
 let cachedSiteConfig = null;
 let isDataLoaded = false;
 
+// Pre-hydrate from localStorage for instantaneous 0ms initial render
+try {
+    const _rawA = localStorage.getItem("app_armadas");
+    if (_rawA) cachedArmadas = JSON.parse(_rawA);
+    const _rawP = localStorage.getItem("app_po_profiles");
+    if (_rawP) cachedPoProfiles = JSON.parse(_rawP);
+    const _rawD = localStorage.getItem("app_denah");
+    if (_rawD) cachedDenah = JSON.parse(_rawD);
+    const _rawT = localStorage.getItem("app_tipe_armada");
+    if (_rawT) cachedTipeArmada = JSON.parse(_rawT);
+    const _rawS = localStorage.getItem("app_site_config");
+    if (_rawS) cachedSiteConfig = JSON.parse(_rawS);
+    const _rawB = localStorage.getItem("app_bookings");
+    if (_rawB) cachedBookings = JSON.parse(_rawB);
+} catch(e) {}
+
 // ==========================================
 // 2. NETWORK HELPER (FETCH & POST)
 // ==========================================

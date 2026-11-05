@@ -1,0 +1,90 @@
+[
+  {
+    "idArmada": "ARM-DAMRI-JKT-1",
+    "namaArmada": "DAMRI JAKARTA",
+    "tujuanArmada": "JAKARTA (PULOGEBANG)",
+    "jam": "18.00",
+    "harga": "180000",
+    "seat": 40,
+    "isActive": true,
+    "tipeArmada": "Bus Besar",
+    "denahId": null
+  },
+  {
+    "idArmada": "ARM-DAMRI-JKT-2",
+    "namaArmada": "DAMRI JAKARTA",
+    "tujuanArmada": "JAKARTA (KAMPUNG RAMBUTAN)",
+    "jam": "19.30",
+    "harga": "180000",
+    "seat": 40,
+    "isActive": true,
+    "tipeArmada": "Bus Besar",
+    "denahId": null
+  },
+  {
+    "idArmada": "ARM-DAMRI-SUM-1",
+    "namaArmada": "DAMRI SUMATRA",
+    "tujuanArmada": "LAMPUNG (RAJABASA)",
+    "jam": "09.30",
+    "harga": "280000",
+    "seat": 40,
+    "isActive": true,
+    "tipeArmada": "Bus Besar",
+    "denahId": null
+  },
+  {
+    "idArmada": "ARM-DAMRI-SUM-2",
+    "namaArmada": "DAMRI SUMATRA",
+    "tujuanArmada": "PALEMBANG",
+    "jam": "14.00",
+    "harga": "350000",
+    "seat": 40,
+    "isActive": true,
+    "tipeArmada": "Bus Besar",
+    "denahId": null
+  },
+  {
+    "idArmada": "ARM-EFI-1",
+    "namaArmada": "EFISIENSI",
+    "tujuanArmada": "YOGYAKARTA (GIWANGAN)",
+    "jam": "06.30",
+    "harga": "90000",
+    "seat": 32,
+    "isActive": true,
+    "tipeArmada": "Medium Bus",
+    "denahId": null
+  },
+  {
+    "idArmada": "ARM-77TRANS-1",
+    "namaArmada": "77 TRANS",
+    "tujuanArmada": "SEMARANG (KRAPYAK)",
+    "jam": "08.00",
+    "harga": "160000",
+    "seat": 14,
+    "isActive": true,
+    "tipeArmada": "Hiace",
+    "denahId": null
+  },
+  {
+    "idArmada": "ARM-BEST-1",
+    "namaArmada": "BEST PREMIUM",
+    "tujuanArmada": "BANDUNG (CICAHEUM)",
+    "jam": "18.30",
+    "harga": "170000",
+    "seat": 32,
+    "isActive": true,
+    "tipeArmada": "Bus Besar",
+    "denahId": null
+  },
+  {
+    "idArmada": "ARM-ESTU-1",
+    "namaArmada": "ESTU TRANS",
+    "tujuanArmada": "SURABAYA (PURABAYA)",
+    "jam": "17.00",
+    "harga": "220000",
+    "seat": 32,
+    "isActive": true,
+    "tipeArmada": "Bus Besar",
+    "denahId": null
+  }
+]

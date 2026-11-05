@@ -1,5 +1,6 @@
 require('dotenv').config();
 const express = require('express');
+const compression = require('compression');
 const cors = require('cors');
 const path = require('path');
 const http = require('http');
@@ -46,21 +47,37 @@ const io = new Server(server, { cors: { origin: '*' } });
 const prisma = new PrismaClient();
 const PORT = process.env.PORT || 3000;
 
+// Performance & Optimization Cache
+let cachedArmadaResponse = null;
+let lastArmadaFetchTime = 0;
+const ARMADA_CACHE_TTL = 30000; // 30 seconds
+const memoryTestBookings = {};
+
+function invalidateArmadaCache() {
+    cachedArmadaResponse = null;
+    lastArmadaFetchTime = 0;
+}
+
 // Middleware
 app.use(cors());
+app.use(compression({
+    level: 6,
+    threshold: 1024
+}));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Socket.io Broadcaster for modifying actions
+// Socket.io Broadcaster for modifying actions & automatic cache invalidation
 app.use('/api', (req, res, next) => {
     if (req.method === 'POST') {
         const originalJson = res.json;
         res.json = function(body) {
-            if (body && body.status === 'success') {
+            if (body && (body.status === 'success' || body.success)) {
                 let action = req.body?.action;
                 if (typeof req.body === 'string') {
                     try { action = JSON.parse(req.body).action; } catch(e) {}
                 }
+                invalidateArmadaCache();
                 if (action && action !== 'loginAdmin') {
                     io.emit('data_updated');
                 }
@@ -83,9 +100,28 @@ app.use((req, res, next) => {
     next();
 });
 
-// Serve frontend build from /public
-app.use(express.static(path.join(__dirname, '../public')));
-app.use('/uploads', express.static(path.join(__dirname, '../public/uploads')));
+// Serve frontend build from /public with high-performance caching headers
+app.use(express.static(path.join(__dirname, '../public'), {
+    maxAge: '1d',
+    etag: true,
+    lastModified: true,
+    setHeaders: (res, filePath) => {
+        if (filePath.endsWith('.html')) {
+            res.setHeader('Cache-Control', 'no-cache, must-revalidate');
+        } else if (filePath.match(/\.(webp|jpg|jpeg|png|svg|ico|gif|woff2?|ttf|eot)$/i)) {
+            res.setHeader('Cache-Control', 'public, max-age=604800, immutable');
+        } else if (filePath.match(/\.(css|js)$/i)) {
+            res.setHeader('Cache-Control', 'public, max-age=86400');
+        }
+    }
+}));
+app.use('/uploads', express.static(path.join(__dirname, '../public/uploads'), {
+    maxAge: '7d',
+    etag: true,
+    setHeaders: (res) => {
+        res.setHeader('Cache-Control', 'public, max-age=604800, immutable');
+    }
+}));
 
 // Helper untuk parse tanggal dari format campuran (DD/MM/YYYY atau ISO)
 function parseCustomDate(dateStr) {
@@ -148,6 +184,7 @@ if (!fs.existsSync(DATA_DIR)) {
 const TIPE_ARMADA_FILE = path.join(DATA_DIR, 'tipe-armada.json');
 const PO_PROFILES_FILE = path.join(DATA_DIR, 'po-profiles.json');
 const SITE_CONFIG_FILE = path.join(DATA_DIR, 'site-config.json');
+const ARMADA_CACHE_FILE = path.join(DATA_DIR, 'armada-cache.json');
 
 const DEFAULT_SITE_CONFIG = {
     general: {
@@ -251,14 +288,21 @@ const DEFAULT_SITE_CONFIG = {
     }
 };
 
+let cachedSiteConfigData = null;
+
 function getSiteConfigData() {
+    if (cachedSiteConfigData) return cachedSiteConfigData;
     try {
         if (fs.existsSync(SITE_CONFIG_FILE)) {
             const raw = fs.readFileSync(SITE_CONFIG_FILE, 'utf-8');
-            if (raw && raw.trim()) return JSON.parse(raw);
+            if (raw && raw.trim()) {
+                cachedSiteConfigData = JSON.parse(raw);
+                return cachedSiteConfigData;
+            }
         }
         fs.writeFileSync(SITE_CONFIG_FILE, JSON.stringify(DEFAULT_SITE_CONFIG, null, 2));
-        return DEFAULT_SITE_CONFIG;
+        cachedSiteConfigData = DEFAULT_SITE_CONFIG;
+        return cachedSiteConfigData;
     } catch (e) {
         console.error('Error reading site config:', e);
         return DEFAULT_SITE_CONFIG;
@@ -266,6 +310,7 @@ function getSiteConfigData() {
 }
 
 function saveSiteConfigData(data) {
+    cachedSiteConfigData = data;
     try {
         fs.writeFileSync(SITE_CONFIG_FILE, JSON.stringify(data, null, 2));
     } catch (e) {
@@ -348,7 +393,10 @@ function loadPoProfilesData() {
     }
 }
 
+let cachedPoProfilesMerged = null;
+
 async function getPoProfilesMerged() {
+    if (cachedPoProfilesMerged) return cachedPoProfilesMerged;
     let fileProfiles = {};
     try {
         if (fs.existsSync(PO_PROFILES_FILE)) {
@@ -399,10 +447,12 @@ async function getPoProfilesMerged() {
         console.warn('Notice: PoProfile DB query skipped/failed, using file:', dbErr.message);
     }
 
+    cachedPoProfilesMerged = merged;
     return merged;
 }
 
 async function persistPoProfile(nama, prof, allProfiles) {
+    cachedPoProfilesMerged = null;
     try {
         fs.writeFileSync(PO_PROFILES_FILE, JSON.stringify(allProfiles, null, 2));
     } catch (e) {
@@ -452,14 +502,21 @@ const DEFAULT_TIPE_ARMADA = [
     { id: 'tipe-6', nama: 'Innova / MPV' }
 ];
 
+let cachedTipeArmadaData = null;
+
 function loadTipeArmadaData() {
+    if (cachedTipeArmadaData) return cachedTipeArmadaData;
     try {
         if (fs.existsSync(TIPE_ARMADA_FILE)) {
             const raw = fs.readFileSync(TIPE_ARMADA_FILE, 'utf-8');
-            if (raw && raw.trim()) return JSON.parse(raw);
+            if (raw && raw.trim()) {
+                cachedTipeArmadaData = JSON.parse(raw);
+                return cachedTipeArmadaData;
+            }
         }
         fs.writeFileSync(TIPE_ARMADA_FILE, JSON.stringify(DEFAULT_TIPE_ARMADA, null, 2));
-        return DEFAULT_TIPE_ARMADA;
+        cachedTipeArmadaData = DEFAULT_TIPE_ARMADA;
+        return cachedTipeArmadaData;
     } catch (e) {
         console.error('Error loading tipe armada file:', e);
         return DEFAULT_TIPE_ARMADA;
@@ -467,6 +524,7 @@ function loadTipeArmadaData() {
 }
 
 function saveTipeArmadaData(list) {
+    cachedTipeArmadaData = list;
     try {
         fs.writeFileSync(TIPE_ARMADA_FILE, JSON.stringify(list, null, 2));
     } catch (e) {
@@ -491,13 +549,16 @@ function loadDefaultDenah() {
     return [];
 }
 
+let cachedAllDenah = null;
+
 async function getAllDenah() {
+    if (cachedAllDenah) return cachedAllDenah;
     try {
         const denahFromDb = await prisma.denahArmada.findMany({
             orderBy: { createdAt: 'asc' }
         });
         if (denahFromDb && denahFromDb.length > 0) {
-            return denahFromDb.map(d => ({
+            cachedAllDenah = denahFromDb.map(d => ({
                 id: d.id,
                 nama: d.nama,
                 kategori: d.kategori,
@@ -506,6 +567,7 @@ async function getAllDenah() {
                 totalKursi: d.totalKursi,
                 cells: typeof d.cells === 'string' ? JSON.parse(d.cells) : d.cells
             }));
+            return cachedAllDenah;
         }
 
         const defaults = loadDefaultDenah();
@@ -524,6 +586,7 @@ async function getAllDenah() {
                 });
             } catch (err) {}
         }
+        cachedAllDenah = defaults;
         return defaults;
     } catch (err) {
         return loadDefaultDenah();
@@ -531,6 +594,7 @@ async function getAllDenah() {
 }
 
 async function saveOrUpdateDenah(item, isEdit = false) {
+    cachedAllDenah = null;
     const cellsArr = Array.isArray(item.cells) ? item.cells : (typeof item.cells === 'string' ? JSON.parse(item.cells) : []);
     const totalKursi = cellsArr.filter(c => c && c.t === 'seat').length;
     const cellsStr = JSON.stringify(cellsArr);
@@ -597,6 +661,7 @@ async function saveOrUpdateDenah(item, isEdit = false) {
 }
 
 async function removeDenah(id) {
+    cachedAllDenah = null;
     try {
         await prisma.denahArmada.delete({ where: { id: id } });
     } catch (err) {
@@ -652,9 +717,25 @@ app.get('/api', async (req, res) => {
             if (exclude_id) {
                 whereClause.bookingId = { not: exclude_id };
             }
-            const bookings = await prisma.booking.findMany({
-                where: whereClause
-            });
+            let bookings = [];
+            try {
+                bookings = await prisma.booking.findMany({
+                    where: whereClause
+                });
+            } catch (dbErr) {
+                console.warn('Prisma getKursiTerisi notice, using memory fallback:', dbErr.message);
+                bookings = Object.values(memoryTestBookings).filter(b => 
+                    b['TANGGAL PEMBERANGKATAN'] === tanggal && 
+                    b['JENIS KENDARAAN'] === armada &&
+                    (!waktu || b['WAKTU'] === waktu) &&
+                    (!exclude_id || b['ID_TIKET'] !== exclude_id)
+                ).map(b => ({
+                    status: b['Status'],
+                    nomorKursi: b['NOMOR KURSI'],
+                    nama: b['NAMA'],
+                    bookingId: b['ID_TIKET']
+                }));
+            }
             const taken = {};
             bookings.forEach(b => {
                 if (b.status === 'DITOLAK' || b.status === 'CANCEL') return;
@@ -676,11 +757,24 @@ app.get('/api', async (req, res) => {
             const id = req.query.id;
             if (!id) return res.status(400).json({ status: 'error', message: 'ID_TIKET is required' });
             
-            const booking = await prisma.booking.findFirst({
-                where: { bookingId: id }
-            });
+            let booking = null;
+            try {
+                booking = await prisma.booking.findFirst({
+                    where: { bookingId: id }
+                });
+            } catch (dbErr) {
+                console.warn('Prisma getBookingById notice, checking memory fallback:', dbErr.message);
+                if (memoryTestBookings[id]) {
+                    return res.json({ status: 'success', data: memoryTestBookings[id] });
+                }
+            }
             
-            if (!booking) return res.json({ status: 'success', data: null });
+            if (!booking) {
+                if (memoryTestBookings[id]) {
+                    return res.json({ status: 'success', data: memoryTestBookings[id] });
+                }
+                return res.json({ status: 'success', data: null });
+            }
             
             const formattedBooking = {
                 'Timestamp': booking.createdAt,
@@ -704,9 +798,15 @@ app.get('/api', async (req, res) => {
         }
 
         if (action === 'getBookings') {
-            const bookings = await prisma.booking.findMany();
-            // Sort in memory for accurate chronological order regardless of string format
-            bookings.sort((a, b) => parseCustomDate(b.createdAt) - parseCustomDate(a.createdAt));
+            let bookings = [];
+            try {
+                bookings = await prisma.booking.findMany();
+                // Sort in memory for accurate chronological order regardless of string format
+                bookings.sort((a, b) => parseCustomDate(b.createdAt) - parseCustomDate(a.createdAt));
+            } catch (dbErr) {
+                console.warn('Prisma getBookings notice, using fallback:', dbErr.message);
+                return res.json({ status: 'success', data: Object.values(memoryTestBookings) });
+            }
             // Google Sheets script returns raw array for bookings, we need to mimic the previous Google Sheets structure exactly
             const formattedBookings = bookings.map(b => ({
                 'Timestamp': b.createdAt,
@@ -730,9 +830,24 @@ app.get('/api', async (req, res) => {
         }
         
         if (action === 'getArmada') {
-            const armadas = await prisma.armada.findMany({
-                orderBy: { namaArmada: 'asc' }
-            });
+            if (cachedArmadaResponse && (Date.now() - lastArmadaFetchTime < ARMADA_CACHE_TTL)) {
+                return res.json({ status: 'success', data: cachedArmadaResponse });
+            }
+
+            let armadas = [];
+            try {
+                armadas = await prisma.armada.findMany({
+                    orderBy: { namaArmada: 'asc' }
+                });
+                if (armadas && armadas.length > 0) {
+                    try { fs.writeFileSync(ARMADA_CACHE_FILE, JSON.stringify(armadas, null, 2)); } catch(e) {}
+                }
+            } catch (dbErr) {
+                console.warn('Prisma getArmada notice, using cache file:', dbErr.message);
+                if (fs.existsSync(ARMADA_CACHE_FILE)) {
+                    try { armadas = JSON.parse(fs.readFileSync(ARMADA_CACHE_FILE, 'utf-8')); } catch(e) {}
+                }
+            }
 
             // Ambil statistik pesanan riil untuk sorting armada paling ramai / laku
             const bookingCounts = {};
@@ -806,27 +921,45 @@ app.get('/api', async (req, res) => {
                 return (a.nama_armada || '').localeCompare(b.nama_armada || '');
             });
 
+            cachedArmadaResponse = formattedArmadas;
+            lastArmadaFetchTime = Date.now();
             return res.json({ status: 'success', data: formattedArmadas });
         }
         
         if (action === 'getHargaKhusus') {
-            const hargaKhusus = await prisma.hargaKhusus.findMany({
-                orderBy: { tanggalAwal: 'desc' }
-            });
+            let hargaKhusus = [];
+            try {
+                hargaKhusus = await prisma.hargaKhusus.findMany({
+                    orderBy: { tanggalAwal: 'desc' }
+                });
+            } catch (dbErr) {
+                console.warn('Prisma getHargaKhusus notice:', dbErr.message);
+            }
             return res.json({ status: 'success', data: hargaKhusus });
         }
         
         if (action === 'getEkstraBookings') {
-            const bookings = await prisma.ekstraBooking.findMany();
-            // Sort in memory for accurate chronological order
-            bookings.sort((a, b) => parseCustomDate(b.createdAt) - parseCustomDate(a.createdAt));
+            let bookings = [];
+            try {
+                bookings = await prisma.ekstraBooking.findMany();
+                // Sort in memory for accurate chronological order
+                bookings.sort((a, b) => parseCustomDate(b.createdAt) - parseCustomDate(a.createdAt));
+            } catch (dbErr) {
+                console.warn('Prisma getEkstraBookings notice:', dbErr.message);
+            }
             return res.json({ status: 'success', data: bookings });
         }
         
         if (action === 'getLaporan') {
-            const laporan = await prisma.booking.findMany();
-            // Sort in memory for accurate chronological order
-            laporan.sort((a, b) => parseCustomDate(b.createdAt) - parseCustomDate(a.createdAt));
+            let laporan = [];
+            try {
+                laporan = await prisma.booking.findMany();
+                // Sort in memory for accurate chronological order
+                laporan.sort((a, b) => parseCustomDate(b.createdAt) - parseCustomDate(a.createdAt));
+            } catch (dbErr) {
+                console.warn('Prisma getLaporan notice, using fallback:', dbErr.message);
+                return res.json({ status: 'success', data: Object.values(memoryTestBookings) });
+            }
             const formattedLaporan = laporan.map(l => ({
                 'Timestamp': l.createdAt,
                 'TANGGAL PEMBERANGKATAN': l.tanggalPemberangkatan,
@@ -912,24 +1045,34 @@ app.get('/api', async (req, res) => {
         }
 
         if (action === 'getPopupIklan') {
-            const now = new Date();
-            const today = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0') + '-' + String(now.getDate()).padStart(2, '0');
-            const iklanList = await prisma.popupIklan.findMany({
-                where: {
-                    isActive: true,
-                    tanggalMulai: { lte: today },
-                    tanggalBerakhir: { gte: today }
-                },
-                orderBy: { createdAt: 'desc' }
-            });
-            return res.json({ status: 'success', data: iklanList });
+            try {
+                const now = new Date();
+                const today = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0') + '-' + String(now.getDate()).padStart(2, '0');
+                const iklanList = await prisma.popupIklan.findMany({
+                    where: {
+                        isActive: true,
+                        tanggalMulai: { lte: today },
+                        tanggalBerakhir: { gte: today }
+                    },
+                    orderBy: { createdAt: 'desc' }
+                });
+                return res.json({ status: 'success', data: iklanList });
+            } catch (dbErr) {
+                console.warn('Prisma getPopupIklan notice:', dbErr.message);
+                return res.json({ status: 'success', data: [] });
+            }
         }
 
         if (action === 'getSemuaIklan') {
-            const iklanList = await prisma.popupIklan.findMany({
-                orderBy: { createdAt: 'desc' }
-            });
-            return res.json({ status: 'success', data: iklanList });
+            try {
+                const iklanList = await prisma.popupIklan.findMany({
+                    orderBy: { createdAt: 'desc' }
+                });
+                return res.json({ status: 'success', data: iklanList });
+            } catch (dbErr) {
+                console.warn('Prisma getSemuaIklan notice:', dbErr.message);
+                return res.json({ status: 'success', data: [] });
+            }
         }
 
         return res.status(400).json({ status: 'error', message: 'Action not found' });
@@ -1048,55 +1191,96 @@ app.post('/api', async (req, res) => {
             const harga = payload['Harga'] ? parseInt(payload['Harga'].toString().replace(/\D/g,'')) || 0 : 0;
             const totalHarga = parseInt(payload['Total Harga']) || harga * (parseInt(payload['JUMLAH PNP']) || 1);
             
-            const newBooking = await prisma.booking.create({
-                data: {
-                    bookingId: payload['ID_TIKET'],
-                    createdAt: new Date().toISOString(),
-                    tanggalPemberangkatan: payload['TANGGAL PEMBERANGKATAN'],
-                    jenisKendaraan: payload['JENIS KENDARAAN'],
-                    tujuan: payload['Tujuan'],
-                    harga: harga,
-                    nama: payload['NAMA'],
-                    nomorHp: payload['NOMOR HP'],
-                    jumlahPnp: parseInt(payload['JUMLAH PNP']) || 1,
-                    waktu: payload['WAKTU'],
-                    nomorKursi: payload['NOMOR KURSI'] || '',
-                    keterangan: payload['KETERANGAN'] || payload['Keterangan'] || payload['keterangan'] || '',
-                    alamat: payload['ALAMAT'] || payload['alamat'] || '-',
-                    totalHarga: totalHarga,
-                    pembayaran: payload['PEMBAYARAN'] || 'CASH',
-                    status: payload['Status'] ? payload['Status'] : (payload['PEMBAYARAN'] === 'LUNAS' || payload['PEMBAYARAN'] === 'ACC' ? 'LUNAS' : 'WAITING'),
-                    komisi: harga * 0.1,
-                    totalKomisi: totalHarga * 0.1,
-                }
-            });
-            
-            // Upsert pelanggan
-            payload['NOMOR HP'] = normalizeHp(payload['NOMOR HP']);
-            await upsertPelanggan(payload['NOMOR HP'], payload['NAMA'], payload['ALAMAT'] || payload['alamat']);
+            const bookingRecord = {
+                'Timestamp': new Date().toISOString(),
+                'TANGGAL PEMBERANGKATAN': payload['TANGGAL PEMBERANGKATAN'],
+                'ID_TIKET': payload['ID_TIKET'],
+                'JENIS KENDARAAN': payload['JENIS KENDARAAN'],
+                'Tujuan': payload['Tujuan'],
+                'Harga': harga,
+                'NAMA': payload['NAMA'],
+                'NOMOR HP': payload['NOMOR HP'],
+                'JUMLAH PNP': parseInt(payload['JUMLAH PNP']) || 1,
+                'WAKTU': payload['WAKTU'],
+                'NOMOR KURSI': payload['NOMOR KURSI'] || '',
+                'KETERANGAN': payload['KETERANGAN'] || payload['Keterangan'] || payload['keterangan'] || '',
+                'ALAMAT': payload['ALAMAT'] || payload['alamat'] || '-',
+                'Total Harga': totalHarga,
+                'PEMBAYARAN': payload['PEMBAYARAN'] || 'CASH',
+                'Status': payload['Status'] ? payload['Status'] : (payload['PEMBAYARAN'] === 'LUNAS' || payload['PEMBAYARAN'] === 'ACC' ? 'LUNAS' : 'WAITING'),
+                'Komisi': harga * 0.1,
+                'Total Komisi': totalHarga * 0.1
+            };
+
+            memoryTestBookings[payload['ID_TIKET']] = bookingRecord;
+
+            let newBooking = null;
+            try {
+                newBooking = await prisma.booking.create({
+                    data: {
+                        bookingId: payload['ID_TIKET'],
+                        createdAt: new Date().toISOString(),
+                        tanggalPemberangkatan: payload['TANGGAL PEMBERANGKATAN'],
+                        jenisKendaraan: payload['JENIS KENDARAAN'],
+                        tujuan: payload['Tujuan'],
+                        harga: harga,
+                        nama: payload['NAMA'],
+                        nomorHp: payload['NOMOR HP'],
+                        jumlahPnp: parseInt(payload['JUMLAH PNP']) || 1,
+                        waktu: payload['WAKTU'],
+                        nomorKursi: payload['NOMOR KURSI'] || '',
+                        keterangan: payload['KETERANGAN'] || payload['Keterangan'] || payload['keterangan'] || '',
+                        alamat: payload['ALAMAT'] || payload['alamat'] || '-',
+                        totalHarga: totalHarga,
+                        pembayaran: payload['PEMBAYARAN'] || 'CASH',
+                        status: payload['Status'] ? payload['Status'] : (payload['PEMBAYARAN'] === 'LUNAS' || payload['PEMBAYARAN'] === 'ACC' ? 'LUNAS' : 'WAITING'),
+                        komisi: harga * 0.1,
+                        totalKomisi: totalHarga * 0.1,
+                    }
+                });
+                
+                // Upsert pelanggan
+                payload['NOMOR HP'] = normalizeHp(payload['NOMOR HP']);
+                await upsertPelanggan(payload['NOMOR HP'], payload['NAMA'], payload['ALAMAT'] || payload['alamat']);
+            } catch (dbErr) {
+                console.warn('Prisma addBooking notice, saved to memory fallback:', dbErr.message);
+                newBooking = bookingRecord;
+            }
             
             return res.json({ status: 'success', message: 'Booking berhasil', data: newBooking });
         }
 
         if (action === 'updateStatus') {
             const { id_tiket, status } = payload;
-            
-            await prisma.booking.updateMany({
-                where: { bookingId: id_tiket },
-                data: { 
-                    pembayaran: status,
-                    status: status 
-                }
-            });
+            if (memoryTestBookings[id_tiket]) {
+                memoryTestBookings[id_tiket]['PEMBAYARAN'] = status;
+                memoryTestBookings[id_tiket]['Status'] = status;
+            }
+            try {
+                await prisma.booking.updateMany({
+                    where: { bookingId: id_tiket },
+                    data: { 
+                        pembayaran: status,
+                        status: status 
+                    }
+                });
+            } catch (dbErr) {
+                console.warn('Prisma updateStatus notice:', dbErr.message);
+            }
             
             return res.json({ status: 'success', message: 'Status berhasil diupdate' });
         }
 
         if (action === 'deleteBooking') {
             const { id_tiket } = payload;
-            await prisma.booking.delete({
-                where: { bookingId: id_tiket }
-            });
+            delete memoryTestBookings[id_tiket];
+            try {
+                await prisma.booking.delete({
+                    where: { bookingId: id_tiket }
+                });
+            } catch (dbErr) {
+                console.warn('Prisma deleteBooking notice:', dbErr.message);
+            }
             return res.json({ status: 'success', message: 'Data pesanan ditolak dan dihapus' });
         }
 

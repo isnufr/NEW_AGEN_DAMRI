@@ -42,10 +42,14 @@
     `;
 
     async function loadAllData() {
-        // Tampilkan skeleton sebelum fetch data
-        ['todayTableBody', 'pesananTableBody', 'armadaTableBody'].forEach(id => {
-            if(document.getElementById(id)) document.getElementById(id).innerHTML = SKELETON_HTML;
-        });
+        if (typeof cachedBookings !== 'undefined' && cachedBookings && cachedBookings.length > 0) {
+            renderAll();
+        } else {
+            // Tampilkan skeleton sebelum fetch data jika cache kosong
+            ['todayTableBody', 'pesananTableBody', 'armadaTableBody'].forEach(id => {
+                if(document.getElementById(id)) document.getElementById(id).innerHTML = SKELETON_HTML;
+            });
+        }
 
         isDataLoaded = false;
         await initData();
