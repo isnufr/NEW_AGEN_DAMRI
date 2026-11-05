@@ -223,6 +223,93 @@ function loadPoProfilesData() {
     }
 }
 
+async function getPoProfilesMerged() {
+    let fileProfiles = {};
+    try {
+        if (fs.existsSync(PO_PROFILES_FILE)) {
+            const raw = fs.readFileSync(PO_PROFILES_FILE, 'utf-8');
+            if (raw && raw.trim()) fileProfiles = JSON.parse(raw);
+        }
+    } catch (e) {
+        console.error('Error reading po-profiles.json:', e);
+    }
+
+    let merged = { ...DEFAULT_PO_PROFILES, ...fileProfiles };
+
+    try {
+        if (prisma.poProfile) {
+            const dbProfiles = await prisma.poProfile.findMany();
+            if (dbProfiles && dbProfiles.length > 0) {
+                for (const item of dbProfiles) {
+                    let fac = [];
+                    try { fac = item.facilities ? JSON.parse(item.facilities) : []; } catch(_) { fac = []; }
+                    merged[item.namaArmada] = {
+                        image: item.image || merged[item.namaArmada]?.image || 'damri.webp',
+                        logo: item.logo !== undefined ? item.logo : (merged[item.namaArmada]?.logo || ''),
+                        tagline: item.tagline !== undefined ? item.tagline : (merged[item.namaArmada]?.tagline || ''),
+                        description: item.description !== undefined ? item.description : (merged[item.namaArmada]?.description || ''),
+                        facilities: Array.isArray(fac) && fac.length > 0 ? fac : (merged[item.namaArmada]?.facilities || [])
+                    };
+                }
+            } else {
+                for (const [nama, prof] of Object.entries(merged)) {
+                    try {
+                        await prisma.poProfile.upsert({
+                            where: { namaArmada: nama },
+                            update: {},
+                            create: {
+                                namaArmada: nama,
+                                image: prof.image || 'damri.webp',
+                                logo: prof.logo || '',
+                                tagline: prof.tagline || '',
+                                description: prof.description || '',
+                                facilities: JSON.stringify(prof.facilities || [])
+                            }
+                        });
+                    } catch(seedErr) {}
+                }
+            }
+        }
+    } catch (dbErr) {
+        console.warn('Notice: PoProfile DB query skipped/failed, using file:', dbErr.message);
+    }
+
+    return merged;
+}
+
+async function persistPoProfile(nama, prof, allProfiles) {
+    try {
+        fs.writeFileSync(PO_PROFILES_FILE, JSON.stringify(allProfiles, null, 2));
+    } catch (e) {
+        console.error('Error saving po profiles file:', e);
+    }
+
+    try {
+        if (prisma.poProfile) {
+            await prisma.poProfile.upsert({
+                where: { namaArmada: nama },
+                update: {
+                    image: prof.image || 'damri.webp',
+                    logo: prof.logo !== undefined ? prof.logo : '',
+                    tagline: prof.tagline !== undefined ? prof.tagline : '',
+                    description: prof.description !== undefined ? prof.description : '',
+                    facilities: JSON.stringify(prof.facilities || [])
+                },
+                create: {
+                    namaArmada: nama,
+                    image: prof.image || 'damri.webp',
+                    logo: prof.logo || '',
+                    tagline: prof.tagline || '',
+                    description: prof.description || '',
+                    facilities: JSON.stringify(prof.facilities || [])
+                }
+            });
+        }
+    } catch (dbErr) {
+        console.error('Error saving PoProfile to database:', dbErr);
+    }
+}
+
 function savePoProfilesData(data) {
     try {
         fs.writeFileSync(PO_PROFILES_FILE, JSON.stringify(data, null, 2));
@@ -408,7 +495,7 @@ app.get('/api', async (req, res) => {
         }
 
         if (action === 'getPoProfiles') {
-            const data = loadPoProfilesData();
+            const data = await getPoProfilesMerged();
             return res.json({ status: 'success', data });
         }
 
@@ -995,7 +1082,7 @@ app.post('/api', async (req, res) => {
 
             // Update PO Profile if provided
             if (image || logo !== undefined || description !== undefined || facilities !== undefined || tagline !== undefined) {
-                const profiles = loadPoProfilesData();
+                const profiles = await getPoProfilesMerged();
                 const cleanKey = String(nama_armada || '').trim().toUpperCase();
                 let foundKey = Object.keys(profiles).find(k => k.toUpperCase() === cleanKey) || String(nama_armada || '').trim();
                 profiles[foundKey] = {
@@ -1005,7 +1092,7 @@ app.post('/api', async (req, res) => {
                     description: description !== undefined ? description : (profiles[foundKey]?.description || ''),
                     facilities: Array.isArray(facilities) ? facilities : (profiles[foundKey]?.facilities || [])
                 };
-                savePoProfilesData(profiles);
+                await persistPoProfile(foundKey, profiles[foundKey], profiles);
             }
 
             return res.json({ status: 'success', message: `Profil dan tipe bus PO ${nama_armada} berhasil diperbarui!` });
@@ -1015,7 +1102,7 @@ app.post('/api', async (req, res) => {
             const { nama_armada, image, logo, description, facilities, tagline, tipe_armada, denah_id } = payload;
             if (!nama_armada) return res.status(400).json({ status: 'error', message: 'Nama PO wajib diisi' });
 
-            const profiles = loadPoProfilesData();
+            const profiles = await getPoProfilesMerged();
             const cleanKey = String(nama_armada || '').trim().toUpperCase();
             let foundKey = Object.keys(profiles).find(k => k.toUpperCase() === cleanKey) || String(nama_armada || '').trim();
             profiles[foundKey] = {
@@ -1025,7 +1112,7 @@ app.post('/api', async (req, res) => {
                 description: description !== undefined ? description : (profiles[foundKey]?.description || ''),
                 facilities: Array.isArray(facilities) ? facilities : (profiles[foundKey]?.facilities || [])
             };
-            savePoProfilesData(profiles);
+            await persistPoProfile(foundKey, profiles[foundKey], profiles);
 
             // Also synchronize tipe_armada and denah_id to database if provided
             if (tipe_armada || denah_id) {

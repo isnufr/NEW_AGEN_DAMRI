@@ -109,3 +109,13 @@ model PopupIklan {
   isActive         Boolean  @default(false)
   createdAt        DateTime @default(now())
 }
+
+model PoProfile {
+  namaArmada   String   @id
+  image        String   @default("")
+  logo         String   @default("")
+  tagline      String   @default("")
+  description  String   @db.Text
+  facilities   String   @db.Text
+  updatedAt    DateTime @default(now()) @updatedAt
+}
