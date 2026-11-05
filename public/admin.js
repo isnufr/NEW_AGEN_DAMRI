@@ -1122,18 +1122,7 @@
         const bQty = b.qty || b['JUMLAH PNP'] || 1;
 
         const formatHp = String(b.hp || b['NOMOR HP'] || "").replace(/[^0-9]/g, '').replace(/^0/, '62');
-        const waMsgText = `Halo Sdr/i *${b.name || 'Penumpang'}*,\n\nBerikut rincian tiket perjalanan Anda di *Agen DAMRI Kawunganten*:\n` +
-            `🎫 *No Tiket:* ${bTicketId}\n` +
-            `🚌 *Armada:* ${armadaName}\n` +
-            `📍 *Tujuan:* ${tujuan}\n` +
-            `📅 *Tanggal:* ${b.dateTravel || '-'}\n` +
-            `⏰ *Jam:* ${b.waktu || '-'}\n` +
-            `👥 *Penumpang:* ${bQty} Orang\n` +
-            `🪑 *Kursi:* ${bKursi}\n` +
-            `💰 *Total:* ${formatRupiah(total)}\n` +
-            `📌 *Status:* ${badgeText}\n\n` +
-            `Terima kasih telah menggunakan layanan kami.`;
-        const waLink = `https://wa.me/${formatHp}?text=${encodeURIComponent(waMsgText)}`;
+        const waLink = formatHp ? `https://wa.me/${formatHp}` : '';
         
         let biayaTambahanHtml = '';
         if (nominalBiayaTambahan > 0) {
@@ -1169,7 +1158,7 @@
                         <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-0.5">Nomor HP</p>
                         <div class="flex items-center justify-between gap-2">
                             <span class="font-bold text-slate-800 text-xs sm:text-sm truncate">${b.hp || '-'}</span>
-                            ${formatHp ? `<a href="${waLink}" target="_blank" class="text-emerald-700 bg-emerald-100/80 hover:bg-emerald-200 px-2 py-0.5 rounded text-[10px] font-bold flex items-center gap-1 transition-colors shrink-0" title="Chat WA Langsung"><i class="fab fa-whatsapp"></i> Chat</a>` : ''}
+                            ${formatHp ? `<a href="${waLink}" target="_blank" class="w-8 h-8 rounded-lg bg-emerald-500 hover:bg-emerald-600 active:scale-95 text-white flex items-center justify-center text-lg shadow-sm shadow-emerald-500/20 transition-all shrink-0" title="Chat WhatsApp"><i class="fab fa-whatsapp"></i></a>` : ''}
                         </div>
                     </div>
 
@@ -1421,14 +1410,28 @@
         const rows = document.querySelectorAll('.armada-group-' + index);
         rows.forEach(row => row.classList.toggle('hidden'));
         
+        const isHidden = rows.length > 0 && rows[0].classList.contains('hidden');
         const icon = document.getElementById('icon-armada-' + index);
         if (icon) {
-            if (rows.length > 0 && rows[0].classList.contains('hidden')) {
-                icon.style.transform = 'rotate(0deg)';
+            icon.style.transform = isHidden ? 'rotate(0deg)' : 'rotate(180deg)';
+        }
+        const iconMob = document.getElementById('icon-armada-mob-' + index);
+        if (iconMob) {
+            iconMob.style.transform = isHidden ? 'rotate(0deg)' : 'rotate(180deg)';
+        }
+    };
+
+    window.handleSearchArmadaInput = function() {
+        const input = document.getElementById('searchArmadaInput');
+        const clearBtn = document.getElementById('clearSearchArmadaBtn');
+        if (clearBtn && input) {
+            if (input.value.trim().length > 0) {
+                clearBtn.classList.remove('hidden');
             } else {
-                icon.style.transform = 'rotate(180deg)';
+                clearBtn.classList.add('hidden');
             }
         }
+        renderArmada();
     };
 
     function renderArmada() {
@@ -1436,22 +1439,40 @@
         
         // Filter by Search
         const searchInput = document.getElementById('searchArmadaInput');
+        const clearBtn = document.getElementById('clearSearchArmadaBtn');
         let isSearching = false;
         if (searchInput && searchInput.value.trim() !== '') {
             isSearching = true;
+            if (clearBtn) clearBtn.classList.remove('hidden');
             const query = searchInput.value.toLowerCase().trim();
             armadas = armadas.filter(a => 
-                a.name.toLowerCase().includes(query) || 
-                a.destination.toLowerCase().includes(query) ||
-                a.id.toLowerCase().includes(query)
+                (a.name && a.name.toLowerCase().includes(query)) || 
+                (a.destination && a.destination.toLowerCase().includes(query)) ||
+                (a.id && a.id.toLowerCase().includes(query)) ||
+                (a.tipeArmada && a.tipeArmada.toLowerCase().includes(query))
             );
+        } else {
+            if (clearBtn) clearBtn.classList.add('hidden');
         }
 
         const tbody = document.getElementById('armadaTableBody');
-        if (!tbody) return;
+        const mobileContainer = document.getElementById('armadaMobileContainer');
 
         if (!armadas.length) {
-            tbody.innerHTML = '<tr><td colspan="5" class="text-center text-sm text-slate-400 font-bold py-8 italic uppercase tracking-widest">Belum ada data armada</td></tr>';
+            if (tbody) {
+                tbody.innerHTML = '<tr><td colspan="5" class="text-center text-sm text-slate-400 font-bold py-8 italic uppercase tracking-widest">Belum ada data armada</td></tr>';
+            }
+            if (mobileContainer) {
+                mobileContainer.innerHTML = `
+                    <div class="bg-white rounded-2xl border border-slate-200/90 p-8 text-center shadow-xs">
+                        <div class="w-12 h-12 mx-auto rounded-full bg-slate-100 flex items-center justify-center text-slate-400 mb-3 text-lg">
+                            <i class="fas fa-bus"></i>
+                        </div>
+                        <h4 class="font-black text-sm text-slate-700 uppercase tracking-wider">Tidak Ada Armada</h4>
+                        <p class="text-xs text-slate-400 mt-1">${isSearching ? 'Tidak ditemukan data yang cocok dengan kata kunci pencarian.' : 'Belum ada data armada yang tersimpan.'}</p>
+                    </div>
+                `;
+            }
             return;
         }
 
@@ -1463,7 +1484,8 @@
         });
 
         const sortedKeys = Object.keys(groups).sort();
-        let html = '';
+        let tableHtml = '';
+        let mobileHtml = '';
 
         sortedKeys.forEach((key, index) => {
             // If searching, automatically expand the results
@@ -1479,7 +1501,8 @@
             const poImg = poProf?.image || 'damri.webp';
             const poTagline = poProf?.tagline ? `<span class="hidden md:inline-block text-[10px] font-bold text-slate-500 italic bg-white/80 px-2 py-0.5 rounded-md border border-slate-200">${poProf.tagline}</span>` : '';
 
-            html += `
+            // --- 1. Desktop Table Row HTML ---
+            tableHtml += `
                 <tr class="cursor-pointer bg-blue-50/80 hover:bg-blue-100/90 transition-colors border-b border-blue-200" onclick="toggleArmada('${index}')">
                     <td colspan="5" class="px-3 sm:px-4 py-3">
                         <div class="flex items-center justify-between gap-2 flex-wrap sm:flex-nowrap">
@@ -1504,8 +1527,15 @@
                     </td>
                 </tr>
             `;
+
+            // --- 2. Mobile Card Items for this PO ---
+            let mobileRoutesHtml = '';
+
             groups[key].forEach(a => {
-                html += `
+                const isAct = a.isActive !== false;
+
+                // Desktop Route Row
+                tableHtml += `
                     <tr class="armada-group-${index} ${hiddenClass} hover:bg-slate-50 transition-colors border-b border-slate-100 last:border-0">
                         <td class="pl-8"><span class="font-black text-[10px] text-slate-400">${a.id}</span></td>
                         <td>
@@ -1519,17 +1549,106 @@
                         <td class="text-right"><p class="font-black text-sm text-slate-800">${formatRupiah(a.price)}</p><p class="text-[11px] text-blue-500 font-bold mt-1"><i class="far fa-clock mr-1"></i>${a.time}</p></td>
                         <td class="text-center">
                             <div class="flex gap-1 justify-center">
-                                <button onclick="toggleArmadaStatusAPI('${a.id}', ${!a.isActive})" class="${a.isActive ? 'bg-emerald-500 hover:bg-emerald-600' : 'bg-slate-400 hover:bg-slate-500'} text-white w-7 h-7 flex items-center justify-center rounded-lg text-xs shadow-sm transition-all mx-auto" title="${a.isActive ? 'Nonaktifkan Armada' : 'Aktifkan Armada'}"><i class="fas ${a.isActive ? 'fa-check' : 'fa-times'}"></i></button>
+                                <button onclick="toggleArmadaStatusAPI('${a.id}', ${!isAct})" class="${isAct ? 'bg-emerald-500 hover:bg-emerald-600' : 'bg-slate-400 hover:bg-slate-500'} text-white w-7 h-7 flex items-center justify-center rounded-lg text-xs shadow-sm transition-all mx-auto" title="${isAct ? 'Nonaktifkan Armada' : 'Aktifkan Armada'}"><i class="fas ${isAct ? 'fa-check' : 'fa-times'}"></i></button>
                                 <button onclick="openEditArmadaModal('${a.id}')" class="bg-amber-500 hover:bg-amber-600 text-white w-7 h-7 flex items-center justify-center rounded-lg text-xs shadow-sm transition-all mx-auto" title="Edit Armada"><i class="fas fa-edit"></i></button>
                                 <button onclick="openDeleteArmadaModal('${a.id}')" class="bg-red-500 hover:bg-red-600 text-white w-7 h-7 flex items-center justify-center rounded-lg text-xs shadow-sm transition-all mx-auto" title="Hapus Armada"><i class="fas fa-trash"></i></button>
                             </div>
                         </td>
                     </tr>
                 `;
+
+                // Mobile Route Card
+                mobileRoutesHtml += `
+                    <div class="bg-white rounded-xl p-3 border border-slate-200/90 shadow-2xs hover:border-amber-300 transition-all">
+                        <div class="flex items-start justify-between gap-2">
+                            <div class="flex items-center gap-1.5 flex-wrap flex-1 min-w-0">
+                                <span class="font-mono text-[10px] font-bold text-slate-500 bg-slate-100 px-1.5 py-0.5 rounded border border-slate-200/80">#${a.id}</span>
+                                <span class="font-black text-xs text-slate-800 uppercase tracking-tight truncate">${a.destination}</span>
+                            </div>
+                            <span class="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full shrink-0 ${isAct ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-slate-100 text-slate-500 border border-slate-200'}">
+                                <span class="w-1.5 h-1.5 rounded-full ${isAct ? 'bg-emerald-500 animate-pulse' : 'bg-slate-400'}"></span>
+                                ${isAct ? 'Aktif' : 'Nonaktif'}
+                            </span>
+                        </div>
+
+                        <div class="mt-2.5 pt-2 border-t border-slate-100 flex items-center justify-between gap-2">
+                            <div>
+                                <span class="text-[9px] font-bold text-slate-400 uppercase tracking-wider block">Tarif Tiket</span>
+                                <span class="font-black text-sm text-slate-900">${formatRupiah(a.price)}</span>
+                            </div>
+                            <div class="text-right">
+                                <span class="text-[9px] font-bold text-slate-400 uppercase tracking-wider block">Jam Berangkat</span>
+                                <span class="text-xs font-bold text-blue-600 inline-flex items-center gap-1">
+                                    <i class="far fa-clock text-[10px]"></i> ${a.time || '-'}
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="mt-2.5 pt-2 border-t border-slate-100 flex items-center gap-1.5">
+                            <button type="button" onclick="toggleArmadaStatusAPI('${a.id}', ${!isAct})" class="flex-1 py-1.5 px-2 rounded-lg text-[10px] font-black uppercase tracking-wider flex items-center justify-center gap-1.5 transition-all ${isAct ? 'bg-slate-100 hover:bg-slate-200 text-slate-600' : 'bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200'} active:scale-95">
+                                <i class="fas ${isAct ? 'fa-pause' : 'fa-play'} text-[9px]"></i>
+                                <span>${isAct ? 'Nonaktifkan' : 'Aktifkan'}</span>
+                            </button>
+                            <button type="button" onclick="openEditArmadaModal('${a.id}')" class="px-3 py-1.5 bg-amber-50 hover:bg-amber-100 text-amber-700 border border-amber-200 rounded-lg text-[10px] font-black uppercase tracking-wider flex items-center justify-center gap-1 transition-all active:scale-95" title="Edit Rute">
+                                <i class="fas fa-edit text-[10px]"></i>
+                                <span>Edit</span>
+                            </button>
+                            <button type="button" onclick="openDeleteArmadaModal('${a.id}')" class="w-8 h-7 bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 rounded-lg text-xs flex items-center justify-center transition-all shrink-0 active:scale-95" title="Hapus Rute">
+                                <i class="fas fa-trash text-[10px]"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
             });
+
+            // Mobile PO Card Container
+            mobileHtml += `
+                <div class="bg-white rounded-2xl border border-slate-200/90 shadow-xs overflow-hidden transition-all">
+                    <!-- PO Header (Clickable Accordion) -->
+                    <div class="p-3.5 bg-gradient-to-r from-blue-50/70 to-indigo-50/40 cursor-pointer select-none" onclick="toggleArmada('${index}')">
+                        <div class="flex items-start gap-3">
+                            <img src="${poImg}" alt="${key}" class="w-12 h-12 rounded-xl object-cover border border-amber-300 shadow-2xs shrink-0 mt-0.5" onerror="this.src='damri.webp'">
+                            <div class="flex-1 min-w-0">
+                                <div class="flex items-center justify-between gap-1.5">
+                                    <h3 class="font-black text-sm text-slate-900 uppercase tracking-tight truncate">${key}</h3>
+                                    <span class="inline-flex items-center text-[10px] font-black text-blue-700 bg-blue-100/80 px-2 py-0.5 rounded-full shrink-0">
+                                        ${rutes.length} Rute
+                                    </span>
+                                </div>
+                                <div class="flex items-center gap-1.5 flex-wrap mt-1">
+                                    <span class="text-[10px] font-bold text-slate-600 bg-white/90 border border-slate-200/70 px-2 py-0.5 rounded-lg flex items-center gap-1 shadow-2xs">
+                                        <i class="fas fa-bus text-[9px] text-amber-500"></i> ${poTipe}
+                                    </span>
+                                    <span class="text-[10px] font-bold text-slate-600 bg-white/90 border border-slate-200/70 px-2 py-0.5 rounded-lg flex items-center gap-1 shadow-2xs">
+                                        <i class="fas fa-chair text-[9px] text-slate-400"></i> ${poSeat} Kursi
+                                    </span>
+                                </div>
+                                ${poProf?.tagline ? `<p class="text-[10px] font-medium text-slate-400 italic mt-1 line-clamp-1">${poProf.tagline}</p>` : ''}
+                            </div>
+                        </div>
+
+                        <!-- Action & Toggle Indicator -->
+                        <div class="mt-3 pt-2.5 border-t border-blue-100/80 flex items-center justify-between gap-2">
+                            <button type="button" onclick="event.stopPropagation(); openEditPoModal('${key}')" class="px-2.5 py-1.5 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 text-slate-950 text-[10px] font-black uppercase tracking-wider rounded-xl shadow-xs transition-all flex items-center gap-1.5 active:scale-95">
+                                <i class="fas fa-sliders-h text-[10px]"></i> Kelola Info & Foto PO
+                            </button>
+                            <div class="flex items-center gap-1.5 text-xs font-black text-blue-600 bg-white/90 border border-blue-200/80 px-2.5 py-1.5 rounded-xl shadow-2xs">
+                                <span class="text-[10px] uppercase tracking-wider">Rute</span>
+                                <i class="fas fa-chevron-down text-[10px] transition-transform duration-300" id="icon-armada-mob-${index}" style="transform: ${iconRotate};"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Collapsible Routes -->
+                    <div class="armada-group-${index} ${hiddenClass} bg-slate-50/60 p-2.5 border-t border-slate-100 space-y-2">
+                        ${mobileRoutesHtml}
+                    </div>
+                </div>
+            `;
         });
 
-        tbody.innerHTML = html;
+        if (tbody) tbody.innerHTML = tableHtml;
+        if (mobileContainer) mobileContainer.innerHTML = mobileHtml;
     }
 
     // ========================================
@@ -2673,7 +2792,7 @@
             keterangan: rawKet
         };
 
-        const ruteFullText = asalText + ' ➁E' + tujuan;
+        const ruteFullText = asalText + ' - ' + tujuan;
 
         // Populate Thermal Receipt
         if(document.getElementById('r_tgl_beli')) document.getElementById('r_tgl_beli').innerText = 'TGL BELI: ' + tglBeli;
@@ -2704,8 +2823,27 @@
         // Prepare WA Link
         const hp = b.hp || '';
         const waNum = String(hp).replace(/[^0-9]/g, '').replace(/^0/, '62');
-        const textWa = `*AGEN DAMRI KAWUNGANTEN*\n\nHalo ${b.name}, ini adalah rincian E-Ticketing Anda:\n\n*ID Tiket:* ${b.bookingId}\n*Armada:* ${armadaName}\n*Rute:* ${ruteFullText}\n*Tanggal:* ${formattedDate}\n*Jam:* ${b.waktu || '-'}\n*Jml Penumpang:* ${qty} Orang\n*Total Harga:* ${formatRupiah(total)}\n*Status:* ${statusPay}\n\nTerima kasih telah menggunakan jasa kami!\nWebsite: agendamrikawunganten.net`;
-        currentTicketWaText = `https://wa.me/${waNum}?text=${encodeURIComponent(textWa)}`;
+        const textWa = `AGEN DAMRI KAWUNGANTEN\nPusat Penjualan Tiket\n\n` +
+            `Halo ${b.name}, ini adalah rincian tiket perjalanan Anda:\n\n` +
+            `Kode Booking: ${b.bookingId}\n` +
+            `Armada: ${armadaName}\n` +
+            `Asal: ${asalText}\n` +
+            `Tujuan: ${tujuan}\n` +
+            `Tanggal: ${formattedDate}\n` +
+            `Jam: ${b.waktu || '-'}\n` +
+            `Jumlah Penumpang: ${qty} Orang\n` +
+            `Nomor Kursi: ${b.kursi || '-'}\n` +
+            (rawKet && rawKet !== '-' ? `Keterangan: ${rawKet}\n` : '') +
+            `Harga per Tiket: ${formatRupiah(harga)}\n` +
+            (hasBiayaTambahan ? `Biaya Tambahan: ${formatRupiah(nominalBiayaTambahan)} (${ketTambahan})\n` : '') +
+            `Total Bayar: ${formatRupiah(total)}\n` +
+            `Status Pembayaran: ${statusPay}\n\n` +
+            `HADIR 30 MENIT SEBELUM PEMBERANGKATAN\n` +
+            `TIKET YANG SUDAH DIBOOKING TIDAK BISA DICANCEL MENDADAK (MAX 1x24jam)\n\n` +
+            `Terima Kasih telah menggunakan jasa kami.\n` +
+            `Info: 082133607759\n` +
+            `Website: agendamrikawunganten.net`;
+        currentTicketWaText = waNum ? `https://wa.me/${waNum}?text=${encodeURIComponent(textWa)}` : '';
 
         openEticketModal();
     }
@@ -3730,8 +3868,27 @@
 
                 // Prepare WA Link
                 const waNum = String(hp).replace(/[^0-9]/g, '').replace(/^0/, '62');
-                const textWa = `*AGEN DAMRI KAWUNGANTEN*\n\nHalo ${name}, ini adalah rincian E-Ticketing Anda:\n\n*ID Tiket:* ${idTiket}\n*Armada:* ${payload['JENIS KENDARAAN']}\n*Tujuan:* ${payload['Tujuan']}\n*Tanggal:* ${formattedDate}\n*Jam:* ${payload['WAKTU']}\n*Jml Penumpang:* ${qty} Orang\n*Total Harga:* ${formatRupiah(total)}\n*Status:* ${statusPay}\n\nTerima kasih telah menggunakan jasa kami!\nWebsite: agendamrikawunganten.net`;
-                currentTicketWaText = `https://wa.me/${waNum}?text=${encodeURIComponent(textWa)}`;
+                const textWa = `AGEN DAMRI KAWUNGANTEN\nPusat Penjualan Tiket\n\n` +
+                    `Halo ${name}, ini adalah rincian tiket perjalanan Anda:\n\n` +
+                    `Kode Booking: ${idTiket}\n` +
+                    `Armada: ${payload['JENIS KENDARAAN']}\n` +
+                    `Asal: ${visualAsal}\n` +
+                    `Tujuan: ${visualTujuan}\n` +
+                    `Tanggal: ${formattedDate}\n` +
+                    `Jam: ${payload['WAKTU'] || '-'}\n` +
+                    `Jumlah Penumpang: ${qty} Orang\n` +
+                    `Nomor Kursi: ${kursiString || '-'}\n` +
+                    (rawKet && rawKet !== '-' ? `Keterangan: ${rawKet}\n` : '') +
+                    `Harga per Tiket: ${formatRupiah(armada ? armada.price : 0)}\n` +
+                    (hasBiayaTambahan ? `Biaya Tambahan: ${formatRupiah(nominalBiayaTambahan)} (${ketBiayaTambahan})\n` : '') +
+                    `Total Bayar: ${formatRupiah(total)}\n` +
+                    `Status Pembayaran: ${statusPay}\n\n` +
+                    `HADIR 30 MENIT SEBELUM PEMBERANGKATAN\n` +
+                    `TIKET YANG SUDAH DIBOOKING TIDAK BISA DICANCEL MENDADAK (MAX 1x24jam)\n\n` +
+                    `Terima Kasih telah menggunakan jasa kami.\n` +
+                    `Info: 082133607759\n` +
+                    `Website: agendamrikawunganten.net`;
+                currentTicketWaText = waNum ? `https://wa.me/${waNum}?text=${encodeURIComponent(textWa)}` : '';
 
                 // Simpan data untuk Web Bluetooth API
                 currentTicketDataForBT = {
@@ -5522,19 +5679,8 @@ async function submitEditPo(e) {
             const ruteAsal = ruteParts[0] || item.rute || '-';
             const ruteTujuan = ruteParts.slice(1).join(' - ') || ruteAsal;
 
-            // Generate WhatsApp formatted message
-            const pnpTextList = pnpList.map((p, idx) => `${idx + 1}. ${p.nama} (${formatRupiah(p.harga || 0)})`).join('\n');
-            const waMsg = `Halo Sdr/i *${pnpList[0]?.nama || 'Penumpang'}*,\n\n` +
-                `Berikut rincian tiket *${isPlane ? 'PESAWAT' : 'KAPAL LAUT'}* Anda melalui *Agen DAMRI Kawunganten*:\n\n` +
-                `🎫 *Operator:* ${item.vendor}\n` +
-                `📍 *Rute:* ${item.rute}\n` +
-                `📅 *Tanggal:* ${item.tanggalBerangkat}\n` +
-                `⏰ *Waktu:* ${item.jamBerangkat} WIB\n` +
-                `👥 *Penumpang (${pnpList.length} Org):*\n${pnpTextList}\n\n` +
-                `💰 *Total Bayar:* ${formatRupiah(item.totalHarga)}\n` +
-                `📌 *Status:* ${item.statusPembayaran}\n\n` +
-                `Terima kasih telah memesan tiket bersama Agen DAMRI Kawunganten!`;
-            const waLink = `https://wa.me/${formatHp}?text=${encodeURIComponent(waMsg)}`;
+            // Empty chat WA Link
+            const waLink = formatHp ? `https://wa.me/${formatHp}` : '';
 
             // Body Content HTML (Boarding Pass & Maritime Style)
             const contentEl = document.getElementById('ekstraDetailContent');
@@ -5621,8 +5767,8 @@ async function submitEditPo(e) {
                                 <p class="font-bold text-slate-800 text-xs sm:text-sm mt-0.5">${rawHp || '-'}</p>
                             </div>
                             ${formatHp ? `
-                                <a href="${waLink}" target="_blank" class="px-3 py-1.5 bg-emerald-100 text-emerald-700 hover:bg-emerald-200 active:scale-95 text-xs font-black rounded-xl border border-emerald-300 shadow-2xs transition-all flex items-center gap-1.5 shrink-0" title="Chat WhatsApp Langsung">
-                                    <i class="fab fa-whatsapp text-sm text-emerald-600"></i> Chat WA
+                                <a href="${waLink}" target="_blank" class="w-8 h-8 rounded-lg bg-emerald-500 hover:bg-emerald-600 active:scale-95 text-white flex items-center justify-center text-lg shadow-sm shadow-emerald-500/20 transition-all shrink-0" title="Chat WhatsApp">
+                                    <i class="fab fa-whatsapp"></i>
                                 </a>
                             ` : ''}
                         </div>
@@ -6453,17 +6599,20 @@ function switchArmadaSubtab(sub) {
     const actList = document.getElementById('armadaActionsList');
     const actDenah = document.getElementById('armadaActionsDenah');
 
+    const activeClass = 'flex-1 sm:flex-initial px-4 py-2 rounded-xl font-black text-xs uppercase tracking-wider transition-all bg-slate-900 text-amber-400 shadow-sm flex items-center justify-center gap-2';
+    const inactiveClass = 'flex-1 sm:flex-initial px-4 py-2 rounded-xl font-bold text-xs uppercase tracking-wider transition-all bg-transparent hover:bg-slate-200/60 text-slate-500 hover:text-slate-800 flex items-center justify-center gap-2';
+
     if (sub === 'list') {
-        if (tabList) { tabList.className = 'px-5 py-2.5 rounded-xl font-black text-xs uppercase tracking-widest transition-all bg-slate-900 text-amber-400 shadow-md flex items-center gap-2'; }
-        if (tabDenah) { tabDenah.className = 'px-5 py-2.5 rounded-xl font-black text-xs uppercase tracking-widest transition-all bg-white hover:bg-slate-100 text-slate-600 border border-slate-200 flex items-center gap-2'; }
+        if (tabList) tabList.className = activeClass;
+        if (tabDenah) tabDenah.className = inactiveClass;
         if (paneList) paneList.classList.remove('hidden');
         if (paneDenah) paneDenah.classList.add('hidden');
         if (actList) actList.classList.remove('hidden');
         if (actDenah) actDenah.classList.add('hidden');
         renderArmada();
     } else {
-        if (tabDenah) { tabDenah.className = 'px-5 py-2.5 rounded-xl font-black text-xs uppercase tracking-widest transition-all bg-slate-900 text-amber-400 shadow-md flex items-center gap-2'; }
-        if (tabList) { tabList.className = 'px-5 py-2.5 rounded-xl font-black text-xs uppercase tracking-widest transition-all bg-white hover:bg-slate-100 text-slate-600 border border-slate-200 flex items-center gap-2'; }
+        if (tabDenah) tabDenah.className = activeClass;
+        if (tabList) tabList.className = inactiveClass;
         if (paneDenah) paneDenah.classList.remove('hidden');
         if (paneList) paneList.classList.add('hidden');
         if (actDenah) actDenah.classList.remove('hidden');
