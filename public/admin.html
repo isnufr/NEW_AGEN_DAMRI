@@ -230,27 +230,33 @@
                         <!-- Total Pendapatan -->
                         <div class="bg-gradient-to-br from-slate-800 to-slate-900 rounded-[1.5rem] p-5 text-white shadow-xl shadow-slate-900/20 border border-slate-700 transition-all hover:-translate-y-1 hover:shadow-2xl hover:border-amber-500/50">
                             <div class="flex flex-row items-center justify-between mb-3">
-                                <div class="flex flex-col">
+                                <div class="flex items-center gap-2">
                                     <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest leading-tight">Total Pendapatan</p>
+                                    <button type="button" id="btnEyePendapatan" onclick="toggleDashboardNominal('pendapatan')" class="w-6 h-6 rounded-lg bg-slate-700/80 hover:bg-slate-700 text-slate-400 hover:text-amber-400 flex items-center justify-center transition-all text-xs focus:outline-none shadow-xs active:scale-95 cursor-pointer" title="Klik untuk melihat/sembunyikan nominal">
+                                        <i id="eyeIconPendapatan" class="fas fa-eye-slash"></i>
+                                    </button>
                                 </div>
                                 <div class="w-10 h-10 rounded-xl bg-slate-700 flex items-center justify-center text-amber-500 shadow-inner">
                                     <i class="fas fa-chart-line text-lg"></i>
                                 </div>
                             </div>
-                            <h3 class="text-2xl font-black truncate text-white" id="cardTotalPendapatan">Rp 0</h3>
+                            <h3 class="text-2xl font-black truncate text-white cursor-pointer select-none hover:opacity-85 transition-opacity" id="cardTotalPendapatan" onclick="toggleDashboardNominal('pendapatan')" title="Klik untuk melihat/sembunyikan nominal">Rp ••••••••</h3>
                         </div>
 
                         <!-- Total Omset -->
                         <div class="bg-gradient-to-br from-slate-800 to-slate-900 rounded-[1.5rem] p-5 text-white shadow-xl shadow-slate-900/20 border border-slate-700 transition-all hover:-translate-y-1 hover:shadow-2xl hover:border-amber-500/50">
                             <div class="flex flex-row items-center justify-between mb-3">
-                                <div class="flex flex-col">
+                                <div class="flex items-center gap-2">
                                     <p class="text-[10px] font-bold text-amber-500 uppercase tracking-widest leading-tight">Total Omset</p>
+                                    <button type="button" id="btnEyeOmset" onclick="toggleDashboardNominal('omset')" class="w-6 h-6 rounded-lg bg-slate-700/80 hover:bg-slate-700 text-slate-400 hover:text-amber-400 flex items-center justify-center transition-all text-xs focus:outline-none shadow-xs active:scale-95 cursor-pointer" title="Klik untuk melihat/sembunyikan nominal">
+                                        <i id="eyeIconOmset" class="fas fa-eye-slash"></i>
+                                    </button>
                                 </div>
                                 <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center text-slate-900 shadow-lg shadow-amber-500/30">
                                     <i class="fas fa-wallet text-lg"></i>
                                 </div>
                             </div>
-                            <h3 class="text-2xl font-black truncate text-transparent bg-clip-text bg-gradient-to-r from-amber-200 to-amber-500" id="cardTotalOmset">Rp 0</h3>
+                            <h3 class="text-2xl font-black truncate text-transparent bg-clip-text bg-gradient-to-r from-amber-200 to-amber-500 cursor-pointer select-none hover:opacity-85 transition-opacity" id="cardTotalOmset" onclick="toggleDashboardNominal('omset')" title="Klik untuk melihat/sembunyikan nominal">Rp ••••••••</h3>
                         </div>
                     </div>
 

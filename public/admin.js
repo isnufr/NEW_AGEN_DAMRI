@@ -290,8 +290,64 @@
     }
 
     // ========================================
-    // DASHBOARD
+    // DASHBOARD (DENGAN KONTROL PRIVASI NOMINAL)
     // ========================================
+    let rawTotalPendapatan = 0;
+    let rawTotalOmset = 0;
+    let isPendapatanVisible = localStorage.getItem('show_dashboard_pendapatan') === 'true';
+    let isOmsetVisibility = localStorage.getItem('show_dashboard_omset') === 'true';
+
+    function updateDashboardPendapatanDisplay() {
+        const el = document.getElementById('cardTotalPendapatan');
+        const eye = document.getElementById('eyeIconPendapatan');
+        const btn = document.getElementById('btnEyePendapatan');
+        if (!el) return;
+
+        if (isPendapatanVisible) {
+            el.textContent = formatRupiah(rawTotalPendapatan);
+            el.classList.remove('tracking-widest', 'text-slate-400');
+            if (eye) eye.className = 'fas fa-eye text-amber-400';
+            if (btn) btn.title = 'Sembunyikan Total Pendapatan';
+        } else {
+            el.textContent = 'Rp ••••••••';
+            el.classList.add('tracking-widest', 'text-slate-400');
+            if (eye) eye.className = 'fas fa-eye-slash text-slate-400';
+            if (btn) btn.title = 'Tampilkan Total Pendapatan';
+        }
+    }
+
+    function updateDashboardOmsetDisplay() {
+        const el = document.getElementById('cardTotalOmset');
+        const eye = document.getElementById('eyeIconOmset');
+        const btn = document.getElementById('btnEyeOmset');
+        if (!el) return;
+
+        if (isOmsetVisibility) {
+            el.textContent = formatRupiah(rawTotalOmset);
+            el.classList.remove('tracking-widest');
+            if (eye) eye.className = 'fas fa-eye text-amber-400';
+            if (btn) btn.title = 'Sembunyikan Total Omset';
+        } else {
+            el.textContent = 'Rp ••••••••';
+            el.classList.add('tracking-widest');
+            if (eye) eye.className = 'fas fa-eye-slash text-slate-400';
+            if (btn) btn.title = 'Tampilkan Total Omset';
+        }
+    }
+
+    function toggleDashboardNominal(type) {
+        if (type === 'pendapatan') {
+            isPendapatanVisible = !isPendapatanVisible;
+            localStorage.setItem('show_dashboard_pendapatan', isPendapatanVisible ? 'true' : 'false');
+            updateDashboardPendapatanDisplay();
+        } else if (type === 'omset') {
+            isOmsetVisibility = !isOmsetVisibility;
+            localStorage.setItem('show_dashboard_omset', isOmsetVisibility ? 'true' : 'false');
+            updateDashboardOmsetDisplay();
+        }
+    }
+    window.toggleDashboardNominal = toggleDashboardNominal;
+
     function renderDashboard() {
         const laporan = getLaporan();
         const today = new Date();
@@ -317,7 +373,8 @@
         // Card 3: Total Omset (period)
         const totalOmsetBus = periodData.reduce((s, l) => s + l.totalHarga, 0);
         const totalOmsetEkstra = ekstraPeriod.reduce((s, e) => s + e.totalHarga, 0);
-        document.getElementById('cardTotalOmset').textContent = formatRupiah(totalOmsetBus + totalOmsetEkstra);
+        rawTotalOmset = totalOmsetBus + totalOmsetEkstra;
+        updateDashboardOmsetDisplay();
 
         // Card 4 is removed (was Setoran Hari Ini, but dashboard only has Total Setoran now)
         // const setoranToday = todayData.reduce((s, l) => s + l.totalHarga, 0) - todayData.reduce((s, l) => s + l.totalKomisi, 0);
@@ -326,11 +383,11 @@
         const totalSetoran = futureData.reduce((s, l) => s + l.totalHarga, 0) - futureData.reduce((s, l) => s + l.totalKomisi, 0);
         document.getElementById('cardTotalSetoran').textContent = formatRupiah(totalSetoran);
 
-
         // Card 7: Total Pendapatan (period)
         const totalPendapatanBus = periodData.reduce((s, l) => s + l.totalKomisi, 0);
         const totalPendapatanEkstra = ekstraPeriod.reduce((s, e) => s + e.komisi, 0);
-        document.getElementById('cardTotalPendapatan').textContent = formatRupiah(totalPendapatanBus + totalPendapatanEkstra);
+        rawTotalPendapatan = totalPendapatanBus + totalPendapatanEkstra;
+        updateDashboardPendapatanDisplay();
 
         // Charts
         renderCharts(periodData);
@@ -7196,3 +7253,5 @@ function clearEditBookingSeats() {
     const rawDate = document.getElementById('editBookingDate')?.value;
     loadEditBookingSeatMap(id, armada, rawDate);
 }
+
+    if (typeof toggleDashboardNominal !== 'undefined') window.toggleDashboardNominal = toggleDashboardNominal;
