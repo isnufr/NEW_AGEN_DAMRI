@@ -17,6 +17,7 @@
     // ========================================
     let currentMenu = 'dashboard';
     let currentFilter = 'all';
+    let currentPesananSubtab = 'tiket';
     let chartOmsetInstance = null;
     let chartArmadaInstance = null;
     let chartPenumpangInstance = null;
@@ -116,6 +117,10 @@
     // MENU SWITCHING
     // ========================================
     function switchMenu(menu) {
+        if (menu === 'pelanggan') {
+            menu = 'pesanan';
+            currentPesananSubtab = 'pelanggan';
+        }
         currentMenu = menu;
 
         // Update nav items
@@ -281,7 +286,13 @@
         updateNotifications();
         if (currentMenu === 'dashboard') renderDashboard();
         else if (currentMenu === 'today') renderTodayTable();
-        else if (currentMenu === 'pesanan') renderPesanan();
+        else if (currentMenu === 'pesanan') {
+            if (currentPesananSubtab === 'pelanggan') {
+                renderPelanggan();
+            } else {
+                renderPesanan();
+            }
+        }
         else if (currentMenu === 'armada') renderArmada();
         else if (currentMenu === 'ekstra') renderEkstra();
         else if (currentMenu === 'laporan') renderLaporan();
@@ -5997,12 +6008,51 @@ function exportPelangganCSV() {
     window.location.href = `/api/export-pelanggan?token=${localStorage.getItem('adminToken')}`;
 }
 
-// Ensure renderPelanggan is called when menu switches to pelanggan
+// ==========================================
+// SUBTAB PESANAN & PELANGGAN LOGIC
+// ==========================================
+function switchPesananSubtab(sub) {
+    currentPesananSubtab = sub;
+    const tabTiket = document.getElementById('tabBtnPesananTiket');
+    const tabPelanggan = document.getElementById('tabBtnPesananPelanggan');
+    const paneTiket = document.getElementById('subtabPesananTiket');
+    const panePelanggan = document.getElementById('subtabPesananPelanggan');
+
+    if (sub === 'tiket') {
+        if (tabTiket) {
+            tabTiket.className = 'px-5 py-2.5 rounded-xl font-black text-xs uppercase tracking-widest transition-all bg-slate-900 text-amber-400 shadow-md flex items-center gap-2';
+        }
+        if (tabPelanggan) {
+            tabPelanggan.className = 'px-5 py-2.5 rounded-xl font-black text-xs uppercase tracking-widest transition-all bg-white hover:bg-slate-100 text-slate-600 border border-slate-200 flex items-center gap-2';
+        }
+        if (paneTiket) paneTiket.classList.remove('hidden');
+        if (panePelanggan) panePelanggan.classList.add('hidden');
+        renderPesanan();
+    } else {
+        if (tabPelanggan) {
+            tabPelanggan.className = 'px-5 py-2.5 rounded-xl font-black text-xs uppercase tracking-widest transition-all bg-slate-900 text-amber-400 shadow-md flex items-center gap-2';
+        }
+        if (tabTiket) {
+            tabTiket.className = 'px-5 py-2.5 rounded-xl font-black text-xs uppercase tracking-widest transition-all bg-white hover:bg-slate-100 text-slate-600 border border-slate-200 flex items-center gap-2';
+        }
+        if (panePelanggan) panePelanggan.classList.remove('hidden');
+        if (paneTiket) paneTiket.classList.add('hidden');
+        renderPelanggan();
+    }
+}
+window.switchPesananSubtab = switchPesananSubtab;
+
+// Ensure renderPelanggan / renderPesanan is called when menu switches
 const oldSwitchMenu = switchMenu;
 window.switchMenu = function(menuId) {
-    oldSwitchMenu(menuId);
     if (menuId === 'pelanggan') {
-        renderPelanggan(true);
+        oldSwitchMenu('pesanan');
+        switchPesananSubtab('pelanggan');
+        return;
+    }
+    oldSwitchMenu(menuId);
+    if (menuId === 'pesanan') {
+        switchPesananSubtab(currentPesananSubtab || 'tiket');
     }
     if (menuId === 'iklan') {
         renderIklan();
