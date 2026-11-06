@@ -1193,6 +1193,89 @@
     }
 
     // ========================================
+    // TOAST NOTIFIKASI & SALIN CLIPBOARD
+    // ========================================
+    window.showAdminToast = function(message, isSuccess = true) {
+        const toast = document.getElementById('toast');
+        const toastMessage = document.getElementById('toastMessage');
+        const toastIcon = document.getElementById('toastIcon');
+        if (!toast || !toastMessage) return;
+
+        toastMessage.textContent = message;
+        if (toastIcon) {
+            toastIcon.innerHTML = isSuccess 
+                ? '<i class="fas fa-check text-emerald-400"></i>' 
+                : '<i class="fas fa-exclamation-triangle text-amber-400"></i>';
+            toastIcon.className = isSuccess
+                ? 'w-8 h-8 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0'
+                : 'w-8 h-8 rounded-full bg-amber-500/20 text-amber-400 flex items-center justify-center shrink-0';
+        }
+
+        toast.classList.remove('translate-y-24', 'opacity-0');
+        toast.classList.add('translate-y-0', 'opacity-100');
+
+        clearTimeout(window.__adminToastTimeout);
+        window.__adminToastTimeout = setTimeout(() => {
+            toast.classList.remove('translate-y-0', 'opacity-100');
+            toast.classList.add('translate-y-24', 'opacity-0');
+        }, 2200);
+    };
+
+    window.copyToClipboard = function(text, label = 'Teks', btnElement = null) {
+        if (!text || text === '-' || text === 'undefined' || text === 'null') {
+            window.showAdminToast(`${label} tidak tersedia`, false);
+            return;
+        }
+        const cleanText = String(text).trim();
+
+        const onSuccess = () => {
+            window.showAdminToast(`${label} berhasil disalin!`);
+            if (btnElement) {
+                const originalHtml = btnElement.innerHTML;
+                btnElement.innerHTML = '<i class="fas fa-check text-emerald-600"></i>';
+                btnElement.classList.add('!bg-emerald-50', '!border-emerald-300');
+                setTimeout(() => {
+                    btnElement.innerHTML = originalHtml;
+                    btnElement.classList.remove('!bg-emerald-50', '!border-emerald-300');
+                }, 1400);
+            }
+        };
+
+        const fallbackCopy = (str) => {
+            try {
+                const el = document.createElement('textarea');
+                el.value = str;
+                el.setAttribute('readonly', '');
+                el.style.position = 'fixed';
+                el.style.top = '0';
+                el.style.left = '0';
+                el.style.opacity = '0';
+                document.body.appendChild(el);
+                el.focus();
+                el.select();
+                const successful = document.execCommand('copy');
+                document.body.removeChild(el);
+                if (successful) {
+                    onSuccess();
+                } else {
+                    throw new Error('execCommand returned false');
+                }
+            } catch (err) {
+                console.warn('Fallback copy failed, prompt user:', err);
+                window.prompt(`Salin ${label} secara manual:`, str);
+            }
+        };
+
+        if (navigator.clipboard && window.isSecureContext) {
+            navigator.clipboard.writeText(cleanText)
+                .then(onSuccess)
+                .catch(() => fallbackCopy(cleanText));
+        } else {
+            fallbackCopy(cleanText);
+        }
+    };
+
+    // ========================================
     // BOOKING DETAIL MODAL & ON-CLICK ACTIONS
     // ========================================
     window.openBookingDetailModal = function(id, showAccBtn) {
@@ -1253,7 +1336,13 @@
                 <div class="bg-gradient-to-r from-blue-50 to-indigo-50/70 p-3 sm:p-4 rounded-xl sm:rounded-2xl border border-blue-100/90 flex items-center justify-between gap-2 shadow-xs">
                     <div class="min-w-0 flex-1">
                         <p class="text-[9px] font-black text-blue-500 uppercase tracking-widest leading-none mb-1">KODE BOOKING / TIKET</p>
-                        <p class="font-black text-blue-900 text-base sm:text-xl tracking-tight leading-none truncate">${bTicketId}</p>
+                        <div class="flex items-center gap-2 mt-0.5">
+                            <span class="font-black text-blue-900 text-base sm:text-xl tracking-tight leading-none truncate select-all">${bTicketId}</span>
+                            <button type="button" onclick="copyToClipboard('${bTicketId}', 'Kode Booking', this)" class="inline-flex items-center gap-1 px-2.5 py-1 bg-white hover:bg-blue-100 text-blue-700 hover:text-blue-900 border border-blue-200/90 rounded-lg text-[10px] font-black uppercase tracking-wider transition-all shadow-2xs active:scale-95 shrink-0 cursor-pointer" title="Salin Kode Booking">
+                                <i class="far fa-copy text-xs"></i>
+                                <span>Copy</span>
+                            </button>
+                        </div>
                     </div>
                     <span class="px-2.5 sm:px-3.5 py-1 sm:py-1.5 rounded-full text-[10px] sm:text-xs font-black uppercase tracking-wider shrink-0 ${badgeClass}">${badgeText}</span>
                 </div>
@@ -1263,15 +1352,22 @@
                     <!-- Nama Penumpang -->
                     <div class="col-span-2 sm:col-span-1 bg-slate-50/80 p-2.5 sm:p-3 rounded-xl border border-slate-100">
                         <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-0.5">Nama Penumpang</p>
-                        <p class="font-bold text-slate-800 uppercase text-xs sm:text-sm truncate">${b.name || '-'}</p>
+                        <p class="font-bold text-slate-800 uppercase text-xs sm:text-sm truncate select-all">${b.name || '-'}</p>
                     </div>
 
                     <!-- Nomor HP -->
                     <div class="col-span-2 sm:col-span-1 bg-slate-50/80 p-2.5 sm:p-3 rounded-xl border border-slate-100">
                         <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-0.5">Nomor HP</p>
                         <div class="flex items-center justify-between gap-2">
-                            <span class="font-bold text-slate-800 text-xs sm:text-sm truncate">${b.hp || '-'}</span>
-                            ${formatHp ? `<a href="${waLink}" target="_blank" class="w-8 h-8 rounded-lg bg-emerald-500 hover:bg-emerald-600 active:scale-95 text-white flex items-center justify-center text-lg shadow-sm shadow-emerald-500/20 transition-all shrink-0" title="Chat WhatsApp"><i class="fab fa-whatsapp"></i></a>` : ''}
+                            <span class="font-bold text-slate-800 text-xs sm:text-sm truncate select-all">${b.hp || '-'}</span>
+                            <div class="flex items-center gap-1.5 shrink-0">
+                                ${b.hp && b.hp !== '-' ? `
+                                <button type="button" onclick="copyToClipboard('${b.hp}', 'Nomor HP', this)" class="w-8 h-8 rounded-lg bg-white hover:bg-slate-200 text-slate-600 hover:text-slate-900 border border-slate-200/90 flex items-center justify-center text-xs shadow-2xs transition-all active:scale-95 cursor-pointer" title="Salin Nomor HP">
+                                    <i class="far fa-copy"></i>
+                                </button>
+                                ` : ''}
+                                ${formatHp ? `<a href="${waLink}" target="_blank" class="w-8 h-8 rounded-lg bg-emerald-500 hover:bg-emerald-600 active:scale-95 text-white flex items-center justify-center text-base shadow-sm shadow-emerald-500/20 transition-all shrink-0" title="Chat WhatsApp"><i class="fab fa-whatsapp"></i></a>` : ''}
+                            </div>
                         </div>
                     </div>
 
@@ -5820,9 +5916,15 @@ async function submitEditPo(e) {
                             
                             <!-- Top row: Badge Tipe & Status -->
                             <div class="flex items-center justify-between gap-2 mb-2">
-                                <span class="px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase tracking-widest ${isPlane ? 'bg-blue-600 text-white shadow-2xs' : 'bg-teal-600 text-white shadow-2xs'}">
-                                    ${isPlane ? '✈️ TIKET PESAWAT' : '🚢 TIKET KAPAL LAUT'}
-                                </span>
+                                <div class="flex items-center gap-1.5 flex-wrap">
+                                    <span class="px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase tracking-widest ${isPlane ? 'bg-blue-600 text-white shadow-2xs' : 'bg-teal-600 text-white shadow-2xs'}">
+                                        ${isPlane ? '✈️ TIKET PESAWAT' : '🚢 TIKET KAPAL LAUT'}
+                                    </span>
+                                    <button type="button" onclick="copyToClipboard('${item.id || item.kodeBooking || ''}', 'Kode Tiket', this)" class="inline-flex items-center gap-1 px-2 py-0.5 bg-white hover:bg-slate-100 text-slate-700 border border-slate-200/90 rounded-lg text-[9px] font-extrabold uppercase tracking-wider transition-all shadow-2xs active:scale-95 shrink-0 cursor-pointer" title="Salin ID Tiket">
+                                        <i class="far fa-copy text-[9px]"></i>
+                                        <span>Copy ID</span>
+                                    </button>
+                                </div>
                                 <span class="px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider border shadow-2xs ${statusColor}">
                                     ${item.statusPembayaran}
                                 </span>
@@ -5890,13 +5992,20 @@ async function submitEditPo(e) {
                         <div class="bg-slate-50/80 p-3 sm:p-3.5 rounded-2xl border border-slate-100 flex items-center justify-between gap-2">
                             <div>
                                 <p class="text-[9px] font-bold text-slate-400 uppercase tracking-wider">Kontak Pemesan</p>
-                                <p class="font-bold text-slate-800 text-xs sm:text-sm mt-0.5">${rawHp || '-'}</p>
+                                <p class="font-bold text-slate-800 text-xs sm:text-sm mt-0.5 select-all">${rawHp || '-'}</p>
                             </div>
-                            ${formatHp ? `
-                                <a href="${waLink}" target="_blank" class="w-8 h-8 rounded-lg bg-emerald-500 hover:bg-emerald-600 active:scale-95 text-white flex items-center justify-center text-lg shadow-sm shadow-emerald-500/20 transition-all shrink-0" title="Chat WhatsApp">
-                                    <i class="fab fa-whatsapp"></i>
-                                </a>
-                            ` : ''}
+                            <div class="flex items-center gap-1.5 shrink-0">
+                                ${rawHp && rawHp !== '-' ? `
+                                <button type="button" onclick="copyToClipboard('${rawHp}', 'Nomor HP', this)" class="w-8 h-8 rounded-lg bg-white hover:bg-slate-200 text-slate-600 hover:text-slate-900 border border-slate-200/90 flex items-center justify-center text-xs shadow-2xs transition-all active:scale-95 cursor-pointer" title="Salin Nomor HP">
+                                    <i class="far fa-copy"></i>
+                                </button>
+                                ` : ''}
+                                ${formatHp ? `
+                                    <a href="${waLink}" target="_blank" class="w-8 h-8 rounded-lg bg-emerald-500 hover:bg-emerald-600 active:scale-95 text-white flex items-center justify-center text-base shadow-sm shadow-emerald-500/20 transition-all shrink-0" title="Chat WhatsApp">
+                                        <i class="fab fa-whatsapp"></i>
+                                    </a>
+                                ` : ''}
+                            </div>
                         </div>
 
                         <!-- Rincian Biaya -->
