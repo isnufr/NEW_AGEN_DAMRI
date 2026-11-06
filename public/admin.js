@@ -7663,9 +7663,9 @@ function switchKontrolSubtab(tabKey) {
         const pane = document.getElementById('subtabKontrol' + t.charAt(0).toUpperCase() + t.slice(1));
         if (btn) {
             if (t === tabKey) {
-                btn.className = 'kontrol-subtab-btn px-4 py-2.5 rounded-xl font-black text-xs uppercase tracking-wider transition-all bg-slate-900 text-amber-400 shadow-sm flex items-center gap-2 whitespace-nowrap shrink-0';
+                btn.className = 'kontrol-subtab-btn px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-xl font-black text-xs uppercase tracking-wider transition-all bg-slate-900 text-amber-400 shadow-sm flex items-center gap-1.5 sm:gap-2 whitespace-nowrap shrink-0';
             } else {
-                btn.className = 'kontrol-subtab-btn px-4 py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider transition-all bg-white text-slate-600 hover:bg-slate-100 border border-slate-200 shadow-sm flex items-center gap-2 whitespace-nowrap shrink-0';
+                btn.className = 'kontrol-subtab-btn px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider transition-all bg-white text-slate-600 hover:bg-slate-100 border border-slate-200 shadow-xs flex items-center gap-1.5 sm:gap-2 whitespace-nowrap shrink-0';
             }
         }
         if (pane) {
@@ -7826,50 +7826,50 @@ function renderKontrolPayments() {
         else if (p.type === 'ewallet' || p.id === 'dana') iconClass = 'fa-wallet text-sky-500';
 
         return `
-            <div class="bg-white p-5 rounded-3xl border ${isActive ? 'border-amber-300 shadow-md shadow-amber-500/5' : 'border-slate-200 opacity-75'} transition-all space-y-4">
+            <div class="bg-white p-4 sm:p-5 rounded-2xl sm:rounded-3xl border ${isActive ? 'border-amber-300 shadow-sm sm:shadow-md shadow-amber-500/5' : 'border-slate-200 opacity-75'} transition-all space-y-3.5 sm:space-y-4">
                 <div class="flex items-center justify-between border-b border-slate-100 pb-3">
-                    <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 rounded-2xl ${isActive ? 'bg-amber-100 text-amber-700' : 'bg-slate-100 text-slate-400'} flex items-center justify-center text-lg font-black shrink-0">
+                    <div class="flex items-center gap-2.5 sm:gap-3">
+                        <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl sm:rounded-2xl ${isActive ? 'bg-amber-100 text-amber-700' : 'bg-slate-100 text-slate-400'} flex items-center justify-center text-base sm:text-lg font-black shrink-0">
                             <i class="fas ${iconClass}"></i>
                         </div>
                         <div>
-                            <h4 class="font-black text-slate-800 text-sm tracking-tight">${pTitle}</h4>
-                            <span class="text-[10px] font-bold uppercase tracking-wider ${isQris ? 'text-amber-600' : 'text-slate-400'}">${isQris ? 'SCAN QRIS RESMI' : (p.type === 'ewallet' ? 'E-WALLET' : 'TRANSFER BANK')}</span>
+                            <h4 class="font-black text-slate-800 text-xs sm:text-sm tracking-tight uppercase">${pTitle}</h4>
+                            <span class="text-[9px] sm:text-[10px] font-bold uppercase tracking-wider ${isQris ? 'text-amber-600' : 'text-slate-400'}">${isQris ? 'SCAN QRIS RESMI' : (p.type === 'ewallet' ? 'E-WALLET' : 'TRANSFER BANK')}</span>
                         </div>
                     </div>
-                    <div class="flex items-center gap-2">
+                    <div class="flex items-center gap-1.5 sm:gap-2">
                         <label class="relative inline-flex items-center cursor-pointer">
                             <input type="checkbox" class="sr-only peer" ${isActive ? 'checked' : ''} onchange="toggleKontrolPaymentStatus('${p.id}')">
-                            <div class="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-amber-500"></div>
+                            <div class="w-10 sm:w-11 h-5 sm:h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 sm:after:h-5 after:w-4 sm:after:w-5 after:transition-all peer-checked:bg-amber-500"></div>
                         </label>
-                        <span class="text-[10px] font-black uppercase px-2 py-0.5 rounded-md ${isActive ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-400'}">
+                        <span class="text-[9px] sm:text-[10px] font-black uppercase px-2 py-0.5 rounded-md ${isActive ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-400'}">
                             ${isActive ? 'AKTIF' : 'NONAKTIF'}
                         </span>
                     </div>
                 </div>
 
                 ${isQris ? `
-                    <div class="flex flex-col sm:flex-row items-center gap-4 bg-slate-50 p-3.5 rounded-2xl border border-slate-200">
-                        <img src="${pQrImg}" alt="QRIS" class="w-24 h-24 object-contain rounded-xl border border-slate-200 bg-white p-1 shrink-0" onerror="this.src='qris.webp'">
+                    <div class="flex flex-col sm:flex-row items-center gap-3.5 bg-slate-50 p-3 sm:p-3.5 rounded-xl sm:rounded-2xl border border-slate-200">
+                        <img src="${pQrImg}" alt="QRIS" class="w-20 h-20 sm:w-24 sm:h-24 object-contain rounded-xl border border-slate-200 bg-white p-1 shrink-0" onerror="this.src='qris.webp'">
                         <div class="flex-1 w-full space-y-2">
                             <div>
-                                <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Nama Usaha / Merchant (a.n) *</label>
+                                <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Nama Usaha / Merchant (a.n) *</label>
                                 <input type="text" value="${pAtasNama}" onchange="updateKontrolPaymentField('${p.id}', 'atasNama', this.value)" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold text-slate-700 outline-none focus:border-amber-500" placeholder="Contoh: AGEN DAMRI KAWUNGANTEN">
                             </div>
-                            <button type="button" onclick="openModalUploadQris()" class="w-full py-2 bg-amber-500 hover:bg-amber-600 text-slate-900 rounded-xl text-[10px] font-black uppercase tracking-wider shadow-xs transition-all flex items-center justify-center gap-1.5">
+                            <button type="button" onclick="openModalUploadQris()" class="w-full py-2 bg-amber-500 hover:bg-amber-600 text-slate-900 rounded-xl text-[10px] font-black uppercase tracking-wider shadow-xs transition-all flex items-center justify-center gap-1.5 active:scale-95">
                                 <i class="fas fa-camera"></i> Ganti Gambar QRIS
                             </button>
                         </div>
                     </div>
                 ` : `
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3">
                         <div>
-                            <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Nomor Rekening / No. HP *</label>
-                            <input type="text" value="${pNoRek}" onchange="updateKontrolPaymentField('${p.id}', 'nomorRekening', this.value)" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-xs font-bold text-slate-700 outline-none focus:border-amber-500 focus:bg-white" placeholder="Contoh: 1800013416526">
+                            <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Nomor Rekening / No. HP *</label>
+                            <input type="text" value="${pNoRek}" onchange="updateKontrolPaymentField('${p.id}', 'nomorRekening', this.value)" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold text-slate-700 outline-none focus:border-amber-500 focus:bg-white" placeholder="Contoh: 1800013416526">
                         </div>
                         <div>
-                            <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Atas Nama (Pemilik) *</label>
-                            <input type="text" value="${pAtasNama}" onchange="updateKontrolPaymentField('${p.id}', 'atasNama', this.value)" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-xs font-bold text-slate-700 outline-none focus:border-amber-500 focus:bg-white" placeholder="Contoh: ISNU FADKHUL ROIS">
+                            <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Atas Nama (Pemilik) *</label>
+                            <input type="text" value="${pAtasNama}" onchange="updateKontrolPaymentField('${p.id}', 'atasNama', this.value)" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold text-slate-700 outline-none focus:border-amber-500 focus:bg-white" placeholder="Contoh: ISNU FADKHUL ROIS">
                         </div>
                     </div>
                 `}
@@ -8127,23 +8127,23 @@ function renderKontrolFacilities() {
         const desc = f.description || '-';
 
         return `
-            <div class="bg-white rounded-3xl border ${isActive ? 'border-amber-300 shadow-md shadow-amber-500/5' : 'border-slate-200 opacity-60'} overflow-hidden flex flex-col transition-all">
+            <div class="bg-white rounded-2xl sm:rounded-3xl border ${isActive ? 'border-amber-300 shadow-xs sm:shadow-sm' : 'border-slate-200 opacity-60'} overflow-hidden flex flex-col transition-all">
                 <div class="aspect-[16/10] overflow-hidden bg-slate-100 relative">
                     <img src="${img}" alt="${title}" class="w-full h-full object-cover" onerror="this.src='damri.webp'">
-                    <span class="absolute top-3 left-3 bg-slate-900/85 backdrop-blur-xs text-amber-400 text-[10px] font-black px-2.5 py-1 rounded-full uppercase tracking-wider shadow-sm flex items-center gap-1">
-                        <i class="fas fa-tag text-[9px]"></i> ${tag}
+                    <span class="absolute top-2.5 left-2.5 bg-slate-900/85 backdrop-blur-xs text-amber-400 text-[9px] sm:text-[10px] font-black px-2.5 py-1 rounded-full uppercase tracking-wider shadow-sm flex items-center gap-1">
+                        <i class="fas fa-tag text-[8px]"></i> ${tag}
                     </span>
-                    <span class="absolute top-3 right-3 text-[9px] font-black uppercase px-2 py-0.5 rounded-md ${isActive ? 'bg-emerald-500 text-white' : 'bg-slate-700 text-slate-200'}">
+                    <span class="absolute top-2.5 right-2.5 text-[8px] sm:text-[9px] font-black uppercase px-2 py-0.5 rounded-md ${isActive ? 'bg-emerald-500 text-white' : 'bg-slate-700 text-slate-200'}">
                         ${isActive ? 'AKTIF' : 'NONAKTIF'}
                     </span>
                 </div>
-                <div class="p-5 flex-1 flex flex-col justify-between space-y-4">
+                <div class="p-3.5 sm:p-4 flex-1 flex flex-col justify-between space-y-3">
                     <div>
-                        <h4 class="font-black text-slate-800 text-base tracking-tight uppercase">${title}</h4>
-                        <p class="text-xs text-slate-500 font-semibold mt-1.5 leading-relaxed line-clamp-3">${desc}</p>
+                        <h4 class="font-black text-slate-800 text-sm sm:text-base tracking-tight uppercase leading-snug line-clamp-1">${title}</h4>
+                        <p class="text-[11px] sm:text-xs text-slate-500 font-medium mt-1 leading-relaxed line-clamp-2 sm:line-clamp-3">${desc}</p>
                     </div>
-                    <div class="pt-3 border-t border-slate-100 flex items-center justify-between gap-2">
-                        <button type="button" onclick="toggleFacilityStatus('${f.id}')" class="px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-wider transition-all ${isActive ? 'bg-amber-100 text-amber-800 hover:bg-amber-200' : 'bg-emerald-100 text-emerald-800 hover:bg-emerald-200'}">
+                    <div class="pt-2.5 border-t border-slate-100 flex items-center justify-between gap-2">
+                        <button type="button" onclick="toggleFacilityStatus('${f.id}')" class="px-2.5 py-1.5 rounded-xl text-[9px] sm:text-[10px] font-black uppercase tracking-wider transition-all ${isActive ? 'bg-amber-100 text-amber-800 hover:bg-amber-200' : 'bg-emerald-100 text-emerald-800 hover:bg-emerald-200'}">
                             ${isActive ? 'Nonaktifkan' : 'Aktifkan'}
                         </button>
                         <div class="flex items-center gap-1.5">
@@ -8471,7 +8471,7 @@ async function saveKontrolConfig() {
     } finally {
         if (saveBtn) {
             saveBtn.disabled = false;
-            saveBtn.innerHTML = '<i class="fas fa-save"></i> <span>Simpan Semua Perubahan</span>';
+            saveBtn.innerHTML = '<i class="fas fa-save"></i> <span>Simpan Perubahan</span>';
         }
     }
 }
