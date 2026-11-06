@@ -325,12 +325,21 @@ const DEFAULT_SITE_CONFIG = {
 let cachedSiteConfigData = null;
 
 function getSiteConfigData() {
-    if (cachedSiteConfigData) return cachedSiteConfigData;
+    if (cachedSiteConfigData) {
+        if (!cachedSiteConfigData.facilities || !Array.isArray(cachedSiteConfigData.facilities) || cachedSiteConfigData.facilities.length === 0) {
+            cachedSiteConfigData.facilities = DEFAULT_SITE_CONFIG.facilities;
+        }
+        return cachedSiteConfigData;
+    }
     try {
         if (fs.existsSync(SITE_CONFIG_FILE)) {
             const raw = fs.readFileSync(SITE_CONFIG_FILE, 'utf-8');
             if (raw && raw.trim()) {
                 cachedSiteConfigData = JSON.parse(raw);
+                if (!cachedSiteConfigData.facilities || !Array.isArray(cachedSiteConfigData.facilities) || cachedSiteConfigData.facilities.length === 0) {
+                    cachedSiteConfigData.facilities = DEFAULT_SITE_CONFIG.facilities;
+                    fs.writeFileSync(SITE_CONFIG_FILE, JSON.stringify(cachedSiteConfigData, null, 2));
+                }
                 return cachedSiteConfigData;
             }
         }

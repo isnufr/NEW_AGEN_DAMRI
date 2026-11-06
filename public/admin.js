@@ -7620,6 +7620,41 @@ function clearEditBookingSeats() {
 let kontrolConfigData = null;
 let currentKontrolSubtab = 'profil';
 
+const DEFAULT_AGEN_FACILITIES = [
+    {
+        id: "fac-1",
+        title: "Tampak Depan Agen",
+        tag: "Titik Kumpul",
+        image: "damri.webp",
+        description: "Lokasi agen strategis di Kawunganten, mudah dijangkau dengan plang resmi dan titik kumpul yang jelas.",
+        isActive: true
+    },
+    {
+        id: "fac-2",
+        title: "Ruang Tunggu Penumpang",
+        tag: "Kenyamanan",
+        image: "estutrans.webp",
+        description: "Area tempat duduk yang nyaman dan teduh bagi calon penumpang selagi menunggu kedatangan armada.",
+        isActive: true
+    },
+    {
+        id: "fac-3",
+        title: "Kamar Mandi & Toilet",
+        tag: "Kebersihan",
+        image: "bestpremium.webp",
+        description: "Tersedia fasilitas toilet bersih dan terawat yang dapat digunakan oleh seluruh penumpang agen.",
+        isActive: true
+    },
+    {
+        id: "fac-4",
+        title: "Area Parkir Kendaraan",
+        tag: "Keamanan",
+        image: "efisiensi.webp",
+        description: "Area parkir yang luas dan aman untuk kendaraan pengantar, penjemput, maupun titip motor/mobil.",
+        isActive: true
+    }
+];
+
 function switchKontrolSubtab(tabKey) {
     currentKontrolSubtab = tabKey;
     const tabs = ['profil', 'pembayaran', 'fasilitas', 'hero', 'kebijakan', 'footer'];
@@ -7637,19 +7672,28 @@ function switchKontrolSubtab(tabKey) {
             pane.classList.toggle('hidden', t !== tabKey);
         }
     });
+
+    if (tabKey === 'fasilitas') {
+        if (!kontrolConfigData || !kontrolConfigData.facilities || !kontrolConfigData.facilities.length) {
+            renderKontrol().then(() => renderKontrolFacilities());
+        } else {
+            renderKontrolFacilities();
+        }
+    }
 }
 
 async function renderKontrol() {
     const section = document.getElementById('sec-kontrol');
     if (!section) return;
 
-    let cfg = typeof getSiteConfig === 'function' ? getSiteConfig() : null;
-    if (!cfg) {
-        try {
-            cfg = await fetchFromSheets('getSiteConfig');
-        } catch(e) {
-            console.error('Gagal mengambil site config:', e);
-        }
+    let cfg = null;
+    try {
+        cfg = await fetchFromSheets('getSiteConfig');
+    } catch(e) {
+        console.error('Gagal mengambil site config:', e);
+    }
+    if (!cfg && typeof getSiteConfig === 'function') {
+        cfg = getSiteConfig();
     }
     if (!cfg) {
         cfg = {
@@ -7679,6 +7723,7 @@ async function renderKontrol() {
                 { id: "dana", name: "DANA", type: "ewallet", accountNumber: "082133607759", accountName: "ISNU FADKHUL ROIS", isActive: true },
                 { id: "qris", name: "QRIS SCAN (Semua Bank / E-Wallet)", type: "qris", qrImage: "qris.webp", accountName: "AGEN DAMRI KAWUNGANTEN", isActive: true }
             ],
+            facilities: DEFAULT_AGEN_FACILITIES,
             policy: {
                 cancellationPolicy: "HADIR 30 MENIT SEBELUM PEMBERANGKATAN\nTIKET YANG SUDAH DIBOOKING TIDAK BISA DICANCEL MENDAK (MAX 1x24jam)",
                 seatSelectionNotice: "Pemilihan kursi dilakukan oleh Admin Agen saat verifikasi pesanan. Nomor kursi resmi akan tertera pada E-Ticket Anda."
@@ -7694,6 +7739,9 @@ async function renderKontrol() {
     }
 
     kontrolConfigData = JSON.parse(JSON.stringify(cfg));
+    if (!kontrolConfigData.facilities || !Array.isArray(kontrolConfigData.facilities) || kontrolConfigData.facilities.length === 0) {
+        kontrolConfigData.facilities = JSON.parse(JSON.stringify(DEFAULT_AGEN_FACILITIES));
+    }
 
     // Subtab 1: Profil
     const elNama = document.getElementById('cfgNamaAgen');
@@ -7755,8 +7803,8 @@ async function renderKontrol() {
     if (elCopy) elCopy.value = kontrolConfigData.social?.copyright || kontrolConfigData.social?.copyrightText || '';
 
     // Subtab 6: Fasilitas Agen
-    if (!kontrolConfigData.facilities || !Array.isArray(kontrolConfigData.facilities)) {
-        kontrolConfigData.facilities = [];
+    if (!kontrolConfigData.facilities || !Array.isArray(kontrolConfigData.facilities) || kontrolConfigData.facilities.length === 0) {
+        kontrolConfigData.facilities = JSON.parse(JSON.stringify(DEFAULT_AGEN_FACILITIES));
     }
     renderKontrolFacilities();
 }
