@@ -6208,67 +6208,88 @@ document.addEventListener('click', (e) => {
 // ==========================================
 // DATA PELANGGAN LOGIC
 // ==========================================
+// DATA PELANGGAN & CRM LOGIC (MOBILE-FIRST)
+// ==========================================
 let pelangganData = [];
 let currentPagePelanggan = 1;
 const itemsPerPagePelanggan = 25;
 
 async function renderPelanggan(resetPage = false) {
     if (resetPage) currentPagePelanggan = 1;
-    const search = document.getElementById('pelangganSearch').value;
+    const searchInput = document.getElementById('pelangganSearch');
+    const search = searchInput ? searchInput.value.trim() : '';
     
     try {
         const res = await fetch(`/api?action=getPelangganTable&search=${encodeURIComponent(search)}&page=${currentPagePelanggan}&limit=${itemsPerPagePelanggan}`);
         const data = await res.json();
         
         const tbody = document.getElementById('pelangganTableBody');
+        if (!tbody) return;
         tbody.innerHTML = '';
         
-        if (data.status === 'success' && data.data.length > 0) {
-            data.data.forEach(p => {
-                const tr = document.createElement('tr');
-                tr.className = 'border-b border-slate-50 hover:bg-slate-50/50 transition-colors group';
-                tr.innerHTML = `
-                    <td class="p-4">
-                        <div class="flex items-center gap-3">
-                            <div class="w-8 h-8 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center font-bold text-xs shrink-0">${p.nama.charAt(0).toUpperCase()}</div>
-                            <span class="font-bold text-slate-700 text-sm">${p.nama}</span>
+        pelangganData = (data.status === 'success' && Array.isArray(data.data)) ? data.data : [];
+        
+        if (pelangganData.length > 0) {
+            tbody.innerHTML = pelangganData.map(p => {
+                const safeName = String(p.nama || 'Tanpa Nama').trim();
+                const initial = (safeName.charAt(0) || 'P').toUpperCase();
+                const safeHp = String(p.nomorHp || '-').trim();
+                const rawAlamat = String(p.alamat || '-').trim();
+                const displayAlamat = (rawAlamat && rawAlamat !== '-' && rawAlamat !== 'null') ? rawAlamat : '-';
+                const safeHpParam = safeHp.replace(/'/g, "\\'");
+
+                return `
+                <tr class="border-b border-slate-100 hover:bg-amber-50/70 active:bg-amber-100/60 transition-colors cursor-pointer group" onclick="openPelangganDetailModal('${safeHpParam}')">
+                    <td class="w-[36%] sm:w-[32%] py-3.5 px-3 sm:px-5 font-black text-xs sm:text-sm text-slate-800 tracking-tight whitespace-nowrap truncate">
+                        <div class="flex items-center gap-2 min-w-0">
+                            <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-amber-100 text-amber-700 font-black text-[11px] sm:text-xs flex items-center justify-center shrink-0 border border-amber-200/60">
+                                ${initial}
+                            </div>
+                            <span class="font-black text-slate-800 text-xs sm:text-sm uppercase truncate block" title="${safeName}">
+                                ${safeName}
+                            </span>
                         </div>
                     </td>
-                    <td class="p-4">
-                        <span class="font-semibold text-slate-600 text-sm"><i class="fab fa-whatsapp text-emerald-500 mr-2"></i>${p.nomorHp}</span>
+                    <td class="w-[32%] sm:w-[30%] py-3.5 px-2 sm:px-4 font-bold text-xs sm:text-sm text-slate-600 font-mono tracking-tight truncate" title="${safeHp}">
+                        <span class="truncate block text-slate-700 font-semibold">${safeHp}</span>
                     </td>
-                    <td class="p-4">
-                        <span class="font-semibold text-slate-500 text-sm truncate max-w-[150px] inline-block" title="${p.alamat || '-'}">${p.alamat || '-'}</span>
+                    <td class="w-[26%] sm:w-[32%] py-3.5 px-2 sm:px-4 font-bold text-[11px] sm:text-xs text-slate-500 truncate" title="${displayAlamat}">
+                        <span class="truncate block ${displayAlamat === '-' ? 'text-slate-300' : 'text-slate-600'}">
+                            ${displayAlamat}
+                        </span>
                     </td>
-                    <td class="p-4 text-center">
-                        <span class="inline-flex items-center justify-center px-2 py-1 rounded-lg bg-blue-50 text-blue-600 text-xs font-black">${p.totalBooking} Order</span>
+                    <td class="w-[6%] py-3.5 px-1 sm:px-2 text-center text-slate-300 group-hover:text-amber-500 group-hover:translate-x-0.5 transition-all">
+                        <i class="fas fa-chevron-right text-[10px] sm:text-xs"></i>
                     </td>
-                    <td class="p-4 text-center">
-                        <span class="text-xs font-semibold text-slate-500">${new Date(p.createdAt).toLocaleDateString('id-ID', {day: 'numeric', month: 'short', year: 'numeric'})}</span>
-                    </td>
-                    <td class="p-4 text-center">
-                        <div class="flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                            <button onclick="openEditPelangganModal('${p.nomorHp}', '${p.nama.replace(/'/g, "\\'")}', '${(p.alamat || "").replace(/'/g, "\\'")}')" class="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white flex items-center justify-center transition-colors" title="Edit Nama">
-                                <i class="fas fa-edit text-sm"></i>
-                            </button>
-                            <button onclick="deletePelanggan('${p.nomorHp}')" class="w-8 h-8 rounded-lg bg-red-50 text-red-600 hover:bg-red-600 hover:text-white flex items-center justify-center transition-colors" title="Hapus Pelanggan">
-                                <i class="fas fa-trash text-sm"></i>
-                            </button>
-                        </div>
-                    </td>
-                `;
-                tbody.appendChild(tr);
-            });
+                </tr>`;
+            }).join('');
             
-            document.getElementById('pelangganPageInfo').textContent = `Halaman ${data.page} dari ${data.totalPages}`;
-            document.getElementById('btnPrevPelanggan').disabled = data.page <= 1;
-            document.getElementById('btnNextPelanggan').disabled = data.page >= data.totalPages;
+            const pageInfo = document.getElementById('pelangganPageInfo');
+            if (pageInfo) pageInfo.textContent = `Halaman ${data.page || 1} dari ${data.totalPages || 1} (${data.totalItems || pelangganData.length} Kontak)`;
+            
+            const btnPrev = document.getElementById('btnPrevPelanggan');
+            const btnNext = document.getElementById('btnNextPelanggan');
+            if (btnPrev) btnPrev.disabled = (data.page || 1) <= 1;
+            if (btnNext) btnNext.disabled = (data.page || 1) >= (data.totalPages || 1);
             
         } else {
-            tbody.innerHTML = '<tr><td colspan="5" class="text-center py-8 text-slate-400 font-bold text-sm">Tidak ada data pelanggan.</td></tr>';
-            document.getElementById('pelangganPageInfo').textContent = 'Halaman 1 dari 1';
-            document.getElementById('btnPrevPelanggan').disabled = true;
-            document.getElementById('btnNextPelanggan').disabled = true;
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="4" class="text-center py-12 px-4 bg-slate-50/50">
+                        <div class="w-12 h-12 bg-amber-100 text-amber-600 rounded-2xl flex items-center justify-center mx-auto mb-3 text-lg">
+                            <i class="fas fa-users-slash"></i>
+                        </div>
+                        <p class="text-xs sm:text-sm font-black text-slate-700 uppercase tracking-wider">Tidak ada data pelanggan</p>
+                        <p class="text-[11px] text-slate-400 font-medium mt-1">Data kontak pelanggan akan otomatis tersimpan dari pemesanan tiket.</p>
+                    </td>
+                </tr>
+            `;
+            const pageInfo = document.getElementById('pelangganPageInfo');
+            if (pageInfo) pageInfo.textContent = 'Halaman 1 dari 1';
+            const btnPrev = document.getElementById('btnPrevPelanggan');
+            const btnNext = document.getElementById('btnNextPelanggan');
+            if (btnPrev) btnPrev.disabled = true;
+            if (btnNext) btnNext.disabled = true;
         }
     } catch (err) {
         console.error('Error load pelanggan:', err);
@@ -6277,16 +6298,238 @@ async function renderPelanggan(resetPage = false) {
 
 function changePagePelanggan(delta) {
     currentPagePelanggan += delta;
+    if (currentPagePelanggan < 1) currentPagePelanggan = 1;
     renderPelanggan();
 }
 
+// ==========================================
+// MODAL DETAIL DATA PELANGGAN & CRM
+// ==========================================
+function openPelangganDetailModal(hp) {
+    const p = pelangganData.find(x => String(x.nomorHp).trim() === String(hp).trim());
+    if (!p) {
+        console.error("Data pelanggan tidak ditemukan:", hp);
+        return;
+    }
+
+    const modal = document.getElementById('pelangganDetailModal');
+    const inner = document.getElementById('pelangganDetailModalInner');
+    const content = document.getElementById('pelangganDetailContent');
+    const actions = document.getElementById('pelangganDetailActions');
+    if (!modal || !content || !actions) return;
+
+    const safeName = String(p.nama || 'Tanpa Nama').trim();
+    const initial = (safeName.charAt(0) || 'P').toUpperCase();
+    const safeHp = String(p.nomorHp || '-').trim();
+    const rawAlamat = String(p.alamat || '-').trim();
+    const displayAlamat = (rawAlamat && rawAlamat !== '-' && rawAlamat !== 'null') ? rawAlamat : '-';
+    const totalOrder = parseInt(p.totalBooking) || 1;
+
+    // Loyalty Tier
+    let tierText = 'PELANGGAN BARU';
+    let tierClass = 'bg-amber-100 text-amber-800 border-amber-300';
+    if (totalOrder >= 5) {
+        tierText = '⭐ PELANGGAN PRIORITAS (VIP)';
+        tierClass = 'bg-emerald-100 text-emerald-800 border-emerald-300';
+    } else if (totalOrder >= 2) {
+        tierText = 'PELANGGAN REGULER';
+        tierClass = 'bg-blue-100 text-blue-800 border-blue-300';
+    }
+
+    // Tanggal terdaftar
+    let tglDaftar = '-';
+    if (p.createdAt) {
+        try {
+            tglDaftar = new Date(p.createdAt).toLocaleDateString('id-ID', {
+                day: 'numeric',
+                month: 'long',
+                year: 'numeric'
+            });
+        } catch(e) {}
+    }
+
+    // WA Link
+    const cleanDigits = safeHp.replace(/[^0-9]/g, '');
+    const cleanWa = cleanDigits.startsWith('0') ? '62' + cleanDigits.slice(1) : cleanDigits;
+    const waLink = cleanWa ? `https://wa.me/${cleanWa}` : '';
+
+    // Riwayat pesanan pelanggan dari memori booking
+    const allBookings = (typeof getBookings === 'function') ? getBookings() : [];
+    const customerBookings = allBookings.filter(b => {
+        const bHp = String(b.hp || b['NOMOR HP'] || b.nomorHp || '').replace(/[^0-9]/g, '');
+        return cleanDigits && bHp && (bHp === cleanDigits || (bHp.endsWith(cleanDigits.slice(-9)) && cleanDigits.length >= 9));
+    }).slice(0, 4);
+
+    let bookingsHtml = '';
+    if (customerBookings.length > 0) {
+        bookingsHtml = `
+            <div class="bg-slate-50/90 p-3 sm:p-4 rounded-xl sm:rounded-2xl border border-slate-200/80 space-y-2">
+                <div class="flex items-center justify-between">
+                    <p class="text-[9px] font-black text-slate-500 uppercase tracking-widest flex items-center gap-1.5">
+                        <i class="fas fa-history text-amber-500"></i> Riwayat Tiket Terakhir
+                    </p>
+                    <span class="text-[9px] font-bold text-slate-400 uppercase tracking-wider">${customerBookings.length} Tiket Ditemukan</span>
+                </div>
+                <div class="space-y-1.5">
+                    ${customerBookings.map(b => {
+                        const bId = b.bookingId || b.id || '-';
+                        const bArmada = b.kendaraan || b['JENIS KENDARAAN'] || 'Bus';
+                        const bTujuan = b.tujuan || '-';
+                        const bDate = b.dateTravel || b.tanggalPemberangkatan || '-';
+                        const isPaid = (b.status === 'paid' || String(b.status).toUpperCase() === 'LUNAS');
+                        return `
+                        <div class="flex items-center justify-between p-2.5 bg-white rounded-xl border border-slate-200/70 text-xs shadow-2xs">
+                            <div class="min-w-0 flex-1 pr-2">
+                                <div class="flex items-center gap-1.5">
+                                    <span class="font-mono font-black text-blue-900 text-[11px]">${bId}</span>
+                                    <span class="text-slate-300">•</span>
+                                    <span class="font-bold text-slate-700 truncate text-[11px]">${bArmada} → ${bTujuan}</span>
+                                </div>
+                                <p class="text-[10px] text-slate-400 font-semibold mt-0.5">${bDate}</p>
+                            </div>
+                            <span class="text-[9px] font-black uppercase px-2 py-0.5 rounded-md ${isPaid ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'} shrink-0">
+                                ${isPaid ? 'LUNAS' : 'PENDING'}
+                            </span>
+                        </div>`;
+                    }).join('')}
+                </div>
+            </div>
+        `;
+    }
+
+    content.innerHTML = `
+        <div class="flex flex-col gap-2.5 sm:gap-3">
+            <!-- Profil Utama Card -->
+            <div class="bg-gradient-to-r from-amber-50 via-orange-50/50 to-amber-50 p-3.5 sm:p-4 rounded-xl sm:rounded-2xl border border-amber-200/90 flex items-center justify-between gap-3 shadow-xs">
+                <div class="flex items-center gap-3 min-w-0 flex-1">
+                    <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-amber-500 to-amber-600 text-slate-950 font-black text-lg flex items-center justify-center shadow-md shadow-amber-500/25 shrink-0 border border-amber-400">
+                        ${initial}
+                    </div>
+                    <div class="min-w-0 flex-1">
+                        <p class="text-[9px] font-black text-amber-700 uppercase tracking-widest leading-none mb-1">DATA PELANGGAN</p>
+                        <h4 class="font-black text-slate-900 text-base sm:text-lg tracking-tight leading-snug uppercase truncate select-all" title="${safeName}">${safeName}</h4>
+                        <div class="flex items-center gap-2 mt-1">
+                            <span class="inline-flex items-center gap-1 text-[9px] font-black uppercase px-2 py-0.5 rounded-full border ${tierClass}">
+                                ${tierText}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div class="text-right shrink-0">
+                    <span class="px-3 py-1.5 rounded-xl text-xs sm:text-sm font-black uppercase tracking-wider bg-slate-900 text-amber-400 shadow-xs inline-block">
+                        ${totalOrder} Order
+                    </span>
+                    <p class="text-[9px] text-slate-400 font-bold uppercase tracking-wider mt-1">Total Transaksi</p>
+                </div>
+            </div>
+
+            <!-- 2-Column Info Grid -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3 text-xs">
+                <!-- Kontak / Nomor HP -->
+                <div class="bg-slate-50/90 p-3 rounded-xl border border-slate-100 flex flex-col justify-between">
+                    <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1">Nomor HP / WhatsApp</p>
+                    <div class="flex items-center justify-between gap-2 mt-1">
+                        <span class="font-black text-slate-800 text-sm font-mono tracking-tight select-all">${safeHp}</span>
+                        <div class="flex items-center gap-1.5 shrink-0">
+                            ${safeHp && safeHp !== '-' ? `
+                            <button type="button" onclick="copyToClipboard('${safeHp.replace(/'/g, "\\'")}', 'Nomor HP', this)" class="w-8 h-8 rounded-lg bg-white hover:bg-slate-200 text-slate-600 hover:text-slate-900 border border-slate-200/90 flex items-center justify-center text-xs shadow-2xs transition-all active:scale-95 cursor-pointer" title="Salin Nomor HP">
+                                <i class="far fa-copy"></i>
+                            </button>
+                            ` : ''}
+                            ${cleanWa ? `
+                            <a href="${waLink}" target="_blank" class="w-8 h-8 rounded-lg bg-emerald-500 hover:bg-emerald-600 active:scale-95 text-white flex items-center justify-center text-base shadow-sm shadow-emerald-500/20 transition-all shrink-0" title="Chat WhatsApp">
+                                <i class="fab fa-whatsapp"></i>
+                            </a>
+                            ` : ''}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Alamat / Domisili -->
+                <div class="bg-slate-50/90 p-3 rounded-xl border border-slate-100 flex flex-col justify-between">
+                    <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1">Alamat / Domisili</p>
+                    <div class="flex items-start gap-1.5 mt-1">
+                        <i class="fas fa-map-marker-alt text-amber-500 text-xs mt-0.5 shrink-0"></i>
+                        <span class="font-bold text-slate-700 text-xs leading-snug select-all">${displayAlamat}</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Terdaftar Sejak Banner -->
+            <div class="bg-slate-50/90 px-3.5 py-2.5 rounded-xl border border-slate-100 flex items-center justify-between text-xs">
+                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Terdaftar Sejak</span>
+                <span class="font-black text-slate-700 text-xs">${tglDaftar}</span>
+            </div>
+
+            <!-- Riwayat Pesanan jika ada -->
+            ${bookingsHtml}
+        </div>
+    `;
+
+    const safeHpAttr = safeHp.replace(/'/g, "\\'");
+    const safeNameAttr = safeName.replace(/'/g, "\\'");
+    const safeAlamatAttr = (displayAlamat !== '-' ? displayAlamat : '').replace(/'/g, "\\'");
+
+    actions.innerHTML = `
+        <div class="w-full flex items-center justify-between gap-2">
+            <button type="button" onclick="deletePelangganFromDetail('${safeHpAttr}')" class="text-red-500 hover:text-red-700 hover:bg-red-50 active:bg-red-100 px-3 py-2 rounded-xl text-xs font-bold transition-colors flex items-center gap-1.5 shrink-0">
+                <i class="fas fa-trash-alt text-xs"></i> <span>Hapus</span>
+            </button>
+            <div class="flex items-center gap-2">
+                <button type="button" onclick="closePelangganDetailModal()" class="bg-slate-200 hover:bg-slate-300 active:bg-slate-400 text-slate-700 px-3.5 sm:px-4 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-colors">
+                    Tutup
+                </button>
+                <button type="button" onclick="openEditPelangganModalFromDetail('${safeHpAttr}', '${safeNameAttr}', '${safeAlamatAttr}')" class="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 active:scale-95 text-slate-900 px-4 sm:px-5 py-2.5 rounded-xl text-xs font-black uppercase tracking-wider shadow-md shadow-amber-500/20 transition-all flex items-center gap-1.5">
+                    <i class="fas fa-edit text-xs"></i> <span>Edit Data</span>
+                </button>
+            </div>
+        </div>
+    `;
+
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+    setTimeout(() => {
+        inner.classList.remove('scale-95', 'opacity-0');
+        inner.classList.add('scale-100', 'opacity-100');
+    }, 10);
+}
+
+function closePelangganDetailModal() {
+    const modal = document.getElementById('pelangganDetailModal');
+    const inner = document.getElementById('pelangganDetailModalInner');
+    if (!modal) return;
+    if (inner) {
+        inner.classList.remove('scale-100', 'opacity-100');
+        inner.classList.add('scale-95', 'opacity-0');
+    }
+    setTimeout(() => {
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+    }, 250);
+}
+
+function openEditPelangganModalFromDetail(hp, nama, alamat) {
+    closePelangganDetailModal();
+    setTimeout(() => {
+        openEditPelangganModal(hp, nama, alamat);
+    }, 200);
+}
+
 function openEditPelangganModal(hp, nama, alamat) {
-    document.getElementById('editPelangganHpOld').value = hp;
-    document.getElementById('editPelangganHp').value = hp;
-    document.getElementById('editPelangganNama').value = nama;
-    document.getElementById('editPelangganAlamat').value = alamat && alamat !== '-' && alamat !== 'null' ? alamat : '';
+    const elHpOld = document.getElementById('editPelangganHpOld');
+    const elHp = document.getElementById('editPelangganHp');
+    const elNama = document.getElementById('editPelangganNama');
+    const elAlamat = document.getElementById('editPelangganAlamat');
+
+    if (elHpOld) elHpOld.value = hp || '';
+    if (elHp) elHp.value = hp || '';
+    if (elNama) elNama.value = nama || '';
+    if (elAlamat) elAlamat.value = (alamat && alamat !== '-' && alamat !== 'null') ? alamat : '';
+
     const modal = document.getElementById('modalEditPelanggan');
     const content = document.getElementById('modalEditPelangganContent');
+    if (!modal || !content) return;
+
     modal.classList.remove('hidden');
     modal.classList.add('flex');
     setTimeout(() => {
@@ -6299,21 +6542,44 @@ function openEditPelangganModal(hp, nama, alamat) {
 function closeEditPelangganModal() {
     const modal = document.getElementById('modalEditPelanggan');
     const content = document.getElementById('modalEditPelangganContent');
+    if (!modal) return;
+    if (content) {
+        content.classList.remove('scale-100');
+        content.classList.add('scale-95');
+    }
     modal.classList.add('opacity-0');
-    content.classList.remove('scale-100');
-    content.classList.add('scale-95');
     setTimeout(() => {
         modal.classList.add('hidden');
         modal.classList.remove('flex');
-    }, 300);
+    }, 250);
 }
 
 async function submitEditPelanggan() {
-    const hp = document.getElementById('editPelangganHpOld').value;
-    const newNama = document.getElementById('editPelangganNama').value.trim();
-    const newAlamat = document.getElementById('editPelangganAlamat').value.trim();
-    if (!newNama) return Swal.fire({ icon: 'error', title: 'Oops...', text: 'Nama tidak boleh kosong' });
+    const hpOld = document.getElementById('editPelangganHpOld')?.value.trim() || '';
+    const hpNew = document.getElementById('editPelangganHp')?.value.trim() || '';
+    const newNama = document.getElementById('editPelangganNama')?.value.trim() || '';
+    const newAlamat = document.getElementById('editPelangganAlamat')?.value.trim() || '';
+
+    if (!hpNew) {
+        if (typeof Swal !== 'undefined') {
+            return Swal.fire({ icon: 'warning', title: 'Nomor HP Kosong', text: 'Nomor HP pelanggan wajib diisi.' });
+        }
+        return alert('Nomor HP pelanggan wajib diisi');
+    }
+
+    if (!newNama) {
+        if (typeof Swal !== 'undefined') {
+            return Swal.fire({ icon: 'warning', title: 'Nama Kosong', text: 'Nama pelanggan wajib diisi.' });
+        }
+        return alert('Nama pelanggan wajib diisi');
+    }
     
+    const submitBtn = document.getElementById('btnSubmitEditPelanggan');
+    if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> <span>Menyimpan...</span>';
+    }
+
     try {
         const res = await fetch('/api', {
             method: 'POST',
@@ -6321,32 +6587,71 @@ async function submitEditPelanggan() {
                 'Content-Type': 'application/json',
                 'Authorization': 'Bearer ' + localStorage.getItem('adminToken')
             },
-            body: JSON.stringify({ action: 'editPelanggan', payload: { nomorHp: hp, namaBaru: newNama, alamatBaru: newAlamat } })
+            body: JSON.stringify({
+                action: 'editPelanggan',
+                payload: {
+                    nomorHp: hpOld,
+                    nomorHpBaru: hpNew,
+                    namaBaru: newNama,
+                    alamatBaru: newAlamat
+                }
+            })
         });
         const data = await res.json();
         if (data.status === 'success') {
             closeEditPelangganModal();
-            renderPelanggan();
-            Swal.fire({
-                icon: 'success',
-                title: 'Berhasil',
-                text: 'Data pelanggan telah diperbarui!',
-                timer: 2000,
-                showConfirmButton: false
-            });
+            await renderPelanggan();
+            if (typeof window.showAdminToast === 'function') {
+                window.showAdminToast('Data pelanggan berhasil diperbarui!');
+            } else if (typeof Swal !== 'undefined') {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Berhasil Disimpan!',
+                    text: 'Data kontak dan nomor HP pelanggan telah diperbarui.',
+                    timer: 2000,
+                    showConfirmButton: false
+                });
+            }
         } else {
-            Swal.fire({ icon: 'error', title: 'Gagal', text: data.message });
+            if (typeof Swal !== 'undefined') {
+                Swal.fire({ icon: 'error', title: 'Gagal Menyimpan', text: data.message || 'Terjadi kesalahan' });
+            } else {
+                alert('Gagal: ' + (data.message || 'Terjadi kesalahan'));
+            }
         }
     } catch (err) {
-        console.error(err);
-        Swal.fire({ icon: 'error', title: 'Kesalahan Server', text: 'Gagal menyambung ke server' });
+        console.error('Submit edit pelanggan error:', err);
+        if (typeof Swal !== 'undefined') {
+            Swal.fire({ icon: 'error', title: 'Kesalahan Jaringan', text: 'Gagal menyambung ke server' });
+        } else {
+            alert('Kesalahan jaringan');
+        }
+    } finally {
+        if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = 'Simpan';
+        }
     }
 }
 
+function deletePelangganFromDetail(hp) {
+    closePelangganDetailModal();
+    setTimeout(() => {
+        deletePelanggan(hp);
+    }, 200);
+}
+
 function deletePelanggan(hp) {
+    if (typeof Swal === 'undefined') {
+        if (confirm('Hapus pelanggan ini dari daftar kontak?')) {
+            doDeletePelanggan(hp);
+        }
+        return;
+    }
+
     Swal.fire({
-        title: 'Hapus Pelanggan?',
-        text: 'Riwayat pesanan orang ini TIDAK akan terhapus.',
+        title: 'Hapus Kontak Pelanggan?',
+        text: 'Kontak akan dihapus dari CRM. Riwayat tiket transaksi pesanan tetap aman dan tidak terhapus.',
         icon: 'warning',
         showCancelButton: true,
         confirmButtonColor: '#ef4444',
@@ -6355,34 +6660,50 @@ function deletePelanggan(hp) {
         cancelButtonText: 'Batal'
     }).then(async (result) => {
         if (result.isConfirmed) {
-            try {
-                const res = await fetch('/api', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': 'Bearer ' + localStorage.getItem('adminToken')
-                    },
-                    body: JSON.stringify({ action: 'deletePelanggan', payload: { nomorHp: hp } })
-                });
-                const data = await res.json();
-                if (data.status === 'success') {
-                    renderPelanggan();
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Terhapus!',
-                        text: 'Pelanggan berhasil dihapus dari kontak.',
-                        timer: 2000,
-                        showConfirmButton: false
-                    });
-                } else {
-                    Swal.fire({ icon: 'error', title: 'Gagal', text: data.message });
-                }
-            } catch(err) {
-                console.error(err);
-                Swal.fire({ icon: 'error', title: 'Kesalahan Server', text: 'Gagal menyambung ke server' });
-            }
+            await doDeletePelanggan(hp);
         }
     });
+}
+
+async function doDeletePelanggan(hp) {
+    try {
+        const res = await fetch('/api', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + localStorage.getItem('adminToken')
+            },
+            body: JSON.stringify({ action: 'deletePelanggan', payload: { nomorHp: hp } })
+        });
+        const data = await res.json();
+        if (data.status === 'success') {
+            await renderPelanggan();
+            if (typeof window.showAdminToast === 'function') {
+                window.showAdminToast('Pelanggan berhasil dihapus!');
+            } else if (typeof Swal !== 'undefined') {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Terhapus!',
+                    text: 'Data pelanggan berhasil dihapus.',
+                    timer: 1800,
+                    showConfirmButton: false
+                });
+            }
+        } else {
+            if (typeof Swal !== 'undefined') {
+                Swal.fire({ icon: 'error', title: 'Gagal Menghapus', text: data.message || 'Error server' });
+            } else {
+                alert('Gagal: ' + (data.message || 'Error server'));
+            }
+        }
+    } catch(err) {
+        console.error('Delete pelanggan error:', err);
+        if (typeof Swal !== 'undefined') {
+            Swal.fire({ icon: 'error', title: 'Kesalahan Server', text: 'Gagal menyambung ke server' });
+        } else {
+            alert('Kesalahan jaringan');
+        }
+    }
 }
 
 function exportPelangganCSV() {

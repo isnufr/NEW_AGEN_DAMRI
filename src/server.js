@@ -275,6 +275,8 @@ async function upsertPelanggan(hp, nama, alamat) {
     if (!hp || hp.trim() === '' || hp.trim() === '-') return;
     try {
         const hpTrim = normalizeHp(hp);
+        // Cegah dummy phone number agar tidak menumpuk di 1 data pelanggan palsu
+        if (/^0+$/.test(hpTrim) || hpTrim.length < 5) return;
         const namaTrim = nama ? nama.trim() : 'Tanpa Nama';
         const alamatTrim = alamat ? alamat.trim() : '-';
         await prisma.pelanggan.upsert({
@@ -1203,10 +1205,14 @@ app.get('/api', async (req, res) => {
         }
 
         if (action === 'getPelanggan') {
-            const pelanggan = await prisma.pelanggan.findMany({
-                orderBy: { totalBooking: 'desc' }
-            });
-            return res.json({ status: 'success', data: pelanggan });
+            try {
+                const pelanggan = await prisma.pelanggan.findMany({
+                    orderBy: { totalBooking: 'desc' }
+                });
+                return res.json({ status: 'success', data: pelanggan });
+            } catch (e) {
+                return res.json({ status: 'success', data: [] });
+            }
         }
         
         
@@ -1218,42 +1224,58 @@ app.get('/api', async (req, res) => {
             const whereClause = search ? {
                 OR: [
                     { nama: { contains: search } },
-                    { nomorHp: { contains: search } }
+                    { nomorHp: { contains: search } },
+                    { alamat: { contains: search } }
                 ]
             } : {};
             
-            const total = await prisma.pelanggan.count({ where: whereClause });
-            const pelangganList = await prisma.pelanggan.findMany({
-                where: whereClause,
-                orderBy: { totalBooking: 'desc' },
-                skip: (page - 1) * limit,
-                take: limit
-            });
-            
-            return res.json({ 
-                status: 'success', 
-                data: pelangganList,
-                page: page,
-                totalPages: Math.ceil(total / limit) || 1,
-                totalItems: total
-            });
+            try {
+                const total = await prisma.pelanggan.count({ where: whereClause });
+                const pelangganList = await prisma.pelanggan.findMany({
+                    where: whereClause,
+                    orderBy: { totalBooking: 'desc' },
+                    skip: (page - 1) * limit,
+                    take: limit
+                });
+                
+                return res.json({ 
+                    status: 'success', 
+                    data: pelangganList,
+                    page: page,
+                    totalPages: Math.ceil(total / limit) || 1,
+                    totalItems: total
+                });
+            } catch (e) {
+                console.warn('Notice: getPelangganTable query error:', e.message);
+                return res.json({ 
+                    status: 'success', 
+                    data: [],
+                    page: 1,
+                    totalPages: 1,
+                    totalItems: 0
+                });
+            }
         }
 
         if (action === 'cariPelanggan') {
             const q = req.query.q;
             if (!q || q.length < 2) return res.json({ status: 'success', data: [] });
             
-            const results = await prisma.pelanggan.findMany({
-                where: {
-                    OR: [
-                        { nama: { contains: q } },
-                        { nomorHp: { contains: q } }
-                    ]
-                },
-                take: 10,
-                orderBy: { totalBooking: 'desc' }
-            });
-            return res.json({ status: 'success', data: results });
+            try {
+                const results = await prisma.pelanggan.findMany({
+                    where: {
+                        OR: [
+                            { nama: { contains: q } },
+                            { nomorHp: { contains: q } }
+                        ]
+                    },
+                    take: 10,
+                    orderBy: { totalBooking: 'desc' }
+                });
+                return res.json({ status: 'success', data: results });
+            } catch (e) {
+                return res.json({ status: 'success', data: [] });
+            }
         }
 
         if (action === 'getPopupIklan') {
@@ -1994,19 +2016,73 @@ app.post('/api', async (req, res) => {
 
         
         if (action === 'editPelanggan') {
-            const { nomorHp, namaBaru, alamatBaru } = payload;
-            await prisma.pelanggan.update({
-                where: { nomorHp: nomorHp },
-                data: { nama: namaBaru, alamat: alamatBaru || "-" }
+            const { nomorHp, nomorHpBaru, namaBaru, alamatBaru } = payload;
+            if (!nomorHp || !namaBaru) {
+                return res.status(400).json({ status: 'error', message: 'Nomor HP dan Nama wajib diisi' });
+            }
+            const cleanOldHp = normalizeHp(nomorHp);
+            const cleanNewHp = nomorHpBaru ? normalizeHp(nomorHpBaru) : cleanOldHp;
+            const cleanNama = namaBaru.trim();
+            const cleanAlamat = alamatBaru ? alamatBaru.trim() : '-';
+
+            // Jika nomor HP diubah
+            if (cleanNewHp !== cleanOldHp) {
+                const existing = await prisma.pelanggan.findUnique({
+                    where: { nomorHp: cleanNewHp }
+                });
+                if (existing && existing.nomorHp !== cleanOldHp) {
+                    return res.status(400).json({ status: 'error', message: `Nomor HP ${cleanNewHp} sudah terdaftar pada pelanggan lain (${existing.nama})` });
+                }
+
+                await prisma.pelanggan.update({
+                    where: { nomorHp: cleanOldHp },
+                    data: {
+                        nomorHp: cleanNewHp,
+                        nama: cleanNama,
+                        alamat: cleanAlamat
+                    }
+                });
+
+                // Sinkronkan juga nomor HP & nama ke seluruh riwayat booking terkait
+                await prisma.booking.updateMany({
+                    where: { nomorHp: cleanOldHp },
+                    data: { nomorHp: cleanNewHp, nama: cleanNama }
+                });
+            } else {
+                await prisma.pelanggan.update({
+                    where: { nomorHp: cleanOldHp },
+                    data: {
+                        nama: cleanNama,
+                        alamat: cleanAlamat
+                    }
+                });
+
+                await prisma.booking.updateMany({
+                    where: { nomorHp: cleanOldHp },
+                    data: { nama: cleanNama }
+                });
+            }
+
+            return res.json({
+                status: 'success',
+                message: 'Data pelanggan berhasil diperbarui',
+                data: { nomorHp: cleanNewHp, nama: cleanNama, alamat: cleanAlamat }
             });
-            return res.json({ status: 'success', message: 'Nama pelanggan berhasil diubah' });
         }
 
         if (action === 'deletePelanggan') {
             const { nomorHp } = payload;
-            await prisma.pelanggan.delete({
-                where: { nomorHp: nomorHp }
-            });
+            const cleanHp = normalizeHp(nomorHp);
+            try {
+                await prisma.pelanggan.delete({
+                    where: { nomorHp: cleanHp }
+                });
+            } catch (err) {
+                // If not found by cleanHp, try raw
+                await prisma.pelanggan.delete({
+                    where: { nomorHp: nomorHp }
+                });
+            }
             return res.json({ status: 'success', message: 'Pelanggan berhasil dihapus dari kontak' });
         }
 
