@@ -112,13 +112,6 @@
                     <i class="fas fa-users-cog"></i>
                     <span>KELOLA AKUN</span>
                 </div>
-
-                <div class="h-px bg-white/10 my-4"></div>
-                <div class="text-[9px] font-black text-slate-600 uppercase tracking-[0.2em] px-4 mb-2">Aksi</div>
-                <div class="nav-item" onclick="promptRefresh()">
-                    <i class="fas fa-sync-alt"></i>
-                    <span>Segarkan Data</span>
-                </div>
             </nav>
 
             <!-- Logout -->
@@ -388,58 +381,68 @@
                     </div>
 
                     <!-- Subtabs Header -->
-                    <div class="mb-6 flex flex-wrap items-center justify-between gap-4 border-b border-slate-200 pb-4">
-                        <div class="flex flex-wrap gap-2">
-                            <button id="tabBtnPesananTiket" onclick="switchPesananSubtab('tiket')" class="px-5 py-2.5 rounded-xl font-black text-xs uppercase tracking-widest transition-all bg-slate-900 text-amber-400 shadow-md flex items-center gap-2">
-                                <i class="fas fa-ticket-alt"></i> Riwayat Pesanan Tiket
-                            </button>
-                            <button id="tabBtnPesananPelanggan" onclick="switchPesananSubtab('pelanggan')" class="px-5 py-2.5 rounded-xl font-black text-xs uppercase tracking-widest transition-all bg-white hover:bg-slate-100 text-slate-600 border border-slate-200 flex items-center gap-2">
-                                <i class="fas fa-address-book"></i> Data Pelanggan &amp; CRM
-                            </button>
-                        </div>
+                    <div class="mb-4 sm:mb-6 flex items-center gap-2 overflow-x-auto pb-2 border-b border-slate-200">
+                        <button id="tabBtnPesananTiket" onclick="switchPesananSubtab('tiket')" class="px-4 sm:px-5 py-2.5 rounded-xl font-black text-xs uppercase tracking-widest transition-all bg-slate-900 text-amber-400 shadow-md flex items-center gap-2 whitespace-nowrap shrink-0">
+                            <i class="fas fa-ticket-alt"></i> Riwayat Pesanan
+                        </button>
+                        <button id="tabBtnPesananPelanggan" onclick="switchPesananSubtab('pelanggan')" class="px-4 sm:px-5 py-2.5 rounded-xl font-black text-xs uppercase tracking-widest transition-all bg-white hover:bg-slate-100 text-slate-600 border border-slate-200 flex items-center gap-2 whitespace-nowrap shrink-0">
+                            <i class="fas fa-address-book"></i> Data Pelanggan &amp; CRM
+                        </button>
                     </div>
 
                     <!-- SUBTAB 1: RIWAYAT PESANAN TIKET -->
-                    <div id="subtabPesananTiket">
-                        <!-- Search Bar -->
-                        <div class="mb-4 flex flex-col md:flex-row md:items-center justify-between gap-4 bg-slate-50 p-4 rounded-2xl border border-slate-100">
+                    <div id="subtabPesananTiket" class="space-y-4">
+                        <!-- Search Bar & Controls -->
+                        <div class="bg-white p-3.5 sm:p-4 rounded-2xl sm:rounded-3xl border border-slate-200/90 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                             <div class="flex-1 w-full relative">
-                                <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
-                                <input type="text" id="pesananSearch" class="w-full bg-white border border-slate-200 rounded-xl pl-11 pr-4 py-2.5 text-base md:text-sm font-bold text-slate-700 outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-200 transition-colors shadow-sm" placeholder="Cari ID Tiket, Nama, atau Tanggal..." oninput="renderPesanan(true)">
+                                <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
+                                <input type="text" id="pesananSearch" class="w-full bg-slate-50 border border-slate-200 rounded-xl pl-11 pr-4 py-2.5 sm:py-3 text-sm font-bold text-slate-700 outline-none focus:border-amber-500 focus:bg-white focus:ring-2 focus:ring-amber-200/50 transition-all placeholder:text-slate-400" placeholder="Cari ID Tiket, Nama, atau Alamat..." oninput="renderPesanan(true)">
                             </div>
-                            <div class="flex flex-wrap items-center gap-2">
-                                <button onclick="document.getElementById('pesananSearch').value=''; renderPesanan(true);" class="text-xs font-bold text-slate-500 hover:text-amber-600 uppercase tracking-widest px-3 py-2 bg-white border border-slate-200 rounded-lg hover:border-amber-200 transition-all whitespace-nowrap shadow-sm">
+                            <div class="flex items-center justify-between sm:justify-end gap-2">
+                                <span class="text-[11px] font-bold text-slate-400 sm:hidden">Klik baris untuk detail</span>
+                                <button onclick="document.getElementById('pesananSearch').value=''; renderPesanan(true);" class="text-xs font-black text-slate-600 hover:text-amber-600 uppercase tracking-widest px-4 py-2.5 bg-slate-100 hover:bg-amber-50 border border-slate-200 rounded-xl transition-all whitespace-nowrap active:scale-95 shadow-xs">
                                     <i class="fas fa-times mr-1"></i> Reset
                                 </button>
                             </div>
                         </div>
-                        <div class="chart-card overflow-hidden">
-                            <div class="overflow-x-auto">
-                                <table class="data-table">
+
+                        <!-- Table Card Container (Mobile-First 100% Fit) -->
+                        <div class="bg-white rounded-2xl sm:rounded-3xl border border-slate-200/90 shadow-sm overflow-hidden">
+                            <div class="w-full">
+                                <table class="w-full border-collapse table-fixed">
                                     <thead>
-                                        <tr>
-                                            <th class="py-3 px-4 text-left font-black text-[10px] text-slate-400 uppercase tracking-widest border-b border-slate-100">ID Tiket</th>
-                                            <th class="py-3 px-4 text-left font-black text-[10px] text-slate-400 uppercase tracking-widest border-b border-slate-100">Penumpang</th>
-                                            <th class="py-3 px-4 text-left font-black text-[10px] text-slate-400 uppercase tracking-widest border-b border-slate-100">Alamat</th>
-                                            <th class="py-3 px-4 text-left font-black text-[10px] text-slate-400 uppercase tracking-widest border-b border-slate-100">Tujuan</th>
-                                            <th class="py-3 px-4 text-right font-black text-[10px] text-slate-400 uppercase tracking-widest border-b border-slate-100">Total</th>
-                                            <th class="py-3 px-4 text-center font-black text-[10px] text-slate-400 uppercase tracking-widest border-b border-slate-100">Status</th>
+                                        <tr class="bg-slate-900 text-amber-400 border-b border-slate-800 select-none">
+                                            <th class="w-[32%] sm:w-[26%] py-3.5 px-3 sm:px-5 text-left font-black text-[10px] sm:text-xs uppercase tracking-widest text-amber-400">
+                                                ID TIKET
+                                            </th>
+                                            <th class="w-[36%] sm:w-[36%] py-3.5 px-2 sm:px-4 text-left font-black text-[10px] sm:text-xs uppercase tracking-widest text-amber-400">
+                                                PENUMPANG
+                                            </th>
+                                            <th class="w-[24%] sm:w-[32%] py-3.5 px-2 sm:px-4 text-left font-black text-[10px] sm:text-xs uppercase tracking-widest text-amber-400">
+                                                ALAMAT
+                                            </th>
+                                            <th class="w-[8%] sm:w-[6%] py-3.5 px-1 sm:px-2 text-center text-amber-400/60">
+                                                <i class="fas fa-chevron-right text-[10px]"></i>
+                                            </th>
                                         </tr>
                                     </thead>
-                                    <tbody id="pesananTableBody">
-                                        <tr class="animate-pulse border-b border-slate-50"><td colspan="6" class="p-4"><div class="flex items-center gap-4"><div class="w-10 h-10 bg-slate-200 rounded-xl flex-shrink-0"></div><div class="flex-1 space-y-2"><div class="h-4 bg-slate-200 rounded w-1/3"></div><div class="h-3 bg-slate-100 rounded w-1/4"></div></div><div class="w-16 h-6 bg-slate-200 rounded-lg flex-shrink-0"></div></div></td></tr>
-                                        <tr class="animate-pulse border-b border-slate-50"><td colspan="6" class="p-4"><div class="flex items-center gap-4"><div class="w-10 h-10 bg-slate-200 rounded-xl flex-shrink-0"></div><div class="flex-1 space-y-2"><div class="h-4 bg-slate-200 rounded w-1/2"></div><div class="h-3 bg-slate-100 rounded w-1/3"></div></div><div class="w-16 h-6 bg-slate-200 rounded-lg flex-shrink-0"></div></div></td></tr>
-                                        <tr class="animate-pulse border-b border-slate-50"><td colspan="6" class="p-4"><div class="flex items-center gap-4"><div class="w-10 h-10 bg-slate-200 rounded-xl flex-shrink-0"></div><div class="flex-1 space-y-2"><div class="h-4 bg-slate-200 rounded w-2/5"></div><div class="h-3 bg-slate-100 rounded w-1/5"></div></div><div class="w-16 h-6 bg-slate-200 rounded-lg flex-shrink-0"></div></div></td></tr>
+                                    <tbody id="pesananTableBody" class="divide-y divide-slate-100">
+                                        <tr class="animate-pulse border-b border-slate-50"><td colspan="4" class="p-4"><div class="flex items-center gap-4"><div class="w-10 h-10 bg-slate-200 rounded-xl flex-shrink-0"></div><div class="flex-1 space-y-2"><div class="h-4 bg-slate-200 rounded w-1/3"></div><div class="h-3 bg-slate-100 rounded w-1/4"></div></div></div></td></tr>
+                                        <tr class="animate-pulse border-b border-slate-50"><td colspan="4" class="p-4"><div class="flex items-center gap-4"><div class="w-10 h-10 bg-slate-200 rounded-xl flex-shrink-0"></div><div class="flex-1 space-y-2"><div class="h-4 bg-slate-200 rounded w-1/2"></div><div class="h-3 bg-slate-100 rounded w-1/3"></div></div></div></td></tr>
                                     </tbody>
                                 </table>
                             </div>
 
                             <!-- Pagination Controls -->
-                            <div id="pesananPagination" class="flex justify-between items-center px-4 py-3 bg-white border-t border-slate-100">
-                                <span class="text-xs text-slate-500 font-bold uppercase tracking-widest" id="pesananPageInfo">Halaman 1 dari 1</span>
-                                <div class="flex gap-2">
-                                    <button onclick="changePagePesanan(-1)" id="btnPrevPesanan" class="px-3 py-1 border border-slate-200 rounded-lg text-xs font-bold text-slate-600 hover:bg-amber-50 hover:text-amber-600 hover:border-amber-200 disabled:opacity-50 disabled:cursor-not-allowed uppercase tracking-widest transition-colors">Sebelumnya</button>
-                                    <button onclick="changePagePesanan(1)" id="btnNextPesanan" class="px-3 py-1 border border-slate-200 rounded-lg text-xs font-bold text-slate-600 hover:bg-amber-50 hover:text-amber-600 hover:border-amber-200 disabled:opacity-50 disabled:cursor-not-allowed uppercase tracking-widest transition-colors">Selanjutnya</button>
+                            <div id="pesananPagination" class="flex flex-col sm:flex-row justify-between items-center gap-3 px-4 sm:px-6 py-3.5 bg-slate-50/70 border-t border-slate-100">
+                                <span class="text-[11px] sm:text-xs text-slate-500 font-bold uppercase tracking-wider text-center sm:text-left" id="pesananPageInfo">Halaman 1 dari 1</span>
+                                <div class="flex items-center gap-2">
+                                    <button onclick="changePagePesanan(-1)" id="btnPrevPesanan" class="px-3.5 py-1.5 bg-white border border-slate-200 rounded-xl text-xs font-black text-slate-600 hover:bg-amber-500 hover:text-slate-950 hover:border-amber-500 disabled:opacity-40 disabled:pointer-events-none uppercase tracking-wider transition-all active:scale-95 shadow-xs">
+                                        <i class="fas fa-chevron-left mr-1"></i> Prev
+                                    </button>
+                                    <button onclick="changePagePesanan(1)" id="btnNextPesanan" class="px-3.5 py-1.5 bg-white border border-slate-200 rounded-xl text-xs font-black text-slate-600 hover:bg-amber-500 hover:text-slate-950 hover:border-amber-500 disabled:opacity-40 disabled:pointer-events-none uppercase tracking-wider transition-all active:scale-95 shadow-xs">
+                                        Next <i class="fas fa-chevron-right ml-1"></i>
+                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -954,6 +957,9 @@
                         <button type="button" onclick="switchKontrolSubtab('pembayaran')" id="tabBtnKontrolPembayaran" class="kontrol-subtab-btn px-4 py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider transition-all bg-white text-slate-600 hover:bg-slate-100 border border-slate-200 shadow-sm flex items-center gap-2 whitespace-nowrap shrink-0">
                             <i class="fas fa-wallet"></i> <span>Metode Pembayaran &amp; QRIS</span>
                         </button>
+                        <button type="button" onclick="switchKontrolSubtab('fasilitas')" id="tabBtnKontrolFasilitas" class="kontrol-subtab-btn px-4 py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider transition-all bg-white text-slate-600 hover:bg-slate-100 border border-slate-200 shadow-sm flex items-center gap-2 whitespace-nowrap shrink-0">
+                            <i class="fas fa-couch text-amber-500"></i> <span>FASILITAS AGEN</span>
+                        </button>
                         <button type="button" onclick="switchKontrolSubtab('hero')" id="tabBtnKontrolHero" class="kontrol-subtab-btn px-4 py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider transition-all bg-white text-slate-600 hover:bg-slate-100 border border-slate-200 shadow-sm flex items-center gap-2 whitespace-nowrap shrink-0">
                             <i class="fas fa-desktop"></i> <span>Hero &amp; Pengumuman</span>
                         </button>
@@ -1218,6 +1224,106 @@
                             <div>
                                 <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Teks Hak Cipta</label>
                                 <input type="text" id="cfgCopyright" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-bold text-slate-700 outline-none focus:border-amber-500 focus:bg-white transition-all" placeholder="AGEN DAMRI KAWUNGANTEN. ALL RIGHTS RESERVED.">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ============================================== -->
+                    <!-- SUBTAB 6: FASILITAS AGEN                       -->
+                    <!-- ============================================== -->
+                    <div id="subtabKontrolFasilitas" class="space-y-6 hidden">
+                        <!-- Header Banner -->
+                        <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
+                            <div>
+                                <div class="flex items-center gap-2 mb-1">
+                                    <span class="bg-amber-100 text-amber-800 text-[10px] font-black uppercase tracking-widest px-2.5 py-0.5 rounded-full flex items-center gap-1.5">
+                                        <i class="fas fa-couch text-amber-500"></i> Fasilitas Publik
+                                    </span>
+                                    <span class="text-xs font-bold text-slate-400">• Tampil di Beranda</span>
+                                </div>
+                                <h3 class="font-black text-slate-800 text-lg uppercase tracking-tight">FASILITAS AGEN</h3>
+                                <p class="text-xs text-slate-400 font-bold mt-0.5">Kelola foto, nama fasilitas, tag kategori, dan deskripsi fasilitas agen yang tampil di halaman pelanggan</p>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span id="facCountBadge" class="bg-slate-100 text-slate-700 text-xs font-black px-3.5 py-2 rounded-xl border border-slate-200">
+                                    0 Fasilitas Tersedia
+                                </span>
+                            </div>
+                        </div>
+
+                        <!-- Form Tambah / Edit Fasilitas -->
+                        <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-xs space-y-5">
+                            <div class="border-b border-slate-100 pb-3 flex items-center justify-between">
+                                <h4 class="font-black text-slate-800 text-sm uppercase tracking-wide flex items-center gap-2" id="formFacilityTitle">
+                                    <i class="fas fa-plus-circle text-amber-500"></i> Tambah Fasilitas Agen Baru
+                                </h4>
+                                <span class="text-[10px] bg-amber-50 text-amber-700 font-black px-2.5 py-1 rounded-full uppercase tracking-wider">Form Input</span>
+                            </div>
+
+                            <input type="hidden" id="facEditId" value="">
+                            <input type="hidden" id="facImageUrl" value="">
+
+                            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                                <!-- Upload Foto Box -->
+                                <div class="lg:col-span-5 space-y-2">
+                                    <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest">Foto Fasilitas Agen *</label>
+                                    <div class="border-2 border-dashed border-slate-200 hover:border-amber-400 transition-colors rounded-2xl p-4 bg-slate-50 flex flex-col items-center justify-center text-center relative overflow-hidden group">
+                                        <div id="facUploadPlaceholder" class="py-4 flex flex-col items-center">
+                                            <div class="w-12 h-12 bg-amber-100 text-amber-600 rounded-2xl flex items-center justify-center text-xl mb-2">
+                                                <i class="fas fa-camera"></i>
+                                            </div>
+                                            <p class="text-xs font-bold text-slate-700">Pilih / Unggah Foto</p>
+                                            <p class="text-[10px] text-slate-400 mt-0.5">Format JPG, PNG, atau WebP (Maks 4MB)</p>
+                                        </div>
+                                        <div id="facPreviewContainer" class="hidden w-full relative">
+                                            <img id="facImagePreview" src="" alt="Preview Fasilitas" class="w-full h-44 object-cover rounded-xl border border-slate-200">
+                                            <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity rounded-xl flex items-center justify-center text-white text-xs font-bold gap-2">
+                                                <i class="fas fa-exchange-alt"></i> Ganti Foto
+                                            </div>
+                                        </div>
+                                        <input type="file" id="facInputFile" accept="image/*" class="absolute inset-0 opacity-0 cursor-pointer z-10" onchange="handleFacilityFileSelect(this)">
+                                    </div>
+                                    <div id="facUploadStatus" class="text-[11px] font-bold text-slate-400 text-center hidden"></div>
+                                </div>
+
+                                <!-- Detail Fields -->
+                                <div class="lg:col-span-7 space-y-4">
+                                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                        <div>
+                                            <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Nama Fasilitas *</label>
+                                            <input type="text" id="facTitle" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm font-bold text-slate-700 outline-none focus:border-amber-500 focus:bg-white transition-all" placeholder="Contoh: Ruang Tunggu Penumpang">
+                                        </div>
+                                        <div>
+                                            <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Tag / Kategori *</label>
+                                            <input type="text" id="facTag" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm font-bold text-slate-700 outline-none focus:border-amber-500 focus:bg-white transition-all" placeholder="Contoh: Kenyamanan, Kebersihan, Keamanan">
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Deskripsi Fasilitas *</label>
+                                        <textarea id="facDescription" rows="3" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm font-bold text-slate-700 outline-none focus:border-amber-500 focus:bg-white transition-all" placeholder="Jelaskan fasilitas ini secara singkat dan jelas bagi calon penumpang..."></textarea>
+                                    </div>
+                                    <div class="flex items-center gap-3 pt-1">
+                                        <button type="button" onclick="saveFacilityItem()" id="btnSaveFacility" class="bg-slate-900 hover:bg-amber-500 hover:text-slate-900 text-white px-6 py-2.5 rounded-xl text-xs font-black uppercase tracking-wider transition-all flex items-center gap-2 active:scale-95 shadow-md">
+                                            <i class="fas fa-plus"></i> <span id="btnSaveFacilityText">Tambah Fasilitas</span>
+                                        </button>
+                                        <button type="button" onclick="cancelEditFacility()" id="btnCancelFacility" class="hidden bg-slate-100 hover:bg-slate-200 text-slate-600 px-4 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all active:scale-95">
+                                            Batal
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Daftar Fasilitas yang Tersedia -->
+                        <div class="space-y-4">
+                            <div class="flex items-center justify-between px-1">
+                                <h4 class="font-black text-slate-800 text-sm uppercase tracking-wide flex items-center gap-2">
+                                    <i class="fas fa-list text-amber-500"></i> Daftar Fasilitas Agen yang Aktif
+                                </h4>
+                                <span class="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Urutan sesuai kartu di bawah</span>
+                            </div>
+                            <div id="kontrolFacilitiesContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+                                <!-- Render dinamis dari Javascript -->
                             </div>
                         </div>
                     </div>
@@ -2005,20 +2111,44 @@
             </div>
         </div>
     </div>
-    <!-- Notification Modal -->
-    <div id="notifModal" class="fixed inset-0 bg-gray-900/60  z-[150] hidden items-center justify-center p-4">
-        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[85vh] flex flex-col transform scale-95 opacity-0 transition-all duration-300" id="notifModalInner">
-            <div class="p-6 flex items-center justify-between border-b border-slate-100">
-                <div>
-                    <h2 class="text-xl font-black text-slate-800 tracking-tight">Request Pesanan Baru</h2>
-                    <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-1">Butuh persetujuan Anda</p>
+    <!-- Notification Modal: Request Pesanan Baru (Premium & Proporsional) -->
+    <div id="notifModal" class="fixed inset-0 bg-slate-950/70 backdrop-blur-md z-[150] hidden items-center justify-center p-3 sm:p-5 transition-all duration-300" onclick="if(event.target === this) closeNotifModal()">
+        <div class="bg-white rounded-[2rem] shadow-2xl w-full max-w-xl max-h-[90vh] flex flex-col transform scale-95 opacity-0 transition-all duration-300 border border-slate-100 overflow-hidden" id="notifModalInner">
+            <!-- Modal Header -->
+            <div class="px-6 py-5 bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 text-white flex items-center justify-between border-b border-slate-800 relative shrink-0">
+                <div class="flex items-center gap-3.5">
+                    <div class="w-11 h-11 rounded-2xl bg-gradient-to-tr from-amber-500 to-amber-300 text-slate-950 flex items-center justify-center text-lg font-black shadow-lg shadow-amber-500/25 shrink-0 ring-2 ring-white/10">
+                        <i class="fas fa-bell"></i>
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <h2 class="text-base sm:text-lg font-black text-white tracking-tight uppercase">Request Pesanan Baru</h2>
+                            <span id="notifModalCountBadge" class="bg-amber-400 text-slate-950 text-[10px] font-black px-2.5 py-0.5 rounded-full uppercase tracking-wider hidden">0</span>
+                        </div>
+                        <p class="text-[11px] font-bold text-slate-400 flex items-center gap-1.5 mt-0.5">
+                            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse inline-block"></span>
+                            <span>Menunggu Persetujuan &amp; Verifikasi Admin</span>
+                        </p>
+                    </div>
                 </div>
-                <button onclick="closeNotifModal()" class="w-8 h-8 flex items-center justify-center rounded-full bg-slate-100 text-slate-500 hover:bg-red-100 hover:text-red-500 transition-colors">
+                <button onclick="closeNotifModal()" class="w-9 h-9 flex items-center justify-center rounded-xl bg-white/10 text-slate-300 hover:bg-rose-500 hover:text-white transition-all text-sm shrink-0 active:scale-95" title="Tutup">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
-            <div class="p-4 overflow-y-auto flex-1 space-y-3 bg-slate-50" id="notifListContainer">
+
+            <!-- Modal Content List -->
+            <div class="p-4 sm:p-6 overflow-y-auto flex-1 space-y-3.5 bg-slate-50/80" id="notifListContainer">
                 <!-- Data populated dynamically -->
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="px-6 py-3.5 bg-white border-t border-slate-100 flex items-center justify-between text-xs font-bold text-slate-400 shrink-0">
+                <span class="flex items-center gap-1.5 text-[11px]">
+                    <i class="fas fa-shield-alt text-amber-500"></i> Sistem Verifikasi Tiket Otomatis
+                </span>
+                <button onclick="closeNotifModal()" class="text-slate-600 hover:text-slate-900 text-xs font-black uppercase tracking-wider transition-colors px-3 py-1.5 rounded-lg hover:bg-slate-100">
+                    Tutup
+                </button>
             </div>
         </div>
     </div>
@@ -3048,7 +3178,7 @@
     </div>
 </div>
 <!-- Floating Booking Button -->
-<button onclick="openBookingModal()" class="fixed bottom-6 right-6 sm:bottom-8 sm:right-8 z-40 bg-gradient-to-r from-amber-400 to-amber-600 hover:from-amber-500 hover:to-amber-700 text-slate-900 rounded-full p-4 sm:px-6 shadow-2xl shadow-amber-500/40 transition-all hover:-translate-y-1 hover:scale-105 flex items-center justify-center gap-3 group" title="Booking Tiket Baru">
+<button id="floatingBookingBtn" onclick="openBookingModal()" class="fixed bottom-6 right-6 sm:bottom-8 sm:right-8 z-40 bg-gradient-to-r from-amber-400 to-amber-600 hover:from-amber-500 hover:to-amber-700 text-slate-900 rounded-full p-4 sm:px-6 shadow-2xl shadow-amber-500/40 transition-all hover:-translate-y-1 hover:scale-105 flex items-center justify-center gap-3 group" title="Booking Tiket Baru">
     <i class="fas fa-ticket-alt text-xl sm:text-lg group-hover:rotate-12 transition-transform"></i>
     <span class="hidden sm:inline-block font-black text-xs uppercase tracking-widest">Booking</span>
 </button>

@@ -128,6 +128,21 @@
     // ========================================
     // MENU SWITCHING
     // ========================================
+    function updateFloatingBookingBtn(menu) {
+        const btn = document.getElementById('floatingBookingBtn');
+        if (!btn) return;
+        const targetMenu = menu || currentMenu;
+        const allowed = ['dashboard', 'today', 'pesanan'];
+        if (allowed.includes(targetMenu)) {
+            btn.classList.remove('hidden');
+            btn.style.display = '';
+        } else {
+            btn.classList.add('hidden');
+            btn.style.display = 'none';
+        }
+    }
+    window.updateFloatingBookingBtn = updateFloatingBookingBtn;
+
     function switchMenu(menu) {
         if (menu === 'pelanggan') {
             menu = 'pesanan';
@@ -148,6 +163,7 @@
         // Close sidebar on mobile
         if (window.innerWidth < 1024) closeSidebar();
 
+        updateFloatingBookingBtn(currentMenu);
         renderAll();
     }
 
@@ -296,6 +312,7 @@
     // ========================================
     function renderAll() {
         updateNotifications();
+        updateFloatingBookingBtn(currentMenu);
         if (currentMenu === 'dashboard') renderDashboard();
         else if (currentMenu === 'today') renderTodayTable();
         else if (currentMenu === 'pesanan') {
@@ -934,7 +951,7 @@
     // REQUEST PESANAN
     // ========================================
     // ========================================
-    // NOTIFICATIONS SYSTEM
+    // NOTIFICATIONS SYSTEM (REQUEST PESANAN BARU)
     // ========================================
     function updateNotifications() {
         const allBookings = getBookings().slice();
@@ -942,48 +959,130 @@
         
         const badgeMobile = document.getElementById('notifBadgeMobile');
         const badgeDesktop = document.getElementById('notifBadgeDesktop');
+        const modalBadge = document.getElementById('notifModalCountBadge');
         const listContainer = document.getElementById('notifListContainer');
         
         // Update Badges
         if (requests.length > 0) {
             if (badgeMobile) { badgeMobile.innerText = requests.length; badgeMobile.classList.remove('hidden'); }
             if (badgeDesktop) { badgeDesktop.innerText = requests.length; badgeDesktop.classList.remove('hidden'); }
+            if (modalBadge) { modalBadge.innerText = `${requests.length} Request`; modalBadge.classList.remove('hidden'); }
         } else {
             if (badgeMobile) badgeMobile.classList.add('hidden');
             if (badgeDesktop) badgeDesktop.classList.add('hidden');
+            if (modalBadge) modalBadge.classList.add('hidden');
         }
 
         // Update Modal Content
         if (!listContainer) return;
         
         if (requests.length === 0) {
-            listContainer.innerHTML = '<div class="text-center text-sm text-slate-400 font-bold py-8 italic uppercase tracking-widest">Tidak ada pesanan baru</div>';
+            listContainer.innerHTML = `
+                <div class="py-12 sm:py-16 px-4 flex flex-col items-center justify-center text-center">
+                    <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-3xl bg-amber-50 border border-amber-200/80 flex items-center justify-center text-amber-500 text-2xl sm:text-3xl mb-4 shadow-sm shadow-amber-500/10">
+                        <i class="fas fa-clipboard-check"></i>
+                    </div>
+                    <h3 class="text-slate-800 font-black text-base uppercase tracking-tight mb-1">Semua Pesanan Bersih!</h3>
+                    <p class="text-slate-400 text-xs font-semibold max-w-xs leading-relaxed">
+                        Saat ini tidak ada request pesanan tiket baru yang butuh persetujuan. Pesanan baru dari pelanggan akan otomatis muncul di sini.
+                    </p>
+                    <div class="mt-5 inline-flex items-center gap-2 bg-emerald-50 text-emerald-700 text-[11px] font-black px-3.5 py-1.5 rounded-full border border-emerald-200/70">
+                        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse inline-block"></span>
+                        <span>Sistem Monitoring Realtime Aktif</span>
+                    </div>
+                </div>
+            `;
             return;
         }
 
         listContainer.innerHTML = requests.map(b => {
             const armada = b.armadaId !== 'UNKNOWN' ? getArmada(b.armadaId) : null;
-            const armadaName = armada ? armada.name : '-';
-            const tujuan = armada ? armada.destination : '-';
+            const armadaName = armada ? armada.name : (b.jenisKendaraan || '-');
+            const tujuan = armada ? armada.destination : (b.tujuan || '-');
+            const totalNominal = parseInt(b.totalPrice) || parseInt(b.totalHarga) || 0;
+            const rawHp = String(b.hp || b.nomorHp || '');
+            const cleanHp = rawHp.replace(/[^0-9]/g, '').replace(/^0/, '62');
+            const paymentName = b.pembayaran || b.metodeBayar || 'Transfer';
             
             return `
-            <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-100 flex flex-col sm:flex-row justify-between sm:items-center gap-3 relative">
-                <div>
-                    <div class="flex items-center gap-2 mb-1">
-                        <span class="text-[10px] bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full font-black uppercase">Belum ACC</span>
-                        <span class="text-xs font-black text-slate-500">${b.bookingId}</span>
+            <div class="bg-white rounded-2xl border border-slate-200/90 shadow-sm hover:shadow-md transition-all p-4 sm:p-5 flex flex-col gap-3.5 relative overflow-hidden group">
+                <!-- Accent Line -->
+                <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-amber-400 via-amber-500 to-amber-600"></div>
+
+                <!-- Header: Status, Booking ID, Date -->
+                <div class="flex items-center justify-between gap-2 border-b border-slate-100 pb-2.5">
+                    <div class="flex items-center gap-2 flex-wrap">
+                        <span class="bg-amber-100 text-amber-900 text-[10px] font-black px-2.5 py-0.5 rounded-md uppercase tracking-wider flex items-center gap-1">
+                            <i class="fas fa-clock text-amber-600 text-[9px]"></i> MENUNGGU ACC
+                        </span>
+                        <span class="text-xs font-black text-slate-800 font-mono tracking-wider bg-slate-100 px-2.5 py-0.5 rounded-md">
+                            ${b.bookingId}
+                        </span>
                     </div>
-                    <h3 class="font-bold text-sm text-slate-800 uppercase">${b.name} <span class="text-slate-400 font-normal">(${b.hp})</span></h3>
-                    <p class="text-xs text-slate-500 mt-1">
-                        <b>${armadaName}</b> &rarr; ${tujuan}
-                    </p>
-                    <p class="text-[10px] text-slate-400 font-bold mt-1">
-                        <i class="fas fa-calendar-alt mr-1"></i> ${b.dateTravel || '-'} | ${b.qty} Orang | ${formatRupiah(b.totalPrice)}
-                    </p>
+                    <span class="text-[10px] font-bold text-slate-400 flex items-center gap-1">
+                        <i class="far fa-calendar-alt"></i> ${b.dateTravel || b.tanggalPemberangkatan || '-'}
+                    </span>
                 </div>
-                <div class="flex gap-2 shrink-0">
-                    <button onclick="openConfirmModal('${b.bookingId}')" class="flex-1 sm:flex-none py-2 px-4 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs uppercase tracking-widest rounded-lg shadow-md transition-all">ACC</button>
-                    <button onclick="openDeleteModal('${b.bookingId}')" class="flex-1 sm:flex-none py-2 px-4 bg-red-100 hover:bg-red-200 text-red-600 font-bold text-xs uppercase tracking-widest rounded-lg transition-all">Tolak</button>
+
+                <!-- Passenger & Travel Info -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-left">
+                    <!-- Pemesan -->
+                    <div class="space-y-1">
+                        <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest block">Data Pemesan</span>
+                        <h4 class="font-black text-slate-900 text-sm uppercase tracking-tight">${b.name}</h4>
+                        <div class="flex items-center gap-1.5 pt-0.5">
+                            ${cleanHp ? `
+                                <a href="https://wa.me/${cleanHp}" target="_blank" class="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-600 hover:text-emerald-700 bg-emerald-50 hover:bg-emerald-100 px-2 py-0.5 rounded-md transition-colors" title="Chat WhatsApp Pemesan">
+                                    <i class="fab fa-whatsapp"></i> ${rawHp}
+                                </a>
+                            ` : `<span class="text-xs text-slate-400">-</span>`}
+                        </div>
+                        ${(b.alamat && b.alamat !== '-') ? `
+                            <p class="text-[10px] text-slate-500 font-semibold truncate flex items-center gap-1 pt-0.5">
+                                <i class="fas fa-map-marker-alt text-slate-400 text-[9px]"></i> ${b.alamat}
+                            </p>
+                        ` : ''}
+                    </div>
+
+                    <!-- Armada & Rute -->
+                    <div class="space-y-1 sm:text-right">
+                        <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest block">Armada &amp; Rute</span>
+                        <div class="font-black text-slate-900 text-sm uppercase flex items-center sm:justify-end gap-1.5">
+                            <i class="fas fa-bus text-amber-500 text-xs"></i> <span>${armadaName}</span>
+                        </div>
+                        <p class="text-xs font-bold text-blue-900">
+                            Ke: <span class="uppercase tracking-wide">${tujuan}</span>
+                        </p>
+                        <p class="text-[10px] font-bold text-slate-500">
+                            ${b.waktu || '-'} • <span class="text-slate-800 font-black">${b.qty || b.jumlahPnp || 1} Penumpang</span>
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Payment Details -->
+                <div class="bg-slate-50 p-3 rounded-xl border border-slate-100 flex items-center justify-between gap-3">
+                    <div>
+                        <span class="text-[9px] font-bold text-slate-400 uppercase tracking-wider block">Pembayaran</span>
+                        <span class="text-xs font-black text-slate-700 uppercase flex items-center gap-1 mt-0.5">
+                            <i class="fas fa-wallet text-amber-500 text-[10px]"></i> ${paymentName}
+                        </span>
+                    </div>
+                    <div class="text-right">
+                        <span class="text-[9px] font-bold text-slate-400 uppercase tracking-wider block">Total Tagihan</span>
+                        <span class="text-sm sm:text-base font-black text-slate-900 tracking-tight text-emerald-600">
+                            ${formatRupiah(totalNominal)}
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="flex items-center gap-2 pt-1">
+                    <button onclick="openConfirmModal('${b.bookingId}')" class="flex-1 py-2.5 px-4 bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-700 hover:to-emerald-600 text-white font-black text-xs uppercase tracking-wider rounded-xl shadow-md shadow-emerald-600/20 hover:shadow-lg transition-all flex items-center justify-center gap-2 active:scale-95">
+                        <i class="fas fa-check-circle"></i> <span>ACC Pesanan</span>
+                    </button>
+                    <button onclick="openDeleteModal('${b.bookingId}')" class="py-2.5 px-4 bg-slate-100 hover:bg-rose-50 text-slate-600 hover:text-rose-600 font-black text-xs uppercase tracking-wider rounded-xl transition-all flex items-center justify-center gap-1.5 active:scale-95 border border-slate-200 hover:border-rose-200">
+                        <i class="fas fa-times-circle"></i> <span>Tolak</span>
+                    </button>
                 </div>
             </div>`;
         }).join('');
@@ -1026,9 +1125,10 @@
 
         if (query) {
             allBookings = allBookings.filter(b => {
-                return String(b.bookingId).toLowerCase().includes(query) ||
-                       String(b.name).toLowerCase().includes(query) ||
-                       String(b.dateTravel).toLowerCase().includes(query);
+                return String(b.bookingId || '').toLowerCase().includes(query) ||
+                       String(b.name || '').toLowerCase().includes(query) ||
+                       String(b.alamat || '').toLowerCase().includes(query) ||
+                       String(b.dateTravel || '').toLowerCase().includes(query);
             });
         }
 
@@ -1044,7 +1144,7 @@
         if (!tbody) return;
 
         tbody.innerHTML = paginatedBookings.length ? paginatedBookings.map(b => buildBookingRow(b, false)).join('') :
-            '<tr><td colspan="5" class="text-center text-sm text-slate-400 font-bold py-8 italic uppercase tracking-widest">Tidak ada data pesanan</td></tr>';
+            '<tr><td colspan="4" class="text-center text-xs font-bold text-slate-400 py-12 uppercase tracking-widest"><i class="fas fa-inbox text-3xl text-slate-300 block mb-2"></i>Tidak ada data pesanan</td></tr>';
 
         // Update Pagination UI
         const pageInfo = document.getElementById('pesananPageInfo');
@@ -1062,33 +1162,33 @@
     }
 
     // ========================================
-    // BOOKING ROW BUILDER
+    // BOOKING ROW BUILDER (HANYA ID TIKET, NAMA & ALAMAT - PRIORITAS HP)
     // ========================================
     function buildBookingRow(b, showAccBtn) {
-        const isPaid = (b.status === 'paid' || String(b.status).toUpperCase() === 'LUNAS' || String(b.status).toUpperCase() === 'ACC');
-        const badgeClass = isPaid ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700';
-        const badgeText = isPaid ? 'LUNAS' : 'BELUM LUNAS';
-
-        const armada = b.armadaId !== 'UNKNOWN' ? getArmada(b.armadaId) : null;
-        const tujuan = armada ? armada.destination : (b.tujuan || '-');
-
         // Gunakan ID saja untuk onclick agar terhindar dari error parsing string
-        const safeId = String(b.bookingId || '').replace(/'/g, "\\'");
-        
-        const rawKet = String(b.keterangan || b['Keterangan'] || b['KETERANGAN'] || '-');
-        const mKet = rawKet.match(/Biaya Tambahan: (.*?) \((Rp[ \d.,]+)\)/);
-        let nominalBiayaTambahan = 0;
-        if (mKet) nominalBiayaTambahan = parseInt(mKet[2].replace(/[^\d]/g, '')) || 0;
-        
-        const expectedTotal = armada ? parseInt(armada.price) * (parseInt(b.qty) || 1) : 0;
-        const total = Math.max(parseInt(b.totalPrice) || 0, expectedTotal + nominalBiayaTambahan);
+        const safeId = String(b.bookingId || b.id || '').replace(/'/g, "\\'");
+        const rawName = String(b.name || b['Nama'] || b['NAMA'] || '-').trim();
+        const rawAlamat = String(b.alamat || b['Alamat'] || b['ALAMAT'] || b.titikKumpul || '-').trim();
+        const displayAlamat = (rawAlamat && rawAlamat !== '-') ? rawAlamat : '-';
 
-        return `<tr class="border-b border-slate-50 group hover:bg-blue-50 transition-colors cursor-pointer" onclick="openBookingDetailModal('${safeId}', ${showAccBtn})">
-            <td class="py-3 px-4 font-black text-xs text-blue-900 whitespace-nowrap">${b.bookingId}</td>
-            <td class="py-3 px-4 font-bold text-xs text-slate-800 uppercase truncate max-w-[120px]">${b.name}</td>
-            <td class="py-3 px-4 font-bold text-[10px] text-slate-500 truncate max-w-[150px]" title="${b.alamat || '-'}">${b.alamat || '-'}</td>\n            <td class="py-3 px-4 font-bold text-xs text-slate-600 truncate max-w-[120px]">${tujuan}</td>
-            <td class="py-3 px-4 font-black text-xs text-slate-800 text-right whitespace-nowrap">${formatRupiah(total)}</td>
-            <td class="py-3 px-4 text-center"><span class="inline-block px-2 py-1 rounded text-[9px] font-black ${badgeClass}">${badgeText}</span></td>
+        return `
+        <tr class="border-b border-slate-100 hover:bg-amber-50/70 active:bg-amber-100/60 transition-colors cursor-pointer group" onclick="openBookingDetailModal('${safeId}', ${showAccBtn})">
+            <td class="w-[32%] sm:w-[26%] py-3.5 px-3 sm:px-5 font-black text-xs sm:text-sm text-blue-900 font-mono tracking-tight whitespace-nowrap">
+                <span class="inline-block bg-blue-50/90 text-blue-900 px-2 py-0.5 rounded-lg border border-blue-200/70 font-black shadow-2xs">
+                    ${b.bookingId}
+                </span>
+            </td>
+            <td class="w-[36%] sm:w-[36%] py-3.5 px-2 sm:px-4 font-black text-xs sm:text-sm text-slate-800 uppercase truncate" title="${rawName}">
+                <span class="truncate block">${rawName}</span>
+            </td>
+            <td class="w-[24%] sm:w-[32%] py-3.5 px-2 sm:px-4 font-bold text-[11px] sm:text-xs text-slate-500 truncate" title="${displayAlamat}">
+                <span class="truncate block ${displayAlamat === '-' ? 'text-slate-300' : 'text-slate-600'}">
+                    ${displayAlamat}
+                </span>
+            </td>
+            <td class="w-[8%] sm:w-[6%] py-3.5 px-1 sm:px-2 text-center text-slate-300 group-hover:text-amber-500 group-hover:translate-x-0.5 transition-all">
+                <i class="fas fa-chevron-right text-[10px] sm:text-xs"></i>
+            </td>
         </tr>`;
     }
 
@@ -6192,20 +6292,20 @@ function switchPesananSubtab(sub) {
 
     if (sub === 'tiket') {
         if (tabTiket) {
-            tabTiket.className = 'px-5 py-2.5 rounded-xl font-black text-xs uppercase tracking-widest transition-all bg-slate-900 text-amber-400 shadow-md flex items-center gap-2';
+            tabTiket.className = 'px-4 sm:px-5 py-2.5 rounded-xl font-black text-xs uppercase tracking-widest transition-all bg-slate-900 text-amber-400 shadow-md flex items-center gap-2 whitespace-nowrap shrink-0';
         }
         if (tabPelanggan) {
-            tabPelanggan.className = 'px-5 py-2.5 rounded-xl font-black text-xs uppercase tracking-widest transition-all bg-white hover:bg-slate-100 text-slate-600 border border-slate-200 flex items-center gap-2';
+            tabPelanggan.className = 'px-4 sm:px-5 py-2.5 rounded-xl font-black text-xs uppercase tracking-widest transition-all bg-white hover:bg-slate-100 text-slate-600 border border-slate-200 flex items-center gap-2 whitespace-nowrap shrink-0';
         }
         if (paneTiket) paneTiket.classList.remove('hidden');
         if (panePelanggan) panePelanggan.classList.add('hidden');
         renderPesanan();
     } else {
         if (tabPelanggan) {
-            tabPelanggan.className = 'px-5 py-2.5 rounded-xl font-black text-xs uppercase tracking-widest transition-all bg-slate-900 text-amber-400 shadow-md flex items-center gap-2';
+            tabPelanggan.className = 'px-4 sm:px-5 py-2.5 rounded-xl font-black text-xs uppercase tracking-widest transition-all bg-slate-900 text-amber-400 shadow-md flex items-center gap-2 whitespace-nowrap shrink-0';
         }
         if (tabTiket) {
-            tabTiket.className = 'px-5 py-2.5 rounded-xl font-black text-xs uppercase tracking-widest transition-all bg-white hover:bg-slate-100 text-slate-600 border border-slate-200 flex items-center gap-2';
+            tabTiket.className = 'px-4 sm:px-5 py-2.5 rounded-xl font-black text-xs uppercase tracking-widest transition-all bg-white hover:bg-slate-100 text-slate-600 border border-slate-200 flex items-center gap-2 whitespace-nowrap shrink-0';
         }
         if (panePelanggan) panePelanggan.classList.remove('hidden');
         if (paneTiket) paneTiket.classList.add('hidden');
@@ -7522,7 +7622,7 @@ let currentKontrolSubtab = 'profil';
 
 function switchKontrolSubtab(tabKey) {
     currentKontrolSubtab = tabKey;
-    const tabs = ['profil', 'pembayaran', 'hero', 'kebijakan', 'footer'];
+    const tabs = ['profil', 'pembayaran', 'fasilitas', 'hero', 'kebijakan', 'footer'];
     tabs.forEach(t => {
         const btn = document.getElementById('tabBtnKontrol' + t.charAt(0).toUpperCase() + t.slice(1));
         const pane = document.getElementById('subtabKontrol' + t.charAt(0).toUpperCase() + t.slice(1));
@@ -7653,6 +7753,12 @@ async function renderKontrol() {
     if (elTiktok) elTiktok.value = kontrolConfigData.social?.tiktok || '';
     if (elWeb) elWeb.value = kontrolConfigData.social?.website || '';
     if (elCopy) elCopy.value = kontrolConfigData.social?.copyright || kontrolConfigData.social?.copyrightText || '';
+
+    // Subtab 6: Fasilitas Agen
+    if (!kontrolConfigData.facilities || !Array.isArray(kontrolConfigData.facilities)) {
+        kontrolConfigData.facilities = [];
+    }
+    renderKontrolFacilities();
 }
 
 function renderKontrolPayments() {
@@ -7936,6 +8042,296 @@ async function submitUploadQris() {
     }
 }
 
+// ==========================================
+// KONTROL FASILITAS AGEN (SUBTAB 6)
+// ==========================================
+function renderKontrolFacilities() {
+    const container = document.getElementById('kontrolFacilitiesContainer');
+    const badge = document.getElementById('facCountBadge');
+    if (!kontrolConfigData) return;
+
+    if (!Array.isArray(kontrolConfigData.facilities)) {
+        kontrolConfigData.facilities = [];
+    }
+
+    if (badge) {
+        badge.innerText = `${kontrolConfigData.facilities.length} Fasilitas Tersedia`;
+    }
+
+    if (!container) return;
+
+    if (kontrolConfigData.facilities.length === 0) {
+        container.innerHTML = `
+            <div class="col-span-full py-12 text-center bg-slate-50 rounded-2xl border-2 border-dashed border-slate-200">
+                <i class="fas fa-couch text-3xl text-slate-300 mb-2"></i>
+                <p class="text-xs font-bold text-slate-500 uppercase tracking-wider">Belum ada fasilitas agen yang ditambahkan</p>
+                <p class="text-[10px] text-slate-400 mt-1">Gunakan formulir di atas untuk menambahkan fasilitas pertama Anda.</p>
+            </div>
+        `;
+        return;
+    }
+
+    container.innerHTML = kontrolConfigData.facilities.map((f) => {
+        const isActive = f.isActive !== false;
+        const img = f.image || 'damri.webp';
+        const tag = f.tag || 'Fasilitas';
+        const title = f.title || '-';
+        const desc = f.description || '-';
+
+        return `
+            <div class="bg-white rounded-3xl border ${isActive ? 'border-amber-300 shadow-md shadow-amber-500/5' : 'border-slate-200 opacity-60'} overflow-hidden flex flex-col transition-all">
+                <div class="aspect-[16/10] overflow-hidden bg-slate-100 relative">
+                    <img src="${img}" alt="${title}" class="w-full h-full object-cover" onerror="this.src='damri.webp'">
+                    <span class="absolute top-3 left-3 bg-slate-900/85 backdrop-blur-xs text-amber-400 text-[10px] font-black px-2.5 py-1 rounded-full uppercase tracking-wider shadow-sm flex items-center gap-1">
+                        <i class="fas fa-tag text-[9px]"></i> ${tag}
+                    </span>
+                    <span class="absolute top-3 right-3 text-[9px] font-black uppercase px-2 py-0.5 rounded-md ${isActive ? 'bg-emerald-500 text-white' : 'bg-slate-700 text-slate-200'}">
+                        ${isActive ? 'AKTIF' : 'NONAKTIF'}
+                    </span>
+                </div>
+                <div class="p-5 flex-1 flex flex-col justify-between space-y-4">
+                    <div>
+                        <h4 class="font-black text-slate-800 text-base tracking-tight uppercase">${title}</h4>
+                        <p class="text-xs text-slate-500 font-semibold mt-1.5 leading-relaxed line-clamp-3">${desc}</p>
+                    </div>
+                    <div class="pt-3 border-t border-slate-100 flex items-center justify-between gap-2">
+                        <button type="button" onclick="toggleFacilityStatus('${f.id}')" class="px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-wider transition-all ${isActive ? 'bg-amber-100 text-amber-800 hover:bg-amber-200' : 'bg-emerald-100 text-emerald-800 hover:bg-emerald-200'}">
+                            ${isActive ? 'Nonaktifkan' : 'Aktifkan'}
+                        </button>
+                        <div class="flex items-center gap-1.5">
+                            <button type="button" onclick="editFacilityItem('${f.id}')" class="w-8 h-8 rounded-xl bg-slate-100 hover:bg-blue-50 text-slate-600 hover:text-blue-600 flex items-center justify-center text-xs transition-colors" title="Edit Fasilitas">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button type="button" onclick="deleteFacilityItem('${f.id}')" class="w-8 h-8 rounded-xl bg-slate-100 hover:bg-red-50 text-slate-600 hover:text-red-600 flex items-center justify-center text-xs transition-colors" title="Hapus Fasilitas">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+
+async function handleFacilityFileSelect(input) {
+    if (!input.files || !input.files[0]) return;
+    const file = input.files[0];
+    const statusEl = document.getElementById('facUploadStatus');
+    const placeholder = document.getElementById('facUploadPlaceholder');
+    const previewContainer = document.getElementById('facPreviewContainer');
+    const previewImg = document.getElementById('facImagePreview');
+    const hiddenUrl = document.getElementById('facImageUrl');
+
+    const token = localStorage.getItem('adminToken');
+    if (!token) {
+        alert('Sesi admin berakhir, silakan login ulang');
+        return;
+    }
+
+    if (statusEl) {
+        statusEl.classList.remove('hidden');
+        statusEl.innerHTML = '<i class="fas fa-spinner fa-spin text-amber-500"></i> Mengunggah foto ke server...';
+    }
+
+    const formData = new FormData();
+    formData.append('image', file);
+
+    try {
+        const resp = await fetch('/api/upload-fasilitas', {
+            method: 'POST',
+            headers: {
+                'Authorization': 'Bearer ' + token
+            },
+            body: formData
+        });
+        const res = await resp.json();
+        if ((res.success || res.status === 'success') && res.url) {
+            if (hiddenUrl) hiddenUrl.value = res.url;
+            if (previewImg) previewImg.src = res.url;
+            if (placeholder) placeholder.classList.add('hidden');
+            if (previewContainer) previewContainer.classList.remove('hidden');
+            if (statusEl) {
+                statusEl.innerHTML = '<span class="text-emerald-600"><i class="fas fa-check-circle"></i> Foto berhasil diunggah!</span>';
+            }
+        } else {
+            alert('Gagal mengunggah foto: ' + (res.message || 'Error server'));
+            if (statusEl) statusEl.classList.add('hidden');
+        }
+    } catch (err) {
+        console.error('Upload foto fasilitas gagal:', err);
+        alert('Terjadi kesalahan jaringan saat mengunggah foto.');
+        if (statusEl) statusEl.classList.add('hidden');
+    }
+}
+
+async function saveFacilityItem() {
+    if (!kontrolConfigData) return;
+    if (!Array.isArray(kontrolConfigData.facilities)) {
+        kontrolConfigData.facilities = [];
+    }
+
+    const editId = document.getElementById('facEditId')?.value.trim();
+    const imageUrl = document.getElementById('facImageUrl')?.value.trim();
+    const title = document.getElementById('facTitle')?.value.trim();
+    const tag = document.getElementById('facTag')?.value.trim();
+    const description = document.getElementById('facDescription')?.value.trim();
+
+    if (!title) {
+        if (typeof Swal !== 'undefined') {
+            Swal.fire({ icon: 'warning', title: 'Nama Fasilitas Kosong', text: 'Silakan isi nama fasilitas terlebih dahulu.' });
+        } else {
+            alert('Silakan isi nama fasilitas.');
+        }
+        return;
+    }
+
+    if (!imageUrl) {
+        if (typeof Swal !== 'undefined') {
+            Swal.fire({ icon: 'warning', title: 'Foto Belum Diunggah', text: 'Silakan pilih dan unggah foto fasilitas terlebih dahulu.' });
+        } else {
+            alert('Silakan unggah foto fasilitas.');
+        }
+        return;
+    }
+
+    if (editId) {
+        const item = kontrolConfigData.facilities.find(f => f.id === editId);
+        if (item) {
+            item.title = title;
+            item.tag = tag || 'Fasilitas';
+            item.description = description || '';
+            item.image = imageUrl;
+        }
+    } else {
+        const newItem = {
+            id: 'fac-' + Date.now(),
+            title: title,
+            tag: tag || 'Fasilitas',
+            description: description || '',
+            image: imageUrl,
+            isActive: true
+        };
+        kontrolConfigData.facilities.push(newItem);
+    }
+
+    renderKontrolFacilities();
+    cancelEditFacility();
+
+    await saveKontrolConfig();
+}
+
+function editFacilityItem(id) {
+    if (!kontrolConfigData || !Array.isArray(kontrolConfigData.facilities)) return;
+    const item = kontrolConfigData.facilities.find(f => f.id === id);
+    if (!item) return;
+
+    document.getElementById('facEditId').value = item.id;
+    document.getElementById('facTitle').value = item.title || '';
+    document.getElementById('facTag').value = item.tag || '';
+    document.getElementById('facDescription').value = item.description || '';
+    document.getElementById('facImageUrl').value = item.image || '';
+
+    const previewImg = document.getElementById('facImagePreview');
+    const placeholder = document.getElementById('facUploadPlaceholder');
+    const previewContainer = document.getElementById('facPreviewContainer');
+    const statusEl = document.getElementById('facUploadStatus');
+
+    if (previewImg && item.image) {
+        previewImg.src = item.image;
+        if (placeholder) placeholder.classList.add('hidden');
+        if (previewContainer) previewContainer.classList.remove('hidden');
+    }
+    if (statusEl) statusEl.classList.add('hidden');
+
+    const formTitle = document.getElementById('formFacilityTitle');
+    if (formTitle) {
+        formTitle.innerHTML = '<i class="fas fa-edit text-amber-500"></i> Edit Fasilitas Agen';
+    }
+    const btnText = document.getElementById('btnSaveFacilityText');
+    if (btnText) btnText.innerText = 'Simpan Perubahan';
+
+    const btnCancel = document.getElementById('btnCancelFacility');
+    if (btnCancel) btnCancel.classList.remove('hidden');
+
+    document.getElementById('subtabKontrolFasilitas')?.scrollIntoView({ behavior: 'smooth' });
+}
+
+function cancelEditFacility() {
+    const editId = document.getElementById('facEditId');
+    if (editId) editId.value = '';
+    const title = document.getElementById('facTitle');
+    if (title) title.value = '';
+    const tag = document.getElementById('facTag');
+    if (tag) tag.value = '';
+    const desc = document.getElementById('facDescription');
+    if (desc) desc.value = '';
+    const imgUrl = document.getElementById('facImageUrl');
+    if (imgUrl) imgUrl.value = '';
+    const fileInput = document.getElementById('facInputFile');
+    if (fileInput) fileInput.value = '';
+
+    const placeholder = document.getElementById('facUploadPlaceholder');
+    const previewContainer = document.getElementById('facPreviewContainer');
+    const statusEl = document.getElementById('facUploadStatus');
+    if (placeholder) placeholder.classList.remove('hidden');
+    if (previewContainer) previewContainer.classList.add('hidden');
+    if (statusEl) statusEl.classList.add('hidden');
+
+    const formTitle = document.getElementById('formFacilityTitle');
+    if (formTitle) {
+        formTitle.innerHTML = '<i class="fas fa-plus-circle text-amber-500"></i> Tambah Fasilitas Agen Baru';
+    }
+    const btnText = document.getElementById('btnSaveFacilityText');
+    if (btnText) btnText.innerText = 'Tambah Fasilitas';
+
+    const btnCancel = document.getElementById('btnCancelFacility');
+    if (btnCancel) btnCancel.classList.add('hidden');
+}
+
+async function deleteFacilityItem(id) {
+    if (!kontrolConfigData || !Array.isArray(kontrolConfigData.facilities)) return;
+
+    const doDelete = async () => {
+        kontrolConfigData.facilities = kontrolConfigData.facilities.filter(f => f.id !== id);
+        renderKontrolFacilities();
+        if (document.getElementById('facEditId')?.value === id) {
+            cancelEditFacility();
+        }
+        await saveKontrolConfig();
+    };
+
+    if (typeof Swal !== 'undefined') {
+        Swal.fire({
+            title: 'Hapus Fasilitas?',
+            text: 'Fasilitas ini tidak akan ditampilkan lagi di halaman web.',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#ef4444',
+            cancelButtonColor: '#64748b',
+            confirmButtonText: 'Ya, Hapus',
+            cancelButtonText: 'Batal'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                doDelete();
+            }
+        });
+    } else {
+        if (confirm('Yakin ingin menghapus fasilitas ini?')) {
+            doDelete();
+        }
+    }
+}
+
+async function toggleFacilityStatus(id) {
+    if (!kontrolConfigData || !Array.isArray(kontrolConfigData.facilities)) return;
+    const item = kontrolConfigData.facilities.find(f => f.id === id);
+    if (!item) return;
+
+    item.isActive = item.isActive === false ? true : false;
+    renderKontrolFacilities();
+    await saveKontrolConfig();
+}
+
 async function saveKontrolConfig() {
     if (!kontrolConfigData) return;
 
@@ -8046,4 +8442,11 @@ if (typeof window !== 'undefined') {
     window.previewSelectedQris = previewSelectedQris;
     window.submitUploadQris = submitUploadQris;
     window.saveKontrolConfig = saveKontrolConfig;
+    window.renderKontrolFacilities = renderKontrolFacilities;
+    window.handleFacilityFileSelect = handleFacilityFileSelect;
+    window.saveFacilityItem = saveFacilityItem;
+    window.editFacilityItem = editFacilityItem;
+    window.cancelEditFacility = cancelEditFacility;
+    window.deleteFacilityItem = deleteFacilityItem;
+    window.toggleFacilityStatus = toggleFacilityStatus;
 }

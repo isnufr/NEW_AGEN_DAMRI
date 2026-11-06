@@ -935,6 +935,8 @@
                     class="px-4 py-2 rounded-full hover:bg-amber-50 hover:text-amber-600 transition-all text-center">Layanan</a>
                 <a href="#jadwal"
                     class="px-4 py-2 rounded-full hover:bg-amber-50 hover:text-amber-600 transition-all text-center">Jadwal</a>
+                <a href="#fasilitas"
+                    class="px-4 py-2 rounded-full hover:bg-amber-50 hover:text-amber-600 transition-all text-center">Fasilitas</a>
                 <a href="#kontak"
                     class="px-4 py-2 rounded-full hover:bg-amber-50 hover:text-amber-600 transition-all text-center">Kontak</a>
             </div>
@@ -963,6 +965,8 @@
             class="hover:text-tertiary py-3 border-b border-gray-100 transition-colors block w-full">Layanan</a>
         <a href="#jadwal" onclick="toggleMobileMenu()"
             class="hover:text-tertiary py-3 border-b border-gray-100 transition-colors block w-full">Jadwal</a>
+        <a href="#fasilitas" onclick="toggleMobileMenu()"
+            class="hover:text-tertiary py-3 border-b border-gray-100 transition-colors block w-full">Fasilitas Agen</a>
         <a href="#kontak" onclick="toggleMobileMenu()"
             class="hover:text-tertiary py-3 border-b border-gray-100 transition-colors block w-full">Kontak</a>
     </div>
@@ -1163,157 +1167,19 @@
         </div>
     </section>
 
-    <!-- Galeri Foto Armada -->
-    <section id="galeri" class="py-24 bg-white overflow-hidden">
+    <!-- FASILITAS AGEN -->
+    <section id="fasilitas" class="py-24 bg-white overflow-hidden">
         <div class="container mx-auto px-4 text-center">
             <h2 class="text-slate-800 font-extrabold text-3xl md:text-4xl mb-4 uppercase tracking-tighter text-center">
-                Galeri
-                Armada</h2>
-            <div class="w-20 h-1.5 bg-gradient-to-r from-amber-400 to-amber-500 mx-auto rounded-full mb-12"></div>
+                FASILITAS AGEN
+            </h2>
+            <div class="w-20 h-1.5 bg-gradient-to-r from-amber-400 to-amber-500 mx-auto rounded-full mb-4"></div>
+            <p class="text-xs sm:text-sm font-bold text-slate-500 max-w-2xl mx-auto mb-14 uppercase tracking-wider">
+                Kenyamanan dan pelayanan terbaik di agen kami untuk perjalanan Anda
+            </p>
 
-            <div class="relative group max-w-6xl mx-auto">
-                <div id="slider" class="slider-container flex overflow-x-auto gap-6 pb-12 snap-x snap-mandatory">
-                    <div class="slide-item snap-center">
-                        <div class="modern-card overflow-hidden group/item relative h-full">
-                            <div class="aspect-[16/10] overflow-hidden bg-gray-100">
-                                <img src="damri.webp" alt="Damri Jakarta"
-                                    class="w-full h-full object-cover transition-transform duration-700 group-hover/item:scale-110">
-                            </div>
-                            <div class="p-6 text-center">
-                                <span
-                                    class="bg-blue-600 text-white text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-widest mb-2 inline-block">Bus
-                                    Antar Kota</span>
-                                <h4 class="text-blue-900 font-black italic uppercase tracking-tighter">DAMRI JAKARTA
-                                </h4>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="slide-item snap-center">
-                        <div class="modern-card overflow-hidden group/item relative h-full">
-                            <div class="aspect-[16/10] overflow-hidden bg-gray-100">
-                                <img src="damri2.webp" alt="Damri Sumatra"
-                                    class="w-full h-full object-cover transition-transform duration-700 group-hover/item:scale-110">
-                            </div>
-                            <div class="p-6 text-center">
-                                <span
-                                    class="bg-blue-600 text-white text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-widest mb-2 inline-block">Bus
-                                    Antar Pulau</span>
-                                <h4 class="text-blue-900 font-black italic uppercase tracking-tighter">DAMRI SUMATRA
-                                </h4>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="slide-item snap-center">
-                        <div class="modern-card overflow-hidden group/item relative h-full">
-                            <div class="aspect-[16/10] overflow-hidden bg-gray-100">
-                                <img src="bestpremium.webp" alt="Best Premium"
-                                    class="w-full h-full object-cover transition-transform duration-700 group-hover/item:scale-110">
-                            </div>
-                            <div class="p-6 text-center">
-                                <span
-                                    class="bg-blue-600 text-white text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-widest mb-2 inline-block">Bus
-                                    Antar Kota</span>
-                                <h4 class="text-blue-900 font-black italic uppercase tracking-tighter">BEST PREMIUM</h4>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="slide-item snap-center">
-                        <div class="modern-card overflow-hidden group/item relative h-full">
-                            <div class="aspect-[16/10] overflow-hidden bg-gray-100">
-                                <img src="efisiensi.webp" alt="EFISIENSI"
-                                    class="w-full h-full object-cover transition-transform duration-700 group-hover/item:scale-110">
-                            </div>
-                            <div class="p-6 text-center">
-                                <span
-                                    class="bg-blue-600 text-white text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-widest mb-2 inline-block">Bus
-                                    Antar Kota</span>
-                                <h4 class="text-blue-900 font-black italic uppercase tracking-tighter">EFISIENSI</h4>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="slide-item snap-center">
-                        <div class="modern-card overflow-hidden group/item relative h-full">
-                            <div class="aspect-[16/10] overflow-hidden bg-gray-100">
-                                <img src="riyan.webp" alt="RIYAN"
-                                    class="w-full h-full object-cover transition-transform duration-700 group-hover/item:scale-110">
-                            </div>
-                            <div class="p-6 text-center">
-                                <span
-                                    class="bg-blue-600 text-white text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-widest mb-2 inline-block">Bus
-                                    Antar Kota</span>
-                                <h4 class="text-blue-900 font-black italic uppercase tracking-tighter">RIYAN</h4>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="slide-item snap-center">
-                        <div class="modern-card overflow-hidden group/item relative h-full">
-                            <div class="aspect-[16/10] overflow-hidden bg-gray-100">
-                                <img src="estutrans.webp" alt="Estu Trans"
-                                    class="w-full h-full object-cover transition-transform duration-700 group-hover/item:scale-110">
-                            </div>
-                            <div class="p-6 text-center">
-                                <span
-                                    class="bg-blue-600 text-white text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-widest mb-2 inline-block">Travel
-                                    Executive</span>
-                                <h4 class="text-blue-900 font-black italic uppercase tracking-tighter">ESTU TRANS</h4>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="slide-item snap-center">
-                        <div class="modern-card overflow-hidden group/item relative h-full">
-                            <div class="aspect-[16/10] overflow-hidden bg-gray-100">
-                                <img src="busjogja.webp" alt="Bus Jogja"
-                                    class="w-full h-full object-cover transition-transform duration-700 group-hover/item:scale-110">
-                            </div>
-                            <div class="p-6 text-center">
-                                <span
-                                    class="bg-blue-600 text-white text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-widest mb-2 inline-block">Bus
-                                    Antar Kota</span>
-                                <h4 class="text-blue-900 font-black italic uppercase tracking-tighter">BUS JOGJA</h4>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="slide-item snap-center">
-                        <div class="modern-card overflow-hidden group/item relative h-full">
-                            <div class="aspect-[16/10] overflow-hidden bg-gray-100">
-                                <img src="qyta.webp" alt="QYTA TRANS"
-                                    class="w-full h-full object-cover transition-transform duration-700 group-hover/item:scale-110">
-                            </div>
-                            <div class="p-6 text-center">
-                                <span
-                                    class="bg-blue-600 text-white text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-widest mb-2 inline-block">Travel
-                                    Executive</span>
-                                <h4 class="text-blue-900 font-black italic uppercase tracking-tighter">QYTA TRANS</h4>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="slide-item snap-center">
-                        <div class="modern-card overflow-hidden group/item relative h-full">
-                            <div class="aspect-[16/10] overflow-hidden bg-gray-100">
-                                <img src="77trans.webp" alt="77 TRANS"
-                                    class="w-full h-full object-cover transition-transform duration-700 group-hover/item:scale-110">
-                            </div>
-                            <div class="p-6 text-center">
-                                <span
-                                    class="bg-blue-600 text-white text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-widest mb-2 inline-block">Travel
-                                    Executive</span>
-                                <h4 class="text-blue-900 font-black italic uppercase tracking-tighter">77 TRANS</h4>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <button onclick="slidePrev()"
-                    class="absolute left-2 top-1/2 -translate-y-1/2 w-12 h-12 bg-white/90 backdrop-blur shadow-2xl rounded-full flex items-center justify-center text-slate-800 hover:bg-amber-500 hover:text-white transition-all z-10 focus:outline-none">
-                    <i class="fas fa-chevron-left text-lg"></i>
-                </button>
-                <button onclick="slideNext()"
-                    class="absolute right-2 top-1/2 -translate-y-1/2 w-12 h-12 bg-white/90 backdrop-blur shadow-2xl rounded-full flex items-center justify-center text-slate-800 hover:bg-amber-500 hover:text-white transition-all z-10 focus:outline-none">
-                    <i class="fas fa-chevron-right text-lg"></i>
-                </button>
-
-                <div class="flex justify-center gap-2 mt-4" id="sliderDots">
-                </div>
+            <div id="fasilitasGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 max-w-7xl mx-auto">
+                <!-- Fasilitas akan dimuat secara dinamis dari KONTROL Website Admin -->
             </div>
         </div>
     </section>
@@ -1741,7 +1607,7 @@
 
                 populateArmadaDropdown();
                 renderArmadaGrid();
-                renderArmadaGallery();
+                renderFasilitasAgen();
                 renderPartnerLogos();
             }
         }
@@ -1887,36 +1753,51 @@
             grid.innerHTML = html;
         }
 
-        function renderArmadaGallery() {
-            const slider = document.getElementById('slider');
-            if (!slider || !fleetData || !fleetData.length) return;
+        function renderFasilitasAgen(cfg) {
+            const grid = document.getElementById('fasilitasGrid');
+            if (!grid) return;
 
-            slider.innerHTML = fleetData.map(f => {
-                const prof = typeof getPoProfile === 'function' ? getPoProfile(f.name) : null;
-                const img = prof?.image || 'damri.webp';
-                const tag = prof?.tagline || f.tipeArmada || 'Bus Eksekutif';
+            if (!cfg) {
+                cfg = typeof getSiteConfig === 'function' ? getSiteConfig() : null;
+            }
+
+            const facilities = (cfg?.facilities && Array.isArray(cfg.facilities))
+                ? cfg.facilities.filter(f => f.isActive !== false)
+                : [];
+
+            if (!facilities.length) {
+                grid.innerHTML = `
+                    <div class="col-span-full py-16 text-center bg-slate-50 rounded-3xl border-2 border-dashed border-slate-200">
+                        <i class="fas fa-couch text-4xl text-slate-300 mb-3"></i>
+                        <p class="text-xs font-black text-slate-400 uppercase tracking-widest">Informasi fasilitas agen akan segera hadir</p>
+                    </div>
+                `;
+                return;
+            }
+
+            grid.innerHTML = facilities.map(item => {
+                const img = item.image || 'damri.webp';
+                const tag = item.tag || 'Fasilitas';
+                const title = item.title || '';
+                const desc = item.description || '';
+
                 return `
-                    <div class="slide-item snap-center shrink-0 w-[280px] sm:w-[320px]">
-                        <div class="modern-card overflow-hidden group/item relative h-full bg-white rounded-3xl border border-slate-200/80 shadow-md flex flex-col">
-                            <div class="aspect-[16/10] overflow-hidden bg-gray-100 relative">
-                                <img src="${img}" alt="${f.name}" class="w-full h-full object-cover transition-transform duration-700 group-hover/item:scale-110" onerror="this.src='damri.webp'">
-                                <span class="absolute top-2.5 left-2.5 bg-slate-900/80 backdrop-blur-xs text-white text-[9px] font-black px-2 py-0.5 rounded-md uppercase tracking-wider">${f.tipeArmada || 'Bus'}</span>
-                            </div>
-                            <div class="p-5 text-center flex flex-col justify-between flex-1">
-                                <div>
-                                    <span class="bg-amber-100 text-amber-800 text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-wider mb-2 inline-block">${tag}</span>
-                                    <h4 class="text-slate-900 font-black italic uppercase tracking-tight text-base sm:text-lg">${f.name}</h4>
-                                </div>
-                                <button onclick="openBookingWithArmada('${f.name}')" class="mt-4 w-full bg-slate-900 hover:bg-amber-500 hover:text-slate-900 text-white text-xs font-black py-2.5 rounded-xl transition-all uppercase tracking-wider">
-                                    Pesan Tiket
-                                </button>
+                    <div class="modern-card overflow-hidden group flex flex-col bg-white rounded-3xl border border-slate-200/80 shadow-md hover:shadow-xl transition-all duration-300">
+                        <div class="aspect-[16/10] overflow-hidden bg-slate-100 relative">
+                            <img src="${img}" alt="${title}" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" onerror="this.src='damri.webp'">
+                            <span class="absolute top-3 left-3 bg-slate-900/85 backdrop-blur-xs text-amber-400 text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-wider shadow-sm flex items-center gap-1.5">
+                                <i class="fas fa-tag text-[9px]"></i> ${tag}
+                            </span>
+                        </div>
+                        <div class="p-6 text-left flex flex-col flex-1 justify-between">
+                            <div>
+                                <h3 class="text-base sm:text-lg font-black text-slate-900 tracking-tight mb-2 uppercase italic leading-snug">${title}</h3>
+                                <p class="text-slate-500 text-xs sm:text-sm font-semibold leading-relaxed">${desc}</p>
                             </div>
                         </div>
                     </div>
                 `;
             }).join('');
-
-            if (typeof initDots === 'function') initDots();
         }
 
         function renderPartnerLogos() {
@@ -2140,6 +2021,9 @@
 
             // 6. Dynamic Payment Select Options
             updatePaymentOptionsFromConfig(cfg);
+
+            // 7. Fasilitas Agen
+            renderFasilitasAgen(cfg);
         }
 
         function updatePaymentOptionsFromConfig(cfg) {
@@ -2950,18 +2834,6 @@
             const m = fleetData.filter(f => f.name.toLowerCase().includes(q) || f.routes.some(r => r.dest.toLowerCase().includes(q)));
             if (m.length > 0) { c.classList.remove('hidden'); l.innerHTML = m.map(i => `<div class="bg-blue-50/50 p-4 rounded-2xl hover:bg-blue-600 hover:text-white border border-blue-100 cursor-pointer transition-all group" onclick="scrollToArmada('${i.id}')"><h5 class="font-black text-blue-900 group-hover:text-white text-sm uppercase italic text-center">${i.name}</h5><p class="text-[10px] text-gray-500 group-hover:text-blue-100 font-bold mt-1 italic truncate text-center">${i.routes.map(r => r.dest).join(', ')}</p></div>`).join(''); } else c.classList.add('hidden');
         }
-
-        let currentSlide = 0; const slider = document.getElementById('slider');
-        function initDots() { const items = document.querySelectorAll('.slide-item'); const dotsContainer = document.getElementById('sliderDots'); if (!dotsContainer || items.length === 0) return; dotsContainer.innerHTML = Array.from(items).map((_, i) => `<div id="dot${i}" onclick="goToSlide(${i})" class="w-2 h-2 rounded-full cursor-pointer transition-all duration-300 ${i === 0 ? 'bg-blue-600 w-6' : 'bg-gray-300'}"></div>`).join(''); }
-        function updateDots() { const items = document.querySelectorAll('.slide-item'); const dotsCount = items.length; for (let i = 0; i < dotsCount; i++) { const dot = document.getElementById('dot' + i); if (dot) { dot.classList.remove('bg-blue-600', 'w-6'); dot.classList.add('bg-gray-300', 'w-2'); if (i === currentSlide % dotsCount) { dot.classList.add('bg-blue-600', 'w-6'); dot.classList.remove('bg-gray-300', 'w-2'); } } } }
-        function goToSlide(i) { currentSlide = i; const items = document.querySelectorAll('.slide-item'); if (items.length > 0) { const itemWidth = items[0].offsetWidth + 24; slider.scrollLeft = currentSlide * itemWidth; updateDots(); } }
-        function slideNext() { const items = document.querySelectorAll('.slide-item'); if (items.length === 0) return; const itemWidth = items[0].offsetWidth + 24; currentSlide++; if (currentSlide >= items.length) currentSlide = 0; slider.scrollLeft = currentSlide * itemWidth; updateDots(); }
-        function slidePrev() { const items = document.querySelectorAll('.slide-item'); if (items.length === 0) return; const itemWidth = items[0].offsetWidth + 24; currentSlide--; if (currentSlide < 0) currentSlide = items.length - 1; slider.scrollLeft = currentSlide * itemWidth; updateDots(); }
-
-        window.addEventListener('DOMContentLoaded', () => {
-            initDots();
-            setInterval(slideNext, 5000);
-        });
 
         window.addEventListener('scroll', () => {
             const btn = document.getElementById('scrollToTopBtn');

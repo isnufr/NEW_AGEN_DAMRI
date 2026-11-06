@@ -285,7 +285,41 @@ const DEFAULT_SITE_CONFIG = {
         tiktok: "",
         website: "agendamrikawunganten.net",
         copyright: "AGEN DAMRI KAWUNGANTEN. ALL RIGHTS RESERVED."
-    }
+    },
+    facilities: [
+        {
+            id: "fac-1",
+            title: "Tampak Depan Agen",
+            tag: "Titik Kumpul",
+            image: "damri.webp",
+            description: "Lokasi agen strategis di Kawunganten, mudah dijangkau dengan plang resmi dan titik kumpul yang jelas.",
+            isActive: true
+        },
+        {
+            id: "fac-2",
+            title: "Ruang Tunggu Penumpang",
+            tag: "Kenyamanan",
+            image: "estutrans.webp",
+            description: "Area tempat duduk yang nyaman dan teduh bagi calon penumpang selagi menunggu kedatangan armada.",
+            isActive: true
+        },
+        {
+            id: "fac-3",
+            title: "Kamar Mandi & Toilet",
+            tag: "Kebersihan",
+            image: "bestpremium.webp",
+            description: "Tersedia fasilitas toilet bersih dan terawat yang dapat digunakan oleh seluruh penumpang agen.",
+            isActive: true
+        },
+        {
+            id: "fac-4",
+            title: "Area Parkir Kendaraan",
+            tag: "Keamanan",
+            image: "efisiensi.webp",
+            description: "Area parkir yang luas dan aman untuk kendaraan pengantar, penjemput, maupun titip motor/mobil.",
+            isActive: true
+        }
+    ]
 };
 
 let cachedSiteConfigData = null;
@@ -2022,6 +2056,27 @@ app.post('/api/upload-qris', (req, res, next) => {
     } catch (err) {
         console.error('Upload QRIS Error:', err);
         return res.status(500).json({ status: 'error', message: 'Gagal mengunggah gambar QRIS: ' + (err.message || 'Server error') });
+    }
+});
+
+// Endpoint upload foto fasilitas agen (Admin)
+app.post('/api/upload-fasilitas', (req, res, next) => {
+    upload.single('image')(req, res, (err) => {
+        if (err) return handleMulterError(err, req, res, next);
+        next();
+    });
+}, async (req, res) => {
+    try {
+        const token = req.headers['authorization']?.split(' ')[1];
+        if (!token) return res.status(401).json({ status: 'error', message: 'Unauthorized' });
+        try { jwt.verify(token, JWT_SECRET); } catch(e) { return res.status(401).json({ status: 'error', message: 'Token tidak valid' }); }
+
+        if (!req.file) return res.status(400).json({ status: 'error', message: 'File gambar wajib diunggah' });
+        const imageUrl = '/uploads/' + req.file.filename;
+        return res.json({ status: 'success', success: true, url: imageUrl, message: 'Foto fasilitas agen berhasil diunggah' });
+    } catch (err) {
+        console.error('Upload Fasilitas Error:', err);
+        return res.status(500).json({ status: 'error', message: 'Gagal mengunggah foto fasilitas: ' + (err.message || 'Server error') });
     }
 });
 
