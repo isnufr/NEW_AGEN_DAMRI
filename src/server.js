@@ -58,6 +58,94 @@ function invalidateArmadaCache() {
     lastArmadaFetchTime = 0;
 }
 
+// ========================================================
+// PERSISTENSI FILE UPLOAD KE DATABASE MYSQL & DISK
+// Bertahan permanen meski container Docker diredeploy/rebuild
+// ========================================================
+async function persistUploadedFileToDb(file) {
+    if (!file || !file.filename || !file.path) return;
+    try {
+        if (!prisma.uploadedFile) return;
+        const buffer = fs.readFileSync(file.path);
+        const base64 = buffer.toString('base64');
+        await prisma.uploadedFile.upsert({
+            where: { filename: file.filename },
+            update: {
+                mimeType: file.mimetype || 'image/jpeg',
+                data: base64
+            },
+            create: {
+                filename: file.filename,
+                mimeType: file.mimetype || 'image/jpeg',
+                data: base64
+            }
+        });
+        console.log(`[PERSISTENCE] File ${file.filename} persisted to database.`);
+    } catch (e) {
+        console.warn(`[PERSISTENCE] Notice: Could not persist ${file.filename} to database:`, e.message);
+    }
+}
+
+async function restoreUploadedFilesFromDb() {
+    try {
+        if (!prisma.uploadedFile) return;
+        const files = await prisma.uploadedFile.findMany();
+        if (!files || files.length === 0) return;
+        let restoredCount = 0;
+        for (const f of files) {
+            const diskPath = path.join(uploadsDir, f.filename);
+            if (!fs.existsSync(diskPath)) {
+                try {
+                    const buf = Buffer.from(f.data, 'base64');
+                    fs.writeFileSync(diskPath, buf);
+                    restoredCount++;
+                } catch (writeErr) {
+                    console.error(`Failed to write restored file ${f.filename}:`, writeErr.message);
+                }
+            }
+        }
+        if (restoredCount > 0) {
+            console.log(`[PERSISTENCE] Restored ${restoredCount} uploaded file(s) from database to ${uploadsDir}`);
+        }
+    } catch (e) {
+        console.warn('[PERSISTENCE] Notice: DB file restore skipped:', e.message);
+    }
+}
+
+async function syncDiskUploadsToDb() {
+    try {
+        if (!prisma.uploadedFile) return;
+        if (!fs.existsSync(uploadsDir)) return;
+        const diskFiles = fs.readdirSync(uploadsDir).filter(f => !f.startsWith('.') && fs.statSync(path.join(uploadsDir, f)).isFile());
+        for (const filename of diskFiles) {
+            try {
+                const exists = await prisma.uploadedFile.findUnique({ where: { filename }, select: { filename: true } });
+                if (!exists) {
+                    const filePath = path.join(uploadsDir, filename);
+                    const buffer = fs.readFileSync(filePath);
+                    const ext = path.extname(filename).toLowerCase();
+                    let mimeType = 'application/octet-stream';
+                    if (ext === '.jpg' || ext === '.jpeg') mimeType = 'image/jpeg';
+                    else if (ext === '.png') mimeType = 'image/png';
+                    else if (ext === '.webp') mimeType = 'image/webp';
+                    else if (ext === '.svg') mimeType = 'image/svg+xml';
+                    
+                    await prisma.uploadedFile.create({
+                        data: {
+                            filename,
+                            mimeType,
+                            data: buffer.toString('base64')
+                        }
+                    });
+                    console.log(`[PERSISTENCE] Synced existing disk file ${filename} to database.`);
+                }
+            } catch (err) {}
+        }
+    } catch (e) {
+        console.warn('[PERSISTENCE] Notice: Disk-to-DB sync skipped:', e.message);
+    }
+}
+
 // Middleware
 app.use(cors());
 app.use(compression({
@@ -122,6 +210,33 @@ app.use('/uploads', express.static(path.join(__dirname, '../public/uploads'), {
         res.setHeader('Cache-Control', 'public, max-age=604800, immutable');
     }
 }));
+
+// Route fallback untuk file uploads jika file fisik belum ada di disk (restore otomatis dari DB MySQL)
+app.get('/uploads/:filename', async (req, res) => {
+    const filename = req.params.filename;
+    if (!filename || filename.includes('..') || filename.includes('/') || filename.includes('\\')) {
+        return res.status(400).send('Invalid filename');
+    }
+    const diskPath = path.join(uploadsDir, filename);
+    if (fs.existsSync(diskPath)) {
+        return res.sendFile(diskPath);
+    }
+    try {
+        if (prisma.uploadedFile) {
+            const dbFile = await prisma.uploadedFile.findUnique({ where: { filename } });
+            if (dbFile && dbFile.data) {
+                const buf = Buffer.from(dbFile.data, 'base64');
+                try { fs.writeFileSync(diskPath, buf); } catch (e) {}
+                res.setHeader('Content-Type', dbFile.mimeType || 'image/jpeg');
+                res.setHeader('Cache-Control', 'public, max-age=604800, immutable');
+                return res.send(buf);
+            }
+        }
+    } catch (e) {
+        console.warn(`[PERSISTENCE] DB fallback check failed for ${filename}:`, e.message);
+    }
+    return res.status(404).send('File not found');
+});
 
 // Helper untuk parse tanggal dari format campuran (DD/MM/YYYY atau ISO)
 function parseCustomDate(dateStr) {
@@ -324,13 +439,35 @@ const DEFAULT_SITE_CONFIG = {
 
 let cachedSiteConfigData = null;
 
-function getSiteConfigData() {
+async function getSiteConfigData() {
     if (cachedSiteConfigData) {
         if (!cachedSiteConfigData.facilities || !Array.isArray(cachedSiteConfigData.facilities) || cachedSiteConfigData.facilities.length === 0) {
             cachedSiteConfigData.facilities = DEFAULT_SITE_CONFIG.facilities;
         }
         return cachedSiteConfigData;
     }
+
+    // 1. Coba ambil dari Database terlebih dahulu (bertahan meski redeploy/rebuild container)
+    try {
+        if (prisma.siteConfig) {
+            const dbRecord = await prisma.siteConfig.findUnique({ where: { key: 'main' } });
+            if (dbRecord && dbRecord.data) {
+                const parsed = JSON.parse(dbRecord.data);
+                if (parsed && typeof parsed === 'object') {
+                    if (!parsed.facilities || !Array.isArray(parsed.facilities) || parsed.facilities.length === 0) {
+                        parsed.facilities = DEFAULT_SITE_CONFIG.facilities;
+                    }
+                    cachedSiteConfigData = parsed;
+                    try { fs.writeFileSync(SITE_CONFIG_FILE, JSON.stringify(parsed, null, 2)); } catch(e) {}
+                    return cachedSiteConfigData;
+                }
+            }
+        }
+    } catch (dbErr) {
+        console.warn('Notice: SiteConfig DB load skipped, checking file:', dbErr.message);
+    }
+
+    // 2. Fallback ke file data/site-config.json jika DB kosong / belum terkoneksi
     try {
         if (fs.existsSync(SITE_CONFIG_FILE)) {
             const raw = fs.readFileSync(SITE_CONFIG_FILE, 'utf-8');
@@ -340,11 +477,30 @@ function getSiteConfigData() {
                     cachedSiteConfigData.facilities = DEFAULT_SITE_CONFIG.facilities;
                     fs.writeFileSync(SITE_CONFIG_FILE, JSON.stringify(cachedSiteConfigData, null, 2));
                 }
+                // Sinkronkan ke database agar data tersimpan aman
+                try {
+                    if (prisma.siteConfig) {
+                        await prisma.siteConfig.upsert({
+                            where: { key: 'main' },
+                            update: {},
+                            create: { key: 'main', data: JSON.stringify(cachedSiteConfigData) }
+                        });
+                    }
+                } catch(e) {}
                 return cachedSiteConfigData;
             }
         }
         fs.writeFileSync(SITE_CONFIG_FILE, JSON.stringify(DEFAULT_SITE_CONFIG, null, 2));
         cachedSiteConfigData = DEFAULT_SITE_CONFIG;
+        try {
+            if (prisma.siteConfig) {
+                await prisma.siteConfig.upsert({
+                    where: { key: 'main' },
+                    update: {},
+                    create: { key: 'main', data: JSON.stringify(cachedSiteConfigData) }
+                });
+            }
+        } catch(e) {}
         return cachedSiteConfigData;
     } catch (e) {
         console.error('Error reading site config:', e);
@@ -352,12 +508,25 @@ function getSiteConfigData() {
     }
 }
 
-function saveSiteConfigData(data) {
+async function saveSiteConfigData(data) {
     cachedSiteConfigData = data;
+    // 1. Simpan ke file lokal data/site-config.json
     try {
         fs.writeFileSync(SITE_CONFIG_FILE, JSON.stringify(data, null, 2));
     } catch (e) {
-        console.error('Error saving site config:', e);
+        console.error('Error saving site config to file:', e);
+    }
+    // 2. Simpan ke database MySQL agar tidak hilang saat redeploy container
+    try {
+        if (prisma.siteConfig) {
+            await prisma.siteConfig.upsert({
+                where: { key: 'main' },
+                update: { data: JSON.stringify(data) },
+                create: { key: 'main', data: JSON.stringify(data) }
+            });
+        }
+    } catch (e) {
+        console.error('Error saving site config to DB:', e.message);
     }
 }
 const DEFAULT_PO_PROFILES = {
@@ -728,7 +897,7 @@ app.get('/api', async (req, res) => {
         }
 
         if (action === 'getSiteConfig') {
-            const data = getSiteConfigData();
+            const data = await getSiteConfigData();
             return res.json({ status: 'success', data });
         }
 
@@ -1894,7 +2063,7 @@ app.post('/api', async (req, res) => {
         if (action === 'saveSiteConfig') {
             const newConfig = payload;
             if (!newConfig) return res.status(400).json({ status: 'error', message: 'Payload konfigurasi kosong' });
-            saveSiteConfigData(newConfig);
+            await saveSiteConfigData(newConfig);
             io.emit('site_config_updated', newConfig);
             return res.json({ status: 'success', message: 'Konfigurasi website berhasil disimpan', data: newConfig });
         }
@@ -1933,6 +2102,7 @@ app.post('/api/iklan', (req, res, next) => {
         try { jwt.verify(token, JWT_SECRET); } catch(e) { return res.status(401).json({ status: 'error', message: 'Token tidak valid. Silakan login ulang.' }); }
 
         if (!req.file) return res.status(400).json({ status: 'error', message: 'File banner wajib diupload' });
+        await persistUploadedFileToDb(req.file);
 
         const { judul, deskripsiSingkat, deskripsiLengkap, nomorWhatsapp, pesanWhatsapp, tanggalMulai, tanggalBerakhir, isActive } = req.body;
         const bannerUrl = '/uploads/' + req.file.filename;
@@ -1984,6 +2154,7 @@ app.put('/api/iklan/:id', (req, res, next) => {
         };
 
         if (req.file) {
+            await persistUploadedFileToDb(req.file);
             // Delete old banner
             const old = await prisma.popupIklan.findUnique({ where: { id } });
             if (old && old.bannerUrl) {
@@ -2015,6 +2186,7 @@ app.post('/api/upload-armada', (req, res, next) => {
         try { jwt.verify(token, JWT_SECRET); } catch(e) { return res.status(401).json({ status: 'error', message: 'Token tidak valid' }); }
 
         if (!req.file) return res.status(400).json({ status: 'error', message: 'File gambar wajib diupload' });
+        await persistUploadedFileToDb(req.file);
         const imageUrl = '/uploads/' + req.file.filename;
         return res.json({ status: 'success', url: imageUrl, message: 'Foto armada berhasil diunggah' });
     } catch (err) {
@@ -2036,6 +2208,7 @@ app.post('/api/upload-logo', (req, res, next) => {
         try { jwt.verify(token, JWT_SECRET); } catch(e) { return res.status(401).json({ status: 'error', message: 'Token tidak valid' }); }
 
         if (!req.file) return res.status(400).json({ status: 'error', message: 'File logo wajib diupload' });
+        await persistUploadedFileToDb(req.file);
         const logoUrl = '/uploads/' + req.file.filename;
         return res.json({ status: 'success', url: logoUrl, message: 'Logo PO berhasil diunggah' });
     } catch (err) {
@@ -2060,6 +2233,7 @@ app.post('/api/upload-qris', (req, res, next) => {
         try { jwt.verify(token, JWT_SECRET); } catch(e) { return res.status(401).json({ status: 'error', message: 'Token tidak valid' }); }
 
         if (!req.file) return res.status(400).json({ status: 'error', message: 'File QRIS wajib diupload' });
+        await persistUploadedFileToDb(req.file);
         const qrisUrl = '/uploads/' + req.file.filename;
         return res.json({ status: 'success', success: true, url: qrisUrl, message: 'Gambar QRIS berhasil diunggah' });
     } catch (err) {
@@ -2081,6 +2255,7 @@ app.post('/api/upload-fasilitas', (req, res, next) => {
         try { jwt.verify(token, JWT_SECRET); } catch(e) { return res.status(401).json({ status: 'error', message: 'Token tidak valid' }); }
 
         if (!req.file) return res.status(400).json({ status: 'error', message: 'File gambar wajib diunggah' });
+        await persistUploadedFileToDb(req.file);
         const imageUrl = '/uploads/' + req.file.filename;
         return res.json({ status: 'success', success: true, url: imageUrl, message: 'Foto fasilitas agen berhasil diunggah' });
     } catch (err) {
@@ -2093,6 +2268,13 @@ app.use((req, res) => {
     res.sendFile(path.join(__dirname, '../public/index.html'));
 });
 
-server.listen(PORT, () => {
+server.listen(PORT, async () => {
     console.log(`Server is running on port ${PORT}`);
+    try {
+        await restoreUploadedFilesFromDb();
+        await syncDiskUploadsToDb();
+        await getSiteConfigData();
+    } catch (e) {
+        console.warn('Startup sync notice:', e.message);
+    }
 });

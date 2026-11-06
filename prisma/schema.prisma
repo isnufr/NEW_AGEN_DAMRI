@@ -119,3 +119,16 @@ model PoProfile {
   facilities   String   @db.Text
   updatedAt    DateTime @default(now()) @updatedAt
 }
+
+model SiteConfig {
+  key       String   @id @default("main")
+  data      String   @db.LongText
+  updatedAt DateTime @default(now()) @updatedAt
+}
+
+model UploadedFile {
+  filename  String   @id
+  mimeType  String   @default("application/octet-stream")
+  data      String   @db.LongText
+  createdAt DateTime @default(now())
+}

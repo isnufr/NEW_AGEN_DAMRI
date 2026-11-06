@@ -20,6 +20,9 @@ RUN npx prisma generate
 # Remove local .env file so it doesn't override Docker ENV
 RUN rm -f .env
 
+# Declare persistent volumes for uploads and data
+VOLUME ["/app/public/uploads", "/app/data"]
+
 # Expose port
 EXPOSE 3000
 
