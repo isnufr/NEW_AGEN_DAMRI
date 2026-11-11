@@ -346,7 +346,15 @@ function getPoProfile(poName) {
     if (!poName) return null;
     const clean = String(poName).trim().toUpperCase();
     const profiles = cachedPoProfiles || {};
-    const key = Object.keys(profiles).find(k => k.toUpperCase() === clean);
+    let key = Object.keys(profiles).find(k => k.toUpperCase() === clean);
+    if (!key) {
+        key = Object.keys(profiles)
+            .sort((a, b) => b.length - a.length)
+            .find(k => {
+                const ku = k.toUpperCase().trim();
+                return ku && (clean.startsWith(ku + ' ') || ku.startsWith(clean + ' '));
+            });
+    }
     if (key && profiles[key]) {
         return {
             name: key,
@@ -490,8 +498,175 @@ if (typeof io !== 'undefined') {
     });
 }
 
+// ==========================================
+// 8. SHARED VISUAL ARMADA PICKER (ADMIN & PELANGGAN)
+// ==========================================
+function escapeArmadaHtml(str) {
+    return String(str || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+}
+
+function updateArmadaVisualPickerSelection(containerId, selectId, badgeId, selectedValue) {
+    const container = document.getElementById(containerId);
+    const select = selectId ? document.getElementById(selectId) : null;
+    const badge = badgeId ? document.getElementById(badgeId) : null;
+    const val = selectedValue !== undefined && selectedValue !== null
+        ? String(selectedValue)
+        : (select ? String(select.value || '') : '');
+
+    if (container) {
+        if (val) {
+            container.classList.remove('ring-2', 'ring-red-400', 'rounded-2xl', 'p-1');
+        }
+        const cards = container.querySelectorAll('.armada-visual-card');
+        cards.forEach(card => {
+            const cardVal = card.getAttribute('data-armada-value') || '';
+            const isSelected = Boolean(val) && cardVal === val;
+            card.setAttribute('aria-pressed', isSelected ? 'true' : 'false');
+
+            if (isSelected) {
+                card.className = 'armada-visual-card is-selected group relative flex flex-col text-left rounded-2xl overflow-hidden transition-all duration-200 focus:outline-none active:scale-[0.97] min-w-0 w-full border-2 border-amber-500 bg-amber-50/60 shadow-lg shadow-amber-500/20 ring-2 ring-amber-400/30';
+            } else {
+                card.className = 'armada-visual-card group relative flex flex-col text-left rounded-2xl overflow-hidden transition-all duration-200 focus:outline-none active:scale-[0.97] min-w-0 w-full border border-slate-200 bg-white hover:border-amber-300 hover:shadow-md shadow-sm';
+            }
+
+            const checkBadge = card.querySelector('.armada-check-badge');
+            if (checkBadge) {
+                checkBadge.className = isSelected
+                    ? 'armada-check-badge absolute top-1.5 right-1.5 sm:top-2 sm:right-2 w-5 h-5 sm:w-6 sm:h-6 rounded-full flex items-center justify-center transition-all duration-200 pointer-events-none bg-amber-500 text-slate-950 shadow-md ring-2 ring-white scale-100'
+                    : 'armada-check-badge absolute top-1.5 right-1.5 sm:top-2 sm:right-2 w-5 h-5 sm:w-6 sm:h-6 rounded-full flex items-center justify-center transition-all duration-200 pointer-events-none bg-slate-950/45 border border-white/70 text-transparent backdrop-blur-sm scale-90 group-hover:scale-100';
+            }
+
+            const footer = card.querySelector('.armada-card-footer');
+            if (footer) {
+                footer.className = `armada-card-footer w-full px-2.5 py-2 sm:px-3 sm:py-2.5 flex items-center justify-between gap-1.5 flex-1 min-h-[38px] sm:min-h-[44px] transition-colors ${isSelected ? 'bg-gradient-to-r from-amber-50 to-white' : 'bg-white'}`;
+            }
+
+            const title = card.querySelector('.armada-card-title');
+            if (title) {
+                title.className = `armada-card-title font-black text-[11px] sm:text-xs uppercase tracking-tight leading-tight line-clamp-2 ${isSelected ? 'text-amber-900' : 'text-slate-800'}`;
+            }
+
+            const arrow = card.querySelector('.armada-card-arrow');
+            if (arrow) {
+                arrow.className = `armada-card-arrow fas ${isSelected ? 'fa-check-circle text-amber-600' : 'fa-chevron-right text-slate-300 group-hover:text-amber-500'} text-[10px] shrink-0 transition-all duration-200`;
+            }
+        });
+    }
+
+    if (badge) {
+        if (val) {
+            badge.className = 'inline-flex items-center gap-1 bg-amber-100 text-amber-900 border border-amber-300 px-2.5 py-0.5 rounded-full text-[10px] font-black shadow-sm max-w-[60%] truncate';
+            badge.innerHTML = `<i class="fas fa-check-circle text-amber-600 shrink-0"></i><span class="truncate">${escapeArmadaHtml(val)}</span>`;
+        } else {
+            badge.className = 'inline-flex items-center gap-1 bg-slate-100 text-slate-500 border border-slate-200 px-2.5 py-0.5 rounded-full text-[10px] font-bold';
+            badge.innerHTML = `<i class="fas fa-hand-pointer text-[9px] text-amber-500"></i><span>Ketuk Foto Armada</span>`;
+        }
+    }
+}
+
+function renderArmadaVisualPicker(config) {
+    const {
+        containerId,
+        selectId,
+        badgeId,
+        items = [],
+        selectedValue,
+        onSelect
+    } = config || {};
+
+    const container = document.getElementById(containerId);
+    const select = selectId ? document.getElementById(selectId) : null;
+    if (!container) return;
+
+    const currentVal = selectedValue !== undefined && selectedValue !== null
+        ? String(selectedValue)
+        : (select ? String(select.value || '') : '');
+
+    if (!items || items.length === 0) {
+        container.innerHTML = `
+            <div class="col-span-full py-6 px-4 text-center bg-white rounded-2xl border border-dashed border-slate-200 text-slate-400 text-xs font-bold">
+                <i class="fas fa-bus text-slate-300 text-lg mb-1.5 block"></i>
+                Belum ada armada aktif tersedia
+            </div>
+        `;
+        updateArmadaVisualPickerSelection(containerId, selectId, badgeId, '');
+        return;
+    }
+
+    container.innerHTML = items.map(item => {
+        const name = String(item.name || '').trim();
+        const profile = getPoProfile(name);
+        const poImg = item.image || (profile && profile.image) || 'damri.webp';
+        const poLogo = item.logo !== undefined ? item.logo : (profile && profile.logo ? profile.logo : '');
+        const subLabel = item.subLabel || '';
+
+        return `
+            <button type="button"
+                data-armada-value="${escapeArmadaHtml(name)}"
+                aria-pressed="false"
+                class="armada-visual-card group relative flex flex-col text-left rounded-2xl overflow-hidden transition-all duration-200 focus:outline-none active:scale-[0.97] min-w-0 w-full border border-slate-200 bg-white hover:border-amber-300 hover:shadow-md shadow-sm">
+                <div class="relative w-full aspect-[16/9] sm:aspect-[16/10] bg-slate-900 overflow-hidden shrink-0">
+                    <img src="${escapeArmadaHtml(poImg)}"
+                        alt="${escapeArmadaHtml(name)}"
+                        loading="lazy"
+                        class="w-full h-full object-cover object-center transition-transform duration-500 group-hover:scale-105"
+                        onerror="this.onerror=null; this.src='damri.webp';">
+                    <div class="absolute inset-0 bg-gradient-to-t from-slate-950/75 via-slate-950/10 to-black/15 pointer-events-none"></div>
+
+                    ${poLogo ? `
+                    <div class="armada-logo-chip absolute top-1.5 left-1.5 sm:top-2 sm:left-2 bg-white/95 backdrop-blur-sm px-1.5 py-0.5 rounded-md shadow-sm border border-white/60 max-w-[54px] pointer-events-none">
+                        <img src="${escapeArmadaHtml(poLogo)}" alt="" class="h-3 sm:h-3.5 w-auto object-contain" onerror="this.parentElement.style.display='none'">
+                    </div>` : ''}
+
+                    <div class="armada-check-badge absolute top-1.5 right-1.5 sm:top-2 sm:right-2 w-5 h-5 sm:w-6 sm:h-6 rounded-full flex items-center justify-center transition-all duration-200 pointer-events-none bg-slate-950/45 border border-white/70 text-transparent backdrop-blur-sm scale-90 group-hover:scale-100">
+                        <i class="fas fa-check text-[9px] sm:text-[10px] font-black"></i>
+                    </div>
+
+                    ${subLabel ? `
+                    <div class="absolute bottom-1.5 left-2 right-2 flex items-center pointer-events-none">
+                        <span class="inline-flex items-center gap-1 text-[8.5px] sm:text-[9px] font-extrabold uppercase tracking-wider text-amber-300 truncate">
+                            <i class="fas fa-bus text-[8px]"></i> ${escapeArmadaHtml(subLabel)}
+                        </span>
+                    </div>` : ''}
+                </div>
+
+                <div class="armada-card-footer w-full px-2.5 py-2 sm:px-3 sm:py-2.5 flex items-center justify-between gap-1.5 flex-1 min-h-[38px] sm:min-h-[44px] bg-white transition-colors">
+                    <span class="armada-card-title font-black text-[11px] sm:text-xs uppercase tracking-tight leading-tight line-clamp-2 text-slate-800">${escapeArmadaHtml(name)}</span>
+                    <i class="armada-card-arrow fas fa-chevron-right text-[10px] text-slate-300 shrink-0 transition-all duration-200"></i>
+                </div>
+            </button>
+        `;
+    }).join('');
+
+    container.onclick = (e) => {
+        const btn = e.target.closest('.armada-visual-card');
+        if (!btn || !container.contains(btn)) return;
+        const val = btn.getAttribute('data-armada-value') || '';
+        if (select) {
+            select.value = val;
+            if (typeof onSelect === 'function') {
+                onSelect(val);
+            } else {
+                select.dispatchEvent(new Event('change', { bubbles: true }));
+            }
+        } else if (typeof onSelect === 'function') {
+            onSelect(val);
+        }
+        updateArmadaVisualPickerSelection(containerId, selectId, badgeId, val);
+    };
+
+    updateArmadaVisualPickerSelection(containerId, selectId, badgeId, currentVal);
+}
+
 if (typeof window !== 'undefined') {
     window.getPoProfiles = getPoProfiles;
     window.getPoProfile = getPoProfile;
     window.getSiteConfig = getSiteConfig;
+    window.renderArmadaVisualPicker = renderArmadaVisualPicker;
+    window.updateArmadaVisualPickerSelection = updateArmadaVisualPickerSelection;
 }

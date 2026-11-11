@@ -669,16 +669,27 @@ body.dark-mode .le-cell.t-door {
 /* Wizard Steps Indicator */
 .wizard-step {
     flex: 1;
+    min-width: 0;
+    overflow: hidden;
     display: flex;
     align-items: center;
-    gap: 8px;
-    padding: 10px 12px;
-    border-radius: 14px;
+    justify-content: center;
+    gap: 5px;
+    padding: 8px 6px;
+    border-radius: 12px;
     background: #f1f5f9;
     color: #64748b;
-    font-size: 12px;
+    font-size: 11px;
     font-weight: 800;
     transition: all 0.25s ease;
+}
+@media (min-width: 640px) {
+    .wizard-step {
+        gap: 8px;
+        padding: 10px 12px;
+        border-radius: 14px;
+        font-size: 12px;
+    }
 }
 body.dark-mode .wizard-step {
     background: #1e293b;
@@ -698,14 +709,22 @@ body.dark-mode .wizard-step.completed {
     color: #38bdf8;
 }
 .wizard-num {
-    width: 22px;
-    height: 22px;
+    width: 20px;
+    height: 20px;
     border-radius: 50%;
     background: rgba(0,0,0,0.1);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 11px;
+    font-size: 10px;
+    flex-shrink: 0;
+}
+@media (min-width: 640px) {
+    .wizard-num {
+        width: 22px;
+        height: 22px;
+        font-size: 11px;
+    }
 }
 .wizard-step.active .wizard-num {
     background: #ffffff;
@@ -713,6 +732,38 @@ body.dark-mode .wizard-step.completed {
     font-weight: 900;
 }
 
+
+/* Visual Armada Picker Dark Mode Support */
+body.dark-mode .armada-visual-card {
+    background-color: #1e293b !important;
+    border-color: #334155 !important;
+}
+body.dark-mode .armada-visual-card:hover {
+    border-color: #f59e0b !important;
+}
+body.dark-mode .armada-visual-card.is-selected {
+    border-color: #f59e0b !important;
+    background-color: #292524 !important;
+}
+body.dark-mode .armada-visual-card .armada-card-footer {
+    background: #1e293b !important;
+}
+body.dark-mode .armada-visual-card.is-selected .armada-card-footer {
+    background: linear-gradient(90deg, rgba(245, 158, 11, 0.22), #1e293b) !important;
+}
+body.dark-mode .armada-visual-card.is-selected .armada-card-title {
+    color: #fbbf24 !important;
+}
+body.dark-mode .armada-visual-card .armada-logo-chip {
+    background-color: rgba(255, 255, 255, 0.95) !important;
+}
+body.dark-mode #bookingModal .bg-amber-50 {
+    background-color: rgba(245, 158, 11, 0.14) !important;
+    border-color: rgba(245, 158, 11, 0.35) !important;
+}
+body.dark-mode #bookingModal #adminBookingTarifBadge {
+    color: #fbbf24 !important;
+}
 
 /* Mobile Device Optimization */
 @media (max-width: 640px) {

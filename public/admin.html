@@ -40,8 +40,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js?v=2"></script>
     <script src="/socket.io/socket.io.js?v=2"></script>
-    <script src="app.js?v=5.1"></script>
-    <link rel="stylesheet" href="admin.css?v=2.1">
+    <script src="app.js?v=7"></script>
+    <link rel="stylesheet" href="admin.css?v=2.2">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.js"></script>
 </head>
@@ -1585,24 +1585,24 @@
                 <!-- ======================= -->
                 <!-- BOOKING TIKET MODAL (3 TAHAPAN) -->
                 <!-- ======================= -->
-                <div id="bookingModal" class="fixed inset-0 bg-gray-900/60 z-[140] hidden justify-center items-center p-4 lg:p-8 overflow-y-auto">
-                    <div class="bg-white rounded-[2rem] p-6 sm:p-8 shadow-2xl border border-slate-100 max-w-2xl w-full relative max-h-[92dvh] overflow-y-auto my-auto">
-                        <div class="absolute top-4 right-4 w-10 h-10 bg-amber-500 rounded-full flex items-center justify-center text-white text-lg shadow-lg cursor-pointer hover:bg-amber-600 transition-colors z-10" onclick="closeBookingModal()">
+                <div id="bookingModal" class="fixed inset-0 bg-gray-900/60 z-[140] hidden justify-center items-center p-2.5 sm:p-4 lg:p-8 overflow-y-auto">
+                    <div class="bg-white rounded-[1.75rem] sm:rounded-[2rem] p-4 sm:p-8 shadow-2xl border border-slate-100 max-w-2xl w-full relative max-h-[92dvh] overflow-y-auto my-auto">
+                        <div class="absolute top-3.5 right-3.5 sm:top-4 sm:right-4 w-9 h-9 sm:w-10 sm:h-10 bg-amber-500 rounded-full flex items-center justify-center text-white text-base sm:text-lg shadow-lg cursor-pointer hover:bg-amber-600 transition-colors z-10" onclick="closeBookingModal()">
                             <i class="fas fa-times"></i>
                         </div>
                         
-                        <div class="mb-4 flex items-center gap-3 mt-6 sm:mt-1">
+                        <div class="mb-4 flex items-center gap-3 pr-10">
                             <div class="w-10 h-10 bg-amber-100 text-amber-600 rounded-xl flex items-center justify-center text-lg flex-shrink-0">
                                 <i class="fas fa-ticket-alt"></i>
                             </div>
                             <div>
-                                <h3 class="text-xl font-black text-slate-800 tracking-tight">Booking Tiket (Admin)</h3>
+                                <h3 class="text-lg sm:text-xl font-black text-slate-800 tracking-tight leading-tight">Booking Tiket (Admin)</h3>
                                 <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-0.5">Alur Pemesanan 3 Tahapan Interaktif</p>
                             </div>
                         </div>
 
                         <!-- Stepper Indicator 3 Tahap -->
-                        <div class="flex items-center gap-2 mb-6">
+                        <div class="flex items-center gap-1.5 sm:gap-2 mb-5 sm:mb-6">
                             <div id="bookingStepBadge1" class="wizard-step active">
                                 <span class="wizard-num">1</span>
                                 <span class="truncate">Jadwal &amp; PO</span>
@@ -1617,21 +1617,21 @@
                             </div>
                         </div>
 
-                        <form id="formAdminBooking" onsubmit="submitAdminBooking(event)" class="space-y-6">
+                        <form id="formAdminBooking" onsubmit="submitAdminBooking(event)" class="space-y-5 sm:space-y-6">
                             
                             <!-- ========================================== -->
                             <!-- TAHAPAN 1: JADWAL, PO, RUTE & JAM           -->
                             <!-- ========================================== -->
                             <div id="bookingStepPane1" class="space-y-4">
-                                <div class="bg-slate-50 p-5 rounded-2xl border border-slate-100 space-y-4">
-                                    <div class="flex items-center justify-between border-b border-slate-200 pb-2">
+                                <div class="bg-slate-50 p-3.5 sm:p-5 rounded-2xl border border-slate-100 space-y-4">
+                                    <div class="flex items-center justify-between border-b border-slate-200 pb-2.5">
                                         <h3 class="text-xs font-black text-slate-600 uppercase tracking-widest flex items-center gap-2">
                                             <i class="fas fa-calendar-alt text-amber-500"></i> 1. Pemilihan Tanggal &amp; Armada
                                         </h3>
-                                        <span class="text-[10px] bg-amber-100 text-amber-800 font-extrabold px-2 py-0.5 rounded-full">Tahap 1 dari 3</span>
+                                        <span class="text-[10px] bg-amber-100 text-amber-800 font-extrabold px-2 py-0.5 rounded-full shrink-0">Tahap 1 dari 3</span>
                                     </div>
 
-                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5 sm:gap-4">
                                         <div>
                                             <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Tanggal Pemberangkatan *</label>
                                             <input type="date" id="adminBookingDate" class="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-base md:text-sm font-bold text-slate-700 outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-200 transition-colors" onchange="onAdminBookingTripChange()" required>
@@ -1651,12 +1651,20 @@
                                         </div>
                                     </div>
 
-                                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                        <div>
-                                            <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Pilih Armada / PO *</label>
-                                            <select id="adminBookingArmadaName" class="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-base md:text-sm font-bold text-slate-700 outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-200 transition-colors" onchange="updateAdminTime(); onAdminBookingTripChange();" required>
-                                            </select>
+                                    <!-- Visual Pilih Armada / PO -->
+                                    <div>
+                                        <div class="flex items-center justify-between gap-2 mb-2">
+                                            <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest">Pilih Armada / PO *</label>
+                                            <span id="adminBookingArmadaSelectedBadge" class="inline-flex items-center gap-1 bg-slate-100 text-slate-500 border border-slate-200 px-2.5 py-0.5 rounded-full text-[10px] font-bold">
+                                                <i class="fas fa-hand-pointer text-[9px] text-amber-500"></i><span>Ketuk Foto Armada</span>
+                                            </span>
                                         </div>
+                                        <select id="adminBookingArmadaName" class="hidden" onchange="updateAdminTime(); onAdminBookingTripChange();">
+                                        </select>
+                                        <div id="adminBookingArmadaVisualGrid" class="grid grid-cols-2 sm:grid-cols-3 gap-2.5 sm:gap-3"></div>
+                                    </div>
+
+                                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5 sm:gap-4">
                                         <div>
                                             <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Jam Pemberangkatan *</label>
                                             <select id="adminBookingTime" class="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-base md:text-sm font-bold text-slate-700 outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-200 transition-colors" onchange="updateAdminRute(); onAdminBookingTripChange();" required>
@@ -1670,12 +1678,12 @@
                                     </div>
 
                                     <!-- Info Armada Banner -->
-                                    <div id="adminBookingArmadaInfoBanner" class="p-3 bg-amber-50 border border-amber-200/60 rounded-xl flex items-center justify-between text-xs">
-                                        <div class="flex items-center gap-2 text-slate-700">
-                                            <i class="fas fa-info-circle text-amber-600 text-sm"></i>
-                                            <span id="adminBookingArmadaInfoText" class="font-bold">Silakan pilih armada, jam, dan rute di atas</span>
+                                    <div id="adminBookingArmadaInfoBanner" class="p-3 bg-amber-50 border border-amber-200/60 rounded-xl flex items-center justify-between gap-2 text-xs">
+                                        <div class="flex items-center gap-2 text-slate-700 min-w-0">
+                                            <i class="fas fa-info-circle text-amber-600 text-sm shrink-0"></i>
+                                            <span id="adminBookingArmadaInfoText" class="font-bold truncate sm:whitespace-normal">Silakan pilih armada, jam, dan rute di atas</span>
                                         </div>
-                                        <span id="adminBookingTarifBadge" class="font-black text-amber-700">Rp0 / kursi</span>
+                                        <span id="adminBookingTarifBadge" class="font-black text-amber-700 shrink-0">Rp0 / kursi</span>
                                     </div>
                                 </div>
 
@@ -3026,7 +3034,7 @@
 
     <!-- Custom script for admin dashboard -->
     <script src="routes-data.js"></script>
-    <script src="admin.js?v=2.49"></script>
+    <script src="admin.js?v=2.50"></script>
 
     <!-- ======================================= -->
     <!-- DETAIL DATA PELANGGAN & CRM MODAL        -->

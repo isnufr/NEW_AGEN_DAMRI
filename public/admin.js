@@ -55,58 +55,84 @@
         await initData();
         if (typeof populateTipeArmadaDropdowns === 'function') populateTipeArmadaDropdowns();
         
-        // Populate static dropdowns globally
-        const armadas = getArmadas();
-        const activeArmadas = armadas.filter(a => a.isActive !== false);
-        const armadaNameSelect = document.getElementById('adminBookingArmadaName');
-        if (armadaNameSelect) {
-            const POPULAR_RANKS = [
-                'DAMRI JAKARTA',
-                'DAMRI SUMATRA',
-                'DAMRI',
-                'EFISIENSI',
-                'BEST PREMIUM',
-                'ESTU TRANS',
-                '77 TRANS',
-                'QYTA TRANS',
-                'BUS JOGJA',
-                'ARDY TRANS',
-                'RIYAN',
-                'HANDOYO',
-                'MADU KISMO'
-            ];
-            const getRank = (name) => {
-                const up = String(name || '').trim().toUpperCase();
-                const idx = POPULAR_RANKS.findIndex(p => up === p || up.includes(p) || p.includes(up));
-                return idx === -1 ? 999 : idx;
-            };
-
-            const uniqueNames = [...new Set(activeArmadas.map(a => a.name))].sort((a, b) => {
-                const bookings = typeof getBookings === 'function' ? getBookings() : [];
-                const countA = bookings.filter(bk => String(bk.jenisKendaraan || '').trim().toUpperCase() === a.trim().toUpperCase()).length;
-                const countB = bookings.filter(bk => String(bk.jenisKendaraan || '').trim().toUpperCase() === b.trim().toUpperCase()).length;
-                if (countB !== countA) return countB - countA;
-
-                const rankDiff = getRank(a) - getRank(b);
-                if (rankDiff !== 0) return rankDiff;
-
-                return a.localeCompare(b);
-            });
-            armadaNameSelect.innerHTML = '<option value="">-- Pilih Armada --</option>' + uniqueNames.map(n => `<option value="${n}">${n}</option>`).join('');
-            
-            const timeSelect = document.getElementById('adminBookingTime');
-            if(timeSelect) timeSelect.innerHTML = '<option value="">-- Pilih Jam --</option>';
-
-            const ruteSelect = document.getElementById('adminBookingArmada');
-            if(ruteSelect) ruteSelect.innerHTML = '<option value="">-- Pilih Rute --</option>';
-            
-            if(typeof recalcAdminBooking === 'function') recalcAdminBooking();
-        }
-        
-
+        // Populate static & visual armada dropdowns globally
+        populateAdminBookingArmadaPicker(true);
+        if (typeof recalcAdminBooking === 'function') recalcAdminBooking();
 
         renderAll();
         document.getElementById('loadingOverlay').classList.add('hidden');
+    }
+
+    function populateAdminBookingArmadaPicker(resetDependentSelects = false) {
+        const armadas = typeof getArmadas === 'function' ? getArmadas() : [];
+        const activeArmadas = armadas.filter(a => a.isActive !== false);
+        const armadaNameSelect = document.getElementById('adminBookingArmadaName');
+        if (!armadaNameSelect) return;
+
+        const prevSelected = resetDependentSelects ? '' : armadaNameSelect.value;
+
+        const POPULAR_RANKS = [
+            'DAMRI JAKARTA',
+            'DAMRI SUMATRA',
+            'DAMRI',
+            'EFISIENSI',
+            'BEST PREMIUM',
+            'ESTU TRANS',
+            '77 TRANS',
+            'QYTA TRANS',
+            'BUS JOGJA',
+            'ARDY TRANS',
+            'RIYAN',
+            'HANDOYO',
+            'MADU KISMO'
+        ];
+        const getRank = (name) => {
+            const up = String(name || '').trim().toUpperCase();
+            const idx = POPULAR_RANKS.findIndex(p => up === p || up.includes(p) || p.includes(up));
+            return idx === -1 ? 999 : idx;
+        };
+
+        const bookings = typeof getBookings === 'function' ? getBookings() : [];
+        const uniqueNames = [...new Set(activeArmadas.map(a => a.name))].sort((a, b) => {
+            const countA = bookings.filter(bk => String(bk.jenisKendaraan || '').trim().toUpperCase() === a.trim().toUpperCase()).length;
+            const countB = bookings.filter(bk => String(bk.jenisKendaraan || '').trim().toUpperCase() === b.trim().toUpperCase()).length;
+            if (countB !== countA) return countB - countA;
+
+            const rankDiff = getRank(a) - getRank(b);
+            if (rankDiff !== 0) return rankDiff;
+
+            return a.localeCompare(b);
+        });
+
+        armadaNameSelect.innerHTML = '<option value="">-- Pilih Armada --</option>' + uniqueNames.map(n => `<option value="${n}">${n}</option>`).join('');
+        if (prevSelected && uniqueNames.includes(prevSelected)) {
+            armadaNameSelect.value = prevSelected;
+        }
+
+        if (resetDependentSelects) {
+            const timeSelect = document.getElementById('adminBookingTime');
+            if (timeSelect) timeSelect.innerHTML = '<option value="">-- Pilih Jam --</option>';
+
+            const ruteSelect = document.getElementById('adminBookingArmada');
+            if (ruteSelect) ruteSelect.innerHTML = '<option value="">-- Pilih Rute --</option>';
+        }
+
+        if (typeof renderArmadaVisualPicker === 'function') {
+            const items = uniqueNames.map(n => {
+                const sample = activeArmadas.find(a => a.name === n);
+                return {
+                    name: n,
+                    subLabel: sample?.tipeArmada || 'Bus'
+                };
+            });
+            renderArmadaVisualPicker({
+                containerId: 'adminBookingArmadaVisualGrid',
+                selectId: 'adminBookingArmadaName',
+                badgeId: 'adminBookingArmadaSelectedBadge',
+                items: items,
+                selectedValue: armadaNameSelect.value
+            });
+        }
     }
 
     // ========================================
@@ -313,6 +339,7 @@
     function renderAll() {
         updateNotifications();
         updateFloatingBookingBtn(currentMenu);
+        if (typeof populateAdminBookingArmadaPicker === 'function') populateAdminBookingArmadaPicker(false);
         if (currentMenu === 'dashboard') renderDashboard();
         else if (currentMenu === 'today') renderTodayTable();
         else if (currentMenu === 'pesanan') {
@@ -3902,8 +3929,15 @@
 
         const armadaId = document.getElementById('adminBookingArmada').value;
         const armada = getArmada(armadaId);
-        
         const rawDate = document.getElementById('adminBookingDate').value;
+
+        if (!armada || !rawDate) {
+            alert('Data armada atau tanggal keberangkatan belum lengkap!');
+            btn.innerHTML = '<i class="fas fa-check-double"></i> <span>BOOKING</span>';
+            btn.disabled = false;
+            return;
+        }
+        
         const [yyyy, mm, dd] = rawDate.split('-');
         const dObj = new Date(parseInt(yyyy), parseInt(mm)-1, parseInt(dd));
         const formattedDate = INDO_DAYS[dObj.getDay()] + ', ' + dObj.getDate() + ' ' + INDO_MONTHS[dObj.getMonth()] + ' ' + dObj.getFullYear();
@@ -4141,14 +4175,6 @@
         btn.innerHTML = '<i class="fas fa-check-double"></i> <span>BOOKING</span>'; btn.disabled = false;
     }
 
-    function resetAdminBooking() {
-        document.getElementById('formAdminBooking').reset();
-        document.getElementById('adminBookingDate').value = getLocalYYYYMMDD(new Date());
-        document.getElementById('adminBookingTotalDisplay').innerText = 'Rp0';
-        if(typeof toggleAdminBiayaTambahan === 'function') toggleAdminBiayaTambahan();
-        updateAdminRute();
-    }
-
     function updateAdminTime() {
         const selectedName = document.getElementById('adminBookingArmadaName').value;
         const timeSelect = document.getElementById('adminBookingTime');
@@ -4165,6 +4191,9 @@
             
             timeSelect.innerHTML = '<option value="">-- Pilih Jam --</option>' + uniqueTimes.map(t => `<option value="${t}">${t}</option>`).join('');
             ruteSelect.innerHTML = '<option value="">-- Pilih Rute --</option>';
+        }
+        if (typeof updateArmadaVisualPickerSelection === 'function') {
+            updateArmadaVisualPickerSelection('adminBookingArmadaVisualGrid', 'adminBookingArmadaName', 'adminBookingArmadaSelectedBadge', selectedName);
         }
         recalcAdminBooking();
     }
@@ -4255,6 +4284,7 @@
     }
 
     function openBookingModal() {
+        if (typeof populateAdminBookingArmadaPicker === 'function') populateAdminBookingArmadaPicker(true);
         if (typeof resetAdminBooking === 'function') resetAdminBooking();
         const dateInput = document.getElementById('adminBookingDate');
         if (dateInput && !dateInput.value) {
@@ -7635,14 +7665,25 @@ function goToBookingStep(step) {
     // Validasi saat meninggalkan Step 1
     if (adminBookingStep === 1 && step > 1) {
         const dateVal = document.getElementById('adminBookingDate').value;
+        const armadaNameVal = document.getElementById('adminBookingArmadaName').value;
         const armadaVal = document.getElementById('adminBookingArmada').value;
         if (!dateVal) {
             alert('Silakan pilih tanggal pemberangkatan terlebih dahulu!');
             document.getElementById('adminBookingDate').focus();
             return;
         }
+        if (!armadaNameVal) {
+            alert('Silakan pilih armada / PO terlebih dahulu!');
+            const gridEl = document.getElementById('adminBookingArmadaVisualGrid');
+            if (gridEl) {
+                gridEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                gridEl.classList.add('ring-2', 'ring-red-400', 'rounded-2xl', 'p-1');
+                setTimeout(() => gridEl.classList.remove('ring-2', 'ring-red-400', 'p-1'), 1800);
+            }
+            return;
+        }
         if (!armadaVal) {
-            alert('Silakan pilih armada, jam, dan rute perjalanan terlebih dahulu!');
+            alert('Silakan pilih jam dan rute perjalanan terlebih dahulu!');
             document.getElementById('adminBookingArmada').focus();
             return;
         }
@@ -7900,7 +7941,8 @@ function updateAdminBookingSummary() {
 
 // Reset admin booking
 function resetAdminBooking() {
-    document.getElementById('formAdminBooking').reset();
+    const form = document.getElementById('formAdminBooking');
+    if (form) form.reset();
     
     // Set default tanggal keberangkatan ke hari ini (YYYY-MM-DD lokal)
     const todayStr = (typeof getLocalYYYYMMDD === 'function') ? getLocalYYYYMMDD(new Date()) : new Date().toISOString().split('T')[0];
@@ -7908,6 +7950,18 @@ function resetAdminBooking() {
     if (dateInput) {
         dateInput.value = todayStr;
     }
+
+    const armadaNameSelect = document.getElementById('adminBookingArmadaName');
+    if (armadaNameSelect) armadaNameSelect.value = '';
+    const timeSelect = document.getElementById('adminBookingTime');
+    if (timeSelect) timeSelect.innerHTML = '<option value="">-- Pilih Jam --</option>';
+    const ruteSelect = document.getElementById('adminBookingArmada');
+    if (ruteSelect) ruteSelect.innerHTML = '<option value="">-- Pilih Rute --</option>';
+
+    if (typeof updateArmadaVisualPickerSelection === 'function') {
+        updateArmadaVisualPickerSelection('adminBookingArmadaVisualGrid', 'adminBookingArmadaName', 'adminBookingArmadaSelectedBadge', '');
+    }
+    if (typeof toggleAdminBiayaTambahan === 'function') toggleAdminBiayaTambahan();
 
     adminBookingStep = 1;
     adminBookingSelectedSeats.clear();

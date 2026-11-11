@@ -40,7 +40,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
     <script src="/socket.io/socket.io.js"></script>
-    <script src="app.js?v=6" defer></script>
+    <script src="app.js?v=7" defer></script>
 
     <script>
         function handleLogoError(img) {
@@ -477,11 +477,13 @@
         /* Customer Wizard Steps */
         .cust-wizard-step {
             flex: 1;
+            min-width: 0;
+            overflow: hidden;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 6px;
-            padding: 9px 8px;
+            gap: 5px;
+            padding: 8px 6px;
             border-radius: 12px;
             background: #f1f5f9;
             color: #64748b;
@@ -586,18 +588,18 @@
             </div>
 
             <!-- Body Modal (Scrollable Area) -->
-            <div class="p-5 sm:p-7 booking-modal-content space-y-4">
+            <div class="p-3.5 sm:p-7 booking-modal-content space-y-4">
 
                 <!-- ========================================== -->
                 <!-- TAHAPAN 1: JADWAL & PO                     -->
                 <!-- ========================================== -->
                 <div id="custBookingStepPane1" class="space-y-4">
-                    <div class="bg-slate-50 p-4 sm:p-5 rounded-2xl border border-slate-200/80 space-y-4">
+                    <div class="bg-slate-50 p-3.5 sm:p-5 rounded-2xl border border-slate-200/80 space-y-4">
                         <div class="flex items-center justify-between border-b border-slate-200/80 pb-3">
                             <h4 class="text-xs sm:text-sm font-black text-slate-700 uppercase tracking-wider flex items-center gap-2">
                                 <i class="fas fa-calendar-alt text-amber-500"></i> 1. Pemilihan Jadwal &amp; PO
                             </h4>
-                            <span class="text-[10px] bg-amber-100 text-amber-800 font-extrabold px-2.5 py-0.5 rounded-full">Tahap 1 dari 3</span>
+                            <span class="text-[10px] bg-amber-100 text-amber-800 font-extrabold px-2.5 py-0.5 rounded-full shrink-0">Tahap 1 dari 3</span>
                         </div>
 
                         <div>
@@ -628,15 +630,16 @@
                         </div>
 
                         <div>
-                            <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Pilih Armada / PO *</label>
-                            <div class="relative">
-                                <select id="bookArmada" onchange="updateBookingFields()"
-                                    class="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 pl-11 pr-10 text-sm font-bold text-slate-700 outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-200/50 appearance-none transition-all">
-                                    <option value="">-- Pilih Jenis Bus / Travel --</option>
-                                </select>
-                                <i class="fas fa-bus absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-sm pointer-events-none"></i>
-                                <i class="fas fa-chevron-down absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 text-xs pointer-events-none"></i>
+                            <div class="flex items-center justify-between gap-2 mb-2">
+                                <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest">Pilih Armada / PO *</label>
+                                <span id="custBookingArmadaSelectedBadge" class="inline-flex items-center gap-1 bg-slate-100 text-slate-500 border border-slate-200 px-2.5 py-0.5 rounded-full text-[10px] font-bold">
+                                    <i class="fas fa-hand-pointer text-[9px] text-amber-500"></i><span>Ketuk Foto Armada</span>
+                                </span>
                             </div>
+                            <select id="bookArmada" onchange="updateBookingFields()" class="hidden">
+                                <option value="">-- Pilih Jenis Bus / Travel --</option>
+                            </select>
+                            <div id="custBookingArmadaVisualGrid" class="grid grid-cols-2 sm:grid-cols-3 gap-2.5 sm:gap-3"></div>
                         </div>
 
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -1877,6 +1880,8 @@
             const select = document.getElementById('bookArmada');
             if (!select) return;
 
+            const prevValue = select.value;
+
             // Prioritas armada paling laku & populer agen
             const POPULAR_RANKS = [
                 'DAMRI JAKARTA',
@@ -1915,6 +1920,23 @@
                 html += `<option value="${f.name}">${f.name}</option>`;
             });
             select.innerHTML = html;
+
+            if (prevValue && sorted.some(f => f.name === prevValue)) {
+                select.value = prevValue;
+            }
+
+            if (typeof renderArmadaVisualPicker === 'function') {
+                renderArmadaVisualPicker({
+                    containerId: 'custBookingArmadaVisualGrid',
+                    selectId: 'bookArmada',
+                    badgeId: 'custBookingArmadaSelectedBadge',
+                    items: sorted.map(f => ({
+                        name: f.name,
+                        subLabel: f.tipeArmada || 'Bus'
+                    })),
+                    selectedValue: select.value
+                });
+            }
         }
 
         function formatRupiah(number) {
@@ -2230,6 +2252,9 @@
                 f.routes.forEach(r => { const o = document.createElement('option'); o.value = r.dest; o.innerText = r.dest; t.appendChild(o); });
                 f.times.forEach(tm => { const o = document.createElement('option'); o.value = tm; o.innerText = tm; w.appendChild(o); });
             }
+            if (typeof updateArmadaVisualPickerSelection === 'function') {
+                updateArmadaVisualPickerSelection('custBookingArmadaVisualGrid', 'bookArmada', 'custBookingArmadaSelectedBadge', a);
+            }
             if (typeof updateCustomerTarifPreview === 'function') updateCustomerTarifPreview();
         }
 
@@ -2312,7 +2337,12 @@
                 }
                 if (!armada) {
                     showMessage("Silakan pilih armada / PO terlebih dahulu!");
-                    document.getElementById('bookArmada').focus();
+                    const gridEl = document.getElementById('custBookingArmadaVisualGrid');
+                    if (gridEl) {
+                        gridEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        gridEl.classList.add('ring-2', 'ring-red-400', 'rounded-2xl', 'p-1');
+                        setTimeout(() => gridEl.classList.remove('ring-2', 'ring-red-400', 'p-1'), 1800);
+                    }
                     return;
                 }
                 if (!tujuan) {
@@ -2439,6 +2469,10 @@
             document.getElementById('bookingModal').classList.remove('hidden'); 
             document.body.style.overflow = 'hidden'; 
             goToCustomerBookingStep(1);
+            const aSelect = document.getElementById('bookArmada');
+            if (typeof updateArmadaVisualPickerSelection === 'function' && aSelect) {
+                updateArmadaVisualPickerSelection('custBookingArmadaVisualGrid', 'bookArmada', 'custBookingArmadaSelectedBadge', aSelect.value);
+            }
             const dateInput = document.getElementById('bookTanggal');
             if (dateInput && !dateInput.value) {
                 const now = new Date();
