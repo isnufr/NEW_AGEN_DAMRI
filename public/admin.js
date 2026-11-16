@@ -4556,47 +4556,47 @@
             return lines;
         };
 
-        // 1:1 native pixel-crisp layout (no vertical rescaling) matched to Laptop spacing & weights
-        let y = 6;
-        const centerText = (text, font, gapAfter = 3, maxWidth = INNER_W) => {
+        // Calibrated 1:1 to real Laptop RP58EN physical output (matched font sizes, spacing, arrow, QR, and Arsip proportions)
+        let y = 8;
+        const centerText = (text, font, gapAfter = 4, maxWidth = INNER_W) => {
             x.font = font;
             x.textAlign = 'center';
             const lines = wrapLines(text, maxWidth, font);
-            const sizePx = parseFloat(font.match(/([\d.]+)px/)?.[1] || '16');
+            const sizePx = parseFloat(font.match(/([\d.]+)px/)?.[1] || '17');
             for (const ln of lines) {
                 x.fillText(ln, W / 2, y);
                 y += Math.round(sizePx * 1.24);
             }
             y += gapAfter;
         };
-        const solidLine = (thickness = 2, gapBefore = 5, gapAfter = 8) => {
+        const solidLine = (thickness = 3, gapBefore = 6, gapAfter = 10) => {
             y += gapBefore;
             x.fillRect(PAD, y, INNER_W, thickness);
             y += thickness + gapAfter;
         };
-        const dashedLine = (gapBefore = 5, gapAfter = 8, label = '') => {
+        const dashedLine = (gapBefore = 6, gapAfter = 10, label = '') => {
             y += gapBefore;
             for (let px = PAD; px < W - PAD; px += 10) {
                 x.fillRect(px, y, 6, 2);
             }
             if (label) {
-                x.font = 'bold 14.5px Arial, sans-serif';
+                x.font = 'bold 15px Arial, sans-serif';
                 x.textAlign = 'center';
-                const lw = x.measureText(label).width + 16;
+                const lw = x.measureText(label).width + 18;
                 x.fillStyle = '#ffffff';
-                x.fillRect((W - lw) / 2, y - 8, lw, 18);
+                x.fillRect((W - lw) / 2, y - 9, lw, 19);
                 x.fillStyle = '#000000';
-                x.fillText(label, W / 2, y - 7);
-                y += 11;
+                x.fillText(label, W / 2, y - 8);
+                y += 12;
             }
             y += gapAfter;
         };
-        const rowLR = (leftStr, rightStr, leftFont = '600 16.5px Arial, sans-serif', rightFont = 'bold 17px Arial, sans-serif', gapAfter = 8) => {
+        const rowLR = (leftStr, rightStr, leftFont = '600 18px Arial, sans-serif', rightFont = 'bold 18px Arial, sans-serif', gapAfter = 8) => {
             x.font = leftFont;
             const lw = x.measureText(leftStr).width;
             const maxRightW = Math.max(135, INNER_W - lw - 10);
             const rLines = wrapLines(rightStr, maxRightW, rightFont);
-            const sizePx = parseFloat(rightFont.match(/([\d.]+)px/)?.[1] || '17');
+            const sizePx = parseFloat(rightFont.match(/([\d.]+)px/)?.[1] || '18');
             x.textAlign = 'left';
             x.font = leftFont;
             x.fillText(leftStr, PAD, y);
@@ -4609,56 +4609,72 @@
         };
 
         // 1. Header
-        centerText('AGEN DAMRI KAWUNGANTEN', '600 16px Arial, sans-serif', 2);
-        centerText(t.armada, '900 30px Arial, sans-serif', 3);
-        centerText('E-TIKET (TIKET RESMI)', 'bold 16.5px Arial, sans-serif', 2);
-        centerText('Tgl Beli: ' + t.tglBeli, '500 15px Arial, sans-serif', 3);
-        solidLine(2, 5, 8);
+        centerText('AGEN DAMRI KAWUNGANTEN', 'bold 16.5px Arial, sans-serif', 3);
+        centerText(t.armada, '900 32px Arial, sans-serif', 4);
+        centerText('E-TIKET (TIKET RESMI)', 'bold 17px Arial, sans-serif', 3);
+        centerText('Tgl Beli: ' + t.tglBeli, '600 15.5px Arial, sans-serif', 4);
+        solidLine(3, 6, 11);
 
-        // 2. Kode Boking
-        rowLR('KODE BOKING', t.idTiket, 'bold 18px Arial, sans-serif', 'bold 22px Consolas, monospace', 5);
-        dashedLine(4, 8);
+        // 2. Kode Boking (symmetrical centered top/bottom spacing like Laptop)
+        rowLR('KODE BOKING', t.idTiket, 'bold 18.5px Arial, sans-serif', 'bold 23px Consolas, "Courier New", monospace', 8);
+        dashedLine(2, 11);
 
-        // 3. Route Hero
-        centerText(`${t.asalCode}  \u2192  ${t.tujuanCode}`, '900 30px Arial, sans-serif', 3);
-        centerText(`${t.asalFull} \u2192 ${t.tujuanFull}`, 'bold 15px Arial, sans-serif', 3, INNER_W - 28);
-        dashedLine(4, 8);
+        // 3. Route Hero (code 32px, small crisp arrow 22px in middle)
+        const heroFont = '900 32px Arial, sans-serif';
+        const arrowFont = 'bold 22px Arial, sans-serif';
+        x.font = heroFont;
+        const asalW = x.measureText(t.asalCode).width;
+        const tujuanW = x.measureText(t.tujuanCode).width;
+        x.font = arrowFont;
+        const arrW = x.measureText('\u2192').width;
+        const heroGap = 16;
+        const heroStartX = (W - (asalW + heroGap + arrW + heroGap + tujuanW)) / 2;
+        x.textAlign = 'left';
+        x.font = heroFont;
+        x.fillText(t.asalCode, heroStartX, y);
+        x.font = arrowFont;
+        x.fillText('\u2192', heroStartX + asalW + heroGap, y + 5);
+        x.font = heroFont;
+        x.fillText(t.tujuanCode, heroStartX + asalW + heroGap + arrW + heroGap, y);
+        y += 40;
+        centerText(`${t.asalFull} \u2192 ${t.tujuanFull}`, 'bold 15.5px Arial, sans-serif', 4, INNER_W - 24);
+        dashedLine(6, 10);
 
         // 4. Schedule 2 Columns
         x.textAlign = 'left';
-        x.font = '600 14px Arial, sans-serif';
+        x.font = 'bold 14.5px Arial, sans-serif';
         x.fillText('TGL BERANGKAT', PAD, y);
         x.textAlign = 'right';
         x.fillText('JAM BERANGKAT', W - PAD, y);
-        y += 18;
+        y += 20;
         x.textAlign = 'left';
-        x.font = 'bold 19px Arial, sans-serif';
+        x.font = '900 19.5px Arial, sans-serif';
         x.fillText(t.tglBerangkatShort, PAD, y);
         x.textAlign = 'right';
         x.fillText(`${t.jam} WIB`, W - PAD, y);
-        y += 24;
-        dashedLine(4, 8);
+        y += 26;
+        dashedLine(6, 10);
 
         // 5. Hero Seats & Passenger Count
         x.textAlign = 'center';
-        x.font = '600 14px Arial, sans-serif';
+        x.font = 'bold 14.5px Arial, sans-serif';
         x.fillText('JML PENUMPANG', W * 0.25, y);
         x.fillText('NOMOR KURSI', W * 0.75, y);
-        const kursiLines = wrapLines(t.kursi, INNER_W * 0.45, '900 25.5px Arial, sans-serif');
-        const seatBoxH = Math.max(50, 18 + kursiLines.length * 29);
-        for (let dy = 0; dy < seatBoxH; dy += 8) x.fillRect(W / 2 - 1, y + dy, 2, 4);
-        y += 18;
-        x.font = '900 25.5px Arial, sans-serif';
+        const kursiLines = wrapLines(t.kursi, INNER_W * 0.45, '900 27.5px Arial, sans-serif');
+        const seatBoxH = Math.max(54, 20 + kursiLines.length * 31);
+        for (let dy = 0; dy < seatBoxH; dy += 8) x.fillRect(W / 2 - 1, y + dy, 1.5, 4);
+        y += 20;
+        x.font = '900 27.5px Arial, sans-serif';
         x.fillText(t.jumlahPnp, W * 0.25, y);
-        kursiLines.forEach((ln, idx) => x.fillText(ln, W * 0.75, y + idx * 29));
-        y += Math.max(32, kursiLines.length * 29) + 6;
-        solidLine(2, 4, 9);
+        kursiLines.forEach((ln, idx) => x.fillText(ln, W * 0.75, y + idx * 31));
+        y += Math.max(35, kursiLines.length * 31) + 9;
+        solidLine(3, 5, 11);
 
-        // 6. Passenger Details (exact airy Laptop row rhythm)
+        // 6. Passenger Details (18px fonts & airy row rhythm matching Laptop)
         rowLR('Nama', t.nama);
-        rowLR('Titik Naik', t.titikNaik, '600 16.5px Arial, sans-serif', 'bold 16.5px Arial, sans-serif', 8);
+        rowLR('Titik Naik', t.titikNaik, '600 18px Arial, sans-serif', 'bold 17.5px Arial, sans-serif', 8);
         rowLR('Keterangan', t.keterangan || '-');
-        dashedLine(5, 9);
+        dashedLine(7, 11);
 
         // 7. Costs & Total
         const hargaShort = formatShortRupiahUnit(t.hargaSatuanNum);
@@ -4666,67 +4682,70 @@
         const extraLabel = (t.hasBiayaTambahan && t.qty > 1)
             ? `Biaya Tmb (${t.qty}\u00D7${t.biayaTambahanPerTiketShort})`
             : 'Biaya Tambahan/Tiket';
-        rowLR(extraLabel, t.hasBiayaTambahan ? t.biayaTambahanFormatted : '-', '600 16.5px Arial, sans-serif', 'bold 17px Arial, sans-serif', 6);
+        rowLR(extraLabel, t.hasBiayaTambahan ? t.biayaTambahanFormatted : '-', '600 18px Arial, sans-serif', 'bold 18px Arial, sans-serif', 7);
         if (t.hasBiayaTambahan && t.biayaTambahanKet) {
             x.textAlign = 'left';
-            x.font = '600 15px Arial, sans-serif';
-            for (const ln of wrapLines('Ket. Tambahan: ' + t.biayaTambahanKet, INNER_W, '600 15px Arial, sans-serif')) {
+            x.font = '600 15.5px Arial, sans-serif';
+            for (const ln of wrapLines('Ket. Tambahan: ' + t.biayaTambahanKet, INNER_W, '600 15.5px Arial, sans-serif')) {
                 x.fillText(ln, PAD, y);
-                y += 19;
+                y += 20;
             }
         }
-        solidLine(2, 5, 8);
+        solidLine(3, 5, 9);
 
-        rowLR('TOTAL BAYAR', t.totalHarga, '900 20.5px Arial, sans-serif', '900 21px Arial, sans-serif', 4);
-        solidLine(2, 5, 9);
+        rowLR('TOTAL BAYAR', t.totalHarga, '900 22px Arial, sans-serif', '900 22.5px Arial, sans-serif', 7);
+        solidLine(3, 4, 11);
 
-        // 8. Scannable QR Code + Rules
+        // 8. Scannable QR Code (exact ~76px matching Laptop's 42px SVG) + Rules
         const qrMatrix = getThermalQrMatrix(t.qrPayload);
         const qMod = qrMatrix.length;
-        const qCell = Math.max(3, Math.floor(84 / qMod));
-        const qSize = qMod * qCell;
+        const targetQrPx = 76;
         for (let r = 0; r < qMod; r++) {
+            const py0 = Math.round(r * targetQrPx / qMod);
+            const ph = Math.round((r + 1) * targetQrPx / qMod) - py0;
             for (let col = 0; col < qMod; col++) {
                 if (qrMatrix[r][col]) {
-                    x.fillRect(PAD + col * qCell, y + r * qCell, qCell, qCell);
+                    const px0 = Math.round(col * targetQrPx / qMod);
+                    const pw = Math.round((col + 1) * targetQrPx / qMod) - px0;
+                    x.fillRect(PAD + px0, y + py0, pw, ph);
                 }
             }
         }
-        const ruleX = PAD + qSize + 10;
+        const ruleX = PAD + targetQrPx + 12;
         const ruleMaxW = W - PAD - ruleX;
-        let ry = y + 2;
+        let ry = y + 6;
         x.textAlign = 'left';
-        x.font = '600 14.5px Arial, sans-serif';
+        x.font = '600 15px Arial, sans-serif';
         ['• Hadir 30 mnt sblm berangkat', '• Cancel max H-1 (1\u00D724 jam)', '• Info WA: 0821-3360-7759'].forEach(rule => {
-            for (const ln of wrapLines(rule, ruleMaxW, '600 14.5px Arial, sans-serif')) {
+            for (const ln of wrapLines(rule, ruleMaxW, '600 15px Arial, sans-serif')) {
                 x.fillText(ln, ruleX, ry);
-                ry += 19;
+                ry += 20;
             }
         });
-        y = Math.max(y + qSize, ry) + 4;
+        y = Math.max(y + targetQrPx, ry) + 6;
 
-        // 9. Space antara BEFORE & AFTER Arsip Agen + Arsip Body
-        dashedLine(14, 14, '\u2702 ARSIP AGEN / KRU');
-        rowLR(t.armada, t.idTiket, 'bold 17px Arial, sans-serif', 'bold 17px Consolas, monospace', 6);
+        // 9. Space antara BEFORE & AFTER Arsip Agen + Arsip Body (matching Laptop rhythm)
+        dashedLine(20, 18, '\u2702 ARSIP AGEN / KRU');
+        rowLR(t.armada, t.idTiket, 'bold 18px Arial, sans-serif', 'bold 18px Consolas, "Courier New", monospace', 7);
         x.textAlign = 'left';
-        x.font = '600 16.5px Arial, sans-serif';
-        for (const ln of wrapLines(`${t.nama} (${t.qty} Org) • Kursi: ${t.kursi}`, INNER_W, '600 16.5px Arial, sans-serif')) {
+        x.font = '600 17.5px Arial, sans-serif';
+        for (const ln of wrapLines(`${t.nama} (${t.qty} Org) • Kursi: ${t.kursi}`, INNER_W, '600 17.5px Arial, sans-serif')) {
             x.fillText(ln, PAD, y);
-            y += 22;
+            y += 23;
         }
-        x.font = '600 16px Arial, sans-serif';
-        for (const ln of wrapLines(`${t.tglBerangkatShort} • ${t.jam} WIB • ${t.asalCode} \u2192 ${t.tujuanCode}`, INNER_W, '600 16px Arial, sans-serif')) {
+        x.font = '600 17px Arial, sans-serif';
+        for (const ln of wrapLines(`${t.tglBerangkatShort} • ${t.jam} WIB • ${t.asalCode} \u2192 ${t.tujuanCode}`, INNER_W, '600 17px Arial, sans-serif')) {
             x.fillText(ln, PAD, y);
-            y += 22;
+            y += 23;
         }
 
-        // 10. Clean gap + dashed divider + bottom footer text (~1cm total blank bottom)
-        dashedLine(14, 8, '');
-        centerText('• AGEN DAMRI KAWUNGANTEN •', '600 13.5px Arial, sans-serif', 4);
+        // 10. Clean bottom footer + ~1cm total tear margin
+        dashedLine(18, 9, '');
+        centerText('• AGEN DAMRI KAWUNGANTEN •', 'bold 14px Arial, sans-serif', 4);
 
         const rawH = Math.min(c.height, y);
-        // Never blur via fractional vertical scaling when content fits within safe buffer; only clamp extreme overflow
-        const MAX_SAFE_H = 895;
+        // Native 1:1 raster up to 940 rows (~45.1 KB inside Band 8 safe printer ceiling); only rescale extreme long notes
+        const MAX_SAFE_H = 940;
         let finalH = rawH;
         let srcCtx = x;
         if (rawH > MAX_SAFE_H) {
