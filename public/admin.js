@@ -3000,168 +3000,394 @@
     // ========================================
     // E-TICKET MODAL
     // ========================================
-    function openETicket(id) {
-        const b = getBooking(id);
-        if (!b) return;
-        
-        const armada = b.armadaId !== 'UNKNOWN' ? getArmada(b.armadaId) : null;
-        const armadaName = armada ? armada.name : '-';
-        let tujuan = armada ? armada.destination : '-';
-        
-        let asalText = 'Kawunganten';
-        let rawTujuan = b.tujuan || b['Tujuan'] || tujuan;
-        if (rawTujuan && String(rawTujuan).startsWith('[PULANG] ')) {
-            asalText = rawTujuan.replace('[PULANG] ', '');
-            tujuan = 'KAWUNGANTEN';
-        }
+    // ========================================
+    // THERMAL TICKET BUILDER & BIAYA TAMBAHAN HELPERS (SINGLE SOURCE)
+    // ========================================
+    const INDO_SHORT_MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
 
-        const isPaid = (b.status === 'paid' || b.status === 'Lunas' || b.status === 'ACC' || b.status === 'LUNAS');
-        const statusPay = isPaid ? 'LUNAS' : 'BELUM LUNAS';
-        
-        let formattedDate = b.dateTravel || '-';
-        const dObj = parseIndoDate(formattedDate);
-        
-        const qty = parseInt(b.qty) || 1;
-        const harga = getEffectiveHarga(armada, dObj);
-        
-        const totalHargaData = (b.totalHarga !== undefined && b.totalHarga !== null) ? parseInt(String(b.totalHarga).replace(/[^0-9]/g, '')) : (b.total !== undefined && b.total !== null ? parseInt(String(b.total).replace(/[^0-9]/g, '')) : (harga * qty));
-        const expectedTotal = harga * qty;
-        
-        let rawKet = String(b.keterangan || b.ket || '-');
+    function escapeTicketHtml(str) {
+        return String(str ?? '')
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;');
+    }
+
+    function parseBiayaTambahanData(rawKeterangan, qtyValue) {
+        const qty = Math.max(1, parseInt(qtyValue, 10) || 1);
+        let rawKet = String(rawKeterangan || '-');
         const mKet = rawKet.match(/Biaya Tambahan: (.*?) \((Rp[ \d.,]+)\)/);
         let ketTambahan = '';
-        let nominalBiayaTambahan = 0;
+        let totalBiayaTambahan = 0;
+        let perTiketBiayaTambahan = 0;
+
         if (mKet) {
-            ketTambahan = mKet[1].trim();
-            nominalBiayaTambahan = parseInt(mKet[2].replace(/[^\d]/g, '')) || 0;
+            const fullLabel = mKet[1].trim();
+            totalBiayaTambahan = parseInt(mKet[2].replace(/[^\d]/g, ''), 10) || 0;
+            const mPer = fullLabel.match(/@Rp\s*([\d.,]+)\s*x\s*(\d+)/i);
+            if (mPer) {
+                perTiketBiayaTambahan = parseInt(mPer[1].replace(/[^\d]/g, ''), 10) || Math.round(totalBiayaTambahan / qty);
+                ketTambahan = fullLabel.replace(/\s*@Rp\s*[\d.,]+\s*x\s*\d+/i, '').trim();
+            } else {
+                perTiketBiayaTambahan = qty > 0 ? Math.round(totalBiayaTambahan / qty) : totalBiayaTambahan;
+                ketTambahan = fullLabel;
+            }
+            if (ketTambahan === 'Tambahan') ketTambahan = '';
             rawKet = rawKet.replace(/,?\s*Biaya Tambahan:.*?$/, '').trim();
             if (!rawKet) rawKet = '-';
         }
-        const hasBiayaTambahan = nominalBiayaTambahan > 0;
-        
-        const total = Math.max(totalHargaData || 0, expectedTotal + nominalBiayaTambahan);
 
-        if (dObj) formattedDate = INDO_DAYS[dObj.getDay()] + ', ' + dObj.getDate() + ' ' + INDO_MONTHS[dObj.getMonth()] + ' ' + dObj.getFullYear();
+        return {
+            cleanKet: rawKet || '-',
+            ketTambahan,
+            totalBiayaTambahan,
+            perTiketBiayaTambahan,
+            hasBiayaTambahan: totalBiayaTambahan > 0
+        };
+    }
 
-        const now = new Date();
-        const tglBeliObj = new Date(b.createdAt || new Date());
-        const tglBeli = String(tglBeliObj.getDate()).padStart(2, '0') + '/' + String(tglBeliObj.getMonth() + 1).padStart(2, '0') + '/' + tglBeliObj.getFullYear() + ' ' + String(tglBeliObj.getHours()).padStart(2, '0') + ':' + String(tglBeliObj.getMinutes()).padStart(2, '0');
+    function formatBiayaTambahanNote(ket, perTiket, qtyValue) {
+        const qty = Math.max(1, parseInt(qtyValue, 10) || 1);
+        const total = Math.max(0, parseInt(perTiket, 10) || 0) * qty;
+        if (total <= 0) return '';
+        const baseKet = String(ket || '').trim() || 'Tambahan';
+        const label = qty > 1 ? `${baseKet} @${formatRupiah(perTiket)} x${qty}` : baseKet;
+        return `Biaya Tambahan: ${label} (${formatRupiah(total)})`;
+    }
 
-        if(document.getElementById('ticketDate')) document.getElementById('ticketDate').innerText = formattedDate;
-        if(document.getElementById('ticketTime')) document.getElementById('ticketTime').innerText = b.waktu || '-';
-        if(document.getElementById('ticketArmada')) document.getElementById('ticketArmada').innerText = armadaName;
-        if(document.getElementById('ticketAsal')) document.getElementById('ticketAsal').innerText = asalText;
-        if(document.getElementById('ticketTujuan')) document.getElementById('ticketTujuan').innerText = tujuan;
-        if(document.getElementById('ticketKursi')) document.getElementById('ticketKursi').innerText = b.kursi || '-';
-        if(document.getElementById('ticketKeterangan')) document.getElementById('ticketKeterangan').innerText = rawKet;
-        if(document.getElementById('ticketQty')) document.getElementById('ticketQty').innerText = qty;
-        
-        if(document.getElementById('ticketId')) document.getElementById('ticketId').innerText = b.bookingId;
-        if(document.getElementById('ticketName')) document.getElementById('ticketName').innerText = b.name;
-        if(document.getElementById('ticketTglBeli')) document.getElementById('ticketTglBeli').innerText = "TGL BELI: " + tglBeli;
-        if(document.getElementById('ticketHargaSatuan')) document.getElementById('ticketHargaSatuan').innerText = formatRupiah(harga);
-        
-        if (hasBiayaTambahan) {
-            if(document.getElementById('ticketBiayaTambahanContainer')) {
-                document.getElementById('ticketBiayaTambahanContainer').classList.remove('hidden');
-                document.getElementById('ticketBiayaTambahan').innerText = formatRupiah(nominalBiayaTambahan);
-                document.getElementById('ticketBiayaTambahanKet').innerText = ketTambahan ? `(${ketTambahan})` : '';
-            }
-            if(document.getElementById('r_biaya_tambahan_container')) {
-                document.getElementById('r_biaya_tambahan_container').style.display = 'flex';
-                document.getElementById('r_biaya_tambahan').innerText = formatRupiah(nominalBiayaTambahan);
-                document.getElementById('r_biaya_tambahan_ket').innerText = ketTambahan || '-';
-            }
+    function updateBiayaTambahanHint(hintId, nominalPerTiket, qtyValue) {
+        const hintEl = document.getElementById(hintId);
+        if (!hintEl) return;
+        const perTiket = Math.max(0, parseInt(nominalPerTiket, 10) || 0);
+        const qty = Math.max(1, parseInt(qtyValue, 10) || 1);
+        if (perTiket > 0) {
+            const total = perTiket * qty;
+            hintEl.innerText = `Total biaya tambahan: ${qty} × ${formatRupiah(perTiket)} = ${formatRupiah(total)}`;
+            hintEl.classList.remove('hidden');
         } else {
-            if(document.getElementById('ticketBiayaTambahanContainer')) {
-                document.getElementById('ticketBiayaTambahanContainer').classList.add('hidden');
+            hintEl.innerText = '';
+            hintEl.classList.add('hidden');
+        }
+    }
+
+    function getCityCodeFromRoute(text) {
+        const s = String(text || '').toUpperCase().trim();
+        if (!s || s === '-') return '---';
+        if (s.includes('KAWUNGANTEN')) return 'KWT';
+        if (s.includes('JAKARTA') || s.includes('KEMAYORAN') || s.includes('PULOGEBANG') || s.includes('RAMBUTAN') || s.includes('KALIDERES') || s.includes('GROGOL') || s.includes('TANJUNG PRIOK')) return 'JKT';
+        if (s.includes('BANDUNG') || s.includes('CICAHEUM') || s.includes('LEUWIPANJANG')) return 'BDG';
+        if (s.includes('YOGYA') || s.includes('JOGJA') || s.includes('GIWANGAN')) return 'YOG';
+        if (s.includes('SEMARANG') || s.includes('KRAPYAK') || s.includes('TERBOYO')) return 'SMG';
+        if (s.includes('SURABAYA') || s.includes('PURABAYA') || s.includes('BUNGURASIH')) return 'SBY';
+        if (s.includes('LAMPUNG') || s.includes('RAJABASA')) return 'LPG';
+        if (s.includes('PALEMBANG')) return 'PLM';
+        if (s.includes('BEKASI')) return 'BKS';
+        if (s.includes('TANGERANG') || s.includes('PORIS')) return 'TNG';
+        if (s.includes('BOGOR')) return 'BGR';
+        if (s.includes('CILACAP')) return 'CLP';
+        if (s.includes('SOLO') || s.includes('SURAKARTA')) return 'SLO';
+        if (s.includes('MALANG')) return 'MLG';
+        if (s.includes('MERAK')) return 'MRK';
+        return s.replace(/[^A-Z]/g, '').substring(0, 3) || '---';
+    }
+
+    function formatShortIndoDate(dateText) {
+        const dObj = (typeof parseIndoDate === 'function') ? parseIndoDate(dateText) : null;
+        if (dObj && !isNaN(dObj.getTime())) {
+            return `${dObj.getDate()} ${INDO_SHORT_MONTHS[dObj.getMonth()]} ${dObj.getFullYear()}`;
+        }
+        return String(dateText || '-').replace(/^(Senin|Selasa|Rabu|Kamis|Jumat|Sabtu|Minggu),\s*/i, '');
+    }
+
+    function formatTicketTglBeli(dateInput) {
+        const d = dateInput ? new Date(dateInput) : new Date();
+        const safe = isNaN(d.getTime()) ? new Date() : d;
+        const hh = String(safe.getHours()).padStart(2, '0');
+        const mm = String(safe.getMinutes()).padStart(2, '0');
+        return `${safe.getDate()} ${INDO_SHORT_MONTHS[safe.getMonth()]} ${safe.getFullYear()} • ${hh}:${mm} WIB`;
+    }
+
+    function formatShortRupiahUnit(amount) {
+        const n = parseInt(amount, 10) || 0;
+        if (n >= 1000 && n % 1000 === 0) return `${n / 1000}rb`;
+        return formatRupiah(n);
+    }
+
+    function getThermalQrMatrix(payload) {
+        const text = String(payload || 'AGEN-DAMRI-KAWUNGANTEN');
+        try {
+            if (typeof window !== 'undefined' && typeof window.qrcode === 'function') {
+                const qr = window.qrcode(0, 'M');
+                qr.addData(text);
+                qr.make();
+                const count = qr.getModuleCount();
+                const matrix = [];
+                for (let r = 0; r < count; r++) {
+                    const row = [];
+                    for (let c = 0; c < count; c++) row.push(qr.isDark(r, c));
+                    matrix.push(row);
+                }
+                return matrix;
             }
-            if(document.getElementById('r_biaya_tambahan_container')) {
-                document.getElementById('r_biaya_tambahan_container').style.display = 'none';
+        } catch (err) {
+            console.warn('QR matrix fallback:', err);
+        }
+        // Deterministic minimal QR-like fallback pattern if offline without qrcode lib
+        const size = 21;
+        const m = Array.from({ length: size }, () => Array(size).fill(false));
+        const drawFinder = (oy, ox) => {
+            for (let r = 0; r < 7; r++) {
+                for (let c = 0; c < 7; c++) {
+                    m[oy + r][ox + c] = (r === 0 || r === 6 || c === 0 || c === 6 || (r >= 2 && r <= 4 && c >= 2 && c <= 4));
+                }
+            }
+        };
+        drawFinder(0, 0); drawFinder(0, size - 7); drawFinder(size - 7, 0);
+        let hash = 2166136261;
+        for (let i = 0; i < text.length; i++) hash = Math.imul(hash ^ text.charCodeAt(i), 16777619);
+        for (let r = 0; r < size; r++) {
+            for (let c = 0; c < size; c++) {
+                if ((r < 8 && c < 8) || (r < 8 && c >= size - 8) || (r >= size - 8 && c < 8)) continue;
+                hash = Math.imul(hash ^ (r * 31 + c), 16777619);
+                m[r][c] = (hash & 1) === 1;
             }
         }
+        return m;
+    }
 
-        if(document.getElementById('ticketTotal')) document.getElementById('ticketTotal').innerText = formatRupiah(total);
-        
-        if(document.getElementById('ticketArmadaArsip')) document.getElementById('ticketArmadaArsip').innerText = armadaName;
-        if(document.getElementById('ticketNameArsip')) document.getElementById('ticketNameArsip').innerText = b.name;
-        if(document.getElementById('ticketQtyArsip')) document.getElementById('ticketQtyArsip').innerText = qty;
-        if(document.getElementById('ticketTujuanArsip')) document.getElementById('ticketTujuanArsip').innerText = tujuan;
-        if(document.getElementById('ticketDateArsip')) document.getElementById('ticketDateArsip').innerText = formattedDate;
+    function renderThermalQrSvg(payload) {
+        const matrix = getThermalQrMatrix(payload);
+        const n = matrix.length;
+        let paths = '';
+        for (let r = 0; r < n; r++) {
+            for (let c = 0; c < n; c++) {
+                if (matrix[r][c]) paths += `M${c} ${r}h1v1h-1z`;
+            }
+        }
+        return `<svg viewBox="-1 -1 ${n + 2} ${n + 2}" width="48" height="48" style="display:block;flex-shrink:0;shape-rendering:crispEdges;" aria-label="QR Kode Booking"><rect x="-1" y="-1" width="${n + 2}" height="${n + 2}" fill="#fff"/><path d="${paths}" fill="#000"/></svg>`;
+    }
 
-        currentTicketDataForBT = {
-            idTiket: b.bookingId,
-            tglBeli: tglBeli,
-            nama: b.name,
-            tujuan: tujuan,
-            tglBerangkat: formattedDate,
-            jam: b.waktu || '-',
-            jumlahPnp: qty + ' Orang',
-            kursi: b.kursi || '-',
+    function buildThermalTicketData(src) {
+        const qty = Math.max(1, parseInt(src.qty, 10) || 1);
+        const armadaName = String(src.armadaName || '-').trim().toUpperCase();
+        const rawTujuan = String(src.rawTujuan || src.tujuan || '-').trim();
+        const isPulang = rawTujuan.startsWith('[PULANG] ');
+        const asalFull = isPulang ? rawTujuan.replace('[PULANG] ', '').trim() : 'Kawunganten';
+        const tujuanFull = isPulang ? 'KAWUNGANTEN' : rawTujuan;
+        const titikNaik = isPulang ? asalFull : 'Agen Damri Kawunganten';
+
+        const asalCode = getCityCodeFromRoute(asalFull);
+        const tujuanCode = getCityCodeFromRoute(tujuanFull);
+        const formattedDate = src.dateTravel || '-';
+        const tglBerangkatShort = formatShortIndoDate(formattedDate);
+        const tglBeli = formatTicketTglBeli(src.createdAt);
+
+        const hargaSatuan = Math.max(0, parseInt(src.hargaSatuan, 10) || 0);
+        const subtotalTiket = hargaSatuan * qty;
+        const extra = src.extraParsed || parseBiayaTambahanData(src.keterangan, qty);
+        const expectedTotal = subtotalTiket + extra.totalBiayaTambahan;
+        const parsedTotalRaw = parseInt(String(src.totalHarga || 0).replace(/[^0-9]/g, ''), 10) || 0;
+        const total = Math.max(parsedTotalRaw, expectedTotal);
+
+        const kursi = String(src.kursi || '-').trim() || '-';
+        const jam = String(src.jam || '-').trim() || '-';
+        const nama = String(src.nama || '-').trim() || '-';
+        const idTiket = String(src.idTiket || '-').trim().toUpperCase();
+
+        return {
+            idTiket,
+            tglBeli,
             armada: armadaName,
+            asalFull: asalFull.toUpperCase(),
+            tujuanFull: tujuanFull.toUpperCase(),
+            asalText: asalFull,
+            tujuan: tujuanFull,
+            asalCode,
+            tujuanCode,
+            tglBerangkat: formattedDate,
+            tglBerangkatShort,
+            jam,
+            qty,
+            jumlahPnp: `${qty} Orang`,
+            kursi,
+            nama,
+            titikNaik,
+            hp: src.hp || '',
+            keterangan: extra.cleanKet || '-',
+            hargaSatuanNum: hargaSatuan,
+            hargaSatuan: formatRupiah(hargaSatuan),
+            subtotalTiket: formatRupiah(subtotalTiket),
+            biayaTambahan: extra.totalBiayaTambahan,
+            biayaTambahanPerTiket: extra.perTiketBiayaTambahan,
+            biayaTambahanPerTiketShort: formatShortRupiahUnit(extra.perTiketBiayaTambahan),
+            biayaTambahanFormatted: formatRupiah(extra.totalBiayaTambahan),
+            biayaTambahanKet: extra.ketTambahan,
+            hasBiayaTambahan: extra.hasBiayaTambahan,
             totalHarga: formatRupiah(total),
-            hargaSatuan: formatRupiah(harga),
-            biayaTambahan: hasBiayaTambahan ? nominalBiayaTambahan : 0,
-            biayaTambahanKet: ketTambahan,
-            status: statusPay,
-            keterangan: rawKet
+            status: src.status || 'LUNAS',
+            qrPayload: `DAMRI-KWT|${idTiket}|${armadaName}|${tglBerangkatShort}|${jam}|${kursi}`
         };
+    }
 
-        const ruteFullText = asalText + ' - ' + tujuan;
+    function buildThermalTicketHtml(t) {
+        const hargaShort = formatShortRupiahUnit(t.hargaSatuanNum);
+        const extraLabel = (t.hasBiayaTambahan && t.qty > 1)
+            ? `Biaya Tambahan/Tiket (${t.qty}&times;${escapeTicketHtml(t.biayaTambahanPerTiketShort)})`
+            : 'Biaya Tambahan/Tiket';
+        const extraValue = t.hasBiayaTambahan ? escapeTicketHtml(t.biayaTambahanFormatted) : '-';
+        const extraKetHtml = (t.hasBiayaTambahan && t.biayaTambahanKet)
+            ? `<div style="font-size:8.5px;font-weight:700;color:#222;margin-top:1px;">Ket. Tambahan: ${escapeTicketHtml(t.biayaTambahanKet)}</div>`
+            : '';
 
-        // Populate Thermal Receipt
-        if(document.getElementById('r_tgl_beli')) document.getElementById('r_tgl_beli').innerText = 'TGL BELI: ' + tglBeli;
-        document.getElementById('r_id').innerText = b.bookingId;
-        document.getElementById('r_tgl').innerText = formattedDate;
-        document.getElementById('r_jam').innerText = b.waktu || '-';
-        document.getElementById('r_nama').innerText = b.name;
-        document.getElementById('r_pnp').innerText = qty + ' Orang';
-        document.getElementById('r_kursi').innerText = b.kursi || '-';
-        if(document.getElementById('r_keterangan')) document.getElementById('r_keterangan').innerText = rawKet;
-        document.getElementById('r_bus').innerText = armadaName;
-        document.getElementById('r_rute').innerText = ruteFullText;
+        return `
+            <div style="text-align:center;padding-bottom:8px;border-bottom:1.5px solid #000;">
+                <div style="font-size:9.5px;font-weight:800;letter-spacing:0.12em;text-transform:uppercase;">AGEN DAMRI KAWUNGANTEN</div>
+                <div style="font-size:19px;font-weight:900;letter-spacing:0.04em;text-transform:uppercase;line-height:1.15;margin:4px 0 3px;">${escapeTicketHtml(t.armada)}</div>
+                <div style="font-size:9.5px;font-weight:800;letter-spacing:0.09em;">E-TIKET (TIKET RESMI)</div>
+                <div style="font-size:8.5px;font-weight:700;margin-top:2px;color:#222;">Tgl Beli: ${escapeTicketHtml(t.tglBeli)}</div>
+            </div>
 
-        const ruteShortText = (b.tujuan && String(b.tujuan).startsWith('[PULANG] ')) 
-            ? String(asalText).substring(0,3).toUpperCase() + ' - KWT' 
-            : 'KWT - ' + String(tujuan).substring(0,3).toUpperCase();
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px dashed #000;">
+                <span style="font-size:10.5px;font-weight:800;text-transform:uppercase;letter-spacing:0.04em;">KODE BOKING</span>
+                <strong class="tt-mono" style="font-size:13.5px;font-weight:900;letter-spacing:0.08em;white-space:nowrap;">${escapeTicketHtml(t.idTiket)}</strong>
+            </div>
 
-        document.getElementById('r_harga').innerText = formatRupiah(harga);
-        document.getElementById('r_total').innerText = formatRupiah(total);
-        if(document.getElementById('r_rute_short')) document.getElementById('r_rute_short').innerText = ruteShortText;
-        
-        document.getElementById('r_bus_arsip').innerText = armadaName;
-        document.getElementById('r_pnp_arsip_num').innerText = qty + ' Org';
-        document.getElementById('r_rute_arsip').innerText = ruteFullText;
-        document.getElementById('r_nama_arsip').innerText = b.name;
-        document.getElementById('r_tgl_arsip').innerText = formattedDate;
+            <div style="text-align:center;padding:8px 0 6px;">
+                <div style="display:flex;align-items:center;justify-content:center;gap:10px;font-size:18px;font-weight:900;letter-spacing:0.05em;">
+                    <span>${escapeTicketHtml(t.asalCode)}</span>
+                    <span style="font-size:12px;">&#8594;</span>
+                    <span>${escapeTicketHtml(t.tujuanCode)}</span>
+                </div>
+                <div style="font-size:8.5px;font-weight:800;margin-top:2px;letter-spacing:0.02em;line-height:1.25;">${escapeTicketHtml(t.asalFull)} &#8594; ${escapeTicketHtml(t.tujuanFull)}</div>
+            </div>
 
-        // Prepare WA Link
-        const hp = b.hp || '';
-        const waNum = String(hp).replace(/[^0-9]/g, '').replace(/^0/, '62');
-        const textWa = `AGEN DAMRI KAWUNGANTEN\nPusat Penjualan Tiket\n\n` +
-            `Halo ${b.name}, ini adalah rincian tiket perjalanan Anda:\n\n` +
-            `Kode Booking (Ketuk untuk salin):\n` +
-            `\`${b.bookingId}\`\n\n` +
-            `Armada: ${armadaName}\n` +
-            `Asal: ${asalText}\n` +
-            `Tujuan: ${tujuan}\n` +
-            `Tanggal: ${formattedDate}\n` +
-            `Jam: ${b.waktu || '-'}\n` +
-            `Jumlah Penumpang: ${qty} Orang\n` +
-            `Nomor Kursi: ${b.kursi || '-'}\n` +
-            (rawKet && rawKet !== '-' ? `Keterangan: ${rawKet}\n` : '') +
-            `Harga per Tiket: ${formatRupiah(harga)}\n` +
-            (hasBiayaTambahan ? `Biaya Tambahan: ${formatRupiah(nominalBiayaTambahan)} (${ketTambahan})\n` : '') +
-            `Total Bayar: ${formatRupiah(total)}\n` +
-            `Status Pembayaran: ${statusPay}\n\n` +
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:6px 0;border-top:1px dashed #000;border-bottom:1px dashed #000;">
+                <div>
+                    <div style="font-size:8px;font-weight:800;text-transform:uppercase;letter-spacing:0.04em;color:#333;">TGL BERANGKAT</div>
+                    <div style="font-size:10.5px;font-weight:900;margin-top:1px;">${escapeTicketHtml(t.tglBerangkatShort)}</div>
+                </div>
+                <div style="text-align:right;">
+                    <div style="font-size:8px;font-weight:800;text-transform:uppercase;letter-spacing:0.04em;color:#333;">JAM BERANGKAT</div>
+                    <div style="font-size:10.5px;font-weight:900;margin-top:1px;">${escapeTicketHtml(t.jam)} WIB</div>
+                </div>
+            </div>
+
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:7px 0;margin-bottom:5px;border-bottom:1.5px solid #000;">
+                <div style="text-align:center;border-right:1px dashed #888;padding-right:4px;">
+                    <div style="font-size:8px;font-weight:800;text-transform:uppercase;letter-spacing:0.04em;color:#333;">JML PENUMPANG</div>
+                    <div style="font-size:15px;font-weight:900;line-height:1.15;margin-top:2px;">${escapeTicketHtml(t.jumlahPnp)}</div>
+                </div>
+                <div style="text-align:center;padding-left:4px;">
+                    <div style="font-size:8px;font-weight:800;text-transform:uppercase;letter-spacing:0.04em;color:#333;">NOMOR KURSI</div>
+                    <div style="font-size:15px;font-weight:900;line-height:1.15;margin-top:2px;word-break:break-word;">${escapeTicketHtml(t.kursi)}</div>
+                </div>
+            </div>
+
+            <div class="tt-row"><span>Nama</span><strong>${escapeTicketHtml(t.nama)}</strong></div>
+            <div class="tt-row"><span>Titik Naik</span><strong style="white-space:nowrap;">${escapeTicketHtml(t.titikNaik)}</strong></div>
+            <div class="tt-row"><span>Keterangan</span><strong style="max-width:62%;">${escapeTicketHtml(t.keterangan)}</strong></div>
+
+            <div style="border-top:1px dashed #000;margin:7px 0;"></div>
+            <div class="tt-row" style="font-size:9.8px;"><span>Harga Tiket (${t.qty}&times;${escapeTicketHtml(hargaShort)})</span><strong style="white-space:nowrap;flex-shrink:0;">${escapeTicketHtml(t.subtotalTiket)}</strong></div>
+            <div class="tt-row" style="font-size:9.8px;"><span>${extraLabel}</span><strong style="white-space:nowrap;flex-shrink:0;">${extraValue}</strong></div>
+            ${extraKetHtml}
+
+            <div style="border-top:1.5px solid #000;border-bottom:1.5px solid #000;padding:5px 0;display:flex;justify-content:space-between;align-items:center;font-size:12.5px;font-weight:900;margin-top:6px;">
+                <span>TOTAL BAYAR</span>
+                <span style="white-space:nowrap;">${escapeTicketHtml(t.totalHarga)}</span>
+            </div>
+
+            <div style="display:flex;align-items:center;gap:8px;margin-top:8px;">
+                ${renderThermalQrSvg(t.qrPayload)}
+                <div style="font-size:8.3px;font-weight:700;line-height:1.38;">
+                    <div>&bull; Hadir 30 menit sblm berangkat</div>
+                    <div>&bull; Cancel max H-1 (1x24 jam)</div>
+                    <div>&bull; Info WA: 0821-3360-7759</div>
+                </div>
+            </div>
+
+            <div style="border-top:1.5px dashed #000;margin:11px 0 7px;text-align:center;">
+                <span style="background:#fff;padding:0 6px;font-size:8px;font-weight:900;letter-spacing:0.08em;position:relative;top:-8px;">&#9986; ARSIP AGEN / KRU</span>
+            </div>
+            <div style="font-size:9.3px;line-height:1.45;">
+                <div class="tt-row" style="font-size:9.5px;"><strong>${escapeTicketHtml(t.armada)}</strong><strong class="tt-mono" style="white-space:nowrap;">${escapeTicketHtml(t.idTiket)}</strong></div>
+                <div><b>${escapeTicketHtml(t.nama)} (${t.qty} Org)</b> &bull; Kursi: <b>${escapeTicketHtml(t.kursi)}</b></div>
+                <div>${escapeTicketHtml(t.tglBerangkatShort)} &bull; ${escapeTicketHtml(t.jam)} WIB &bull; <b>${escapeTicketHtml(t.asalCode)} &#8594; ${escapeTicketHtml(t.tujuanCode)}</b></div>
+            </div>
+        `;
+    }
+
+    function renderAndShowThermalTicket(src) {
+        const t = buildThermalTicketData(src);
+        const ticketHtml = buildThermalTicketHtml(t);
+
+        const displayEl = document.getElementById('ticketDisplayReceipt');
+        if (displayEl) displayEl.innerHTML = ticketHtml;
+
+        const printEl = document.getElementById('thermalReceipt');
+        if (printEl) printEl.innerHTML = ticketHtml;
+
+        currentTicketDataForBT = t;
+
+        const waNum = String(t.hp || '').replace(/[^0-9]/g, '').replace(/^0/, '62');
+        const textWa = `AGEN DAMRI KAWUNGANTEN\n${t.armada}\nE-TIKET (TIKET RESMI)\nTgl Beli: ${t.tglBeli}\n\n` +
+            `Kode Boking (Ketuk untuk salin):\n` +
+            `\`${t.idTiket}\`\n\n` +
+            `Rute: ${t.asalFull} -> ${t.tujuanFull}\n` +
+            `Tanggal: ${t.tglBerangkat}\n` +
+            `Jam: ${t.jam} WIB\n` +
+            `Jumlah Penumpang: ${t.jumlahPnp}\n` +
+            `Nomor Kursi: ${t.kursi}\n` +
+            `Nama: ${t.nama}\n` +
+            `Titik Naik: ${t.titikNaik}\n` +
+            (t.keterangan && t.keterangan !== '-' ? `Keterangan: ${t.keterangan}\n` : '') +
+            `Harga Tiket (${t.qty} x ${t.hargaSatuan}): ${t.subtotalTiket}\n` +
+            `Biaya Tambahan/Tiket: ${t.hasBiayaTambahan ? `${t.biayaTambahanFormatted}${t.biayaTambahanKet ? ' (' + t.biayaTambahanKet + ')' : ''}` : '-'}\n` +
+            `TOTAL BAYAR: ${t.totalHarga}\n\n` +
             `HADIR 30 MENIT SEBELUM PEMBERANGKATAN\n` +
-            `TIKET YANG SUDAH DIBOOKING TIDAK BISA DICANCEL MENDADAK (MAX 1x24jam)\n\n` +
-            `Terima Kasih telah menggunakan jasa kami.\n` +
+            `TIKET TIDAK BISA DICANCEL MENDADAK (MAX 1x24jam)\n\n` +
             `Info: 082133607759\n` +
             `Website: agendamrikawunganten.net`;
         currentTicketWaText = waNum ? `https://wa.me/${waNum}?text=${encodeURIComponent(textWa)}` : '';
 
         openEticketModal();
+    }
+
+    function openETicket(id) {
+        const b = getBooking(id);
+        if (!b) return;
+
+        const armada = b.armadaId !== 'UNKNOWN' ? getArmada(b.armadaId) : null;
+        const armadaName = armada ? armada.name : (b.armadaName || '-');
+        const rawTujuan = b.tujuan || b['Tujuan'] || (armada ? armada.destination : '-');
+        const dObj = parseIndoDate(b.dateTravel || '-');
+        const formattedDate = dObj
+            ? `${INDO_DAYS[dObj.getDay()]}, ${dObj.getDate()} ${INDO_MONTHS[dObj.getMonth()]} ${dObj.getFullYear()}`
+            : (b.dateTravel || '-');
+        const qty = parseInt(b.qty, 10) || 1;
+        const harga = getEffectiveHarga(armada, dObj);
+        const totalHargaData = (b.totalHarga !== undefined && b.totalHarga !== null)
+            ? parseInt(String(b.totalHarga).replace(/[^0-9]/g, ''), 10)
+            : (b.total !== undefined && b.total !== null ? parseInt(String(b.total).replace(/[^0-9]/g, ''), 10) : (harga * qty));
+        const isPaid = (b.status === 'paid' || b.status === 'Lunas' || b.status === 'ACC' || b.status === 'LUNAS');
+
+        renderAndShowThermalTicket({
+            idTiket: b.bookingId,
+            createdAt: b.createdAt,
+            armadaName,
+            rawTujuan,
+            dateTravel: formattedDate,
+            jam: b.waktu || '-',
+            qty,
+            kursi: b.kursi || '-',
+            nama: b.name || '-',
+            hp: b.hp || '',
+            keterangan: b.keterangan || b.ket || '-',
+            hargaSatuan: harga,
+            totalHarga: totalHargaData,
+            status: isPaid ? 'LUNAS' : 'BELUM LUNAS'
+        });
     }
 
     function closeETicket() {
@@ -3385,14 +3611,12 @@
         document.getElementById('editBookingHp').value = b.hp;
         document.getElementById('editBookingAlamat').value = b.alamat && b.alamat !== '-' ? b.alamat : '';
         
-        let rawKet = String(b.keterangan || b.ket || '');
-        const mKet = rawKet.match(/Biaya Tambahan: (.*?) \((Rp[ \d.,]+)\)/);
-        if (mKet) {
-            document.getElementById('editBookingBiayaTambahanKet').value = mKet[1].trim();
-            document.getElementById('editBookingBiayaTambahanNominal').value = parseInt(mKet[2].replace(/[^\d]/g, '')) || 0;
+        const parsedEditBiaya = parseBiayaTambahanData(b.keterangan || b.ket || '', b.qty);
+        let rawKet = parsedEditBiaya.cleanKet === '-' ? '' : parsedEditBiaya.cleanKet;
+        if (parsedEditBiaya.hasBiayaTambahan) {
+            document.getElementById('editBookingBiayaTambahanKet').value = parsedEditBiaya.ketTambahan;
+            document.getElementById('editBookingBiayaTambahanNominal').value = parsedEditBiaya.perTiketBiayaTambahan;
             document.querySelector('input[name="editBookingHasBiayaTambahan"][value="yes"]').checked = true;
-            
-            rawKet = rawKet.replace(/,?\s*Biaya Tambahan:.*?$/, '').trim();
         } else {
             document.getElementById('editBookingBiayaTambahanKet').value = '';
             document.getElementById('editBookingBiayaTambahanNominal').value = 0;
@@ -3572,7 +3796,9 @@
         const armada = getArmada(armadaId);
         
         const hasBiayaTambahan = document.querySelector('input[name="editBookingHasBiayaTambahan"]:checked').value === 'yes';
-        const nominalBiayaTambahan = hasBiayaTambahan ? (parseInt(document.getElementById('editBookingBiayaTambahanNominal').value) || 0) : 0;
+        const nominalBiayaPerTiket = hasBiayaTambahan ? (parseInt(document.getElementById('editBookingBiayaTambahanNominal').value) || 0) : 0;
+        const totalBiayaTambahan = nominalBiayaPerTiket * qty;
+        updateBiayaTambahanHint('editBookingBiayaTambahanTotalHint', nominalBiayaPerTiket, qty);
         
         const rawDate = document.getElementById('editBookingDate').value;
         let dObjForHarga = null;
@@ -3586,7 +3812,7 @@
         
         if(armada) {
             const harga = getEffectiveHarga(armada, dObjForHarga);
-            const total = (harga * qty) + nominalBiayaTambahan;
+            const total = (harga * qty) + totalBiayaTambahan;
             document.getElementById('editBookingTotalDisplay').innerText = formatRupiah(total);
         } else {
             document.getElementById('editBookingTotalDisplay').innerText = 'Rp 0';
@@ -3622,13 +3848,14 @@
         const dObjForHarga = parseIndoDate(formattedDate);
         const hargaEff = getEffectiveHarga(armada, dObjForHarga);
         
-        let finalKet = document.getElementById('editBookingKeterangan') ? document.getElementById('editBookingKeterangan').value : '';
+        let finalKet = document.getElementById('editBookingKeterangan') ? document.getElementById('editBookingKeterangan').value.trim() : '';
         const hasBiayaTambahan = document.querySelector('input[name="editBookingHasBiayaTambahan"]:checked').value === 'yes';
-        const nominalBiayaTambahan = hasBiayaTambahan ? (parseInt(document.getElementById('editBookingBiayaTambahanNominal').value) || 0) : 0;
+        const nominalBiayaPerTiket = hasBiayaTambahan ? (parseInt(document.getElementById('editBookingBiayaTambahanNominal').value) || 0) : 0;
         const ketBiayaTambahan = hasBiayaTambahan ? document.getElementById('editBookingBiayaTambahanKet').value : '';
+        const totalBiayaTambahan = nominalBiayaPerTiket * qty;
         
-        if (hasBiayaTambahan && nominalBiayaTambahan > 0) {
-            const ketTambahanText = `Biaya Tambahan: ${ketBiayaTambahan} (${formatRupiah(nominalBiayaTambahan)})`;
+        if (hasBiayaTambahan && totalBiayaTambahan > 0) {
+            const ketTambahanText = formatBiayaTambahanNote(ketBiayaTambahan, nominalBiayaPerTiket, qty);
             finalKet = finalKet ? `${finalKet}, ${ketTambahanText}` : ketTambahanText;
         }
 
@@ -3644,7 +3871,7 @@
             jumlahPnp: qty,
             nomorKursi: kursiString,
             harga: hargaEff,
-            totalHarga: (hargaEff * qty) + nominalBiayaTambahan,
+            totalHarga: (hargaEff * qty) + totalBiayaTambahan,
             waktu: armada ? armada.time : ''
         };
         const statusSelect = document.getElementById('editBookingStatus');
@@ -4028,12 +4255,13 @@
         const rawKet = ket ? ket.trim() : '';
         
         const hasBiayaTambahan = document.querySelector('input[name="adminBookingHasBiayaTambahan"]:checked').value === 'yes';
-        const nominalBiayaTambahan = hasBiayaTambahan ? (parseInt(document.getElementById('adminBookingBiayaTambahanNominal').value) || 0) : 0;
+        const nominalBiayaPerTiket = hasBiayaTambahan ? (parseInt(document.getElementById('adminBookingBiayaTambahanNominal').value) || 0) : 0;
         const ketBiayaTambahan = hasBiayaTambahan ? document.getElementById('adminBookingBiayaTambahanKet').value : '';
+        const nominalBiayaTambahan = nominalBiayaPerTiket * qty;
         
-        let finalKet = ket;
+        let finalKet = rawKet;
         if (hasBiayaTambahan && nominalBiayaTambahan > 0) {
-            const ketTambahanText = `Biaya Tambahan: ${ketBiayaTambahan} (${formatRupiah(nominalBiayaTambahan)})`;
+            const ketTambahanText = formatBiayaTambahanNote(ketBiayaTambahan, nominalBiayaPerTiket, qty);
             finalKet = finalKet ? `${finalKet}, ${ketTambahanText}` : ketTambahanText;
         }
 
@@ -4086,7 +4314,7 @@
             'ID_TIKET': idTiket,
             'JENIS KENDARAAN': armada ? armada.name : '',
             'Tujuan': finalTujuan,
-            'Harga': armada ? formatRupiah(armada.price) : '0',
+            'Harga': armada ? formatRupiah(finalHargaSatuan) : '0',
             'NAMA': name,
             'NOMOR HP': hp,
             'JUMLAH PNP': qty,
@@ -4119,128 +4347,30 @@
                     filterEl.value = rawDate; // yyyy-mm-dd format
                     if (typeof renderTodayTable === 'function') renderTodayTable();
                 }
-                
-                // Populate Thermal Receipt
-                const now = new Date();
-                const tglBeli = String(now.getDate()).padStart(2, '0') + '/' + String(now.getMonth() + 1).padStart(2, '0') + '/' + now.getFullYear() + ' ' + String(now.getHours()).padStart(2, '0') + ':' + String(now.getMinutes()).padStart(2, '0');
 
-                if (document.getElementById('r_tgl_beli')) document.getElementById('r_tgl_beli').innerText = tglBeli;
-                if (document.getElementById('r_id')) document.getElementById('r_id').innerText = idTiket;
-                if (document.getElementById('r_tgl')) document.getElementById('r_tgl').innerText = formattedDate;
-                if (document.getElementById('r_jam')) document.getElementById('r_jam').innerText = payload['WAKTU'] || '-';
-                if (document.getElementById('r_nama')) document.getElementById('r_nama').innerText = payload['NAMA'] || '-';
-                if (document.getElementById('r_pnp')) document.getElementById('r_pnp').innerText = (payload['JUMLAH PNP'] || qty) + ' Orang';
-                if (document.getElementById('r_kursi')) document.getElementById('r_kursi').innerText = kursiString || '-';
-                if (document.getElementById('r_bus')) document.getElementById('r_bus').innerText = payload['JENIS KENDARAAN'] || '-';
-                if (document.getElementById('r_rute')) document.getElementById('r_rute').innerText = payload['Tujuan'] || '-';
-                if (document.getElementById('r_harga')) document.getElementById('r_harga').innerText = formatRupiah(armada ? armada.price : 0);
-                if (document.getElementById('r_keterangan')) document.getElementById('r_keterangan').innerText = rawKet || '-';
-                
-                if (hasBiayaTambahan && nominalBiayaTambahan > 0) {
-                    if(document.getElementById('r_biaya_tambahan_container')) document.getElementById('r_biaya_tambahan_container').style.display = 'flex';
-                    if(document.getElementById('r_biaya_tambahan_ket')) document.getElementById('r_biaya_tambahan_ket').innerText = ketBiayaTambahan || '-';
-                    if(document.getElementById('r_biaya_tambahan')) document.getElementById('r_biaya_tambahan').innerText = formatRupiah(nominalBiayaTambahan);
-                } else {
-                    if(document.getElementById('r_biaya_tambahan_container')) document.getElementById('r_biaya_tambahan_container').style.display = 'none';
-                }
-                
-                if (document.getElementById('r_total')) document.getElementById('r_total').innerText = formatRupiah(total);
-                if (document.getElementById('r_rute_short')) document.getElementById('r_rute_short').innerText = 'KWT - ' + String(payload['Tujuan'] || '').substring(0,3).toUpperCase();
-                
-                if (document.getElementById('r_bus_arsip')) document.getElementById('r_bus_arsip').innerText = payload['JENIS KENDARAAN'] || '-';
-                if (document.getElementById('r_pnp_arsip_num')) document.getElementById('r_pnp_arsip_num').innerText = String(payload['JUMLAH PNP'] || qty);
-                if (document.getElementById('r_rute_arsip')) document.getElementById('r_rute_arsip').innerText = payload['Tujuan'] || '-';
-                if (document.getElementById('r_nama_arsip')) document.getElementById('r_nama_arsip').innerText = payload['NAMA'] || '-';
-                if (document.getElementById('r_tgl_arsip')) document.getElementById('r_tgl_arsip').innerText = formattedDate;
-
-                // Populate E-Ticket Visual Modal (ticket*)
-                let visualAsal = 'Kawunganten';
-                let visualTujuan = payload['Tujuan'] || '';
-                if (visualTujuan && String(visualTujuan).startsWith('[PULANG] ')) {
-                    visualAsal = visualTujuan.replace('[PULANG] ', '');
-                    visualTujuan = 'KAWUNGANTEN';
-                }
-
-                if(document.getElementById('ticketDate')) document.getElementById('ticketDate').innerText = formattedDate;
-                if(document.getElementById('ticketTime')) document.getElementById('ticketTime').innerText = payload['WAKTU'] || '-';
-                if(document.getElementById('ticketArmada')) document.getElementById('ticketArmada').innerText = payload['JENIS KENDARAAN'] || '-';
-                if(document.getElementById('ticketAsal')) document.getElementById('ticketAsal').innerText = visualAsal;
-                if(document.getElementById('ticketTujuan')) document.getElementById('ticketTujuan').innerText = visualTujuan;
-                if(document.getElementById('ticketKursi')) document.getElementById('ticketKursi').innerText = kursiString || '-';
-                if(document.getElementById('ticketKeterangan')) document.getElementById('ticketKeterangan').innerText = rawKet || '-';
-                if(document.getElementById('ticketQty')) document.getElementById('ticketQty').innerText = String(payload['JUMLAH PNP'] || qty);
-                if(document.getElementById('ticketId')) document.getElementById('ticketId').innerText = idTiket;
-                if(document.getElementById('ticketName')) document.getElementById('ticketName').innerText = payload['NAMA'] || '-';
-                if(document.getElementById('ticketTglBeli')) document.getElementById('ticketTglBeli').innerText = "TGL BELI: " + tglBeli;
-                
-                if(document.getElementById('ticketHargaSatuan')) document.getElementById('ticketHargaSatuan').innerText = formatRupiah(armada ? armada.price : 0);
-                if(document.getElementById('ticketTotal')) document.getElementById('ticketTotal').innerText = formatRupiah(total);
-                
-                if (hasBiayaTambahan && nominalBiayaTambahan > 0) {
-                    if(document.getElementById('ticketBiayaTambahanContainer')) {
-                        document.getElementById('ticketBiayaTambahanContainer').classList.remove('hidden');
-                        document.getElementById('ticketBiayaTambahanContainer').classList.add('flex');
-                    }
-                    if(document.getElementById('ticketBiayaTambahanKet')) document.getElementById('ticketBiayaTambahanKet').innerText = '(' + (ketBiayaTambahan || 'Tambahan') + ')';
-                    if(document.getElementById('ticketBiayaTambahan')) document.getElementById('ticketBiayaTambahan').innerText = formatRupiah(nominalBiayaTambahan);
-                } else {
-                    if(document.getElementById('ticketBiayaTambahanContainer')) {
-                        document.getElementById('ticketBiayaTambahanContainer').classList.add('hidden');
-                        document.getElementById('ticketBiayaTambahanContainer').classList.remove('flex');
-                    }
-                }
-
-                if(document.getElementById('ticketArmadaArsip')) document.getElementById('ticketArmadaArsip').innerText = payload['JENIS KENDARAAN'] || '-';
-                if(document.getElementById('ticketNameArsip')) document.getElementById('ticketNameArsip').innerText = payload['NAMA'] || '-';
-                if(document.getElementById('ticketQtyArsip')) document.getElementById('ticketQtyArsip').innerText = String(payload['JUMLAH PNP'] || qty);
-                if(document.getElementById('ticketTujuanArsip')) document.getElementById('ticketTujuanArsip').innerText = payload['Tujuan'] || '-';
-                if(document.getElementById('ticketDateArsip')) document.getElementById('ticketDateArsip').innerText = formattedDate;
-
-                // Prepare WA Link
-                const waNum = String(hp).replace(/[^0-9]/g, '').replace(/^0/, '62');
-                const textWa = `AGEN DAMRI KAWUNGANTEN\nPusat Penjualan Tiket\n\n` +
-                    `Halo ${name}, ini adalah rincian tiket perjalanan Anda:\n\n` +
-                    `Kode Booking (Ketuk untuk salin):\n` +
-                    `\`${idTiket}\`\n\n` +
-                    `Armada: ${payload['JENIS KENDARAAN']}\n` +
-                    `Asal: ${visualAsal}\n` +
-                    `Tujuan: ${visualTujuan}\n` +
-                    `Tanggal: ${formattedDate}\n` +
-                    `Jam: ${payload['WAKTU'] || '-'}\n` +
-                    `Jumlah Penumpang: ${qty} Orang\n` +
-                    `Nomor Kursi: ${kursiString || '-'}\n` +
-                    (rawKet && rawKet !== '-' ? `Keterangan: ${rawKet}\n` : '') +
-                    `Harga per Tiket: ${formatRupiah(armada ? armada.price : 0)}\n` +
-                    (hasBiayaTambahan ? `Biaya Tambahan: ${formatRupiah(nominalBiayaTambahan)} (${ketBiayaTambahan})\n` : '') +
-                    `Total Bayar: ${formatRupiah(total)}\n` +
-                    `Status Pembayaran: ${statusPay}\n\n` +
-                    `HADIR 30 MENIT SEBELUM PEMBERANGKATAN\n` +
-                    `TIKET YANG SUDAH DIBOOKING TIDAK BISA DICANCEL MENDADAK (MAX 1x24jam)\n\n` +
-                    `Terima Kasih telah menggunakan jasa kami.\n` +
-                    `Info: 082133607759\n` +
-                    `Website: agendamrikawunganten.net`;
-                currentTicketWaText = waNum ? `https://wa.me/${waNum}?text=${encodeURIComponent(textWa)}` : '';
-
-                // Simpan data untuk Web Bluetooth API
-                currentTicketDataForBT = {
-                    idTiket: idTiket,
-                    tglBeli: tglBeli,
-                    nama: payload['NAMA'],
-                    tujuan: payload['Tujuan'],
-                    tglBerangkat: formattedDate,
-                    jam: payload['WAKTU'],
-                    jumlahPnp: qty + ' Orang',
-                    kursi: kursiString,
-                    armada: payload['JENIS KENDARAAN'],
-                    totalHarga: formatRupiah(total),
-                    hargaSatuan: formatRupiah(armada ? armada.price : 0),
-                    biayaTambahan: hasBiayaTambahan ? nominalBiayaTambahan : 0,
-                    biayaTambahanKet: ketBiayaTambahan,
-                    status: statusPay,
-                    keterangan: rawKet || '-'
-                };
-
-                openEticketModal();
+                renderAndShowThermalTicket({
+                    idTiket,
+                    createdAt: new Date().toISOString(),
+                    armadaName: payload['JENIS KENDARAAN'] || '-',
+                    rawTujuan: payload['Tujuan'] || '-',
+                    dateTravel: formattedDate,
+                    jam: payload['WAKTU'] || '-',
+                    qty,
+                    kursi: kursiString || '-',
+                    nama: payload['NAMA'] || '-',
+                    hp,
+                    keterangan: rawKet || '-',
+                    extraParsed: {
+                        cleanKet: rawKet || '-',
+                        ketTambahan: ketBiayaTambahan.trim(),
+                        totalBiayaTambahan: nominalBiayaTambahan,
+                        perTiketBiayaTambahan: nominalBiayaPerTiket,
+                        hasBiayaTambahan: hasBiayaTambahan && nominalBiayaTambahan > 0
+                    },
+                    hargaSatuan: finalHargaSatuan,
+                    totalHarga: total,
+                    status: statusPay
+                });
             } else {
                 showMessage(res && res.message ? res.message : 'Gagal booking', true);
             }
@@ -4335,15 +4465,15 @@
         const armada = getArmada(armadaId);
         
         const hasBiayaTambahan = document.querySelector('input[name="adminBookingHasBiayaTambahan"]:checked').value === 'yes';
-        const nominalBiayaTambahan = hasBiayaTambahan ? (parseInt(document.getElementById('adminBookingBiayaTambahanNominal').value) || 0) : 0;
+        const nominalBiayaPerTiket = hasBiayaTambahan ? (parseInt(document.getElementById('adminBookingBiayaTambahanNominal').value) || 0) : 0;
+        const totalBiayaTambahan = nominalBiayaPerTiket * qty;
+        updateBiayaTambahanHint('adminBookingBiayaTambahanTotalHint', nominalBiayaPerTiket, qty);
 
         if(armada) {
             const dObj = d ? new Date(d) : null;
             const finalHarga = getEffectiveHarga(armada, dObj);
             
-            document.getElementById('adminBookingTotalDisplay').innerText = formatRupiah((finalHarga * qty) + nominalBiayaTambahan);
-            // Simpan harga satuan untuk submit form (jika ada hidden field, atau submit form hitung ulang)
-            // Di admin.js, submitAdminBooking biasanya menghitung ulang dari elemen total
+            document.getElementById('adminBookingTotalDisplay').innerText = formatRupiah((finalHarga * qty) + totalBiayaTambahan);
         } else {
             document.getElementById('adminBookingTotalDisplay').innerText = 'Rp0';
         }
@@ -4356,6 +4486,8 @@
             container.classList.remove('hidden');
         } else {
             container.classList.add('hidden');
+            const nom = document.getElementById('adminBookingBiayaTambahanNominal');
+            if (nom) nom.value = 0;
         }
         recalcAdminBooking();
     }
@@ -4389,174 +4521,326 @@
             inner.classList.add('scale-100', 'opacity-100');
         }, 10);
     }
-    function printRawBT() {
-        if(typeof currentTicketDataForBT === 'undefined' || !currentTicketDataForBT) {
-            alert('Data tiket tidak ditemukan.');
-            return;
+    function buildRawBtCanvasBitmapBytes(t) {
+        if (typeof document === 'undefined') return null;
+        const canvas = document.createElement('canvas');
+        const W = 384; // Native 58mm thermal printer dot width (8 dots/mm * 48mm printable)
+        const PAD = 8;
+        const INNER_W = W - PAD * 2;
+        canvas.width = W;
+        canvas.height = 1400;
+        const ctx = canvas.getContext('2d');
+        if (!ctx) return null;
+
+        const resetWhite = () => {
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(0, 0, W, canvas.height);
+            ctx.fillStyle = '#000000';
+            ctx.textBaseline = 'top';
+        };
+        resetWhite();
+
+        const wrapLines = (text, maxW, font) => {
+            ctx.font = font;
+            const words = String(text || '').split(/\s+/).filter(Boolean);
+            if (!words.length) return ['-'];
+            const lines = [];
+            let cur = words[0];
+            for (let i = 1; i < words.length; i++) {
+                const candidate = cur + ' ' + words[i];
+                if (ctx.measureText(candidate).width <= maxW) cur = candidate;
+                else { lines.push(cur); cur = words[i]; }
+            }
+            lines.push(cur);
+            return lines;
+        };
+
+        let y = 10;
+        const centerText = (text, font, gapAfter = 4) => {
+            ctx.font = font;
+            ctx.textAlign = 'center';
+            const lines = wrapLines(text, INNER_W, font);
+            const sizePx = parseInt(font.match(/(\d+)px/)?.[1] || '14', 10);
+            for (const ln of lines) {
+                ctx.fillText(ln, W / 2, y);
+                y += Math.round(sizePx * 1.24);
+            }
+            y += gapAfter;
+        };
+        const solidLine = (thickness = 2, gapBefore = 6, gapAfter = 8) => {
+            y += gapBefore;
+            ctx.fillRect(PAD, y, INNER_W, thickness);
+            y += thickness + gapAfter;
+        };
+        const dashedLine = (gapBefore = 6, gapAfter = 8, label = '') => {
+            y += gapBefore;
+            for (let x = PAD; x < W - PAD; x += 10) {
+                ctx.fillRect(x, y, 5, 1.5);
+            }
+            if (label) {
+                ctx.font = 'bold 12px Arial, sans-serif';
+                ctx.textAlign = 'center';
+                const lw = ctx.measureText(label).width + 12;
+                ctx.fillStyle = '#ffffff';
+                ctx.fillRect((W - lw) / 2, y - 7, lw, 16);
+                ctx.fillStyle = '#000000';
+                ctx.fillText(label, W / 2, y - 6);
+                y += 10;
+            }
+            y += gapAfter;
+        };
+        const rowLR = (leftStr, rightStr, leftFont = '600 15px Arial, sans-serif', rightFont = 'bold 15px Arial, sans-serif', gapAfter = 4) => {
+            ctx.font = leftFont;
+            const lw = ctx.measureText(leftStr).width;
+            const maxRightW = Math.max(110, INNER_W - lw - 10);
+            const rLines = wrapLines(rightStr, maxRightW, rightFont);
+            const sizePx = parseInt(rightFont.match(/(\d+)px/)?.[1] || '15', 10);
+            ctx.textAlign = 'left';
+            ctx.font = leftFont;
+            ctx.fillText(leftStr, PAD, y);
+            ctx.textAlign = 'right';
+            ctx.font = rightFont;
+            rLines.forEach((ln, idx) => {
+                ctx.fillText(ln, W - PAD, y + idx * Math.round(sizePx * 1.24));
+            });
+            y += Math.max(Math.round(sizePx * 1.24), rLines.length * Math.round(sizePx * 1.24)) + gapAfter;
+        };
+
+        // 1. Minimalist Header (AGEN DAMRI small -> ARMADA HERO -> E-TIKET -> Tgl Beli)
+        centerText('AGEN DAMRI KAWUNGANTEN', 'bold 13px Arial, sans-serif', 3);
+        centerText(t.armada, '900 28px Arial, sans-serif', 3);
+        centerText('E-TIKET (TIKET RESMI)', 'bold 13px Arial, sans-serif', 2);
+        centerText('Tgl Beli: ' + t.tglBeli, '600 12px Arial, sans-serif', 2);
+        solidLine(2, 6, 8);
+
+        // 2. Kode Boking Row
+        rowLR('KODE BOKING', t.idTiket, 'bold 15px Arial, sans-serif', 'bold 19px Consolas, monospace', 2);
+        dashedLine(4, 8);
+
+        // 3. Route Hero
+        centerText(`${t.asalCode}  ->  ${t.tujuanCode}`, '900 25px Arial, sans-serif', 2);
+        centerText(`${t.asalFull} -> ${t.tujuanFull}`, 'bold 12px Arial, sans-serif', 4);
+        dashedLine(4, 8);
+
+        // 4. Schedule 2-Col Row
+        ctx.textAlign = 'left';
+        ctx.font = 'bold 11px Arial, sans-serif';
+        ctx.fillText('TGL BERANGKAT', PAD, y);
+        ctx.textAlign = 'right';
+        ctx.fillText('JAM BERANGKAT', W - PAD, y);
+        y += 15;
+        ctx.textAlign = 'left';
+        ctx.font = '900 15px Arial, sans-serif';
+        ctx.fillText(t.tglBerangkatShort, PAD, y);
+        ctx.textAlign = 'right';
+        ctx.fillText(`${t.jam} WIB`, W - PAD, y);
+        y += 20;
+        dashedLine(4, 8);
+
+        // 5. Highlighted JML PENUMPANG & NOMOR KURSI
+        ctx.textAlign = 'center';
+        ctx.font = 'bold 11px Arial, sans-serif';
+        ctx.fillText('JML PENUMPANG', W * 0.25, y);
+        ctx.fillText('NOMOR KURSI', W * 0.75, y);
+        // Subtle vertical divider
+        for (let dy = 0; dy < 42; dy += 6) ctx.fillRect(W / 2 - 0.5, y + dy, 1, 3);
+        y += 16;
+        const kursiLines = wrapLines(t.kursi, INNER_W * 0.45, '900 21px Arial, sans-serif');
+        ctx.font = '900 21px Arial, sans-serif';
+        ctx.fillText(t.jumlahPnp, W * 0.25, y);
+        kursiLines.forEach((ln, idx) => ctx.fillText(ln, W * 0.75, y + idx * 24));
+        y += Math.max(28, kursiLines.length * 24) + 6;
+        solidLine(2, 2, 10);
+
+        // 6. Passenger Details
+        rowLR('Nama', t.nama);
+        rowLR('Titik Naik', t.titikNaik);
+        rowLR('Keterangan', t.keterangan || '-');
+        dashedLine(4, 8);
+
+        // 7. Cost Breakdown
+        rowLR(`Harga Tiket (${t.qty} x ${t.hargaSatuan})`, t.subtotalTiket);
+        const extraLabel = (t.hasBiayaTambahan && t.qty > 1)
+            ? `Biaya Tambahan/Tiket (${t.qty}x${t.biayaTambahanPerTiketShort})`
+            : 'Biaya Tambahan/Tiket';
+        rowLR(extraLabel, t.hasBiayaTambahan ? t.biayaTambahanFormatted : '-');
+        if (t.hasBiayaTambahan && t.biayaTambahanKet) {
+            ctx.textAlign = 'left';
+            ctx.font = '600 12px Arial, sans-serif';
+            for (const ln of wrapLines('Ket. Tambahan: ' + t.biayaTambahanKet, INNER_W, '600 12px Arial, sans-serif')) {
+                ctx.fillText(ln, PAD, y);
+                y += 15;
+            }
         }
-        const t = currentTicketDataForBT;
-        
-        // ESC/POS Commands
+        solidLine(2, 4, 7);
+        rowLR('TOTAL BAYAR', t.totalHarga, '900 18px Arial, sans-serif', '900 18px Arial, sans-serif', 2);
+        solidLine(2, 4, 10);
+
+        // 8. Scannable QR Code + Rules
+        const qrMatrix = getThermalQrMatrix(t.qrPayload);
+        const qMod = qrMatrix.length;
+        const qCell = Math.max(2, Math.floor(76 / qMod));
+        const qSize = qMod * qCell;
+        for (let r = 0; r < qMod; r++) {
+            for (let c = 0; c < qMod; c++) {
+                if (qrMatrix[r][c]) {
+                    ctx.fillRect(PAD + c * qCell, y + r * qCell, qCell, qCell);
+                }
+            }
+        }
+        const ruleX = PAD + qSize + 10;
+        const ruleMaxW = W - PAD - ruleX;
+        let ry = y + 4;
+        ctx.textAlign = 'left';
+        ctx.font = 'bold 12px Arial, sans-serif';
+        ['• Hadir 30 mnt sblm berangkat', '• Cancel max H-1 (1x24 jam)', '• Info WA: 0821-3360-7759'].forEach(rule => {
+            for (const ln of wrapLines(rule, ruleMaxW, 'bold 12px Arial, sans-serif')) {
+                ctx.fillText(ln, ruleX, ry);
+                ry += 15;
+            }
+        });
+        y = Math.max(y + qSize, ry) + 6;
+
+        // 9. Arsip Agen / Kru (TANPA HARGA / TOTAL BAYAR)
+        dashedLine(6, 10, 'ARSIP AGEN / KRU');
+        rowLR(t.armada, t.idTiket, 'bold 14px Arial, sans-serif', 'bold 14px Consolas, monospace', 3);
+        ctx.textAlign = 'left';
+        ctx.font = 'bold 13px Arial, sans-serif';
+        for (const ln of wrapLines(`${t.nama} (${t.qty} Org) • Kursi: ${t.kursi}`, INNER_W, 'bold 13px Arial, sans-serif')) {
+            ctx.fillText(ln, PAD, y);
+            y += 17;
+        }
+        ctx.font = '600 12px Arial, sans-serif';
+        ctx.fillText(`${t.tglBerangkatShort} • ${t.jam} WIB • ${t.asalCode} -> ${t.tujuanCode}`, PAD, y);
+        y += 32;
+
+        // Second pass crop exact height
+        const finalH = Math.min(canvas.height, y);
+        const imgData = ctx.getImageData(0, 0, W, finalH).data;
+        const widthBytes = W / 8; // 48
+        const xL = widthBytes & 0xff;
+        const xH = (widthBytes >> 8) & 0xff;
+        const yL = finalH & 0xff;
+        const yH = (finalH >> 8) & 0xff;
+
+        const out = [0x1B, 0x40, 0x1D, 0x76, 0x30, 0x00, xL, xH, yL, yH];
+        for (let row = 0; row < finalH; row++) {
+            for (let bx = 0; bx < widthBytes; bx++) {
+                let byteVal = 0;
+                for (let bit = 0; bit < 8; bit++) {
+                    const px = bx * 8 + bit;
+                    const idx = (row * W + px) * 4;
+                    const lum = imgData[idx] * 0.299 + imgData[idx + 1] * 0.587 + imgData[idx + 2] * 0.114;
+                    if (lum < 160) byteVal |= (0x80 >> bit);
+                }
+                out.push(byteVal);
+            }
+        }
+        // Feed 3 lines after image
+        out.push(0x0A, 0x0A, 0x0A);
+        return out;
+    }
+
+    function buildRawBtEscPosFallback(t) {
         const CMD = {
             INIT: [0x1B, 0x40],
             ALIGN_LEFT: [0x1B, 0x61, 0x00],
             ALIGN_CENTER: [0x1B, 0x61, 0x01],
-            ALIGN_RIGHT: [0x1B, 0x61, 0x02],
             BOLD_ON: [0x1B, 0x45, 0x01],
             BOLD_OFF: [0x1B, 0x45, 0x00],
             TEXT_NORMAL: [0x1D, 0x21, 0x00],
             TEXT_DOUBLE_HW: [0x1D, 0x21, 0x11],
-            INVERSE_ON: [0x1D, 0x42, 0x01],
-            INVERSE_OFF: [0x1D, 0x42, 0x00],
             LF: [0x0A]
         };
+        const bytes = [];
+        const add = (cmd) => bytes.push(...cmd);
+        const addStr = (str) => {
+            const s = String(str || '');
+            for (let i = 0; i < s.length; i++) bytes.push(s.charCodeAt(i) & 0xff);
+        };
+        const addLine = (str) => { addStr(str); add(CMD.LF); };
+        const addLR = (l, r) => {
+            const left = String(l || '');
+            const right = String(r || '');
+            const sp = Math.max(1, 32 - left.length - right.length);
+            addLine(left + ' '.repeat(sp) + right);
+        };
 
-        let bytes = [];
-        
-        function strToBytes(str) {
-            let arr = [];
-            for (let i = 0; i < str.length; i++) {
-                arr.push(str.charCodeAt(i));
-            }
-            return arr;
-        }
-
-        function add(cmd) { bytes.push(...cmd); }
-        function addStr(str) { bytes.push(...strToBytes(str)); }
-        function addLine(str) { addStr(str); add(CMD.LF); }
-
-        // Start Document
         add(CMD.INIT);
         add(CMD.ALIGN_CENTER);
+        addLine('AGEN DAMRI KAWUNGANTEN');
         add(CMD.BOLD_ON);
-        addLine("AGEN DAMRI KAWUNGANTEN");
-        add(CMD.BOLD_OFF);
-        addLine("Pusat Penjualan Tiket");
-        addLine("TGL BELI: " + t.tglBeli);
-        add(CMD.BOLD_ON);
-        addLine("*** TIKET RESMI ***");
-        add(CMD.BOLD_OFF);
-        addLine("================================");
-        
-        add(CMD.BOLD_ON);
-        add(CMD.INVERSE_ON);
         add(CMD.TEXT_DOUBLE_HW);
-        let armada = String(t.armada).toUpperCase();
-        function centerInverseDouble(str, len) {
-            if(!str) str = "";
-            if(str.length >= len) return str.substring(0, len);
-            let pad = len - str.length;
-            let left = Math.floor(pad/2);
-            let right = pad - left;
-            return " ".repeat(left) + str + " ".repeat(right);
-        }
-        addLine(centerInverseDouble(armada, 16));
+        addLine(String(t.armada || '').substring(0, 16));
         add(CMD.TEXT_NORMAL);
-        add(CMD.INVERSE_OFF);
+        addLine('E-TIKET (TIKET RESMI)');
         add(CMD.BOLD_OFF);
-        addLine("--------------------------------");
-        
-        let line1 = "Kode Boking";
-        let right1Text = t.idTiket;
-        let spaces1 = 32 - line1.length - right1Text.length;
-        if(spaces1 < 0) spaces1 = 0;
+        addLine('Tgl Beli: ' + t.tglBeli);
+        addLine('--------------------------------');
         add(CMD.ALIGN_LEFT);
-        addStr(line1);
-        addStr(" ".repeat(spaces1));
         add(CMD.BOLD_ON);
-        addStr(right1Text);
+        addLR('KODE BOKING', t.idTiket);
         add(CMD.BOLD_OFF);
-        add(CMD.LF);
-        addLine("--------------------------------");
-        
-        function addTwoColumnsLeftRight(leftStr, rightStr, extraSpacing = false) {
-            if(!rightStr) rightStr = "";
-            let spaces = 32 - leftStr.length - rightStr.length;
-            if(spaces < 0) spaces = 0;
-            addLine(leftStr + " ".repeat(spaces) + rightStr);
-            if(extraSpacing) add(CMD.LF);
-        }
-        
-        let asalThermal = "Kawunganten";
-        let tujuanThermal = t.tujuan;
-        if (t.tujuan && String(t.tujuan).startsWith('[PULANG] ')) {
-            asalThermal = t.tujuan.replace('[PULANG] ', '');
-            tujuanThermal = "KAWUNGANTEN";
-        }
-
-        addTwoColumnsLeftRight("Tanggal", t.tglBerangkat, true);
-        addTwoColumnsLeftRight("Jam", t.jam, true);
-        addTwoColumnsLeftRight("Asal", asalThermal, true);
-        addTwoColumnsLeftRight("Tujuan", tujuanThermal, true);
-        addTwoColumnsLeftRight("Nama", t.nama, true);
-        addTwoColumnsLeftRight("Jumlah Pnp", t.jumlahPnp, true);
-        addTwoColumnsLeftRight("Kursi", t.kursi || "-", true);
-        const ketText = t.keterangan || t['Keterangan'] || t['KETERANGAN'] || '';
-        if (ketText) {
-            addTwoColumnsLeftRight("Ket.", ketText, true);
-        }
-        
-        addLine("--------------------------------");
-        addTwoColumnsLeftRight("Harga/Tiket", t.hargaSatuan, false);
-        
-        let lineTot = "TOTAL";
-        let rightTot = " " + t.totalHarga + " ";
-        let spacesTot = 32 - lineTot.length - rightTot.length;
-        if(spacesTot < 0) spacesTot = 0;
-        add(CMD.BOLD_ON);
-        addStr(lineTot);
-        addStr(" ".repeat(spacesTot));
-        add(CMD.INVERSE_ON);
-        addStr(rightTot);
-        add(CMD.INVERSE_OFF);
-        add(CMD.BOLD_OFF);
-        add(CMD.LF);
-        
-        addLine("================================");
-        
+        addLine('--------------------------------');
         add(CMD.ALIGN_CENTER);
-        addLine("HADIR 30 MENIT SEBELUM");
-        addLine("PEMBERANGKATAN");
-        add(CMD.LF);
-        addLine("TIKET YANG SUDAH DIBOOKING");
-        addLine("TIDAK BISA DICANCEL MENDADAK");
-        addLine("(MAX 1x24jam)");
-        add(CMD.LF);
-        addLine("Terima Kasih");
-        addLine("Info: 082133607759");
-        addLine("--------------------------------");
-        
         add(CMD.BOLD_ON);
-        addLine("ARSIP AGEN");
+        addLine(t.asalCode + ' -> ' + t.tujuanCode);
         add(CMD.BOLD_OFF);
-        add(CMD.LF);
-        
+        addLine(t.asalFull + ' -> ' + t.tujuanFull);
+        add(CMD.ALIGN_LEFT);
+        addLine('--------------------------------');
+        addLR('Tgl Berangkat', t.tglBerangkatShort);
+        addLR('Jam Berangkat', t.jam + ' WIB');
         add(CMD.BOLD_ON);
-        add(CMD.INVERSE_ON);
-        add(CMD.TEXT_DOUBLE_HW);
-        addLine(centerInverseDouble(armada, 16));
-        add(CMD.TEXT_NORMAL);
-        add(CMD.INVERSE_OFF);
+        addLR('Jml Penumpang', t.jumlahPnp);
+        addLR('Nomor Kursi', t.kursi);
         add(CMD.BOLD_OFF);
-        add(CMD.LF);
-        
+        addLine('--------------------------------');
+        addLR('Nama', t.nama);
+        addLR('Titik Naik', t.titikNaik);
+        addLR('Keterangan', t.keterangan || '-');
+        addLine('--------------------------------');
+        addLR(`Tiket (${t.qty}x)`, t.subtotalTiket);
+        addLR('Biaya Tmb/Tiket', t.hasBiayaTambahan ? t.biayaTambahanFormatted : '-');
         add(CMD.BOLD_ON);
-        addLine(t.nama + " (" + t.jumlahPnp + " Org) - " + t.tujuan);
+        addLR('TOTAL BAYAR', t.totalHarga);
         add(CMD.BOLD_OFF);
-        addLine(t.tglBerangkat);
-        add(CMD.LF);
-        add(CMD.LF);
-        add(CMD.LF); 
+        addLine('================================');
+        add(CMD.ALIGN_CENTER);
+        addLine('Hadir 30 mnt sblm berangkat');
+        addLine('Cancel max H-1 (1x24 jam)');
+        addLine('Info WA: 0821-3360-7759');
+        addLine('------ ARSIP AGEN / KRU -------');
+        add(CMD.ALIGN_LEFT);
+        addLR(t.armada, t.idTiket);
+        addLine(`${t.nama} (${t.qty} Org) - K:${t.kursi}`);
+        addLine(`${t.tglBerangkatShort} ${t.jam} ${t.asalCode}->${t.tujuanCode}`);
+        add(CMD.LF); add(CMD.LF); add(CMD.LF);
+        return bytes;
+    }
 
-        // Convert to binary string
-        let binStr = "";
+    function printRawBT() {
+        if (typeof currentTicketDataForBT === 'undefined' || !currentTicketDataForBT) {
+            alert('Data tiket tidak ditemukan.');
+            return;
+        }
+        const t = currentTicketDataForBT;
+        let bytes = null;
+        try {
+            bytes = buildRawBtCanvasBitmapBytes(t);
+        } catch (err) {
+            console.warn('RawBT bitmap render fallback to text ESC/POS:', err);
+        }
+        if (!bytes || bytes.length === 0) {
+            bytes = buildRawBtEscPosFallback(t);
+        }
+
+        let binStr = '';
         for (let i = 0; i < bytes.length; i++) {
             binStr += String.fromCharCode(bytes[i]);
         }
-        
-        // Encode Base64 & call RawBT Intent
         const base64 = btoa(binStr);
-        const intentUrl = "intent:base64," + base64 + "#Intent;scheme=rawbt;package=ru.a402d.rawbtprinter;end;";
+        const intentUrl = 'intent:base64,' + base64 + '#Intent;scheme=rawbt;package=ru.a402d.rawbtprinter;end;';
         window.location.href = intentUrl;
     }
 
