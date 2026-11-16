@@ -253,10 +253,10 @@
             #thermalReceipt {
                 position: static !important;
                 display: block !important;
-                width: 47.5mm !important;
+                width: 45.5mm !important;
                 max-width: 100% !important;
-                margin: 0 auto !important;
-                padding: 1.5mm 1mm !important;
+                margin: 0 !important;
+                padding: 1mm 0.5mm !important;
                 background: #ffffff !important;
                 color: #000000 !important;
                 page-break-inside: avoid;
@@ -940,6 +940,12 @@ body.dark-mode #bookingModal #adminBookingTarifBadge {
     transition: transform 0.22s ease, width 0.2s ease, height 0.2s ease;
 }
 
+.mobile-nav-icon-wrap i {
+    font-size: 19px;
+    line-height: 1;
+    transition: transform 0.22s ease, font-size 0.2s ease;
+}
+
 .mobile-nav-icon-wrap svg .svg-duotone {
     opacity: 0;
     transition: opacity 0.22s ease;
@@ -948,6 +954,10 @@ body.dark-mode #bookingModal #adminBookingTarifBadge {
 .mobile-nav-item.active .mobile-nav-icon-wrap svg {
     width: 19px;
     height: 19px;
+}
+
+.mobile-nav-item.active .mobile-nav-icon-wrap i {
+    font-size: 17px;
 }
 
 .mobile-nav-item.active .mobile-nav-icon-wrap svg .svg-duotone {
