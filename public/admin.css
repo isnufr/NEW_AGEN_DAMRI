@@ -253,10 +253,10 @@
             #thermalReceipt {
                 position: static !important;
                 display: block !important;
-                width: 45.5mm !important;
+                width: 42mm !important;
                 max-width: 100% !important;
                 margin: 0 !important;
-                padding: 1mm 0.5mm !important;
+                padding: 1mm 0 !important;
                 background: #ffffff !important;
                 color: #000000 !important;
                 page-break-inside: avoid;
