@@ -159,17 +159,17 @@
         }
         .fade-up { animation: fadeUp 0.5s ease forwards; }
 
-        /* Thermal Ticket Display & 58mm Print (Single-Source Minimalist Design) */
+        /* Thermal Ticket Display & 58mm Print (48mm Printable Width Match) */
         .thermal-ticket-paper {
-            width: 58mm;
+            width: 47.5mm;
             max-width: 100%;
             margin: 0 auto;
             background: #ffffff;
             color: #000000;
             font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
-            font-size: 10.5px;
-            line-height: 1.42;
-            padding: 6px 4px;
+            font-size: 9.2px;
+            line-height: 1.38;
+            padding: 4px 2px;
             box-sizing: border-box;
         }
         .thermal-ticket-paper .tt-mono {
@@ -179,19 +179,21 @@
             display: flex;
             justify-content: space-between;
             align-items: baseline;
-            gap: 8px;
-            font-size: 10.5px;
-            line-height: 1.48;
+            gap: 6px;
+            font-size: 9.2px;
+            line-height: 1.44;
         }
         .thermal-ticket-paper .tt-row span {
             color: #111111;
             font-weight: 600;
+            flex-shrink: 0;
         }
         .thermal-ticket-paper .tt-row strong {
             color: #000000;
             font-weight: 900;
             text-align: right;
             word-break: break-word;
+            min-width: 0;
         }
         body.dark-mode #ticketModal #ticketModalInner,
         body.dark-mode #ticketModal #ticketModalInner > div {
@@ -212,29 +214,53 @@
         }
 
         @media print {
-            body * {
-                visibility: hidden !important;
+            html, body {
+                height: auto !important;
+                min-height: 0 !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                overflow: visible !important;
+                background: #ffffff !important;
+            }
+            body > :not(#eticketModal) {
+                display: none !important;
             }
             #eticketModal {
                 display: block !important;
-                visibility: hidden !important;
                 position: static !important;
-                background: #ffffff !important;
                 inset: auto !important;
+                width: auto !important;
+                height: auto !important;
+                background: #ffffff !important;
+                margin: 0 !important;
+                padding: 0 !important;
+            }
+            #eticketModal > div:first-child {
+                display: none !important;
+            }
+            #eticketModal > div:last-child {
+                display: block !important;
+                width: auto !important;
+                max-width: none !important;
+                overflow: visible !important;
+                padding: 0 !important;
+                margin: 0 !important;
+                background: #ffffff !important;
             }
             #thermalReceipt, #thermalReceipt * {
                 visibility: visible !important;
             }
             #thermalReceipt {
-                position: fixed !important;
-                left: 0 !important;
-                top: 0 !important;
+                position: static !important;
                 display: block !important;
-                width: 58mm !important;
-                margin: 0 !important;
-                padding: 2mm 2.5mm !important;
+                width: 47.5mm !important;
+                max-width: 100% !important;
+                margin: 0 auto !important;
+                padding: 1.5mm 1mm !important;
                 background: #ffffff !important;
                 color: #000000 !important;
+                page-break-inside: avoid;
+                break-inside: avoid;
             }
             @page {
                 size: 58mm auto;

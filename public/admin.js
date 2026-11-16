@@ -3165,7 +3165,7 @@
                 if (matrix[r][c]) paths += `M${c} ${r}h1v1h-1z`;
             }
         }
-        return `<svg viewBox="-1 -1 ${n + 2} ${n + 2}" width="48" height="48" style="display:block;flex-shrink:0;shape-rendering:crispEdges;" aria-label="QR Kode Booking"><rect x="-1" y="-1" width="${n + 2}" height="${n + 2}" fill="#fff"/><path d="${paths}" fill="#000"/></svg>`;
+        return `<svg viewBox="-1 -1 ${n + 2} ${n + 2}" width="42" height="42" style="display:block;flex-shrink:0;shape-rendering:crispEdges;" aria-label="QR Kode Booking"><rect x="-1" y="-1" width="${n + 2}" height="${n + 2}" fill="#fff"/><path d="${paths}" fill="#000"/></svg>`;
     }
 
     function buildThermalTicketData(src) {
@@ -3233,87 +3233,87 @@
     function buildThermalTicketHtml(t) {
         const hargaShort = formatShortRupiahUnit(t.hargaSatuanNum);
         const extraLabel = (t.hasBiayaTambahan && t.qty > 1)
-            ? `Biaya Tambahan/Tiket (${t.qty}&times;${escapeTicketHtml(t.biayaTambahanPerTiketShort)})`
+            ? `Biaya Tmb (${t.qty}&times;${escapeTicketHtml(t.biayaTambahanPerTiketShort)})`
             : 'Biaya Tambahan/Tiket';
         const extraValue = t.hasBiayaTambahan ? escapeTicketHtml(t.biayaTambahanFormatted) : '-';
         const extraKetHtml = (t.hasBiayaTambahan && t.biayaTambahanKet)
-            ? `<div style="font-size:8.5px;font-weight:700;color:#222;margin-top:1px;">Ket. Tambahan: ${escapeTicketHtml(t.biayaTambahanKet)}</div>`
+            ? `<div style="font-size:8px;font-weight:700;color:#222;margin-top:1px;">Ket. Tambahan: ${escapeTicketHtml(t.biayaTambahanKet)}</div>`
             : '';
 
         return `
-            <div style="text-align:center;padding-bottom:8px;border-bottom:1.5px solid #000;">
-                <div style="font-size:9.5px;font-weight:800;letter-spacing:0.12em;text-transform:uppercase;">AGEN DAMRI KAWUNGANTEN</div>
-                <div style="font-size:19px;font-weight:900;letter-spacing:0.04em;text-transform:uppercase;line-height:1.15;margin:4px 0 3px;">${escapeTicketHtml(t.armada)}</div>
-                <div style="font-size:9.5px;font-weight:800;letter-spacing:0.09em;">E-TIKET (TIKET RESMI)</div>
-                <div style="font-size:8.5px;font-weight:700;margin-top:2px;color:#222;">Tgl Beli: ${escapeTicketHtml(t.tglBeli)}</div>
+            <div style="text-align:center;padding-bottom:6px;border-bottom:1.5px solid #000;">
+                <div style="font-size:8.2px;font-weight:800;letter-spacing:0.08em;text-transform:uppercase;white-space:nowrap;">AGEN DAMRI KAWUNGANTEN</div>
+                <div style="font-size:15.5px;font-weight:900;letter-spacing:0.03em;text-transform:uppercase;line-height:1.15;margin:3px 0 2px;">${escapeTicketHtml(t.armada)}</div>
+                <div style="font-size:8.5px;font-weight:800;letter-spacing:0.08em;">E-TIKET (TIKET RESMI)</div>
+                <div style="font-size:7.8px;font-weight:700;margin-top:2px;color:#222;">Tgl Beli: ${escapeTicketHtml(t.tglBeli)}</div>
             </div>
 
-            <div style="display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px dashed #000;">
-                <span style="font-size:10.5px;font-weight:800;text-transform:uppercase;letter-spacing:0.04em;">KODE BOKING</span>
-                <strong class="tt-mono" style="font-size:13.5px;font-weight:900;letter-spacing:0.08em;white-space:nowrap;">${escapeTicketHtml(t.idTiket)}</strong>
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px dashed #000;gap:6px;">
+                <span style="font-size:9.5px;font-weight:800;text-transform:uppercase;letter-spacing:0.04em;white-space:nowrap;">KODE BOKING</span>
+                <strong class="tt-mono" style="font-size:12px;font-weight:900;letter-spacing:0.06em;white-space:nowrap;">${escapeTicketHtml(t.idTiket)}</strong>
             </div>
 
-            <div style="text-align:center;padding:8px 0 6px;">
-                <div style="display:flex;align-items:center;justify-content:center;gap:10px;font-size:18px;font-weight:900;letter-spacing:0.05em;">
+            <div style="text-align:center;padding:6px 0 5px;">
+                <div style="display:flex;align-items:center;justify-content:center;gap:8px;font-size:16px;font-weight:900;letter-spacing:0.04em;">
                     <span>${escapeTicketHtml(t.asalCode)}</span>
-                    <span style="font-size:12px;">&#8594;</span>
+                    <span style="font-size:11px;">&#8594;</span>
                     <span>${escapeTicketHtml(t.tujuanCode)}</span>
                 </div>
-                <div style="font-size:8.5px;font-weight:800;margin-top:2px;letter-spacing:0.02em;line-height:1.25;">${escapeTicketHtml(t.asalFull)} &#8594; ${escapeTicketHtml(t.tujuanFull)}</div>
+                <div style="font-size:7.8px;font-weight:800;margin-top:2px;letter-spacing:0.01em;line-height:1.25;">${escapeTicketHtml(t.asalFull)} &#8594; ${escapeTicketHtml(t.tujuanFull)}</div>
             </div>
 
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:6px 0;border-top:1px dashed #000;border-bottom:1px dashed #000;">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;padding:5px 0;border-top:1px dashed #000;border-bottom:1px dashed #000;">
                 <div>
-                    <div style="font-size:8px;font-weight:800;text-transform:uppercase;letter-spacing:0.04em;color:#333;">TGL BERANGKAT</div>
-                    <div style="font-size:10.5px;font-weight:900;margin-top:1px;">${escapeTicketHtml(t.tglBerangkatShort)}</div>
+                    <div style="font-size:7.4px;font-weight:800;text-transform:uppercase;letter-spacing:0.03em;color:#333;">TGL BERANGKAT</div>
+                    <div style="font-size:9.6px;font-weight:900;margin-top:1px;white-space:nowrap;">${escapeTicketHtml(t.tglBerangkatShort)}</div>
                 </div>
                 <div style="text-align:right;">
-                    <div style="font-size:8px;font-weight:800;text-transform:uppercase;letter-spacing:0.04em;color:#333;">JAM BERANGKAT</div>
-                    <div style="font-size:10.5px;font-weight:900;margin-top:1px;">${escapeTicketHtml(t.jam)} WIB</div>
+                    <div style="font-size:7.4px;font-weight:800;text-transform:uppercase;letter-spacing:0.03em;color:#333;">JAM BERANGKAT</div>
+                    <div style="font-size:9.6px;font-weight:900;margin-top:1px;white-space:nowrap;">${escapeTicketHtml(t.jam)} WIB</div>
                 </div>
             </div>
 
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:7px 0;margin-bottom:5px;border-bottom:1.5px solid #000;">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;padding:6px 0;margin-bottom:4px;border-bottom:1.5px solid #000;">
                 <div style="text-align:center;border-right:1px dashed #888;padding-right:4px;">
-                    <div style="font-size:8px;font-weight:800;text-transform:uppercase;letter-spacing:0.04em;color:#333;">JML PENUMPANG</div>
-                    <div style="font-size:15px;font-weight:900;line-height:1.15;margin-top:2px;">${escapeTicketHtml(t.jumlahPnp)}</div>
+                    <div style="font-size:7.4px;font-weight:800;text-transform:uppercase;letter-spacing:0.03em;color:#333;">JML PENUMPANG</div>
+                    <div style="font-size:13.5px;font-weight:900;line-height:1.15;margin-top:1px;">${escapeTicketHtml(t.jumlahPnp)}</div>
                 </div>
                 <div style="text-align:center;padding-left:4px;">
-                    <div style="font-size:8px;font-weight:800;text-transform:uppercase;letter-spacing:0.04em;color:#333;">NOMOR KURSI</div>
-                    <div style="font-size:15px;font-weight:900;line-height:1.15;margin-top:2px;word-break:break-word;">${escapeTicketHtml(t.kursi)}</div>
+                    <div style="font-size:7.4px;font-weight:800;text-transform:uppercase;letter-spacing:0.03em;color:#333;">NOMOR KURSI</div>
+                    <div style="font-size:13.5px;font-weight:900;line-height:1.15;margin-top:1px;word-break:break-word;">${escapeTicketHtml(t.kursi)}</div>
                 </div>
             </div>
 
             <div class="tt-row"><span>Nama</span><strong>${escapeTicketHtml(t.nama)}</strong></div>
-            <div class="tt-row"><span>Titik Naik</span><strong style="white-space:nowrap;">${escapeTicketHtml(t.titikNaik)}</strong></div>
-            <div class="tt-row"><span>Keterangan</span><strong style="max-width:62%;">${escapeTicketHtml(t.keterangan)}</strong></div>
+            <div class="tt-row"><span>Titik Naik</span><strong style="font-size:8.6px;white-space:nowrap;">${escapeTicketHtml(t.titikNaik)}</strong></div>
+            <div class="tt-row"><span>Keterangan</span><strong style="max-width:60%;">${escapeTicketHtml(t.keterangan)}</strong></div>
 
-            <div style="border-top:1px dashed #000;margin:7px 0;"></div>
-            <div class="tt-row" style="font-size:9.8px;"><span>Harga Tiket (${t.qty}&times;${escapeTicketHtml(hargaShort)})</span><strong style="white-space:nowrap;flex-shrink:0;">${escapeTicketHtml(t.subtotalTiket)}</strong></div>
-            <div class="tt-row" style="font-size:9.8px;"><span>${extraLabel}</span><strong style="white-space:nowrap;flex-shrink:0;">${extraValue}</strong></div>
+            <div style="border-top:1px dashed #000;margin:6px 0;"></div>
+            <div class="tt-row" style="font-size:9px;"><span>Tiket (${t.qty}&times;${escapeTicketHtml(hargaShort)})</span><strong style="white-space:nowrap;">${escapeTicketHtml(t.subtotalTiket)}</strong></div>
+            <div class="tt-row" style="font-size:9px;"><span>${extraLabel}</span><strong style="white-space:nowrap;">${extraValue}</strong></div>
             ${extraKetHtml}
 
-            <div style="border-top:1.5px solid #000;border-bottom:1.5px solid #000;padding:5px 0;display:flex;justify-content:space-between;align-items:center;font-size:12.5px;font-weight:900;margin-top:6px;">
-                <span>TOTAL BAYAR</span>
+            <div style="border-top:1.5px solid #000;border-bottom:1.5px solid #000;padding:4px 0;display:flex;justify-content:space-between;align-items:center;gap:6px;font-size:11px;font-weight:900;margin-top:5px;">
+                <span style="white-space:nowrap;">TOTAL BAYAR</span>
                 <span style="white-space:nowrap;">${escapeTicketHtml(t.totalHarga)}</span>
             </div>
 
-            <div style="display:flex;align-items:center;gap:8px;margin-top:8px;">
+            <div style="display:flex;align-items:center;gap:6px;margin-top:6px;">
                 ${renderThermalQrSvg(t.qrPayload)}
-                <div style="font-size:8.3px;font-weight:700;line-height:1.38;">
-                    <div>&bull; Hadir 30 menit sblm berangkat</div>
-                    <div>&bull; Cancel max H-1 (1x24 jam)</div>
+                <div style="font-size:7.5px;font-weight:700;line-height:1.34;">
+                    <div>&bull; Hadir 30 mnt sblm berangkat</div>
+                    <div>&bull; Cancel max H-1 (1&times;24 jam)</div>
                     <div>&bull; Info WA: 0821-3360-7759</div>
                 </div>
             </div>
 
-            <div style="border-top:1.5px dashed #000;margin:11px 0 7px;text-align:center;">
-                <span style="background:#fff;padding:0 6px;font-size:8px;font-weight:900;letter-spacing:0.08em;position:relative;top:-8px;">&#9986; ARSIP AGEN / KRU</span>
+            <div style="border-top:1.5px dashed #000;margin:9px 0 5px;text-align:center;">
+                <span style="background:#fff;padding:0 5px;font-size:7.5px;font-weight:900;letter-spacing:0.06em;position:relative;top:-7px;">&#9986; ARSIP AGEN / KRU</span>
             </div>
-            <div style="font-size:9.3px;line-height:1.45;">
-                <div class="tt-row" style="font-size:9.5px;"><strong>${escapeTicketHtml(t.armada)}</strong><strong class="tt-mono" style="white-space:nowrap;">${escapeTicketHtml(t.idTiket)}</strong></div>
+            <div style="font-size:8.5px;line-height:1.38;">
+                <div class="tt-row" style="font-size:8.8px;"><strong>${escapeTicketHtml(t.armada)}</strong><strong class="tt-mono" style="white-space:nowrap;">${escapeTicketHtml(t.idTiket)}</strong></div>
                 <div><b>${escapeTicketHtml(t.nama)} (${t.qty} Org)</b> &bull; Kursi: <b>${escapeTicketHtml(t.kursi)}</b></div>
-                <div>${escapeTicketHtml(t.tglBerangkatShort)} &bull; ${escapeTicketHtml(t.jam)} WIB &bull; <b>${escapeTicketHtml(t.asalCode)} &#8594; ${escapeTicketHtml(t.tujuanCode)}</b></div>
+                <div style="white-space:nowrap;">${escapeTicketHtml(t.tglBerangkatShort)} &bull; ${escapeTicketHtml(t.jam)} WIB &bull; <b>${escapeTicketHtml(t.asalCode)} &#8594; ${escapeTicketHtml(t.tujuanCode)}</b></div>
             </div>
         `;
     }
