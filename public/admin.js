@@ -4524,281 +4524,278 @@
     function buildRawBtCanvasBitmapBytes(t, returnDebugCanvas = false) {
         if (typeof document === 'undefined') return null;
         const W = 384; // Native 58mm thermal printer dot width (48mm * 8 dots/mm)
-        const PAD = 4;
+        const PAD = 6;
         const INNER_W = W - PAD * 2;
 
-        const makeCtxCanvas = (h = 1400) => {
-            const c = document.createElement('canvas');
-            c.width = W;
-            c.height = h;
-            const x = c.getContext('2d');
-            if (!x) return null;
-            x.imageSmoothingEnabled = false;
-            x.fillStyle = '#ffffff';
-            x.fillRect(0, 0, W, h);
-            x.fillStyle = '#000000';
-            x.textBaseline = 'top';
-            return { c, x };
+        const c = document.createElement('canvas');
+        c.width = W;
+        c.height = 1400;
+        const x = c.getContext('2d');
+        if (!x) return null;
+        x.imageSmoothingEnabled = false;
+        x.fillStyle = '#ffffff';
+        x.fillRect(0, 0, W, c.height);
+        x.fillStyle = '#000000';
+        x.textBaseline = 'top';
+
+        const wrapLines = (text, maxW, font) => {
+            x.font = font;
+            const words = String(text || '').split(/\s+/).filter(Boolean);
+            if (!words.length) return ['-'];
+            const lines = [];
+            let cur = words[0];
+            for (let i = 1; i < words.length; i++) {
+                const candidate = cur + ' ' + words[i];
+                if (x.measureText(candidate).width <= maxW) cur = candidate;
+                else { lines.push(cur); cur = words[i]; }
+            }
+            lines.push(cur);
+            return lines;
         };
 
-        const renderSection = (drawFn) => {
-            const pair = makeCtxCanvas(1350);
-            if (!pair) return null;
-            const { c, x } = pair;
-
-            const wrapLines = (text, maxW, font) => {
-                x.font = font;
-                const words = String(text || '').split(/\s+/).filter(Boolean);
-                if (!words.length) return ['-'];
-                const lines = [];
-                let cur = words[0];
-                for (let i = 1; i < words.length; i++) {
-                    const candidate = cur + ' ' + words[i];
-                    if (x.measureText(candidate).width <= maxW) cur = candidate;
-                    else { lines.push(cur); cur = words[i]; }
-                }
-                lines.push(cur);
-                return lines;
-            };
-
-            let y = 4;
-            const helpers = {
-                getY: () => y,
-                addY: (d) => { y += d; },
-                centerText(text, font, gapAfter = 4) {
-                    x.font = font;
-                    x.textAlign = 'center';
-                    const lines = wrapLines(text, INNER_W, font);
-                    const sizePx = parseFloat(font.match(/([\d.]+)px/)?.[1] || '18');
-                    for (const ln of lines) {
-                        x.fillText(ln, W / 2, y);
-                        y += Math.round(sizePx * 1.22);
-                    }
-                    y += gapAfter;
-                },
-                solidLine(thickness = 3, gapBefore = 5, gapAfter = 8) {
-                    y += gapBefore;
-                    x.fillRect(PAD, y, INNER_W, thickness);
-                    y += thickness + gapAfter;
-                },
-                dashedLine(gapBefore = 5, gapAfter = 8, label = '') {
-                    y += gapBefore;
-                    for (let px = PAD; px < W - PAD; px += 12) {
-                        x.fillRect(px, y, 7, 2);
-                    }
-                    if (label) {
-                        x.font = 'bold 16px Arial, sans-serif';
-                        x.textAlign = 'center';
-                        const lw = x.measureText(label).width + 16;
-                        x.fillStyle = '#ffffff';
-                        x.fillRect((W - lw) / 2, y - 9, lw, 20);
-                        x.fillStyle = '#000000';
-                        x.fillText(label, W / 2, y - 8);
-                        y += 12;
-                    }
-                    y += gapAfter;
-                },
-                rowLR(leftStr, rightStr, leftFont = 'bold 17.5px Arial, sans-serif', rightFont = '900 17.5px Arial, sans-serif', gapAfter = 5) {
-                    x.font = leftFont;
-                    const lw = x.measureText(leftStr).width;
-                    const maxRightW = Math.max(130, INNER_W - lw - 8);
-                    const rLines = wrapLines(rightStr, maxRightW, rightFont);
-                    const sizePx = parseFloat(rightFont.match(/([\d.]+)px/)?.[1] || '17.5');
-                    x.textAlign = 'left';
-                    x.font = leftFont;
-                    x.fillText(leftStr, PAD, y);
-                    x.textAlign = 'right';
-                    x.font = rightFont;
-                    rLines.forEach((ln, idx) => {
-                        x.fillText(ln, W - PAD, y + idx * Math.round(sizePx * 1.22));
-                    });
-                    y += Math.max(Math.round(sizePx * 1.22), rLines.length * Math.round(sizePx * 1.22)) + gapAfter;
-                },
-                drawSchedule() {
-                    x.textAlign = 'left';
-                    x.font = 'bold 14px Arial, sans-serif';
-                    x.fillText('TGL BERANGKAT', PAD, y);
-                    x.textAlign = 'right';
-                    x.fillText('JAM BERANGKAT', W - PAD, y);
-                    y += 18;
-                    x.textAlign = 'left';
-                    x.font = '900 19px Arial, sans-serif';
-                    x.fillText(t.tglBerangkatShort, PAD, y);
-                    x.textAlign = 'right';
-                    x.fillText(`${t.jam} WIB`, W - PAD, y);
-                    y += 23;
-                },
-                drawHeroSeats() {
-                    x.textAlign = 'center';
-                    x.font = 'bold 14px Arial, sans-serif';
-                    x.fillText('JML PENUMPANG', W * 0.25, y);
-                    x.fillText('NOMOR KURSI', W * 0.75, y);
-                    for (let dy = 0; dy < 52; dy += 7) x.fillRect(W / 2 - 1, y + dy, 2, 4);
-                    y += 19;
-                    const kursiLines = wrapLines(t.kursi, INNER_W * 0.45, '900 27px Arial, sans-serif');
-                    x.font = '900 27px Arial, sans-serif';
-                    x.fillText(t.jumlahPnp, W * 0.25, y);
-                    kursiLines.forEach((ln, idx) => x.fillText(ln, W * 0.75, y + idx * 30));
-                    y += Math.max(32, kursiLines.length * 30) + 6;
-                },
-                drawKetTambahan() {
-                    if (t.hasBiayaTambahan && t.biayaTambahanKet) {
-                        x.textAlign = 'left';
-                        x.font = 'bold 15px Arial, sans-serif';
-                        for (const ln of wrapLines('Ket. Tambahan: ' + t.biayaTambahanKet, INNER_W, 'bold 15px Arial, sans-serif')) {
-                            x.fillText(ln, PAD, y);
-                            y += 18;
-                        }
-                    }
-                },
-                drawQrAndRules() {
-                    const qrMatrix = getThermalQrMatrix(t.qrPayload);
-                    const qMod = qrMatrix.length;
-                    const qCell = Math.max(3, Math.floor(96 / qMod));
-                    const qSize = qMod * qCell;
-                    for (let r = 0; r < qMod; r++) {
-                        for (let col = 0; col < qMod; col++) {
-                            if (qrMatrix[r][col]) {
-                                x.fillRect(PAD + col * qCell, y + r * qCell, qCell, qCell);
-                            }
-                        }
-                    }
-                    const ruleX = PAD + qSize + 12;
-                    const ruleMaxW = W - PAD - ruleX;
-                    let ry = y + 2;
-                    x.textAlign = 'left';
-                    x.font = 'bold 15px Arial, sans-serif';
-                    ['• Hadir 30 mnt sblm berangkat', '• Cancel max H-1 (1x24 jam)', '• Info WA: 0821-3360-7759'].forEach(rule => {
-                        for (const ln of wrapLines(rule, ruleMaxW, 'bold 15px Arial, sans-serif')) {
-                            x.fillText(ln, ruleX, ry);
-                            ry += 19;
-                        }
-                    });
-                    y = Math.max(y + qSize, ry) + 4;
-                },
-                drawArsipDetails() {
-                    helpers.rowLR(t.armada, t.idTiket, 'bold 18px Arial, sans-serif', '900 18px Consolas, monospace', 4);
-                    x.textAlign = 'left';
-                    x.font = 'bold 17px Arial, sans-serif';
-                    for (const ln of wrapLines(`${t.nama} (${t.qty} Org) • Kursi: ${t.kursi}`, INNER_W, 'bold 17px Arial, sans-serif')) {
-                        x.fillText(ln, PAD, y);
-                        y += 21;
-                    }
-                    x.font = 'bold 16px Arial, sans-serif';
-                    x.fillText(`${t.tglBerangkatShort} • ${t.jam} WIB • ${t.asalCode} -> ${t.tujuanCode}`, PAD, y);
-                    y += 22;
-                }
-            };
-
-            drawFn(helpers);
-            const finalH = Math.min(c.height, y);
-            const cropped = document.createElement('canvas');
-            cropped.width = W;
-            cropped.height = finalH;
-            cropped.getContext('2d').drawImage(c, 0, 0, W, finalH, 0, 0, W, finalH);
-            return cropped;
+        // 1:1 geometric match to Laptop @media print (181 CSS px -> 384 dots, aspect 2.70:1)
+        let y = 4;
+        const centerText = (text, font, gapAfter = 6) => {
+            x.font = font;
+            x.textAlign = 'center';
+            const lines = wrapLines(text, INNER_W, font);
+            const sizePx = parseFloat(font.match(/([\d.]+)px/)?.[1] || '18');
+            for (const ln of lines) {
+                x.fillText(ln, W / 2, y);
+                y += Math.round(sizePx * 1.26);
+            }
+            y += gapAfter;
+        };
+        const solidLine = (thickness = 3, gapBefore = 9, gapAfter = 14) => {
+            y += gapBefore;
+            x.fillRect(PAD, y, INNER_W, thickness);
+            y += thickness + gapAfter;
+        };
+        const dashedLine = (gapBefore = 9, gapAfter = 14, label = '') => {
+            y += gapBefore;
+            for (let px = PAD; px < W - PAD; px += 12) {
+                x.fillRect(px, y, 7, 2);
+            }
+            if (label) {
+                x.font = '900 16px Arial, sans-serif';
+                x.textAlign = 'center';
+                const lw = x.measureText(label).width + 18;
+                x.fillStyle = '#ffffff';
+                x.fillRect((W - lw) / 2, y - 9, lw, 20);
+                x.fillStyle = '#000000';
+                x.fillText(label, W / 2, y - 8);
+                y += 12;
+            }
+            y += gapAfter;
+        };
+        const rowLR = (leftStr, rightStr, leftFont = 'bold 18.5px Arial, sans-serif', rightFont = '900 19px Arial, sans-serif', gapAfter = 10) => {
+            x.font = leftFont;
+            const lw = x.measureText(leftStr).width;
+            const maxRightW = Math.max(135, INNER_W - lw - 10);
+            const rLines = wrapLines(rightStr, maxRightW, rightFont);
+            const sizePx = parseFloat(rightFont.match(/([\d.]+)px/)?.[1] || '19');
+            x.textAlign = 'left';
+            x.font = leftFont;
+            x.fillText(leftStr, PAD, y);
+            x.textAlign = 'right';
+            x.font = rightFont;
+            rLines.forEach((ln, idx) => {
+                x.fillText(ln, W - PAD, y + idx * Math.round(sizePx * 1.25));
+            });
+            y += Math.max(Math.round(sizePx * 1.25), rLines.length * Math.round(sizePx * 1.25)) + gapAfter;
         };
 
-        // Part 1: Main Ticket (Scaled to match Laptop printout height & font boldness)
-        const mainCanvas = renderSection((h) => {
-            h.centerText('AGEN DAMRI KAWUNGANTEN', 'bold 17px Arial, sans-serif', 3);
-            h.centerText(t.armada, '900 36px Arial, sans-serif', 3);
-            h.centerText('E-TIKET (TIKET RESMI)', 'bold 17px Arial, sans-serif', 2);
-            h.centerText('Tgl Beli: ' + t.tglBeli, 'bold 15px Arial, sans-serif', 3);
-            h.solidLine(3, 4, 8);
+        // 1. Header
+        centerText('AGEN DAMRI KAWUNGANTEN', 'bold 17.5px Arial, sans-serif', 5);
+        centerText(t.armada, '900 33px Arial, sans-serif', 6);
+        centerText('E-TIKET (TIKET RESMI)', 'bold 18px Arial, sans-serif', 5);
+        centerText('Tgl Beli: ' + t.tglBeli, 'bold 16.5px Arial, sans-serif', 6);
+        solidLine(3, 8, 14);
 
-            h.rowLR('KODE BOKING', t.idTiket, 'bold 19px Arial, sans-serif', '900 22px Consolas, monospace', 3);
-            h.dashedLine(4, 8);
+        // 2. Kode Boking
+        rowLR('KODE BOKING', t.idTiket, 'bold 20px Arial, sans-serif', '900 24px Consolas, monospace', 8);
+        dashedLine(7, 15);
 
-            h.centerText(`${t.asalCode}  ->  ${t.tujuanCode}`, '900 33px Arial, sans-serif', 3);
-            h.centerText(`${t.asalFull} -> ${t.tujuanFull}`, 'bold 15px Arial, sans-serif', 3);
-            h.dashedLine(5, 8);
+        // 3. Route Hero
+        centerText(`${t.asalCode}  ->  ${t.tujuanCode}`, '900 34px Arial, sans-serif', 6);
+        centerText(`${t.asalFull} -> ${t.tujuanFull}`, 'bold 16.5px Arial, sans-serif', 6);
+        dashedLine(8, 14);
 
-            h.drawSchedule();
-            h.dashedLine(4, 8);
+        // 4. Schedule 2 Columns
+        x.textAlign = 'left';
+        x.font = 'bold 15.5px Arial, sans-serif';
+        x.fillText('TGL BERANGKAT', PAD, y);
+        x.textAlign = 'right';
+        x.fillText('JAM BERANGKAT', W - PAD, y);
+        y += 23;
+        x.textAlign = 'left';
+        x.font = '900 20.5px Arial, sans-serif';
+        x.fillText(t.tglBerangkatShort, PAD, y);
+        x.textAlign = 'right';
+        x.fillText(`${t.jam} WIB`, W - PAD, y);
+        y += 30;
+        dashedLine(7, 14);
 
-            h.drawHeroSeats();
-            h.solidLine(3, 3, 10);
+        // 5. Hero Seats & Passenger Count
+        x.textAlign = 'center';
+        x.font = 'bold 15.5px Arial, sans-serif';
+        x.fillText('JML PENUMPANG', W * 0.25, y);
+        x.fillText('NOMOR KURSI', W * 0.75, y);
+        for (let dy = 0; dy < 62; dy += 8) x.fillRect(W / 2 - 1, y + dy, 2, 4);
+        y += 23;
+        const kursiLines = wrapLines(t.kursi, INNER_W * 0.45, '900 28.5px Arial, sans-serif');
+        x.font = '900 28.5px Arial, sans-serif';
+        x.fillText(t.jumlahPnp, W * 0.25, y);
+        kursiLines.forEach((ln, idx) => x.fillText(ln, W * 0.75, y + idx * 34));
+        y += Math.max(38, kursiLines.length * 34) + 10;
+        solidLine(3, 6, 15);
 
-            h.rowLR('Nama', t.nama);
-            h.rowLR('Titik Naik', t.titikNaik, 'bold 17px Arial, sans-serif', '900 17px Arial, sans-serif');
-            h.rowLR('Keterangan', t.keterangan || '-');
-            h.dashedLine(4, 8);
+        // 6. Passenger Details
+        rowLR('Nama', t.nama);
+        rowLR('Titik Naik', t.titikNaik, 'bold 18px Arial, sans-serif', '900 18px Arial, sans-serif', 10);
+        rowLR('Keterangan', t.keterangan || '-');
+        dashedLine(7, 15);
 
-            const hargaShort = formatShortRupiahUnit(t.hargaSatuanNum);
-            h.rowLR(`Tiket (${t.qty}x${hargaShort})`, t.subtotalTiket);
-            const extraLabel = (t.hasBiayaTambahan && t.qty > 1)
-                ? `Biaya Tmb (${t.qty}x${t.biayaTambahanPerTiketShort})`
-                : 'Biaya Tambahan/Tiket';
-            h.rowLR(extraLabel, t.hasBiayaTambahan ? t.biayaTambahanFormatted : '-', 'bold 17px Arial, sans-serif', '900 17.5px Arial, sans-serif');
-            h.drawKetTambahan();
-            h.solidLine(3, 5, 8);
+        // 7. Costs & Total
+        const hargaShort = formatShortRupiahUnit(t.hargaSatuanNum);
+        rowLR(`Tiket (${t.qty}x${hargaShort})`, t.subtotalTiket);
+        const extraLabel = (t.hasBiayaTambahan && t.qty > 1)
+            ? `Biaya Tmb (${t.qty}x${t.biayaTambahanPerTiketShort})`
+            : 'Biaya Tambahan/Tiket';
+        rowLR(extraLabel, t.hasBiayaTambahan ? t.biayaTambahanFormatted : '-', 'bold 18.5px Arial, sans-serif', '900 19px Arial, sans-serif', 8);
+        if (t.hasBiayaTambahan && t.biayaTambahanKet) {
+            x.textAlign = 'left';
+            x.font = 'bold 16.5px Arial, sans-serif';
+            for (const ln of wrapLines('Ket. Tambahan: ' + t.biayaTambahanKet, INNER_W, 'bold 16.5px Arial, sans-serif')) {
+                x.fillText(ln, PAD, y);
+                y += 22;
+            }
+        }
+        solidLine(3, 8, 12);
 
-            h.rowLR('TOTAL BAYAR', t.totalHarga, '900 21px Arial, sans-serif', '900 22px Arial, sans-serif', 3);
-            h.solidLine(3, 5, 10);
+        rowLR('TOTAL BAYAR', t.totalHarga, '900 23px Arial, sans-serif', '900 23.5px Arial, sans-serif', 6);
+        solidLine(3, 8, 15);
 
-            h.drawQrAndRules();
+        // 8. Scannable QR Code + Rules
+        const qrMatrix = getThermalQrMatrix(t.qrPayload);
+        const qMod = qrMatrix.length;
+        const qCell = Math.max(3, Math.floor(96 / qMod));
+        const qSize = qMod * qCell;
+        for (let r = 0; r < qMod; r++) {
+            for (let col = 0; col < qMod; col++) {
+                if (qrMatrix[r][col]) {
+                    x.fillRect(PAD + col * qCell, y + r * qCell, qCell, qCell);
+                }
+            }
+        }
+        const ruleX = PAD + qSize + 12;
+        const ruleMaxW = W - PAD - ruleX;
+        let ry = y + 3;
+        x.textAlign = 'left';
+        x.font = 'bold 16px Arial, sans-serif';
+        ['• Hadir 30 mnt sblm berangkat', '• Cancel max H-1 (1x24 jam)', '• Info WA: 0821-3360-7759'].forEach(rule => {
+            for (const ln of wrapLines(rule, ruleMaxW, 'bold 16px Arial, sans-serif')) {
+                x.fillText(ln, ruleX, ry);
+                ry += 22;
+            }
         });
+        y = Math.max(y + qSize, ry) + 4;
 
-        // Part 2: Arsip Agen Divider Header
-        const arsipDivCanvas = renderSection((h) => {
-            h.addY(6);
-            h.dashedLine(4, 4, 'ARSIP AGEN / KRU');
-        });
+        // 9. 1 clear space BEFORE Arsip Agen, divider, 1 clear space AFTER Arsip Agen header, then Body
+        dashedLine(26, 24, 'ARSIP AGEN / KRU');
+        rowLR(t.armada, t.idTiket, 'bold 18.5px Arial, sans-serif', '900 18.5px Consolas, monospace', 8);
+        x.textAlign = 'left';
+        x.font = 'bold 18px Arial, sans-serif';
+        for (const ln of wrapLines(`${t.nama} (${t.qty} Org) • Kursi: ${t.kursi}`, INNER_W, 'bold 18px Arial, sans-serif')) {
+            x.fillText(ln, PAD, y);
+            y += 24;
+        }
+        x.font = 'bold 17.5px Arial, sans-serif';
+        x.fillText(`${t.tglBerangkatShort} • ${t.jam} WIB • ${t.asalCode} -> ${t.tujuanCode}`, PAD, y);
+        y += 26;
 
-        // Part 3: Arsip Agen Body
-        const arsipBodyCanvas = renderSection((h) => {
-            h.drawArsipDetails();
-        });
-
-        if (!mainCanvas || !arsipDivCanvas || !arsipBodyCanvas) return null;
-
+        const finalH = Math.min(c.height, y);
         if (returnDebugCanvas) {
-            const SPACE_H = 22;
-            const totalH = mainCanvas.height + SPACE_H + arsipDivCanvas.height + SPACE_H + arsipBodyCanvas.height + 16;
             const dbg = document.createElement('canvas');
             dbg.width = W;
-            dbg.height = totalH;
-            const dctx = dbg.getContext('2d');
-            dctx.fillStyle = '#ffffff';
-            dctx.fillRect(0, 0, W, totalH);
-            let cy = 0;
-            dctx.drawImage(mainCanvas, 0, cy); cy += mainCanvas.height + SPACE_H;
-            dctx.drawImage(arsipDivCanvas, 0, cy); cy += arsipDivCanvas.height + SPACE_H;
-            dctx.drawImage(arsipBodyCanvas, 0, cy);
+            dbg.height = finalH;
+            dbg.getContext('2d').drawImage(c, 0, 0, W, finalH, 0, 0, W, finalH);
             return dbg.toDataURL('image/png');
         }
 
+        // Convert to ESC/POS while compressing pure-white blank gaps (>= 6 rows) into 3-byte ESC J dot feeds.
+        // Keeps full Laptop height (~1000px / ~125mm) under ~26 KB total bytes so Panda RPP-02 / RPP210A never truncates Arsip Agen.
+        const imgData = x.getImageData(0, 0, W, finalH).data;
         const widthBytes = W / 8; // 48
-        const BAND_H = 128; // Safe 6.1 KB per GS v 0 command
+        const BAND_H = 128;
         const out = [0x1B, 0x40];
 
-        const appendCanvasBands = (cv) => {
-            const ctx = cv.getContext('2d');
-            const imgData = ctx.getImageData(0, 0, W, cv.height).data;
-            for (let startRow = 0; startRow < cv.height; startRow += BAND_H) {
-                const bandRows = Math.min(BAND_H, cv.height - startRow);
-                out.push(0x1D, 0x76, 0x30, 0x00, widthBytes & 0xff, (widthBytes >> 8) & 0xff, bandRows & 0xff, (bandRows >> 8) & 0xff);
-                for (let row = startRow; row < startRow + bandRows; row++) {
-                    for (let bx = 0; bx < widthBytes; bx++) {
-                        let byteVal = 0;
-                        for (let bit = 0; bit < 8; bit++) {
-                            const px = bx * 8 + bit;
-                            const idx = (row * W + px) * 4;
-                            const lum = imgData[idx] * 0.299 + imgData[idx + 1] * 0.587 + imgData[idx + 2] * 0.114;
-                            if (lum < 190) byteVal |= (0x80 >> bit);
-                        }
-                        out.push(byteVal);
+        const rowHasInk = new Uint8Array(finalH);
+        const packedRows = new Array(finalH);
+        for (let row = 0; row < finalH; row++) {
+            const rowBytes = new Uint8Array(widthBytes);
+            let hasInk = 0;
+            for (let bx = 0; bx < widthBytes; bx++) {
+                let byteVal = 0;
+                for (let bit = 0; bit < 8; bit++) {
+                    const px = bx * 8 + bit;
+                    const idx = (row * W + px) * 4;
+                    const lum = imgData[idx] * 0.299 + imgData[idx + 1] * 0.587 + imgData[idx + 2] * 0.114;
+                    if (lum < 190) {
+                        byteVal |= (0x80 >> bit);
+                        hasInk = 1;
                     }
+                }
+                rowBytes[bx] = byteVal;
+            }
+            rowHasInk[row] = hasInk;
+            packedRows[row] = rowBytes;
+        }
+
+        const emitFeedDots = (dots) => {
+            let rem = dots;
+            while (rem > 0) {
+                const step = Math.min(255, rem);
+                out.push(0x1B, 0x4A, step); // ESC J n: feed n dot-rows (3 bytes total vs 48*n bitmap bytes)
+                rem -= step;
+            }
+        };
+
+        const emitBitmapSlice = (startRow, endRow) => {
+            for (let s = startRow; s < endRow; s += BAND_H) {
+                const bandRows = Math.min(BAND_H, endRow - s);
+                out.push(0x1D, 0x76, 0x30, 0x00, widthBytes & 0xff, (widthBytes >> 8) & 0xff, bandRows & 0xff, (bandRows >> 8) & 0xff);
+                for (let r = s; r < s + bandRows; r++) {
+                    const rb = packedRows[r];
+                    for (let bx = 0; bx < widthBytes; bx++) out.push(rb[bx]);
                 }
             }
         };
 
-        appendCanvasBands(mainCanvas);
-        out.push(0x0A); // 1 clear space BEFORE Arsip Agen (0 bitmap bytes!)
-        appendCanvasBands(arsipDivCanvas);
-        out.push(0x0A); // 1 clear space AFTER Arsip Agen header (0 bitmap bytes!)
-        appendCanvasBands(arsipBodyCanvas);
+        let r = 0;
+        let sliceStart = -1;
+        while (r < finalH) {
+            if (!rowHasInk[r]) {
+                let whiteEnd = r;
+                while (whiteEnd < finalH && !rowHasInk[whiteEnd]) whiteEnd++;
+                const whiteLen = whiteEnd - r;
+                if (whiteLen >= 6) {
+                    if (sliceStart !== -1) {
+                        emitBitmapSlice(sliceStart, r);
+                        sliceStart = -1;
+                    }
+                    if (whiteEnd < finalH) emitFeedDots(whiteLen);
+                    r = whiteEnd;
+                    continue;
+                }
+            }
+            if (sliceStart === -1) sliceStart = r;
+            r++;
+        }
+        if (sliceStart !== -1) {
+            emitBitmapSlice(sliceStart, finalH);
+        }
+
         out.push(0x0A, 0x0A, 0x0A, 0x0A, 0x0A); // Feed clean tear space
         return out;
     }
