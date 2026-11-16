@@ -40,8 +40,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js?v=2"></script>
     <script src="/socket.io/socket.io.js?v=2"></script>
-    <script src="app.js?v=7"></script>
-    <link rel="stylesheet" href="admin.css?v=2.3">
+    <script src="app.js?v=8"></script>
+    <link rel="stylesheet" href="admin.css?v=2.4">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.js"></script>
 </head>
@@ -1585,8 +1585,8 @@
                 <!-- ======================= -->
                 <!-- BOOKING TIKET MODAL (3 TAHAPAN) -->
                 <!-- ======================= -->
-                <div id="bookingModal" class="fixed inset-0 bg-gray-900/60 z-[140] hidden justify-center items-center p-2.5 sm:p-4 lg:p-8 overflow-y-auto">
-                    <div class="bg-white rounded-[1.75rem] sm:rounded-[2rem] p-4 sm:p-8 shadow-2xl border border-slate-100 max-w-2xl w-full relative max-h-[92dvh] overflow-y-auto my-auto">
+                <div id="bookingModal" class="fixed inset-0 bg-gray-900/65 z-[140] hidden justify-center items-center p-2.5 sm:p-4 lg:p-8 overflow-y-auto">
+                    <div class="bg-white rounded-[1.75rem] sm:rounded-[2rem] p-4 sm:p-8 shadow-2xl border border-slate-100 max-w-2xl w-full relative max-h-[92dvh] overflow-y-auto booking-modal-scroll my-auto">
                         <div class="absolute top-3.5 right-3.5 sm:top-4 sm:right-4 w-9 h-9 sm:w-10 sm:h-10 bg-amber-500 rounded-full flex items-center justify-center text-white text-base sm:text-lg shadow-lg cursor-pointer hover:bg-amber-600 transition-colors z-10" onclick="closeBookingModal()">
                             <i class="fas fa-times"></i>
                         </div>
@@ -3305,35 +3305,69 @@
     <div class="mobile-bottom-nav-grid">
         <button type="button" id="mobileNavDashboard" class="mobile-nav-item active" data-mobile-menu="dashboard" onclick="switchMenu('dashboard')" aria-label="Dashboard">
             <span class="mobile-nav-icon-wrap">
-                <i class="fas fa-chart-pie"></i>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <rect class="svg-duotone" x="3" y="3" width="7.5" height="9.5" rx="2.2" fill="currentColor" stroke="none"/>
+                    <rect x="3" y="3" width="7.5" height="9.5" rx="2.2"/>
+                    <rect class="svg-duotone" x="13.5" y="3" width="7.5" height="5.5" rx="2" fill="currentColor" stroke="none"/>
+                    <rect x="13.5" y="3" width="7.5" height="5.5" rx="2"/>
+                    <rect class="svg-duotone" x="13.5" y="11.5" width="7.5" height="9.5" rx="2.2" fill="currentColor" stroke="none"/>
+                    <rect x="13.5" y="11.5" width="7.5" height="9.5" rx="2.2"/>
+                    <rect class="svg-duotone" x="3" y="15.5" width="7.5" height="5.5" rx="2" fill="currentColor" stroke="none"/>
+                    <rect x="3" y="15.5" width="7.5" height="5.5" rx="2"/>
+                </svg>
             </span>
             <span class="mobile-nav-label">Dashboard</span>
         </button>
 
         <button type="button" id="mobileNavManifest" class="mobile-nav-item" data-mobile-menu="today" onclick="switchMenu('today')" aria-label="Manifest">
             <span class="mobile-nav-icon-wrap">
-                <i class="fas fa-clipboard-list"></i>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <rect class="svg-duotone" x="5" y="4" width="14" height="17" rx="3" fill="currentColor" stroke="none"/>
+                    <path d="M9 4.5H7.2A2.2 2.2 0 0 0 5 6.7v12.1A2.2 2.2 0 0 0 7.2 21h9.6a2.2 2.2 0 0 0 2.2-2.2V6.7a2.2 2.2 0 0 0-2.2-2.2H15"/>
+                    <rect x="9" y="2.5" width="6" height="3.2" rx="1.2"/>
+                    <path d="M8.5 11h7"/>
+                    <path d="M8.5 14.5h7"/>
+                    <path d="M8.5 18h4"/>
+                </svg>
             </span>
             <span class="mobile-nav-label">Manifest</span>
         </button>
 
         <div class="mobile-nav-center-slot">
             <button type="button" id="mobileCenterBookingBtn" class="mobile-nav-center-btn" onclick="openBookingModal()" aria-label="Booking Tiket">
-                <i class="fas fa-ticket-alt"></i>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M4.5 7.5A2.5 2.5 0 0 1 7 5h10a2.5 2.5 0 0 1 2.5 2.5v2.1a1.9 1.9 0 0 0 0 3.8V16.5A2.5 2.5 0 0 1 17 19H7a2.5 2.5 0 0 1-2.5-2.5v-3.1a1.9 1.9 0 0 0 0-3.8V7.5Z" fill="rgba(15, 23, 42, 0.14)"/>
+                    <path d="M9.5 5v1.8M9.5 10.6v2.8M9.5 17.2V19"/>
+                    <path d="M13 12h3.5M14.75 10.25v3.5"/>
+                </svg>
             </button>
             <span class="mobile-nav-center-caption">Booking</span>
         </div>
 
         <button type="button" id="mobileNavEkstra" class="mobile-nav-item" data-mobile-menu="ekstra" onclick="switchMenu('ekstra')" aria-label="Pesawat dan Kapal">
             <span class="mobile-nav-icon-wrap">
-                <i class="fas fa-plane-departure"></i>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path class="svg-duotone" d="M21 5.5 14.2 19.5l-2.6-5.7-5.7-2.6L21 5.5Z" fill="currentColor" stroke="none"/>
+                    <path d="M21 5.5 14.2 19.5l-2.6-5.7-5.7-2.6L21 5.5Z"/>
+                    <path d="M11.6 13.8 21 5.5"/>
+                    <path d="M4 19.5c1.6.9 3.4.9 5 0 1.6.9 3.4.9 5 0"/>
+                </svg>
             </span>
             <span class="mobile-nav-label">Pesawat &amp; Kapal</span>
         </button>
 
         <button type="button" id="mobileNavMore" class="mobile-nav-item" data-mobile-menu="more" onclick="toggleMobileMoreMenu()" aria-label="Lainnya">
             <span class="mobile-nav-icon-wrap">
-                <i class="fas fa-th-large"></i>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <rect class="svg-duotone" x="3.5" y="3.5" width="7" height="7" rx="2.2" fill="currentColor" stroke="none"/>
+                    <rect x="3.5" y="3.5" width="7" height="7" rx="2.2"/>
+                    <rect class="svg-duotone" x="13.5" y="3.5" width="7" height="7" rx="2.2" fill="currentColor" stroke="none"/>
+                    <rect x="13.5" y="3.5" width="7" height="7" rx="2.2"/>
+                    <rect class="svg-duotone" x="3.5" y="13.5" width="7" height="7" rx="2.2" fill="currentColor" stroke="none"/>
+                    <rect x="3.5" y="13.5" width="7" height="7" rx="2.2"/>
+                    <circle class="svg-duotone" cx="17" cy="17" r="3.5" fill="currentColor" stroke="none"/>
+                    <circle cx="17" cy="17" r="3.5"/>
+                </svg>
             </span>
             <span class="mobile-nav-label">Lainnya</span>
         </button>

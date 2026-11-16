@@ -501,6 +501,86 @@ if (typeof io !== 'undefined') {
 // ==========================================
 // 8. SHARED VISUAL ARMADA PICKER (ADMIN & PELANGGAN)
 // ==========================================
+const ARMADA_THUMB_MAP = {
+    'damri.webp': 'thumbs/damri.webp',
+    'efisiensi.webp': 'thumbs/efisiensi.webp',
+    'bestpremium.webp': 'thumbs/bestpremium.webp',
+    'estutrans.webp': 'thumbs/estutrans.webp',
+    '77trans.webp': 'thumbs/77trans.webp',
+    'riyan.webp': 'thumbs/riyan.webp',
+    'qyta.webp': 'thumbs/qyta.webp',
+    'logo.png': 'thumbs/logo.webp'
+};
+
+function resolveArmadaThumbSrc(src) {
+    const clean = String(src || '').trim().replace(/^\/+/, '');
+    if (!clean) return '';
+    return ARMADA_THUMB_MAP[clean.toLowerCase()] || src;
+}
+
+function ensureArmadaVisualPickerStyles() {
+    if (typeof document === 'undefined' || !document.head) return;
+    if (document.getElementById('armadaVisualPickerStyles')) return;
+    const style = document.createElement('style');
+    style.id = 'armadaVisualPickerStyles';
+    style.textContent = `
+        .armada-visual-card {
+            contain: layout style;
+            border: 1.5px solid #e2e8f0;
+            background: #ffffff;
+            box-shadow: 0 2px 6px rgba(15, 23, 42, 0.05);
+            transition: border-color 0.15s ease, box-shadow 0.15s ease, transform 0.12s ease;
+        }
+        .armada-visual-card:hover {
+            border-color: #fcd34d;
+            box-shadow: 0 6px 14px -4px rgba(15, 23, 42, 0.1);
+        }
+        .armada-visual-card:active {
+            transform: scale(0.97);
+        }
+        .armada-visual-card.is-selected {
+            border: 2px solid #f59e0b;
+            background: #fffbeb;
+            box-shadow: 0 8px 18px -4px rgba(245, 158, 11, 0.28), 0 0 0 2px rgba(251, 191, 36, 0.28);
+        }
+        .armada-visual-card .armada-check-badge {
+            background: rgba(15, 23, 42, 0.68);
+            border: 1.5px solid rgba(255, 255, 255, 0.78);
+            color: transparent;
+            transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+        }
+        .armada-visual-card.is-selected .armada-check-badge {
+            background: #f59e0b;
+            border-color: #ffffff;
+            color: #0f172a;
+            box-shadow: 0 2px 6px rgba(245, 158, 11, 0.45);
+        }
+        .armada-visual-card .armada-card-footer {
+            background: #ffffff;
+        }
+        .armada-visual-card.is-selected .armada-card-footer {
+            background: linear-gradient(90deg, #fffbeb 0%, #ffffff 100%);
+        }
+        .armada-visual-card .armada-card-title {
+            color: #1e293b;
+        }
+        .armada-visual-card.is-selected .armada-card-title {
+            color: #78350f;
+        }
+        .armada-visual-card .armada-card-arrow {
+            color: #cbd5e1;
+        }
+        .armada-visual-card.is-selected .armada-card-arrow {
+            color: #d97706;
+        }
+        .booking-modal-scroll {
+            -webkit-overflow-scrolling: touch;
+            overscroll-behavior: contain;
+        }
+    `;
+    document.head.appendChild(style);
+}
+
 function escapeArmadaHtml(str) {
     return String(str || '')
         .replace(/&/g, '&amp;')
@@ -526,34 +606,14 @@ function updateArmadaVisualPickerSelection(containerId, selectId, badgeId, selec
         cards.forEach(card => {
             const cardVal = card.getAttribute('data-armada-value') || '';
             const isSelected = Boolean(val) && cardVal === val;
-            card.setAttribute('aria-pressed', isSelected ? 'true' : 'false');
-
-            if (isSelected) {
-                card.className = 'armada-visual-card is-selected group relative flex flex-col text-left rounded-2xl overflow-hidden transition-all duration-200 focus:outline-none active:scale-[0.97] min-w-0 w-full border-2 border-amber-500 bg-amber-50/60 shadow-lg shadow-amber-500/20 ring-2 ring-amber-400/30';
-            } else {
-                card.className = 'armada-visual-card group relative flex flex-col text-left rounded-2xl overflow-hidden transition-all duration-200 focus:outline-none active:scale-[0.97] min-w-0 w-full border border-slate-200 bg-white hover:border-amber-300 hover:shadow-md shadow-sm';
-            }
-
-            const checkBadge = card.querySelector('.armada-check-badge');
-            if (checkBadge) {
-                checkBadge.className = isSelected
-                    ? 'armada-check-badge absolute top-1.5 right-1.5 sm:top-2 sm:right-2 w-5 h-5 sm:w-6 sm:h-6 rounded-full flex items-center justify-center transition-all duration-200 pointer-events-none bg-amber-500 text-slate-950 shadow-md ring-2 ring-white scale-100'
-                    : 'armada-check-badge absolute top-1.5 right-1.5 sm:top-2 sm:right-2 w-5 h-5 sm:w-6 sm:h-6 rounded-full flex items-center justify-center transition-all duration-200 pointer-events-none bg-slate-950/45 border border-white/70 text-transparent backdrop-blur-sm scale-90 group-hover:scale-100';
-            }
-
-            const footer = card.querySelector('.armada-card-footer');
-            if (footer) {
-                footer.className = `armada-card-footer w-full px-2.5 py-2 sm:px-3 sm:py-2.5 flex items-center justify-between gap-1.5 flex-1 min-h-[38px] sm:min-h-[44px] transition-colors ${isSelected ? 'bg-gradient-to-r from-amber-50 to-white' : 'bg-white'}`;
-            }
-
-            const title = card.querySelector('.armada-card-title');
-            if (title) {
-                title.className = `armada-card-title font-black text-[11px] sm:text-xs uppercase tracking-tight leading-tight line-clamp-2 ${isSelected ? 'text-amber-900' : 'text-slate-800'}`;
-            }
-
-            const arrow = card.querySelector('.armada-card-arrow');
-            if (arrow) {
-                arrow.className = `armada-card-arrow fas ${isSelected ? 'fa-check-circle text-amber-600' : 'fa-chevron-right text-slate-300 group-hover:text-amber-500'} text-[10px] shrink-0 transition-all duration-200`;
+            if (card.classList.contains('is-selected') !== isSelected) {
+                card.classList.toggle('is-selected', isSelected);
+                card.setAttribute('aria-pressed', isSelected ? 'true' : 'false');
+                const arrow = card.querySelector('.armada-card-arrow');
+                if (arrow) {
+                    arrow.classList.toggle('fa-check-circle', isSelected);
+                    arrow.classList.toggle('fa-chevron-right', !isSelected);
+                }
             }
         });
     }
@@ -570,6 +630,7 @@ function updateArmadaVisualPickerSelection(containerId, selectId, badgeId, selec
 }
 
 function renderArmadaVisualPicker(config) {
+    ensureArmadaVisualPickerStyles();
     const {
         containerId,
         selectId,
@@ -588,6 +649,7 @@ function renderArmadaVisualPicker(config) {
         : (select ? String(select.value || '') : '');
 
     if (!items || items.length === 0) {
+        if (container.dataset) container.dataset.armadaPickerSig = '';
         container.innerHTML = `
             <div class="col-span-full py-6 px-4 text-center bg-white rounded-2xl border border-dashed border-slate-200 text-slate-400 text-xs font-bold">
                 <i class="fas fa-bus text-slate-300 text-lg mb-1.5 block"></i>
@@ -598,55 +660,68 @@ function renderArmadaVisualPicker(config) {
         return;
     }
 
-    container.innerHTML = items.map(item => {
+    const resolvedItems = items.map(item => {
         const name = String(item.name || '').trim();
         const profile = getPoProfile(name);
-        const poImg = item.image || (profile && profile.image) || 'damri.webp';
-        const poLogo = item.logo !== undefined ? item.logo : (profile && profile.logo ? profile.logo : '');
-        const subLabel = item.subLabel || '';
+        const origImg = item.image || (profile && profile.image) || 'damri.webp';
+        const origLogo = item.logo !== undefined ? item.logo : (profile && profile.logo ? profile.logo : '');
+        return {
+            name,
+            origImg,
+            poImg: resolveArmadaThumbSrc(origImg),
+            origLogo,
+            poLogo: resolveArmadaThumbSrc(origLogo),
+            subLabel: item.subLabel || ''
+        };
+    });
 
-        return `
+    const sig = resolvedItems.map(i => `${i.name}|${i.poImg}|${i.poLogo}|${i.subLabel}`).join('||');
+    if (!container.dataset || container.dataset.armadaPickerSig !== sig || !container.querySelector('.armada-visual-card')) {
+        if (container.dataset) container.dataset.armadaPickerSig = sig;
+        container.innerHTML = resolvedItems.map(item => `
             <button type="button"
-                data-armada-value="${escapeArmadaHtml(name)}"
+                data-armada-value="${escapeArmadaHtml(item.name)}"
                 aria-pressed="false"
-                class="armada-visual-card group relative flex flex-col text-left rounded-2xl overflow-hidden transition-all duration-200 focus:outline-none active:scale-[0.97] min-w-0 w-full border border-slate-200 bg-white hover:border-amber-300 hover:shadow-md shadow-sm">
+                class="armada-visual-card group relative flex flex-col text-left rounded-2xl overflow-hidden focus:outline-none min-w-0 w-full">
                 <div class="relative w-full aspect-[16/9] sm:aspect-[16/10] bg-slate-900 overflow-hidden shrink-0">
-                    <img src="${escapeArmadaHtml(poImg)}"
-                        alt="${escapeArmadaHtml(name)}"
-                        loading="lazy"
-                        class="w-full h-full object-cover object-center transition-transform duration-500 group-hover:scale-105"
-                        onerror="this.onerror=null; this.src='damri.webp';">
-                    <div class="absolute inset-0 bg-gradient-to-t from-slate-950/75 via-slate-950/10 to-black/15 pointer-events-none"></div>
+                    <img src="${escapeArmadaHtml(item.poImg)}"
+                        alt="${escapeArmadaHtml(item.name)}"
+                        loading="eager"
+                        decoding="async"
+                        class="w-full h-full object-cover object-center"
+                        onerror="this.onerror=null; this.src='${escapeArmadaHtml(item.origImg || 'damri.webp')}';">
+                    <div class="absolute inset-0 bg-gradient-to-t from-slate-950/75 via-transparent to-black/15 pointer-events-none"></div>
 
-                    ${poLogo ? `
-                    <div class="armada-logo-chip absolute top-1.5 left-1.5 sm:top-2 sm:left-2 bg-white/95 backdrop-blur-sm px-1.5 py-0.5 rounded-md shadow-sm border border-white/60 max-w-[54px] pointer-events-none">
-                        <img src="${escapeArmadaHtml(poLogo)}" alt="" class="h-3 sm:h-3.5 w-auto object-contain" onerror="this.parentElement.style.display='none'">
+                    ${item.poLogo ? `
+                    <div class="armada-logo-chip absolute top-1.5 left-1.5 sm:top-2 sm:left-2 bg-white/95 px-1.5 py-0.5 rounded-md shadow-xs border border-white/60 max-w-[54px] pointer-events-none">
+                        <img src="${escapeArmadaHtml(item.poLogo)}" alt="" loading="eager" decoding="async" class="h-3 sm:h-3.5 w-auto object-contain" onerror="this.onerror=null; this.src='${escapeArmadaHtml(item.origLogo)}';">
                     </div>` : ''}
 
-                    <div class="armada-check-badge absolute top-1.5 right-1.5 sm:top-2 sm:right-2 w-5 h-5 sm:w-6 sm:h-6 rounded-full flex items-center justify-center transition-all duration-200 pointer-events-none bg-slate-950/45 border border-white/70 text-transparent backdrop-blur-sm scale-90 group-hover:scale-100">
+                    <div class="armada-check-badge absolute top-1.5 right-1.5 sm:top-2 sm:right-2 w-5 h-5 sm:w-6 sm:h-6 rounded-full flex items-center justify-center pointer-events-none">
                         <i class="fas fa-check text-[9px] sm:text-[10px] font-black"></i>
                     </div>
 
-                    ${subLabel ? `
+                    ${item.subLabel ? `
                     <div class="absolute bottom-1.5 left-2 right-2 flex items-center pointer-events-none">
                         <span class="inline-flex items-center gap-1 text-[8.5px] sm:text-[9px] font-extrabold uppercase tracking-wider text-amber-300 truncate">
-                            <i class="fas fa-bus text-[8px]"></i> ${escapeArmadaHtml(subLabel)}
+                            <i class="fas fa-bus text-[8px]"></i> ${escapeArmadaHtml(item.subLabel)}
                         </span>
                     </div>` : ''}
                 </div>
 
-                <div class="armada-card-footer w-full px-2.5 py-2 sm:px-3 sm:py-2.5 flex items-center justify-between gap-1.5 flex-1 min-h-[38px] sm:min-h-[44px] bg-white transition-colors">
-                    <span class="armada-card-title font-black text-[11px] sm:text-xs uppercase tracking-tight leading-tight line-clamp-2 text-slate-800">${escapeArmadaHtml(name)}</span>
-                    <i class="armada-card-arrow fas fa-chevron-right text-[10px] text-slate-300 shrink-0 transition-all duration-200"></i>
+                <div class="armada-card-footer w-full px-2.5 py-2 sm:px-3 sm:py-2.5 flex items-center justify-between gap-1.5 flex-1 min-h-[38px] sm:min-h-[44px]">
+                    <span class="armada-card-title font-black text-[11px] sm:text-xs uppercase tracking-tight leading-tight line-clamp-2">${escapeArmadaHtml(item.name)}</span>
+                    <i class="armada-card-arrow fas fa-chevron-right text-[10px] shrink-0"></i>
                 </div>
             </button>
-        `;
-    }).join('');
+        `).join('');
+    }
 
     container.onclick = (e) => {
         const btn = e.target.closest('.armada-visual-card');
         if (!btn || !container.contains(btn)) return;
         const val = btn.getAttribute('data-armada-value') || '';
+        updateArmadaVisualPickerSelection(containerId, selectId, badgeId, val);
         if (select) {
             select.value = val;
             if (typeof onSelect === 'function') {
@@ -657,7 +732,6 @@ function renderArmadaVisualPicker(config) {
         } else if (typeof onSelect === 'function') {
             onSelect(val);
         }
-        updateArmadaVisualPickerSelection(containerId, selectId, badgeId, val);
     };
 
     updateArmadaVisualPickerSelection(containerId, selectId, badgeId, currentVal);
