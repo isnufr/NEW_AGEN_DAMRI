@@ -41,7 +41,7 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js?v=2"></script>
     <script src="/socket.io/socket.io.js?v=2"></script>
     <script src="app.js?v=7"></script>
-    <link rel="stylesheet" href="admin.css?v=2.2">
+    <link rel="stylesheet" href="admin.css?v=2.3">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.js"></script>
 </head>
@@ -126,23 +126,23 @@
 
         <!-- Main Content -->
         <div class="flex-1 min-w-0 flex flex-col">
-            <div class="mobile-topbar items-center justify-between">
-                <button onclick="toggleSidebar()" class="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center text-slate-600 hover:bg-slate-200 transition-colors">
-                    <i class="fas fa-bars"></i>
-                </button>
-                <div class="text-center">
-                    <h1 class="text-sm font-black text-slate-900 uppercase tracking-tight leading-none">AGEN DAMRI</h1>
-                    <p class="text-[8px] font-bold text-amber-500 uppercase tracking-widest">KAWUNGANTEN</p>
+            <div class="mobile-topbar items-center justify-between gap-2">
+                <div class="flex items-center gap-2.5 min-w-0">
+                    <img src="logo.png" alt="Logo Agen Damri" class="w-9 h-9 object-contain rounded-xl bg-white p-1 border border-amber-400/60 shadow-sm shrink-0">
+                    <div class="min-w-0">
+                        <h1 class="text-xs sm:text-sm font-black text-slate-900 uppercase tracking-tight leading-none truncate">AGEN DAMRI</h1>
+                        <p class="text-[8px] font-extrabold text-amber-600 uppercase tracking-[0.18em] mt-0.5 truncate">KAWUNGANTEN</p>
+                    </div>
                 </div>
-                <div class="flex items-center gap-2">
-                    <button onclick="toggleDarkMode()" class="w-10 h-10 rounded-xl bg-white flex items-center justify-center text-slate-600 hover:text-amber-500 border border-slate-100 transition-colors dark-mode-btn">
+                <div class="flex items-center gap-1.5 shrink-0">
+                    <button onclick="toggleDarkMode()" class="w-9 h-9 rounded-xl bg-white flex items-center justify-center text-slate-600 hover:text-amber-500 border border-slate-200/80 transition-colors dark-mode-btn shadow-xs" title="Mode Gelap/Terang">
                         <i class="fas fa-moon text-sm"></i>
                     </button>
-                    <button onclick="openNotifModal()" class="relative w-10 h-10 rounded-xl bg-white flex items-center justify-center text-slate-600 hover:text-amber-600 border border-slate-100 transition-colors">
+                    <button onclick="openNotifModal()" class="relative w-9 h-9 rounded-xl bg-white flex items-center justify-center text-slate-600 hover:text-amber-600 border border-slate-200/80 transition-colors shadow-xs" title="Notifikasi">
                         <i class="fas fa-bell text-sm"></i>
                         <span id="notifBadgeMobile" class="absolute -top-1 -right-1 bg-amber-500 text-white text-[9px] font-black w-4 h-4 flex items-center justify-center rounded-full border border-white hidden">0</span>
                     </button>
-                    <button onclick="executeRefresh()" class="w-10 h-10 rounded-xl bg-amber-50 flex items-center justify-center text-amber-600 hover:bg-amber-100 transition-colors">
+                    <button onclick="executeRefresh()" class="w-9 h-9 rounded-xl bg-amber-50 flex items-center justify-center text-amber-600 hover:bg-amber-100 border border-amber-200/60 transition-colors shadow-xs" title="Segarkan Data">
                         <i class="fas fa-sync-alt text-sm"></i>
                     </button>
                 </div>
@@ -180,11 +180,11 @@
                                 <button class="filter-btn flex-1 md:flex-none text-center justify-center" data-filter="year" onclick="setFilter('year')">Tahun Ini</button>
                                 <button class="filter-btn flex-1 md:flex-none text-center justify-center" data-filter="month" onclick="setFilter('month')">Bulan Ini</button>
                             </div>
-                            <div class="flex items-center gap-2 md:ml-auto w-full md:w-auto">
-                                <input type="date" id="filterFrom" class="w-full md:w-auto text-xs font-bold border border-slate-200 rounded-lg px-3 py-2 focus:outline-none focus:border-blue-500" onchange="setFilter('range')">
-                                <span class="text-xs font-bold text-slate-400 shrink-0">s/d</span>
-                                <input type="date" id="filterTo" class="w-full md:w-auto text-xs font-bold border border-slate-200 rounded-lg px-3 py-2 focus:outline-none focus:border-blue-500" onchange="setFilter('range')">
-                                <button onclick="resetDashboardDateFilter()" class="bg-slate-100 text-slate-500 hover:bg-red-50 hover:text-red-500 px-3 py-2 rounded-lg text-sm font-bold transition-colors shadow-sm border border-slate-200 flex-shrink-0" title="Reset Filter">
+                            <div class="flex items-center gap-1.5 sm:gap-2 md:ml-auto w-full md:w-auto min-w-0">
+                                <input type="date" id="filterFrom" class="min-w-0 flex-1 md:flex-none md:w-auto text-[11px] sm:text-xs font-bold border border-slate-200 rounded-lg px-2 sm:px-3 py-2 focus:outline-none focus:border-blue-500" onchange="setFilter('range')">
+                                <span class="text-[11px] sm:text-xs font-bold text-slate-400 shrink-0">s/d</span>
+                                <input type="date" id="filterTo" class="min-w-0 flex-1 md:flex-none md:w-auto text-[11px] sm:text-xs font-bold border border-slate-200 rounded-lg px-2 sm:px-3 py-2 focus:outline-none focus:border-blue-500" onchange="setFilter('range')">
+                                <button onclick="resetDashboardDateFilter()" class="bg-slate-100 text-slate-500 hover:bg-red-50 hover:text-red-500 px-2.5 sm:px-3 py-2 rounded-lg text-sm font-bold transition-colors shadow-sm border border-slate-200 flex-shrink-0" title="Reset Filter">
                                     <i class="fas fa-sync-alt"></i>
                                 </button>
                             </div>
@@ -192,63 +192,63 @@
                     </div>
 
                     <!-- Modern Cards -->
-                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8 fade-up">
+                    <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6 sm:mb-8 fade-up">
                         <!-- Total Booking -->
-                        <div class="bg-gradient-to-br from-slate-800 to-slate-900 rounded-[1.5rem] p-5 text-white shadow-xl shadow-slate-900/20 border border-slate-700 transition-all hover:-translate-y-1 hover:shadow-2xl hover:border-amber-500/50">
-                            <div class="flex flex-row items-center justify-between mb-3">
-                                <div class="flex flex-col">
-                                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest leading-tight">Total Booking</p>
+                        <div class="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl sm:rounded-[1.5rem] p-3.5 sm:p-5 text-white shadow-xl shadow-slate-900/20 border border-slate-700 transition-all hover:-translate-y-1 hover:shadow-2xl hover:border-amber-500/50 min-w-0">
+                            <div class="flex flex-row items-center justify-between gap-2 mb-2.5 sm:mb-3">
+                                <div class="flex flex-col min-w-0">
+                                    <p class="text-[9px] sm:text-[10px] font-bold text-slate-400 uppercase tracking-wider sm:tracking-widest leading-tight">Total Booking</p>
                                 </div>
-                                <div class="w-10 h-10 rounded-xl bg-slate-700 flex items-center justify-center text-amber-500 shadow-inner">
-                                    <i class="fas fa-ticket-alt text-lg"></i>
+                                <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-slate-700 flex items-center justify-center text-amber-500 shadow-inner shrink-0">
+                                    <i class="fas fa-ticket-alt text-sm sm:text-lg"></i>
                                 </div>
                             </div>
-                            <h3 class="text-2xl font-black text-white" id="cardTotalBooking">0</h3>
+                            <h3 class="text-lg sm:text-2xl font-black text-white truncate" id="cardTotalBooking">0</h3>
                         </div>
 
                         <!-- Total Setoran -->
-                        <div class="bg-gradient-to-br from-slate-800 to-slate-900 rounded-[1.5rem] p-5 text-white shadow-xl shadow-slate-900/20 border border-slate-700 transition-all hover:-translate-y-1 hover:shadow-2xl hover:border-amber-500/50">
-                            <div class="flex flex-row items-center justify-between mb-3">
-                                <div class="flex flex-col">
-                                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest leading-tight">Total Setoran</p>
+                        <div class="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl sm:rounded-[1.5rem] p-3.5 sm:p-5 text-white shadow-xl shadow-slate-900/20 border border-slate-700 transition-all hover:-translate-y-1 hover:shadow-2xl hover:border-amber-500/50 min-w-0">
+                            <div class="flex flex-row items-center justify-between gap-2 mb-2.5 sm:mb-3">
+                                <div class="flex flex-col min-w-0">
+                                    <p class="text-[9px] sm:text-[10px] font-bold text-slate-400 uppercase tracking-wider sm:tracking-widest leading-tight">Total Setoran</p>
                                 </div>
-                                <div class="w-10 h-10 rounded-xl bg-slate-700 flex items-center justify-center text-amber-500 shadow-inner">
-                                    <i class="fas fa-file-invoice-dollar text-lg"></i>
+                                <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-slate-700 flex items-center justify-center text-amber-500 shadow-inner shrink-0">
+                                    <i class="fas fa-file-invoice-dollar text-sm sm:text-lg"></i>
                                 </div>
                             </div>
-                            <h3 class="text-2xl font-black truncate text-white" id="cardTotalSetoran">Rp 0</h3>
+                            <h3 class="text-base sm:text-2xl font-black truncate text-white" id="cardTotalSetoran">Rp 0</h3>
                         </div>
 
                         <!-- Total Pendapatan -->
-                        <div class="bg-gradient-to-br from-slate-800 to-slate-900 rounded-[1.5rem] p-5 text-white shadow-xl shadow-slate-900/20 border border-slate-700 transition-all hover:-translate-y-1 hover:shadow-2xl hover:border-amber-500/50">
-                            <div class="flex flex-row items-center justify-between mb-3">
-                                <div class="flex items-center gap-2">
-                                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest leading-tight">Total Pendapatan</p>
-                                    <button type="button" id="btnEyePendapatan" onclick="toggleDashboardNominal('pendapatan')" class="w-6 h-6 rounded-lg bg-slate-700/80 hover:bg-slate-700 text-slate-400 hover:text-amber-400 flex items-center justify-center transition-all text-xs focus:outline-none shadow-xs active:scale-95 cursor-pointer" title="Klik untuk melihat/sembunyikan nominal">
+                        <div class="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl sm:rounded-[1.5rem] p-3.5 sm:p-5 text-white shadow-xl shadow-slate-900/20 border border-slate-700 transition-all hover:-translate-y-1 hover:shadow-2xl hover:border-amber-500/50 min-w-0">
+                            <div class="flex flex-row items-center justify-between gap-1.5 mb-2.5 sm:mb-3">
+                                <div class="flex items-center gap-1.5 min-w-0">
+                                    <p class="text-[9px] sm:text-[10px] font-bold text-slate-400 uppercase tracking-tight sm:tracking-widest leading-tight">Total Pendapatan</p>
+                                    <button type="button" id="btnEyePendapatan" onclick="toggleDashboardNominal('pendapatan')" class="w-5 h-5 sm:w-6 sm:h-6 rounded-lg bg-slate-700/80 hover:bg-slate-700 text-slate-400 hover:text-amber-400 flex items-center justify-center transition-all text-[10px] sm:text-xs focus:outline-none shadow-xs active:scale-95 cursor-pointer shrink-0" title="Klik untuk melihat/sembunyikan nominal">
                                         <i id="eyeIconPendapatan" class="fas fa-eye-slash"></i>
                                     </button>
                                 </div>
-                                <div class="w-10 h-10 rounded-xl bg-slate-700 flex items-center justify-center text-amber-500 shadow-inner">
-                                    <i class="fas fa-chart-line text-lg"></i>
+                                <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-slate-700 flex items-center justify-center text-amber-500 shadow-inner shrink-0">
+                                    <i class="fas fa-chart-line text-sm sm:text-lg"></i>
                                 </div>
                             </div>
-                            <h3 class="text-2xl font-black truncate text-white cursor-pointer select-none hover:opacity-85 transition-opacity" id="cardTotalPendapatan" onclick="toggleDashboardNominal('pendapatan')" title="Klik untuk melihat/sembunyikan nominal">Rp ••••••••</h3>
+                            <h3 class="text-base sm:text-2xl font-black truncate text-white cursor-pointer select-none hover:opacity-85 transition-opacity" id="cardTotalPendapatan" onclick="toggleDashboardNominal('pendapatan')" title="Klik untuk melihat/sembunyikan nominal">Rp ••••••••</h3>
                         </div>
 
                         <!-- Total Omset -->
-                        <div class="bg-gradient-to-br from-slate-800 to-slate-900 rounded-[1.5rem] p-5 text-white shadow-xl shadow-slate-900/20 border border-slate-700 transition-all hover:-translate-y-1 hover:shadow-2xl hover:border-amber-500/50">
-                            <div class="flex flex-row items-center justify-between mb-3">
-                                <div class="flex items-center gap-2">
-                                    <p class="text-[10px] font-bold text-amber-500 uppercase tracking-widest leading-tight">Total Omset</p>
-                                    <button type="button" id="btnEyeOmset" onclick="toggleDashboardNominal('omset')" class="w-6 h-6 rounded-lg bg-slate-700/80 hover:bg-slate-700 text-slate-400 hover:text-amber-400 flex items-center justify-center transition-all text-xs focus:outline-none shadow-xs active:scale-95 cursor-pointer" title="Klik untuk melihat/sembunyikan nominal">
+                        <div class="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl sm:rounded-[1.5rem] p-3.5 sm:p-5 text-white shadow-xl shadow-slate-900/20 border border-slate-700 transition-all hover:-translate-y-1 hover:shadow-2xl hover:border-amber-500/50 min-w-0">
+                            <div class="flex flex-row items-center justify-between gap-1.5 mb-2.5 sm:mb-3">
+                                <div class="flex items-center gap-1.5 min-w-0">
+                                    <p class="text-[9px] sm:text-[10px] font-bold text-amber-500 uppercase tracking-wider sm:tracking-widest leading-tight truncate">Total Omset</p>
+                                    <button type="button" id="btnEyeOmset" onclick="toggleDashboardNominal('omset')" class="w-5 h-5 sm:w-6 sm:h-6 rounded-lg bg-slate-700/80 hover:bg-slate-700 text-slate-400 hover:text-amber-400 flex items-center justify-center transition-all text-[10px] sm:text-xs focus:outline-none shadow-xs active:scale-95 cursor-pointer shrink-0" title="Klik untuk melihat/sembunyikan nominal">
                                         <i id="eyeIconOmset" class="fas fa-eye-slash"></i>
                                     </button>
                                 </div>
-                                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center text-slate-900 shadow-lg shadow-amber-500/30">
-                                    <i class="fas fa-wallet text-lg"></i>
+                                <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center text-slate-900 shadow-lg shadow-amber-500/30 shrink-0">
+                                    <i class="fas fa-wallet text-sm sm:text-lg"></i>
                                 </div>
                             </div>
-                            <h3 class="text-2xl font-black truncate text-transparent bg-clip-text bg-gradient-to-r from-amber-200 to-amber-500 cursor-pointer select-none hover:opacity-85 transition-opacity" id="cardTotalOmset" onclick="toggleDashboardNominal('omset')" title="Klik untuk melihat/sembunyikan nominal">Rp ••••••••</h3>
+                            <h3 class="text-base sm:text-2xl font-black truncate text-transparent bg-clip-text bg-gradient-to-r from-amber-200 to-amber-500 cursor-pointer select-none hover:opacity-85 transition-opacity" id="cardTotalOmset" onclick="toggleDashboardNominal('omset')" title="Klik untuk melihat/sembunyikan nominal">Rp ••••••••</h3>
                         </div>
                     </div>
 
@@ -624,7 +624,7 @@
                             <h2 class="text-2xl font-black text-slate-800 tracking-tight">Pesawat dan Kapal</h2>
                             <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mt-1">Pencatatan booking tiket pesawat &amp; kapal laut manual</p>
                         </div>
-                        <button onclick="openAddEkstraModal()" class="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-slate-900 px-6 py-3 rounded-2xl shadow-xl shadow-amber-500/30 transition-all font-bold text-sm tracking-wide flex items-center gap-2">
+                        <button onclick="openAddEkstraModal()" class="w-full sm:w-auto justify-center bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-slate-900 px-5 sm:px-6 py-3 rounded-2xl shadow-xl shadow-amber-500/30 transition-all font-bold text-xs sm:text-sm tracking-wide flex items-center gap-2">
                             <i class="fas fa-plus"></i>
                             Tambah Tiket Baru
                         </button>
@@ -3025,7 +3025,7 @@
     <!-- ======================================= -->
     <!-- TOAST NOTIFICATION -->
     <!-- ======================================= -->
-    <div id="toast" class="fixed bottom-4 right-4 sm:bottom-8 sm:right-8 transform translate-y-24 opacity-0 transition-all duration-300 z-[200] flex items-center gap-3 bg-slate-900 text-white px-4 sm:px-5 py-2.5 sm:py-3.5 rounded-xl sm:rounded-2xl shadow-2xl border border-slate-700/60 pointer-events-none">
+    <div id="toast" class="fixed bottom-24 left-3 right-3 sm:left-auto sm:bottom-8 sm:right-8 transform translate-y-24 opacity-0 transition-all duration-300 z-[200] flex items-center gap-3 bg-slate-900 text-white px-4 sm:px-5 py-2.5 sm:py-3.5 rounded-xl sm:rounded-2xl shadow-2xl border border-slate-700/60 pointer-events-none">
         <div id="toastIcon" class="w-8 h-8 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0">
             <i class="fas fa-check"></i>
         </div>
@@ -3034,7 +3034,7 @@
 
     <!-- Custom script for admin dashboard -->
     <script src="routes-data.js"></script>
-    <script src="admin.js?v=2.50"></script>
+    <script src="admin.js?v=2.51"></script>
 
     <!-- ======================================= -->
     <!-- DETAIL DATA PELANGGAN & CRM MODAL        -->
@@ -3230,11 +3230,115 @@
         </div>
     </div>
 </div>
-<!-- Floating Booking Button -->
-<button id="floatingBookingBtn" onclick="openBookingModal()" class="fixed bottom-6 right-6 sm:bottom-8 sm:right-8 z-40 bg-gradient-to-r from-amber-400 to-amber-600 hover:from-amber-500 hover:to-amber-700 text-slate-900 rounded-full p-4 sm:px-6 shadow-2xl shadow-amber-500/40 transition-all hover:-translate-y-1 hover:scale-105 flex items-center justify-center gap-3 group" title="Booking Tiket Baru">
-    <i class="fas fa-ticket-alt text-xl sm:text-lg group-hover:rotate-12 transition-transform"></i>
-    <span class="hidden sm:inline-block font-black text-xs uppercase tracking-widest">Booking</span>
+<!-- Floating Booking Button (Desktop Only >= 1024px) -->
+<button id="floatingBookingBtn" onclick="openBookingModal()" class="hidden lg:flex fixed bottom-8 right-8 z-40 bg-gradient-to-r from-amber-400 to-amber-600 hover:from-amber-500 hover:to-amber-700 text-slate-900 rounded-full px-6 py-4 shadow-2xl shadow-amber-500/40 transition-all hover:-translate-y-1 hover:scale-105 items-center justify-center gap-3 group" title="Booking Tiket Baru">
+    <i class="fas fa-ticket-alt text-lg group-hover:rotate-12 transition-transform"></i>
+    <span class="font-black text-xs uppercase tracking-widest">Booking</span>
 </button>
+
+<!-- Mobile More Menu Bottom Sheet (< 1024px) -->
+<div id="mobileMoreMenuOverlay" class="mobile-more-overlay lg:hidden" onclick="closeMobileMoreMenu()"></div>
+<div id="mobileMoreMenuSheet" class="mobile-more-sheet lg:hidden" aria-hidden="true">
+    <div class="w-10 h-1.5 rounded-full bg-slate-300 mx-auto mb-3.5"></div>
+    <div class="flex items-center justify-between mb-4">
+        <div class="flex items-center gap-2.5">
+            <div class="w-9 h-9 rounded-xl bg-amber-100 text-amber-600 flex items-center justify-center text-sm shadow-xs">
+                <i class="fas fa-th-large"></i>
+            </div>
+            <div>
+                <h4 class="text-sm font-black text-slate-800 uppercase tracking-tight leading-none">Menu Lainnya</h4>
+                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">Manajemen &amp; Pengaturan</p>
+            </div>
+        </div>
+        <button type="button" onclick="closeMobileMoreMenu()" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center text-xs transition-colors" aria-label="Tutup Menu Lainnya">
+            <i class="fas fa-times"></i>
+        </button>
+    </div>
+
+    <div class="grid grid-cols-3 gap-2.5 mb-4">
+        <button type="button" class="mobile-more-tile" data-more-menu="pesanan" onclick="selectMobileMoreMenu('pesanan')">
+            <span class="w-10 h-10 rounded-xl bg-blue-100 text-blue-600 flex items-center justify-center text-base shadow-xs">
+                <i class="fas fa-database"></i>
+            </span>
+            <span class="text-[11px] font-extrabold tracking-tight leading-tight text-center">Database</span>
+        </button>
+        <button type="button" class="mobile-more-tile" data-more-menu="armada" onclick="selectMobileMoreMenu('armada')">
+            <span class="w-10 h-10 rounded-xl bg-amber-100 text-amber-600 flex items-center justify-center text-base shadow-xs">
+                <i class="fas fa-bus-alt"></i>
+            </span>
+            <span class="text-[11px] font-extrabold tracking-tight leading-tight text-center">PO &amp; Armada</span>
+        </button>
+        <button type="button" class="mobile-more-tile" data-more-menu="laporan" onclick="selectMobileMoreMenu('laporan')">
+            <span class="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-600 flex items-center justify-center text-base shadow-xs">
+                <i class="fas fa-file-invoice-dollar"></i>
+            </span>
+            <span class="text-[11px] font-extrabold tracking-tight leading-tight text-center">Report</span>
+        </button>
+        <button type="button" class="mobile-more-tile" data-more-menu="iklan" onclick="selectMobileMoreMenu('iklan')">
+            <span class="w-10 h-10 rounded-xl bg-rose-100 text-rose-600 flex items-center justify-center text-base shadow-xs">
+                <i class="fas fa-bullhorn"></i>
+            </span>
+            <span class="text-[11px] font-extrabold tracking-tight leading-tight text-center">Pop Up Iklan</span>
+        </button>
+        <button type="button" class="mobile-more-tile" data-more-menu="kontrol" onclick="selectMobileMoreMenu('kontrol')">
+            <span class="w-10 h-10 rounded-xl bg-purple-100 text-purple-600 flex items-center justify-center text-base shadow-xs">
+                <i class="fas fa-magic"></i>
+            </span>
+            <span class="text-[11px] font-extrabold tracking-tight leading-tight text-center">Kontrol</span>
+        </button>
+        <button type="button" class="mobile-more-tile" data-more-menu="akun" onclick="selectMobileMoreMenu('akun')">
+            <span class="w-10 h-10 rounded-xl bg-cyan-100 text-cyan-600 flex items-center justify-center text-base shadow-xs">
+                <i class="fas fa-users-cog"></i>
+            </span>
+            <span class="text-[11px] font-extrabold tracking-tight leading-tight text-center">Kelola Akun</span>
+        </button>
+    </div>
+
+    <button type="button" onclick="closeMobileMoreMenu(); logout();" class="mobile-more-logout w-full py-3 rounded-2xl bg-red-50 hover:bg-red-100 border border-red-200/80 text-red-600 font-black text-xs uppercase tracking-widest flex items-center justify-center gap-2 transition-all active:scale-[0.98]">
+        <i class="fas fa-sign-out-alt"></i>
+        <span>Keluar / Logout</span>
+    </button>
+</div>
+
+<!-- Mobile Bottom Navigation Bar (< 1024px) -->
+<nav id="mobileBottomNav" class="mobile-bottom-nav lg:hidden" aria-label="Navigasi Mobile">
+    <div class="mobile-bottom-nav-grid">
+        <button type="button" id="mobileNavDashboard" class="mobile-nav-item active" data-mobile-menu="dashboard" onclick="switchMenu('dashboard')" aria-label="Dashboard">
+            <span class="mobile-nav-icon-wrap">
+                <i class="fas fa-chart-pie"></i>
+            </span>
+            <span class="mobile-nav-label">Dashboard</span>
+        </button>
+
+        <button type="button" id="mobileNavManifest" class="mobile-nav-item" data-mobile-menu="today" onclick="switchMenu('today')" aria-label="Manifest">
+            <span class="mobile-nav-icon-wrap">
+                <i class="fas fa-clipboard-list"></i>
+            </span>
+            <span class="mobile-nav-label">Manifest</span>
+        </button>
+
+        <div class="mobile-nav-center-slot">
+            <button type="button" id="mobileCenterBookingBtn" class="mobile-nav-center-btn" onclick="openBookingModal()" aria-label="Booking Tiket">
+                <i class="fas fa-ticket-alt"></i>
+            </button>
+            <span class="mobile-nav-center-caption">Booking</span>
+        </div>
+
+        <button type="button" id="mobileNavEkstra" class="mobile-nav-item" data-mobile-menu="ekstra" onclick="switchMenu('ekstra')" aria-label="Pesawat dan Kapal">
+            <span class="mobile-nav-icon-wrap">
+                <i class="fas fa-plane-departure"></i>
+            </span>
+            <span class="mobile-nav-label">Pesawat &amp; Kapal</span>
+        </button>
+
+        <button type="button" id="mobileNavMore" class="mobile-nav-item" data-mobile-menu="more" onclick="toggleMobileMoreMenu()" aria-label="Lainnya">
+            <span class="mobile-nav-icon-wrap">
+                <i class="fas fa-th-large"></i>
+            </span>
+            <span class="mobile-nav-label">Lainnya</span>
+        </button>
+    </div>
+</nav>
 
 </body>
 </html>

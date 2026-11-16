@@ -136,11 +136,15 @@
     }
 
     // ========================================
-    // SIDEBAR TOGGLE (mobile)
+    // SIDEBAR & MOBILE BOTTOM NAVIGATION
     // ========================================
+    const MOBILE_MORE_MENUS = ['pesanan', 'armada', 'laporan', 'iklan', 'kontrol', 'akun'];
+
     function toggleSidebar() {
-        document.getElementById('sidebar').classList.toggle('open');
-        document.getElementById('sidebarOverlay').classList.toggle('show');
+        const sb = document.getElementById('sidebar');
+        const ov = document.getElementById('sidebarOverlay');
+        if (sb) sb.classList.toggle('open');
+        if (ov) ov.classList.toggle('show');
     }
 
     function closeSidebar() {
@@ -151,12 +155,74 @@
     }
     window.closeSidebar = closeSidebar;
 
+    function syncMobileBottomNav(menu) {
+        const activeMenu = menu || currentMenu || 'dashboard';
+        const isMoreActive = MOBILE_MORE_MENUS.includes(activeMenu);
+
+        document.querySelectorAll('#mobileBottomNav .mobile-nav-item[data-mobile-menu]').forEach(el => {
+            const key = el.dataset.mobileMenu;
+            const shouldActivate = key === 'more' ? isMoreActive : key === activeMenu;
+            el.classList.toggle('active', shouldActivate);
+        });
+
+        document.querySelectorAll('#mobileMoreMenuSheet .mobile-more-tile[data-more-menu]').forEach(tile => {
+            tile.classList.toggle('active', tile.dataset.moreMenu === activeMenu);
+        });
+    }
+
+    function openMobileMoreMenu() {
+        const ov = document.getElementById('mobileMoreMenuOverlay');
+        const sheet = document.getElementById('mobileMoreMenuSheet');
+        if (ov) ov.classList.add('show');
+        if (sheet) {
+            sheet.classList.add('show');
+            sheet.setAttribute('aria-hidden', 'false');
+        }
+        const moreTab = document.getElementById('mobileNavMore');
+        if (moreTab) moreTab.classList.add('active');
+    }
+
+    function closeMobileMoreMenu() {
+        const ov = document.getElementById('mobileMoreMenuOverlay');
+        const sheet = document.getElementById('mobileMoreMenuSheet');
+        if (ov) ov.classList.remove('show');
+        if (sheet) {
+            sheet.classList.remove('show');
+            sheet.setAttribute('aria-hidden', 'true');
+        }
+        syncMobileBottomNav(currentMenu);
+    }
+
+    function toggleMobileMoreMenu() {
+        const sheet = document.getElementById('mobileMoreMenuSheet');
+        if (sheet && sheet.classList.contains('show')) {
+            closeMobileMoreMenu();
+        } else {
+            openMobileMoreMenu();
+        }
+    }
+
+    function selectMobileMoreMenu(menu) {
+        closeMobileMoreMenu();
+        switchMenu(menu);
+    }
+
+    window.openMobileMoreMenu = openMobileMoreMenu;
+    window.closeMobileMoreMenu = closeMobileMoreMenu;
+    window.toggleMobileMoreMenu = toggleMobileMoreMenu;
+    window.selectMobileMoreMenu = selectMobileMoreMenu;
+
     // ========================================
     // MENU SWITCHING
     // ========================================
     function updateFloatingBookingBtn(menu) {
         const btn = document.getElementById('floatingBookingBtn');
         if (!btn) return;
+        if (window.innerWidth < 1024) {
+            btn.classList.add('hidden');
+            btn.style.display = 'none';
+            return;
+        }
         const targetMenu = menu || currentMenu;
         const allowed = ['dashboard', 'today', 'pesanan'];
         if (allowed.includes(targetMenu)) {
@@ -168,6 +234,7 @@
         }
     }
     window.updateFloatingBookingBtn = updateFloatingBookingBtn;
+    window.addEventListener('resize', () => updateFloatingBookingBtn(currentMenu));
 
     function switchMenu(menu) {
         if (menu === 'pelanggan') {
@@ -176,18 +243,28 @@
         }
         currentMenu = menu;
 
-        // Update nav items
+        // Update desktop sidebar nav items
         document.querySelectorAll('.nav-item[data-menu]').forEach(el => {
             el.classList.toggle('active', el.dataset.menu === menu);
         });
+
+        // Sync mobile bottom navigation & close drawer if open
+        syncMobileBottomNav(menu);
+        const sheet = document.getElementById('mobileMoreMenuSheet');
+        if (sheet && sheet.classList.contains('show')) {
+            closeMobileMoreMenu();
+        }
 
         // Update content sections
         document.querySelectorAll('.content-section').forEach(sec => sec.classList.remove('active'));
         const target = document.getElementById('sec-' + menu);
         if (target) target.classList.add('active');
 
-        // Close sidebar on mobile
-        if (window.innerWidth < 1024) closeSidebar();
+        // Close sidebar on mobile & scroll cleanly to top
+        if (window.innerWidth < 1024) {
+            closeSidebar();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
 
         updateFloatingBookingBtn(currentMenu);
         renderAll();
