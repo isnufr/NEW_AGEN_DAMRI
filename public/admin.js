@@ -582,8 +582,8 @@
                     datasets: [{
                         label: 'Omset (Rp)',
                         data: omsetValues,
-                        backgroundColor: 'rgba(59, 130, 246, 0.7)',
-                        borderColor: 'rgba(59, 130, 246, 1)',
+                        backgroundColor: 'rgba(142, 38, 53, 0.85)',
+                        borderColor: '#581820',
                         borderWidth: 1,
                         borderRadius: 6,
                         borderSkipped: false
@@ -597,7 +597,7 @@
                         tooltip: { callbacks: { label: ctx => formatRupiah(ctx.parsed.y) } }
                     },
                     scales: {
-                        y: { beginAtZero: true, ticks: { callback: v => 'Rp ' + (v/1000) + 'rb', font: { size: 10, weight: 'bold' } }, grid: { color: '#f1f5f9' } },
+                        y: { beginAtZero: true, ticks: { callback: v => 'Rp ' + (v/1000) + 'rb', font: { size: 10, weight: 'bold' } }, grid: { color: '#F3E9DC' } },
                         x: { ticks: { font: { size: 10, weight: 'bold' } }, grid: { display: false } }
                     }
                 }
@@ -612,7 +612,7 @@
         });
         const armadaLabels = Object.keys(byArmada);
         const armadaValues = Object.values(byArmada);
-        const armadaColors = ['#3b82f6','#8b5cf6','#10b981','#f59e0b','#ef4444','#06b6d4','#ec4899','#84cc16','#f97316','#6366f1'];
+        const armadaColors = ['#581820','#8E2635','#C5A46D','#A8844A','#6E1D29','#D8BC86','#380D13','#B05562','#8C6B37','#171717'];
 
         if (chartArmadaInstance) chartArmadaInstance.destroy();
         const ctxDonut = document.getElementById('chartArmada');
@@ -643,13 +643,13 @@
                     datasets: [{
                         label: 'Jumlah Penumpang',
                         data: pnpValues,
-                        borderColor: '#10b981',
-                        backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                        borderColor: '#C5A46D',
+                        backgroundColor: 'rgba(197, 164, 109, 0.18)',
                         borderWidth: 2.5,
                         fill: true,
                         tension: 0.4,
                         pointRadius: 4,
-                        pointBackgroundColor: '#10b981',
+                        pointBackgroundColor: '#C5A46D',
                         pointBorderColor: '#fff',
                         pointBorderWidth: 2
                     }]
@@ -659,7 +659,7 @@
                     maintainAspectRatio: false,
                     plugins: { legend: { display: false } },
                     scales: {
-                        y: { beginAtZero: true, ticks: { stepSize: 1, font: { size: 10, weight: 'bold' } }, grid: { color: '#f1f5f9' } },
+                        y: { beginAtZero: true, ticks: { stepSize: 1, font: { size: 10, weight: 'bold' } }, grid: { color: '#F3E9DC' } },
                         x: { ticks: { font: { size: 10, weight: 'bold' } }, grid: { display: false } }
                     }
                 }
@@ -3591,7 +3591,7 @@
             html: htmlContent,
             icon: 'info',
             confirmButtonText: 'Tutup & Kembali',
-            confirmButtonColor: '#f59e0b',
+            confirmButtonColor: '#8E2635',
             customClass: {
                 popup: 'rounded-3xl',
                 title: 'text-xl font-black text-slate-800',
@@ -5081,8 +5081,8 @@ function updateDarkModeIcons(isDark) {
 
 function updateChartColors(isDark) {
     if (typeof Chart === 'undefined') return;
-    const textColor = isDark ? '#94a3b8' : '#64748b';
-    const gridColor = isDark ? 'rgba(51,65,85,0.4)' : 'rgba(0,0,0,0.05)';
+    const textColor = isDark ? '#F3E9DC' : '#581820';
+    const gridColor = isDark ? 'rgba(197,164,109,0.15)' : 'rgba(88,24,32,0.08)';
 
     Chart.defaults.color = textColor;
     Chart.defaults.borderColor = gridColor;
@@ -5887,7 +5887,7 @@ async function editTipeArmadaName(oldName) {
             inputLabel: 'Nama tipe baru:',
             inputPlaceholder: 'Ketik nama tipe...',
             showCancelButton: true,
-            confirmButtonColor: '#f59e0b',
+            confirmButtonColor: '#8E2635',
             cancelButtonColor: '#64748b',
             confirmButtonText: 'Simpan',
             cancelButtonText: 'Batal',
@@ -8851,7 +8851,7 @@ async function addNewPaymentMethodPrompt() {
             showCancelButton: true,
             confirmButtonText: 'Tambahkan',
             cancelButtonText: 'Batal',
-            confirmButtonColor: '#f59e0b',
+            confirmButtonColor: '#8E2635',
             preConfirm: () => {
                 const name = document.getElementById('swal-bank-name').value.trim();
                 const num = document.getElementById('swal-bank-num').value.trim();
@@ -9371,7 +9371,7 @@ async function saveKontrolConfig() {
                     icon: 'success',
                     title: 'Berhasil Disimpan!',
                     text: 'Pengaturan KONTROL telah diperbarui dan langsung aktif di halaman website pelanggan.',
-                    confirmButtonColor: '#f59e0b',
+                    confirmButtonColor: '#8E2635',
                     confirmButtonText: 'Selesai'
                 });
             } else {

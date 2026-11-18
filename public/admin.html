@@ -25,7 +25,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Dashboard Admin untuk Agen Damri Kawunganten. Kelola pemesanan, armada, dan manifest dengan mudah.">
-    <meta name="theme-color" content="#1e40af">
+    <meta name="theme-color" content="#581820">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Admin Damri">
@@ -35,18 +35,63 @@
     <link rel="apple-touch-icon" href="/logoadm-192.png?v=2">
     <title>Admin Dashboard - Agen Damri Kawunganten</title>
     <script src="https://cdn.tailwindcss.com?v=2"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        amber: {
+                            50: '#FBF7F0', 100: '#F3E9DC', 200: '#E6D3B3', 300: '#D8BC86',
+                            400: '#C5A46D', 500: '#C5A46D', 600: '#A8844A', 700: '#8E2635',
+                            800: '#581820', 900: '#380D13', 950: '#171717'
+                        },
+                        yellow: {
+                            50: '#FBF7F0', 100: '#F3E9DC', 200: '#E6D3B3', 300: '#D8BC86',
+                            400: '#C5A46D', 500: '#C5A46D', 600: '#A8844A', 700: '#8E2635',
+                            800: '#581820', 900: '#380D13', 950: '#171717'
+                        },
+                        blue: {
+                            50: '#FBF7F0', 100: '#F3E9DC', 200: '#E5C8C8', 300: '#CFA0A5',
+                            400: '#B05562', 500: '#8E2635', 600: '#8E2635', 700: '#6E1D29',
+                            800: '#581820', 900: '#581820', 950: '#380D13'
+                        },
+                        indigo: {
+                            50: '#FBF7F0', 100: '#F3E9DC', 200: '#E5C8C8', 300: '#CFA0A5',
+                            400: '#B05562', 500: '#8E2635', 600: '#8E2635', 700: '#6E1D29',
+                            800: '#581820', 900: '#581820', 950: '#380D13'
+                        },
+                        sky: {
+                            50: '#FBF7F0', 100: '#F3E9DC', 200: '#E5C8C8', 300: '#CFA0A5',
+                            400: '#B05562', 500: '#8E2635', 600: '#8E2635', 700: '#6E1D29',
+                            800: '#581820', 900: '#581820', 950: '#380D13'
+                        },
+                        slate: {
+                            50: '#FBF7F2', 100: '#F3E9DC', 200: '#E5D7C6', 300: '#D4C2AE',
+                            400: '#9A887B', 500: '#78635A', 600: '#5C4440', 700: '#6E1D29',
+                            800: '#8E2635', 900: '#581820', 950: '#171717'
+                        },
+                        gray: {
+                            50: '#FBF7F2', 100: '#F3E9DC', 200: '#E5D7C6', 300: '#D4C2AE',
+                            400: '#9A887B', 500: '#78635A', 600: '#5C4440', 700: '#3B2B29',
+                            800: '#171717', 900: '#171717', 950: '#171717'
+                        }
+                    }
+                }
+            }
+        };
+    </script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css?v=2">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js?v=2"></script>
     <script src="/socket.io/socket.io.js?v=2"></script>
     <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js"></script>
-    <script src="app.js?v=8"></script>
-    <link rel="stylesheet" href="admin.css?v=2.9">
+    <script src="app.js?v=9"></script>
+    <link rel="stylesheet" href="admin.css?v=3.0">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.js"></script>
 </head>
-<body class="bg-[#f1f5f9] text-gray-800">
+<body class="bg-[#F3E9DC] text-[#171717]">
 
     <div id="loadingOverlay" class="fixed inset-0 bg-white/90  z-[100] flex flex-col items-center justify-center transition-all duration-500">
         <div class="w-20 h-20 border-4 border-amber-200 border-t-amber-600 rounded-full animate-spin mb-4"></div>
@@ -2929,7 +2974,7 @@
 
     <!-- Custom script for admin dashboard -->
     <script src="routes-data.js"></script>
-    <script src="admin.js?v=2.64"></script>
+    <script src="admin.js?v=2.65"></script>
 
     <!-- ======================================= -->
     <!-- DETAIL DATA PELANGGAN & CRM MODAL        -->

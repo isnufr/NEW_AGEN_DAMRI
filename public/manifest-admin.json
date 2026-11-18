@@ -4,8 +4,8 @@
   "description": "Dashboard Admin Pusat Penjualan Tiket Bus, Travel, Pesawat & Kapal Laut Resmi di Kawunganten",
   "start_url": "/admin.html",
   "display": "standalone",
-  "background_color": "#1e40af",
-  "theme_color": "#1e40af",
+  "background_color": "#581820",
+  "theme_color": "#581820",
   "icons": [
     {
       "src": "/logoadm-192.png",

@@ -526,52 +526,52 @@ function ensureArmadaVisualPickerStyles() {
     style.textContent = `
         .armada-visual-card {
             contain: layout style;
-            border: 1.5px solid #e2e8f0;
-            background: #ffffff;
-            box-shadow: 0 2px 6px rgba(15, 23, 42, 0.05);
+            border: 1.5px solid #E5D7C6;
+            background: #FFFFFF;
+            box-shadow: 0 2px 6px rgba(88, 24, 32, 0.06);
             transition: border-color 0.15s ease, box-shadow 0.15s ease, transform 0.12s ease;
         }
         .armada-visual-card:hover {
-            border-color: #fcd34d;
-            box-shadow: 0 6px 14px -4px rgba(15, 23, 42, 0.1);
+            border-color: #C5A46D;
+            box-shadow: 0 6px 14px -4px rgba(88, 24, 32, 0.12);
         }
         .armada-visual-card:active {
             transform: scale(0.97);
         }
         .armada-visual-card.is-selected {
-            border: 2px solid #f59e0b;
-            background: #fffbeb;
-            box-shadow: 0 8px 18px -4px rgba(245, 158, 11, 0.28), 0 0 0 2px rgba(251, 191, 36, 0.28);
+            border: 2px solid #8E2635;
+            background: #FBF7F0;
+            box-shadow: 0 8px 18px -4px rgba(142, 38, 53, 0.25), 0 0 0 2px rgba(197, 164, 109, 0.35);
         }
         .armada-visual-card .armada-check-badge {
-            background: rgba(15, 23, 42, 0.68);
+            background: rgba(88, 24, 32, 0.72);
             border: 1.5px solid rgba(255, 255, 255, 0.78);
             color: transparent;
             transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease;
         }
         .armada-visual-card.is-selected .armada-check-badge {
-            background: #f59e0b;
-            border-color: #ffffff;
-            color: #0f172a;
-            box-shadow: 0 2px 6px rgba(245, 158, 11, 0.45);
+            background: #C5A46D;
+            border-color: #FFFFFF;
+            color: #171717;
+            box-shadow: 0 2px 6px rgba(197, 164, 109, 0.45);
         }
         .armada-visual-card .armada-card-footer {
-            background: #ffffff;
+            background: #FFFFFF;
         }
         .armada-visual-card.is-selected .armada-card-footer {
-            background: linear-gradient(90deg, #fffbeb 0%, #ffffff 100%);
+            background: linear-gradient(90deg, #F3E9DC 0%, #FFFFFF 100%);
         }
         .armada-visual-card .armada-card-title {
-            color: #1e293b;
+            color: #171717;
         }
         .armada-visual-card.is-selected .armada-card-title {
-            color: #78350f;
+            color: #581820;
         }
         .armada-visual-card .armada-card-arrow {
-            color: #cbd5e1;
+            color: #D4C2AE;
         }
         .armada-visual-card.is-selected .armada-card-arrow {
-            color: #d97706;
+            color: #8E2635;
         }
         .booking-modal-scroll {
             -webkit-overflow-scrolling: touch;

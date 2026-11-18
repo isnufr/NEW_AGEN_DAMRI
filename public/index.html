@@ -26,7 +26,7 @@
     <link rel="icon" href="/favicon.ico" sizes="any">
     <link rel="icon" type="image/png" sizes="192x192" href="/logoadm-192.png">
     <link rel="apple-touch-icon" href="/logoadm-192.png">
-    <meta name="theme-color" content="#1e40af">
+    <meta name="theme-color" content="#581820">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Agen Damri">
@@ -36,11 +36,56 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AGEN BUS KAWUNGANTEN - Tiket Bus, Travel, Pesawat & Kapal</title>
     <script src="https://cdn.tailwindcss.com?v=2"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        amber: {
+                            50: '#FBF7F0', 100: '#F3E9DC', 200: '#E6D3B3', 300: '#D8BC86',
+                            400: '#C5A46D', 500: '#C5A46D', 600: '#A8844A', 700: '#8E2635',
+                            800: '#581820', 900: '#380D13', 950: '#171717'
+                        },
+                        yellow: {
+                            50: '#FBF7F0', 100: '#F3E9DC', 200: '#E6D3B3', 300: '#D8BC86',
+                            400: '#C5A46D', 500: '#C5A46D', 600: '#A8844A', 700: '#8E2635',
+                            800: '#581820', 900: '#380D13', 950: '#171717'
+                        },
+                        blue: {
+                            50: '#FBF7F0', 100: '#F3E9DC', 200: '#E5C8C8', 300: '#CFA0A5',
+                            400: '#B05562', 500: '#8E2635', 600: '#8E2635', 700: '#6E1D29',
+                            800: '#581820', 900: '#581820', 950: '#380D13'
+                        },
+                        indigo: {
+                            50: '#FBF7F0', 100: '#F3E9DC', 200: '#E5C8C8', 300: '#CFA0A5',
+                            400: '#B05562', 500: '#8E2635', 600: '#8E2635', 700: '#6E1D29',
+                            800: '#581820', 900: '#581820', 950: '#380D13'
+                        },
+                        sky: {
+                            50: '#FBF7F0', 100: '#F3E9DC', 200: '#E5C8C8', 300: '#CFA0A5',
+                            400: '#B05562', 500: '#8E2635', 600: '#8E2635', 700: '#6E1D29',
+                            800: '#581820', 900: '#581820', 950: '#380D13'
+                        },
+                        slate: {
+                            50: '#FBF7F2', 100: '#F3E9DC', 200: '#E5D7C6', 300: '#D4C2AE',
+                            400: '#9A887B', 500: '#78635A', 600: '#5C4440', 700: '#6E1D29',
+                            800: '#8E2635', 900: '#581820', 950: '#171717'
+                        },
+                        gray: {
+                            50: '#FBF7F2', 100: '#F3E9DC', 200: '#E5D7C6', 300: '#D4C2AE',
+                            400: '#9A887B', 500: '#78635A', 600: '#5C4440', 700: '#3B2B29',
+                            800: '#171717', 900: '#171717', 950: '#171717'
+                        }
+                    }
+                }
+            }
+        };
+    </script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js?v=2"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
     <script src="/socket.io/socket.io.js"></script>
-    <script src="app.js?v=8" defer></script>
+    <script src="app.js?v=9" defer></script>
 
     <script>
         function handleLogoError(img) {
@@ -59,19 +104,27 @@
 
         body {
             font-family: 'Inter', sans-serif;
+            background-color: #F3E9DC;
+            color: #171717;
+        }
+
+        [class*="from-amber-"][class*="text-slate-9"],
+        [class*="bg-amber-4"][class*="text-slate-9"],
+        [class*="bg-amber-5"][class*="text-slate-9"] {
+            color: #171717 !important;
         }
 
         .bg-tertiary {
-            background-color: #f59e0b;
-            /* Gold/Amber */
+            background-color: #C5A46D;
+            /* Antique Gold */
         }
 
         .text-tertiary {
-            color: #f59e0b;
+            color: #8E2635;
         }
 
         .border-tertiary {
-            border-color: #f59e0b;
+            border-color: #C5A46D;
         }
 
         .transition-all {
@@ -79,7 +132,7 @@
         }
 
         .hero-pattern {
-            background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #020617 100%);
+            background: linear-gradient(135deg, #380D13 0%, #581820 50%, #8E2635 100%);
             position: relative;
             overflow: hidden;
         }
@@ -90,7 +143,7 @@
             height: 60vw;
             max-width: 800px;
             max-height: 800px;
-            background: radial-gradient(circle, rgba(245, 158, 11, 0.15) 0%, rgba(0, 0, 0, 0) 70%);
+            background: radial-gradient(circle, rgba(197, 164, 109, 0.22) 0%, rgba(0, 0, 0, 0) 70%);
             top: -20%;
             left: -10%;
             border-radius: 50%;
@@ -105,7 +158,7 @@
             height: 70vw;
             max-width: 900px;
             max-height: 900px;
-            background: radial-gradient(circle, rgba(253, 230, 138, 0.1) 0%, rgba(0, 0, 0, 0) 70%);
+            background: radial-gradient(circle, rgba(142, 38, 53, 0.25) 0%, rgba(0, 0, 0, 0) 70%);
             bottom: -30%;
             right: -10%;
             border-radius: 50%;
@@ -125,21 +178,21 @@
         }
 
         .glass-badge {
-            background: rgba(255, 255, 255, 0.05);
+            background: rgba(255, 255, 255, 0.07);
             backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
-            border: 1px solid rgba(245, 158, 11, 0.4);
-            color: #fcd34d;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(197, 164, 109, 0.5);
+            color: #C5A46D;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.15);
         }
 
         .glass-search {
-            background: rgba(255, 255, 255, 0.98);
+            background: #FFFFFF;
             backdrop-filter: blur(15px);
             -webkit-backdrop-filter: blur(15px);
-            border: 1px solid rgba(245, 158, 11, 0.2);
-            border-top: 4px solid #f59e0b;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
+            border: 1px solid rgba(197, 164, 109, 0.35);
+            border-top: 4px solid #C5A46D;
+            box-shadow: 0 25px 50px -12px rgba(88, 24, 32, 0.22);
             border-radius: 1.5rem;
         }
 
@@ -209,22 +262,22 @@
             justify-content: center;
             gap: 0.5rem;
             padding: 0.4rem 0.75rem;
-            background-color: #f8fafc;
-            border: 1px solid #e2e8f0;
+            background-color: #FBF7F0;
+            border: 1px solid #E5D7C6;
             border-radius: 10px;
             font-size: 11px;
             font-weight: 700;
-            color: #334155;
+            color: #581820;
             transition: all 0.2s ease;
             text-align: center;
         }
 
         .destination-tag:hover {
-            background-color: #1e40af;
-            color: white;
-            border-color: #1e40af;
+            background-color: #8E2635;
+            color: #FFFFFF;
+            border-color: #8E2635;
             transform: translateY(-2px);
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 6px -1px rgba(88, 24, 32, 0.18);
         }
 
         .price-badge {
@@ -299,17 +352,17 @@
         }
 
         .modern-card {
-            background: white;
+            background: #FFFFFF;
             border-radius: 2rem;
-            border: 1px solid #f1f5f9;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            border: 1px solid #E5D7C6;
+            box-shadow: 0 4px 6px -1px rgba(88, 24, 32, 0.06);
             transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .modern-card:hover {
             transform: translateY(-8px);
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-            border-color: #1e40af;
+            box-shadow: 0 20px 25px -5px rgba(88, 24, 32, 0.12), 0 10px 10px -5px rgba(88, 24, 32, 0.05);
+            border-color: #C5A46D;
         }
 
         /* Perbaikan Responsivitas Tiket & Modal */
@@ -371,8 +424,8 @@
         }
 
         .time-badge {
-            background: #eff6ff;
-            color: #1e40af;
+            background: #FBF7F0;
+            color: #581820;
             padding: 0.4rem 0.8rem;
             border-radius: 0.75rem;
             font-weight: 800;
@@ -381,12 +434,12 @@
             align-items: center;
             justify-content: center;
             gap: 0.35rem;
-            border: 1px solid #dbeafe;
+            border: 1px solid #E6D3B3;
             width: fit-content;
         }
 
         .ticket-perforation {
-            background-image: linear-gradient(to right, #cbd5e1 50%, rgba(255, 255, 255, 0) 0%);
+            background-image: linear-gradient(to right, #D4C2AE 50%, rgba(255, 255, 255, 0) 0%);
             background-position: bottom;
             background-size: 12px 1px;
             background-repeat: repeat-x;
@@ -395,25 +448,25 @@
         }
 
         .ticket-blue-panel {
-            background-color: #516cb0 !important;
+            background: linear-gradient(135deg, #581820 0%, #8E2635 100%) !important;
         }
 
         /* Modern Form Styling */
         .form-input-focus {
             transition: all 0.3s ease;
-            border: 2px solid #f1f5f9;
+            border: 2px solid #E5D7C6;
         }
 
         .form-input-focus:focus {
-            border-color: #1e40af;
-            background-color: white;
-            box-shadow: 0 10px 15px -3px rgba(30, 64, 175, 0.1);
+            border-color: #8E2635;
+            background-color: #FFFFFF;
+            box-shadow: 0 10px 15px -3px rgba(142, 38, 53, 0.12);
         }
 
         .input-label {
             font-size: 10px;
             font-weight: 800;
-            color: #64748b;
+            color: #78635A;
             text-transform: uppercase;
             letter-spacing: 0.1em;
             margin-bottom: 0.5rem;
@@ -451,13 +504,13 @@
 
         /* Button Price Toggle */
         .btn-price {
-            background: #f0f9ff;
-            color: #0369a1;
+            background: #FBF7F0;
+            color: #8E2635;
             font-size: 10px;
             font-weight: 800;
             padding: 8px 12px;
             border-radius: 12px;
-            border: 1px dashed #bae6fd;
+            border: 1px dashed #C5A46D;
             cursor: pointer;
             transition: all 0.3s ease;
             display: flex;
@@ -469,8 +522,8 @@
         }
 
         .btn-price:hover {
-            background: #0369a1;
-            color: white;
+            background: #8E2635;
+            color: #FFFFFF;
             border-style: solid;
         }
 
@@ -485,8 +538,8 @@
             gap: 5px;
             padding: 8px 6px;
             border-radius: 12px;
-            background: #f1f5f9;
-            color: #64748b;
+            background: #F3E9DC;
+            color: #581820;
             font-size: 11px;
             font-weight: 800;
             transition: all 0.25s ease;
@@ -503,21 +556,22 @@
         }
 
         .cust-wizard-step.active {
-            background: linear-gradient(135deg, #f59e0b, #d97706);
-            color: #ffffff;
-            box-shadow: 0 4px 14px rgba(245, 158, 11, 0.35);
+            background: linear-gradient(135deg, #8E2635, #581820);
+            color: #FFFFFF;
+            box-shadow: 0 4px 14px rgba(142, 38, 53, 0.35);
         }
 
         .cust-wizard-step.completed {
-            background: #e0f2fe;
-            color: #0369a1;
+            background: #FBF7F0;
+            color: #8E2635;
+            border: 1px solid #C5A46D;
         }
 
         .cust-wizard-num {
             width: 20px;
             height: 20px;
             border-radius: 50%;
-            background: rgba(0, 0, 0, 0.08);
+            background: rgba(88, 24, 32, 0.1);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -535,18 +589,18 @@
         }
 
         .cust-wizard-step.active .cust-wizard-num {
-            background: #ffffff;
-            color: #d97706;
+            background: #C5A46D;
+            color: #171717;
         }
 
         .cust-wizard-step.completed .cust-wizard-num {
-            background: #0284c7;
-            color: #ffffff;
+            background: #8E2635;
+            color: #FFFFFF;
         }
     </style>
 </head>
 
-<body class="bg-gray-50/50 selection:bg-blue-600 selection:text-white overflow-x-hidden">
+<body class="bg-[#F3E9DC] text-[#171717] selection:bg-[#8E2635] selection:text-white overflow-x-hidden">
     <!-- Pop-up Modal Booking (3 TAHAPAN INTERAKTIF) -->
     <div id="bookingModal"
         class="hidden fixed inset-0 z-[300] bg-slate-950/75 flex items-center justify-center p-2 sm:p-4 overflow-y-auto">

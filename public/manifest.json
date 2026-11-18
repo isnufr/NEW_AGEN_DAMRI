@@ -4,8 +4,8 @@
   "description": "Pusat Penjualan Tiket Bus, Travel, Pesawat & Kapal Laut Resmi dan Terpercaya di Kawunganten Cilacap",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#1e40af",
-  "theme_color": "#1e40af",
+  "background_color": "#581820",
+  "theme_color": "#581820",
   "icons": [
     {
       "src": "/logo.png",

@@ -4,55 +4,81 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login Admin - Agen Damri Kawunganten</title>
+    <meta name="theme-color" content="#581820">
     <link rel="manifest" href="/manifest-admin.json">
     <link rel="icon" href="/favicon.ico" sizes="any">
     <link rel="icon" type="image/png" sizes="192x192" href="/logoadm-192.png">
     <link rel="apple-touch-icon" href="/logoadm-192.png">
     <script src="https://cdn.tailwindcss.com?v=2"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        burgundy: '#581820',
+                        maroon: '#8E2635',
+                        gold: '#C5A46D',
+                        cream: '#F3E9DC',
+                        dark: '#171717',
+                        amber: {
+                            50: '#FBF7F0', 100: '#F3E9DC', 200: '#E6D3B3', 300: '#D8BC86',
+                            400: '#C5A46D', 500: '#C5A46D', 600: '#A8844A', 700: '#8E2635',
+                            800: '#581820', 900: '#380D13', 950: '#171717'
+                        },
+                        slate: {
+                            50: '#FBF7F2', 100: '#F3E9DC', 200: '#E5D7C6', 300: '#D4C2AE',
+                            400: '#9A887B', 500: '#78635A', 600: '#5C4440', 700: '#6E1D29',
+                            800: '#8E2635', 900: '#581820', 950: '#171717'
+                        }
+                    }
+                }
+            }
+        };
+    </script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
-    <script src="app.js?v=6" defer></script>
+    <script src="app.js?v=9" defer></script>
     <style>
-        body { font-family: 'Inter', sans-serif; background-color: #0f172a; }
-        .bg-pattern { background-image: radial-gradient(rgba(245, 158, 11, 0.2) 1px, transparent 1px); background-size: 20px 20px; opacity: 0.15; }
+        body { font-family: 'Inter', sans-serif; background-color: #581820; }
+        .bg-pattern { background-image: radial-gradient(rgba(197, 164, 109, 0.25) 1px, transparent 1px); background-size: 20px 20px; opacity: 0.2; }
     </style>
 </head>
-<body class="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-950 relative min-h-screen flex items-center justify-center overflow-hidden">
+<body class="bg-gradient-to-br from-[#380D13] via-[#581820] to-[#8E2635] relative min-h-screen flex items-center justify-center overflow-hidden">
     <!-- Pattern Background -->
     <div class="absolute inset-0 bg-pattern pointer-events-none z-0"></div>
 
     <!-- Login Card -->
-    <div class="relative z-10 bg-slate-800/80 backdrop-blur-xl p-8 sm:p-10 rounded-[2.5rem] shadow-2xl shadow-black/50 border border-slate-700 max-w-md w-full mx-4">
+    <div class="relative z-10 bg-[#581820]/85 backdrop-blur-xl p-8 sm:p-10 rounded-[2.5rem] shadow-2xl shadow-black/50 border border-[#C5A46D]/35 max-w-md w-full mx-4">
         <div class="text-center mb-8">
-            <div class="w-20 h-20 rounded-[1.5rem] mx-auto mb-4 flex items-center justify-center shadow-[0_0_30px_rgba(245,158,11,0.3)] ring-4 ring-amber-500/20 ring-offset-4 ring-offset-slate-800">
+            <div class="w-20 h-20 rounded-[1.5rem] mx-auto mb-4 flex items-center justify-center shadow-[0_0_30px_rgba(197,164,109,0.35)] ring-4 ring-[#C5A46D]/30 ring-offset-4 ring-offset-[#581820]">
                 <img src="logo.png" alt="Logo" class="w-full h-full object-contain rounded-[1.5rem] bg-white p-2">
             </div>
             <h1 class="text-3xl font-black text-white tracking-tighter uppercase italic">Admin Panel</h1>
-            <p class="text-xs font-bold text-amber-500 uppercase tracking-widest mt-2">Agen Damri Kawunganten</p>
+            <p class="text-xs font-bold text-[#C5A46D] uppercase tracking-widest mt-2">Agen Damri Kawunganten</p>
         </div>
 
         <form id="loginForm" onsubmit="handleLogin(event)" class="space-y-5">
             <div>
-                <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Username</label>
+                <label class="block text-[10px] font-black text-[#F3E9DC]/80 uppercase tracking-widest mb-2">Username</label>
                 <div class="relative">
-                    <i class="fas fa-user absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                    <i class="fas fa-user absolute left-4 top-1/2 -translate-y-1/2 text-[#C5A46D]"></i>
                     <input type="text" id="username" required
-                        class="w-full bg-slate-900/50 border border-slate-700 text-white text-sm rounded-2xl focus:ring-2 focus:ring-amber-500 focus:border-amber-500 block pl-11 p-4 font-bold outline-none transition-all placeholder:text-slate-500"
+                        class="w-full bg-[#380D13]/65 border border-[#C5A46D]/35 text-white text-sm rounded-2xl focus:ring-2 focus:ring-[#C5A46D] focus:border-[#C5A46D] block pl-11 p-4 font-bold outline-none transition-all placeholder:text-[#F3E9DC]/45"
                         placeholder="Masukkan username">
                 </div>
             </div>
             <div>
-                <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Password</label>
+                <label class="block text-[10px] font-black text-[#F3E9DC]/80 uppercase tracking-widest mb-2">Password</label>
                 <div class="relative">
-                    <i class="fas fa-lock absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                    <i class="fas fa-lock absolute left-4 top-1/2 -translate-y-1/2 text-[#C5A46D]"></i>
                     <input type="password" id="password" required
-                        class="w-full bg-slate-900/50 border border-slate-700 text-white text-sm rounded-2xl focus:ring-2 focus:ring-amber-500 focus:border-amber-500 block pl-11 p-4 font-bold outline-none transition-all placeholder:text-slate-500"
+                        class="w-full bg-[#380D13]/65 border border-[#C5A46D]/35 text-white text-sm rounded-2xl focus:ring-2 focus:ring-[#C5A46D] focus:border-[#C5A46D] block pl-11 p-4 font-bold outline-none transition-all placeholder:text-[#F3E9DC]/45"
                         placeholder="Masukkan password">
                 </div>
             </div>
             
             <button type="submit" id="loginBtn"
-                class="w-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-slate-900 rounded-2xl py-4 px-5 text-sm font-black uppercase tracking-widest shadow-[0_10px_20px_-10px_rgba(245,158,11,0.5)] transition-all active:scale-95 flex justify-center items-center gap-2 mt-4">
+                class="w-full bg-gradient-to-r from-[#D8BC86] via-[#C5A46D] to-[#A8844A] hover:from-[#C5A46D] hover:to-[#8C6B37] text-[#171717] rounded-2xl py-4 px-5 text-sm font-black uppercase tracking-widest shadow-[0_10px_24px_-8px_rgba(197,164,109,0.55)] transition-all active:scale-95 flex justify-center items-center gap-2 mt-4">
                 <i class="fas fa-sign-in-alt"></i> MASUK
             </button>
         </form>
@@ -60,8 +86,8 @@
         <!-- Custom Alert -->
         <div id="loginAlert" class="hidden mt-4 p-4 rounded-xl text-center text-xs font-bold uppercase tracking-widest transition-all"></div>
 
-        <div class="mt-8 text-center border-t border-slate-700 pt-6">
-            <a href="index.html" class="text-[10px] font-black text-slate-400 hover:text-amber-500 uppercase tracking-widest transition-colors">
+        <div class="mt-8 text-center border-t border-[#C5A46D]/25 pt-6">
+            <a href="index.html" class="text-[10px] font-black text-[#F3E9DC]/75 hover:text-[#C5A46D] uppercase tracking-widest transition-colors">
                 <i class="fas fa-arrow-left mr-1"></i> Kembali ke Beranda
             </a>
         </div>
