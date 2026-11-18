@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <link rel="manifest" href="/manifest-admin.json">
-    <link rel="icon" href="/favicon.ico" sizes="any">
-    <link rel="icon" type="image/png" sizes="192x192" href="/logoadm-192.png">
-    <link rel="apple-touch-icon" href="/logoadm-192.png">
+    <link rel="manifest" href="/manifest-admin.json?v=3">
+    <link rel="icon" href="/favicon.ico?v=3" sizes="any">
+    <link rel="icon" type="image/png" sizes="192x192" href="/logoadm-192.png?v=3">
+    <link rel="apple-touch-icon" href="/logoadm-192.png?v=3">
     <script>
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
@@ -29,10 +29,8 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Admin Damri">
-    <link rel="icon" href="favicon.ico" type="image/x-icon">
-    <link rel="apple-touch-icon" href="/logoadm-192.png">
-    <link rel="icon" href="favicon.ico?v=2" type="image/x-icon">
-    <link rel="apple-touch-icon" href="/logoadm-192.png?v=2">
+    <link rel="icon" href="favicon.ico?v=3" type="image/x-icon">
+    <link rel="apple-touch-icon" href="/logoadm-192.png?v=3">
     <title>Admin Dashboard - Agen Damri Kawunganten</title>
     <script src="https://cdn.tailwindcss.com?v=2"></script>
     <script>
@@ -87,16 +85,25 @@
     <script src="/socket.io/socket.io.js?v=2"></script>
     <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js"></script>
     <script src="app.js?v=9"></script>
-    <link rel="stylesheet" href="admin.css?v=3.0">
+    <link rel="stylesheet" href="admin.css?v=3.1">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.js"></script>
 </head>
 <body class="bg-[#F3E9DC] text-[#171717]">
 
-    <div id="loadingOverlay" class="fixed inset-0 bg-white/90  z-[100] flex flex-col items-center justify-center transition-all duration-500">
-        <div class="w-20 h-20 border-4 border-amber-200 border-t-amber-600 rounded-full animate-spin mb-4"></div>
-        <h2 class="text-xl font-black text-slate-900 tracking-tighter uppercase italic">MENSINKRONISASI DATA...</h2>
-        <p class="text-sm font-bold text-gray-500 mt-2 animate-pulse">Menghubungkan ke Server Database</p>
+    <div id="loadingOverlay" class="luxury-loader-overlay fixed inset-0 z-[100] flex flex-col items-center justify-center transition-opacity duration-500">
+        <div class="luxury-loader-ring-wrap mb-6">
+            <div class="luxury-loader-orbit-outer"></div>
+            <div class="luxury-loader-orbit-inner"></div>
+            <div class="luxury-loader-logo-box">
+                <img src="logo.png?v=3" alt="Logo Agen Damri" class="w-full h-full object-contain">
+            </div>
+        </div>
+        <h2 class="luxury-loader-shimmer-text text-xl sm:text-2xl font-black tracking-wider uppercase italic text-center px-4">AGEN DAMRI KAWUNGANTEN</h2>
+        <p class="text-[11px] font-extrabold text-[#C5A46D] uppercase tracking-[0.25em] mt-2 animate-pulse">MENSINKRONISASI DATA...</p>
+        <div class="luxury-loader-bar-track mt-5">
+            <div class="luxury-loader-bar-fill"></div>
+        </div>
     </div>
 
     <!-- Sidebar Overlay (mobile) -->
@@ -109,7 +116,7 @@
         <aside id="sidebar" class="sidebar flex flex-col shrink-0">
             <div class="px-6 pt-6 pb-4">
                 <div class="flex items-center gap-3 mb-1">
-                    <img src="logo.png" alt="Logo" class="w-10 h-10 object-contain rounded-xl shadow-[0_0_15px_rgba(245,158,11,0.5)] bg-white p-1 ring-2 ring-amber-500/50">
+                    <img src="logo.png?v=3" alt="Logo" class="w-10 h-10 object-contain rounded-xl shadow-[0_0_15px_rgba(197,164,109,0.45)] bg-white p-1 ring-2 ring-[#C5A46D]/60">
                     <div>
                         <h1 class="text-sm font-black text-white tracking-tight uppercase leading-none">AGEN DAMRI</h1>
                         <p class="text-[9px] font-bold text-slate-500 uppercase tracking-widest mt-0.5">KAWUNGANTEN</p>
@@ -174,7 +181,7 @@
         <div class="flex-1 min-w-0 flex flex-col">
             <div class="mobile-topbar items-center justify-between gap-2">
                 <div class="flex items-center gap-2.5 min-w-0">
-                    <img src="logo.png" alt="Logo Agen Damri" class="w-9 h-9 object-contain rounded-xl bg-white p-1 border border-amber-400/60 shadow-sm shrink-0">
+                    <img src="logo.png?v=3" alt="Logo Agen Damri" class="w-9 h-9 object-contain rounded-xl bg-white p-1 border border-[#C5A46D]/70 shadow-sm shrink-0">
                     <div class="min-w-0">
                         <h1 class="text-xs sm:text-sm font-black text-slate-900 uppercase tracking-tight leading-none truncate">AGEN DAMRI</h1>
                         <p class="text-[8px] font-extrabold text-amber-600 uppercase tracking-[0.18em] mt-0.5 truncate">KAWUNGANTEN</p>

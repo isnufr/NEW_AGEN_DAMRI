@@ -2,7 +2,7 @@
 <html lang="id" class="overflow-x-hidden scroll-smooth">
 
 <head>
-    <link rel="manifest" href="/manifest.json">
+    <link rel="manifest" href="/manifest.json?v=3">
     <script>
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
@@ -23,9 +23,9 @@
 
         gtag('config', 'G-8REM8EXNBD');
     </script>
-    <link rel="icon" href="/favicon.ico" sizes="any">
-    <link rel="icon" type="image/png" sizes="192x192" href="/logoadm-192.png">
-    <link rel="apple-touch-icon" href="/logoadm-192.png">
+    <link rel="icon" href="/favicon.ico?v=3" sizes="any">
+    <link rel="icon" type="image/png" sizes="192x192" href="/logoadm-192.png?v=3">
+    <link rel="apple-touch-icon" href="/logoadm-192.png?v=3">
     <meta name="theme-color" content="#581820">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -597,10 +597,121 @@
             background: #8E2635;
             color: #FFFFFF;
         }
+
+        /* Luxury Burgundy Gold Loading Screen */
+        .luxury-loader-overlay {
+            background: radial-gradient(circle at 50% 40%, rgba(142, 38, 53, 0.94) 0%, rgba(88, 24, 32, 0.98) 55%, rgba(36, 8, 12, 0.99) 100%) !important;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+        .luxury-loader-ring-wrap {
+            position: relative;
+            width: 120px;
+            height: 120px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .luxury-loader-orbit-outer {
+            position: absolute;
+            inset: 2px;
+            border-radius: 9999px;
+            border: 2.5px solid rgba(197, 164, 109, 0.16);
+            border-top-color: #C5A46D;
+            border-right-color: rgba(197, 164, 109, 0.65);
+            animation: luxurySpin 2.2s cubic-bezier(0.5, 0.15, 0.5, 0.85) infinite;
+        }
+        .luxury-loader-orbit-inner {
+            position: absolute;
+            inset: 11px;
+            border-radius: 9999px;
+            border: 2px solid rgba(243, 233, 220, 0.12);
+            border-bottom-color: #D8BC86;
+            border-left-color: rgba(216, 188, 134, 0.55);
+            animation: luxurySpinReverse 1.8s linear infinite;
+        }
+        .luxury-loader-logo-box {
+            width: 76px;
+            height: 76px;
+            border-radius: 1.25rem;
+            background: #FFFFFF;
+            padding: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid rgba(197, 164, 109, 0.65);
+            animation: luxuryPulseGlow 2.4s ease-in-out infinite;
+            z-index: 2;
+        }
+        .luxury-loader-shimmer-text {
+            background: linear-gradient(90deg, #D8BC86 0%, #FFFFFF 50%, #C5A46D 100%);
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: luxuryTextShimmer 3s linear infinite;
+        }
+        .luxury-loader-bar-track {
+            width: 180px;
+            height: 4px;
+            border-radius: 9999px;
+            background: rgba(243, 233, 220, 0.16);
+            overflow: hidden;
+            position: relative;
+        }
+        .luxury-loader-bar-fill {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 45%;
+            border-radius: 9999px;
+            background: linear-gradient(90deg, transparent, #C5A46D, #FFF5E4, #C5A46D, transparent);
+            animation: luxuryBarSlide 1.5s ease-in-out infinite;
+        }
+        @keyframes luxurySpin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        @keyframes luxurySpinReverse {
+            0% { transform: rotate(360deg); }
+            100% { transform: rotate(0deg); }
+        }
+        @keyframes luxuryPulseGlow {
+            0%, 100% {
+                transform: scale(1);
+                box-shadow: 0 0 24px rgba(197, 164, 109, 0.35), inset 0 0 12px rgba(197, 164, 109, 0.12);
+            }
+            50% {
+                transform: scale(1.045);
+                box-shadow: 0 0 38px rgba(197, 164, 109, 0.65), inset 0 0 16px rgba(197, 164, 109, 0.22);
+            }
+        }
+        @keyframes luxuryTextShimmer {
+            0% { background-position: 0% center; }
+            100% { background-position: 200% center; }
+        }
+        @keyframes luxuryBarSlide {
+            0% { left: -45%; }
+            100% { left: 100%; }
+        }
     </style>
 </head>
 
 <body class="bg-[#F3E9DC] text-[#171717] selection:bg-[#8E2635] selection:text-white overflow-x-hidden">
+    <!-- Elegant Burgundy Gold Splash Loading Overlay -->
+    <div id="publicLoadingOverlay" class="luxury-loader-overlay fixed inset-0 z-[500] flex flex-col items-center justify-center transition-opacity duration-500">
+        <div class="luxury-loader-ring-wrap mb-6">
+            <div class="luxury-loader-orbit-outer"></div>
+            <div class="luxury-loader-orbit-inner"></div>
+            <div class="luxury-loader-logo-box">
+                <img src="logo.png?v=3" alt="Logo Agen Damri" class="w-full h-full object-contain">
+            </div>
+        </div>
+        <h2 class="luxury-loader-shimmer-text text-xl sm:text-2xl font-black tracking-wider uppercase italic text-center px-4">AGEN DAMRI KAWUNGANTEN</h2>
+        <p class="text-[11px] font-extrabold text-[#C5A46D] uppercase tracking-[0.25em] mt-2 animate-pulse">MEMUAT LAYANAN TERBAIK...</p>
+        <div class="luxury-loader-bar-track mt-5">
+            <div class="luxury-loader-bar-fill"></div>
+        </div>
+    </div>
     <!-- Pop-up Modal Booking (3 TAHAPAN INTERAKTIF) -->
     <div id="bookingModal"
         class="hidden fixed inset-0 z-[300] bg-slate-950/75 flex items-center justify-center p-2 sm:p-4 overflow-y-auto">
@@ -965,7 +1076,7 @@
         <div class="container mx-auto px-4 md:px-8 py-3 flex justify-between items-center">
             <div class="flex items-center gap-3">
                 <a href="#home" class="flex items-center gap-2 group text-center">
-                    <img id="headerLogo" src="logobiru.webp" alt="Logo Agen Damri"
+                    <img id="headerLogo" src="logobiru.webp?v=3" alt="Logo Agen Damri"
                         class="h-10 md:h-14 w-auto object-contain transition-transform group-hover:scale-105"
                         onerror="handleLogoError(this)">
                     <div id="logoFallback" class="hidden flex items-center gap-2 text-center">
@@ -1568,6 +1679,16 @@
 
         let fleetData = [];
 
+        // Hide luxury splash loader smoothly
+        function hidePublicLoadingOverlay() {
+            const ov = document.getElementById('publicLoadingOverlay');
+            if (!ov || ov.dataset.hidden) return;
+            ov.dataset.hidden = 'true';
+            ov.classList.add('opacity-0', 'pointer-events-none');
+            setTimeout(() => ov.classList.add('hidden'), 500);
+        }
+        setTimeout(hidePublicLoadingOverlay, 900);
+
         // Mengambil data dari Database saat halaman dimuat
         window.addEventListener('DOMContentLoaded', async () => {
             const dateInput = document.getElementById('bookTanggal');
@@ -1594,6 +1715,8 @@
                 }
             } catch (e) {
                 console.error("Gagal memuat data armada", e);
+            } finally {
+                hidePublicLoadingOverlay();
             }
         });
 
@@ -2779,7 +2902,7 @@
                 
                 <!-- WATERMARK LOGO (Positioned at background) -->
                 <div class="absolute inset-0 flex items-center justify-center pointer-events-none z-0">
-                    <img src="logo.png" alt="" class="w-4/5 h-auto opacity-[0.25] object-contain" onerror="this.style.display='none'">
+                    <img src="logo.png?v=3" alt="" class="w-4/5 h-auto opacity-[0.25] object-contain" onerror="this.style.display='none'">
                 </div>
 
                 <!-- TICKET CONTENT (Layered on top) -->
