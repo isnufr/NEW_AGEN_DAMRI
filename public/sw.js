@@ -1,9 +1,9 @@
-const CACHE_NAME = 'damri-cache-v57';
+const CACHE_NAME = 'damri-cache-v59';
 const urlsToCache = [
   '/',
   '/index.html',
   '/admin.html',
-  '/app.js?v=9',
+  '/app.js?v=10',
   '/admin.css?v=3.1',
   '/logo.png?v=3',
   '/logobiru.webp?v=3',

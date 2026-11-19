@@ -217,16 +217,39 @@ async function initData() {
         }
 
         if (bData && Array.isArray(bData)) {
+            const normTime = (s) => String(s || '').trim().replace(':', '.');
+            const findBestArmada = (bArmada, bTujuan, bWaktu, bUnitPrice) => {
+                const cleanTujuan = String(bTujuan || '').replace(/^\[PULANG\]\s*/i, '').trim();
+                const cleanWaktu = normTime(bWaktu);
+                const candidates = cachedArmadas.filter(a =>
+                    (a.name === bArmada || bArmada.includes(a.name) || a.name.includes(bArmada)) &&
+                    (a.destination === cleanTujuan || cleanTujuan.includes(a.destination) || a.destination.includes(cleanTujuan))
+                );
+                if (!candidates.length) return null;
+                let best = candidates[0];
+                let bestScore = -1;
+                for (const a of candidates) {
+                    let score = 0;
+                    if (a.isActive !== false) score += 100;
+                    if (cleanWaktu && normTime(a.time) === cleanWaktu) score += 50;
+                    if (a.name.toUpperCase() === bArmada.toUpperCase()) score += 30;
+                    if (a.destination.toUpperCase() === cleanTujuan.toUpperCase()) score += 25;
+                    if (bUnitPrice > 0 && parseInt(a.price, 10) === bUnitPrice) score += 20;
+                    if (score > bestScore) {
+                        bestScore = score;
+                        best = a;
+                    }
+                }
+                return best;
+            };
+
             cachedBookings = bData.map(b => {
                 const bArmada = b["JENIS KENDARAAN"] ? String(b["JENIS KENDARAAN"]).trim() : "";
                 const bTujuan = b["Tujuan"] ? String(b["Tujuan"]).trim() : "";
-                
-                const armadaMatch = cachedArmadas.find(a => 
-                    // Bandingkan sebagian string karena bisa saja di boking namanya "DAMRI JAKARTA" tapi di armada cuma "DAMRI"
-                    (a.name === bArmada || bArmada.includes(a.name) || a.name.includes(bArmada)) 
-                    && 
-                    (a.destination === bTujuan || bTujuan.includes(a.destination) || a.destination.includes(bTujuan))
-                );
+                const bWaktu = b["WAKTU"] ? String(b["WAKTU"]).trim() : "";
+                const bUnitPrice = parseInt(b["Harga"]) || 0;
+
+                const armadaMatch = findBestArmada(bArmada, bTujuan, bWaktu, bUnitPrice);
                 
                 let statusLocal = "waiting_payment";
                 const bStatus = b["Status"] ? String(b["Status"]).toUpperCase() : "";
@@ -263,7 +286,8 @@ async function initData() {
                     armadaId: armadaMatch ? armadaMatch.id : "UNKNOWN",
                     tujuan: bTujuan,
                     qty: parseInt(b["JUMLAH PNP"]) || 1,
-                    totalPrice: parseInt(b["Total Harga"]) || parseInt(b["Harga"]) || 0,
+                    unitPrice: bUnitPrice,
+                    totalPrice: parseInt(b["Total Harga"]) || bUnitPrice || 0,
                     status: statusLocal,
                     dateCreated: b["Timestamp"] || "",
                     dateTravel: tgl,

@@ -331,36 +331,44 @@
         return isNaN(dFallback.getTime()) ? null : dFallback;
     }
 
+    function parseLocalDateInput(rawDate) {
+        if (!rawDate) return null;
+        const parts = String(rawDate).split('T')[0].split('-');
+        if (parts.length !== 3) return null;
+        const y = parseInt(parts[0], 10), m = parseInt(parts[1], 10), d = parseInt(parts[2], 10);
+        if (!y || !m || !d) return null;
+        return new Date(y, m - 1, d);
+    }
+
+    function getActiveHargaKhususRule(armada, dateObj) {
+        if (!armada || !dateObj || typeof fetchAllHargaKhusus !== 'function') return null;
+        const hkList = typeof cachedHargaKhusus !== 'undefined' ? cachedHargaKhusus : [];
+        if (!hkList || !hkList.length) return null;
+        const selectedDate = new Date(dateObj.getFullYear(), dateObj.getMonth(), dateObj.getDate()).getTime();
+        const allArmadas = getArmadas();
+        const activeMatches = allArmadas.filter(arm => arm.isActive !== false && arm.name === armada.name && arm.destination === armada.destination);
+        const matchingArmadaIds = (activeMatches.length > 0
+            ? activeMatches
+            : allArmadas.filter(arm => arm.name === armada.name && arm.destination === armada.destination)
+        ).map(arm => arm.id);
+
+        return hkList.find(hk => {
+            if (!matchingArmadaIds.includes(hk.idArmada)) return false;
+            const [sY, sM, sD] = String(hk.tanggalAwal).split('T')[0].split('-');
+            const [eY, eM, eD] = String(hk.tanggalAkhir).split('T')[0].split('-');
+            const start = new Date(parseInt(sY, 10), parseInt(sM, 10) - 1, parseInt(sD, 10)).getTime();
+            const end = new Date(parseInt(eY, 10), parseInt(eM, 10) - 1, parseInt(eD, 10)).getTime();
+            return selectedDate >= start && selectedDate <= end;
+        }) || null;
+    }
+
     function getEffectiveHarga(armada, dateObj) {
         if (!armada) return 0;
-        let finalHarga = armada.price;
-        
-        if (dateObj && typeof fetchAllHargaKhusus === 'function') {
-            const hkList = typeof cachedHargaKhusus !== 'undefined' ? cachedHargaKhusus : [];
-            const selectedDate = new Date(dateObj.getFullYear(), dateObj.getMonth(), dateObj.getDate()).getTime();
-            
-            const allArmadas = getArmadas();
-            const matchingArmadaIds = allArmadas
-                .filter(arm => arm.name === armada.name && arm.destination === armada.destination)
-                .map(arm => arm.id);
-                
-            const activeHk = hkList.find(hk => {
-                if (!matchingArmadaIds.includes(hk.idArmada)) return false;
-                
-                const [sY, sM, sD] = String(hk.tanggalAwal).split('T')[0].split('-');
-                const [eY, eM, eD] = String(hk.tanggalAkhir).split('T')[0].split('-');
-                
-                const start = new Date(sY, parseInt(sM)-1, sD).getTime();
-                const end = new Date(eY, parseInt(eM)-1, eD).getTime();
-                
-                return selectedDate >= start && selectedDate <= end;
-            });
-            
-            if (activeHk) {
-                finalHarga = parseInt(activeHk.hargaBaru) || armada.price;
-            }
+        const activeHk = getActiveHargaKhususRule(armada, dateObj);
+        if (activeHk) {
+            return parseInt(activeHk.hargaBaru, 10) || armada.price;
         }
-        return finalHarga;
+        return armada.price;
     }
 
     function toDateKey(d) {
@@ -1413,8 +1421,9 @@
             if (!rawKet) rawKet = '-';
         }
         
+        const savedTotal = parseInt(b.totalPrice) || 0;
         const expectedTotal = armada ? parseInt(armada.price) * (parseInt(b.qty) || 1) : 0;
-        const total = Math.max(parseInt(b.totalPrice) || 0, expectedTotal + nominalBiayaTambahan);
+        const total = savedTotal > 0 ? savedTotal : (expectedTotal + nominalBiayaTambahan);
 
         const bTicketId = b.bookingId || b.id || id;
         const bAlamat = b.alamat || b['ALAMAT'] || b['Alamat'] || b.titikKumpul || b['TITIK KUMPUL'] || '-';
@@ -3369,10 +3378,16 @@
             ? `${INDO_DAYS[dObj.getDay()]}, ${dObj.getDate()} ${INDO_MONTHS[dObj.getMonth()]} ${dObj.getFullYear()}`
             : (b.dateTravel || '-');
         const qty = parseInt(b.qty, 10) || 1;
-        const harga = getEffectiveHarga(armada, dObj);
-        const totalHargaData = (b.totalHarga !== undefined && b.totalHarga !== null)
+        const extraParsedForTicket = parseBiayaTambahanData(b.keterangan || b.ket || '', qty);
+        const rawTotalForTicket = (b.totalHarga !== undefined && b.totalHarga !== null)
             ? parseInt(String(b.totalHarga).replace(/[^0-9]/g, ''), 10)
-            : (b.total !== undefined && b.total !== null ? parseInt(String(b.total).replace(/[^0-9]/g, ''), 10) : (harga * qty));
+            : (b.total !== undefined && b.total !== null ? parseInt(String(b.total).replace(/[^0-9]/g, ''), 10) : 0);
+        const derivedTicketUnit = rawTotalForTicket > 0
+            ? Math.max(0, Math.round((rawTotalForTicket - extraParsedForTicket.totalBiayaTambahan) / qty))
+            : 0;
+        const storedUnitHarga = (parseInt(b.unitPrice, 10) || 0) || derivedTicketUnit;
+        const harga = storedUnitHarga > 0 ? storedUnitHarga : getEffectiveHarga(armada, dObj);
+        const totalHargaData = rawTotalForTicket > 0 ? rawTotalForTicket : ((harga * qty) + extraParsedForTicket.totalBiayaTambahan);
         const isPaid = (b.status === 'paid' || b.status === 'Lunas' || b.status === 'ACC' || b.status === 'LUNAS');
 
         renderAndShowThermalTicket({
@@ -3604,6 +3619,16 @@
     // ========================================
     // EDIT MODAL LOGIC
     // ========================================
+    function getEditSelectableArmadas(fallbackArmada = null) {
+        const all = getArmadas();
+        const active = all.filter(a => a.isActive !== false);
+        const list = active.length > 0 ? [...active] : [...all];
+        if (fallbackArmada && !list.some(a => a.id === fallbackArmada.id)) {
+            list.push(fallbackArmada);
+        }
+        return list;
+    }
+
     function openEditBookingModal(id) {
         const b = getBooking(id);
         if(!b) return;
@@ -3626,12 +3651,18 @@
             document.querySelector('input[name="editBookingHasBiayaTambahan"][value="no"]').checked = true;
         }
         if(document.getElementById('editBookingKeterangan')) document.getElementById('editBookingKeterangan').value = rawKet;
+
+        const formEl = document.getElementById('formEditBooking');
+        if (formEl) {
+            formEl.dataset.isPulang = String(b.tujuan || '').startsWith('[PULANG] ') ? '1' : '0';
+        }
+
         toggleEditBiayaTambahan();
         document.getElementById('editBookingPnp').value = b.qty;
         const prefillKursi = (b.kursi && b.kursi !== '-') ? b.kursi.split(',').map(s=>s.trim()).filter(Boolean) : [];
         editBookingSelectedSeats = new Set(prefillKursi);
         updateEditBookingSeatDisplay();
-        const currentArmadaForEdit = b.armadaId ? getArmada(b.armadaId) : null;
+        const currentArmadaForEdit = b.armadaId && b.armadaId !== 'UNKNOWN' ? getArmada(b.armadaId) : null;
         if (typeof loadEditBookingSeatMap === 'function') {
             loadEditBookingSeatMap(b.bookingId, currentArmadaForEdit, b.dateTravel, prefillKursi);
         }
@@ -3647,31 +3678,41 @@
             document.getElementById('editBookingDate').value = '';
         }
 
-        const armadas = getArmadas();
-        const uniqueNames = [...new Set(armadas.map(a => a.name))];
+        const selectableArmadas = getEditSelectableArmadas(currentArmadaForEdit);
+        const uniqueNames = [...new Set(selectableArmadas.map(a => a.name))];
         const nameSelect = document.getElementById('editBookingArmadaName');
         nameSelect.innerHTML = '<option value="">-- Pilih Armada --</option>' + uniqueNames.map(n => `<option value="${n}">${n}</option>`).join('');
         document.getElementById('editBookingArmadaRute').innerHTML = '';
         document.getElementById('editBookingArmadaJam').innerHTML = '';
         document.getElementById('editBookingArmada').value = '';
         
-        if (b.armadaId) {
-            const currentArmada = getArmada(b.armadaId);
-            if (currentArmada) {
-                nameSelect.value = currentArmada.name;
-                updateEditBookingRute();
-                document.getElementById('editBookingArmadaRute').value = currentArmada.destination;
-                updateEditBookingJam();
-                
-                // Fix: Prioritaskan waktu dari data booking jika ada dan valid
-                const bWaktu = b.waktu || b['WAKTU'];
-                const jamSelect = document.getElementById('editBookingArmadaJam');
-                const jamOptions = Array.from(jamSelect.options).map(o => o.value);
-                const waktuToSelect = (bWaktu && jamOptions.includes(bWaktu)) ? bWaktu : currentArmada.time;
-                jamSelect.value = waktuToSelect;
-                
-                updateEditBookingArmadaId();
-            }
+        if (currentArmadaForEdit) {
+            nameSelect.value = currentArmadaForEdit.name;
+            updateEditBookingRute();
+            document.getElementById('editBookingArmadaRute').value = currentArmadaForEdit.destination;
+            updateEditBookingJam();
+            
+            // Fix: Prioritaskan waktu dari data booking jika ada dan valid
+            const bWaktu = b.waktu || b['WAKTU'];
+            const jamSelect = document.getElementById('editBookingArmadaJam');
+            const jamOptions = Array.from(jamSelect.options).map(o => o.value);
+            const waktuToSelect = (bWaktu && jamOptions.includes(bWaktu)) ? bWaktu : currentArmadaForEdit.time;
+            jamSelect.value = waktuToSelect;
+            
+            updateEditBookingArmadaId(true);
+        }
+
+        // Preserve existing booked unit price so editing date doesn't silently revert to an older price
+        const qtyNum = Math.max(1, parseInt(b.qty, 10) || 1);
+        const derivedFromTotal = (parseInt(b.totalPrice, 10) > 0)
+            ? Math.max(0, Math.round((parseInt(b.totalPrice, 10) - parsedEditBiaya.totalBiayaTambahan) / qtyNum))
+            : 0;
+        const resolvedArmada = getArmada(document.getElementById('editBookingArmada').value) || currentArmadaForEdit;
+        const savedUnitHarga = (parseInt(b.unitPrice, 10) || 0) || derivedFromTotal;
+        const initialHarga = savedUnitHarga > 0 ? savedUnitHarga : getEffectiveHarga(resolvedArmada, dObj);
+        const hargaInput = document.getElementById('editBookingHargaSatuan');
+        if (hargaInput) {
+            hargaInput.value = initialHarga > 0 ? initialHarga : 0;
         }
 
         recalcEditBooking();
@@ -3698,7 +3739,10 @@
     }
 
     function updateEditBookingRute() {
-        const armadas = getArmadas();
+        const id = document.getElementById('editBookingId')?.value;
+        const b = id ? getBooking(id) : null;
+        const fallbackArmada = b && b.armadaId ? getArmada(b.armadaId) : null;
+        const armadas = getEditSelectableArmadas(fallbackArmada);
         const name = document.getElementById('editBookingArmadaName').value;
         const ruteSelect = document.getElementById('editBookingArmadaRute');
         
@@ -3712,7 +3756,10 @@
     }
 
     function updateEditBookingJam() {
-        const armadas = getArmadas();
+        const id = document.getElementById('editBookingId')?.value;
+        const b = id ? getBooking(id) : null;
+        const fallbackArmada = b && b.armadaId ? getArmada(b.armadaId) : null;
+        const armadas = getEditSelectableArmadas(fallbackArmada);
         const name = document.getElementById('editBookingArmadaName').value;
         const rute = document.getElementById('editBookingArmadaRute').value;
         const jamSelect = document.getElementById('editBookingArmadaJam');
@@ -3725,19 +3772,56 @@
         recalcEditBooking();
     }
 
-    function updateEditBookingArmadaId() {
+    function updateEditBookingArmadaId(keepExistingPrice = false) {
         const armadas = getArmadas();
         const name = document.getElementById('editBookingArmadaName').value;
         const rute = document.getElementById('editBookingArmadaRute').value;
         const jam = document.getElementById('editBookingArmadaJam').value;
         
-        const armada = armadas.find(a => a.name === name && a.destination === rute && a.time === jam);
+        const activeMatch = armadas.find(a => a.isActive !== false && a.name === name && a.destination === rute && a.time === jam);
+        const armada = activeMatch || armadas.find(a => a.name === name && a.destination === rute && a.time === jam);
         if (armada) {
             document.getElementById('editBookingArmada').value = armada.id;
+            if (!keepExistingPrice) {
+                const rawDate = document.getElementById('editBookingDate')?.value;
+                const dObjForHarga = parseLocalDateInput(rawDate);
+                const hargaInput = document.getElementById('editBookingHargaSatuan');
+                if (hargaInput) {
+                    hargaInput.value = getEffectiveHarga(armada, dObjForHarga);
+                }
+            }
         } else {
             document.getElementById('editBookingArmada').value = '';
         }
         recalcEditBooking();
+    }
+
+    function onEditBookingDateChange() {
+        const armadaId = document.getElementById('editBookingArmada')?.value;
+        const armada = getArmada(armadaId);
+        const rawDate = document.getElementById('editBookingDate')?.value;
+        const dObjForHarga = parseLocalDateInput(rawDate);
+        const hargaInput = document.getElementById('editBookingHargaSatuan');
+
+        // Only update price on date change when an active Harga Khusus rule matches the new date;
+        // otherwise preserve the booking's existing ticket price.
+        if (armada && dObjForHarga && hargaInput) {
+            const activeHk = getActiveHargaKhususRule(armada, dObjForHarga);
+            if (activeHk && parseInt(activeHk.hargaBaru, 10) > 0) {
+                hargaInput.value = parseInt(activeHk.hargaBaru, 10);
+            }
+        }
+
+        recalcEditBooking();
+
+        const id = document.getElementById('editBookingId')?.value;
+        if (typeof loadEditBookingSeatMap === 'function' && rawDate) {
+            const b = id ? getBooking(id) : null;
+            const prevSeats = editBookingSelectedSeats.size > 0
+                ? [...editBookingSelectedSeats]
+                : ((b && b.kursi && b.kursi !== '-') ? b.kursi.split(',').map(s => s.trim()).filter(Boolean) : []);
+            loadEditBookingSeatMap(id, armada, rawDate, prevSeats);
+        }
     }
 
     let editLastPnp = 0;
@@ -3804,18 +3888,21 @@
         updateBiayaTambahanHint('editBookingBiayaTambahanTotalHint', nominalBiayaPerTiket, qty);
         
         const rawDate = document.getElementById('editBookingDate').value;
-        let dObjForHarga = null;
-        if (rawDate) {
-            dObjForHarga = new Date(rawDate);
-        } else {
+        let dObjForHarga = parseLocalDateInput(rawDate);
+        if (!dObjForHarga) {
             const id = document.getElementById('editBookingId').value;
             const b = cachedBookings.find(bk => bk.bookingId === id);
             if (b) dObjForHarga = parseIndoDate(b.dateTravel);
         }
         
-        if(armada) {
-            const harga = getEffectiveHarga(armada, dObjForHarga);
-            const total = (harga * qty) + totalBiayaTambahan;
+        const hargaInput = document.getElementById('editBookingHargaSatuan');
+        const inputVal = hargaInput ? parseInt(hargaInput.value, 10) : NaN;
+        const unitHarga = (!isNaN(inputVal) && inputVal > 0)
+            ? inputVal
+            : (armada ? getEffectiveHarga(armada, dObjForHarga) : 0);
+
+        if (unitHarga > 0 || totalBiayaTambahan > 0) {
+            const total = (unitHarga * qty) + totalBiayaTambahan;
             document.getElementById('editBookingTotalDisplay').innerText = formatRupiah(total);
         } else {
             document.getElementById('editBookingTotalDisplay').innerText = 'Rp 0';
@@ -3849,7 +3936,11 @@
         const kursiString = editBookingSelectedSeats.size > 0 ? [...editBookingSelectedSeats].join(', ') : '';
 
         const dObjForHarga = parseIndoDate(formattedDate);
-        const hargaEff = getEffectiveHarga(armada, dObjForHarga);
+        const hargaInputVal = parseInt(document.getElementById('editBookingHargaSatuan')?.value || '0', 10) || 0;
+        const hargaEff = hargaInputVal > 0 ? hargaInputVal : getEffectiveHarga(armada, dObjForHarga);
+        const isPulang = document.getElementById('formEditBooking')?.dataset?.isPulang === '1';
+        const baseDest = armada ? armada.destination : '';
+        const finalTujuan = (isPulang && baseDest && !baseDest.startsWith('[PULANG] ')) ? ('[PULANG] ' + baseDest) : baseDest;
         
         let finalKet = document.getElementById('editBookingKeterangan') ? document.getElementById('editBookingKeterangan').value.trim() : '';
         const hasBiayaTambahan = document.querySelector('input[name="editBookingHasBiayaTambahan"]:checked').value === 'yes';
@@ -3870,7 +3961,7 @@
             keterangan: finalKet,
             tanggalPemberangkatan: formattedDate,
             jenisKendaraan: armada ? armada.name : '',
-            tujuan: armada ? armada.destination : '',
+            tujuan: finalTujuan,
             jumlahPnp: qty,
             nomorKursi: kursiString,
             harga: hargaEff,
@@ -3900,23 +3991,43 @@
     function openEditArmadaModal(id) {
         try {
             const a = getArmada(id);
-            if(!a) return;
-            
+            if (!a) return;
+
             document.getElementById('editArmadaId').value = a.id;
             document.getElementById('editArmadaIdDisplay').innerText = a.id;
             document.getElementById('editArmadaNama').value = a.name;
             document.getElementById('editArmadaTujuan').value = a.destination;
             document.getElementById('editArmadaJam').value = a.time;
             document.getElementById('editArmadaHarga').value = a.price;
-            document.getElementById('editArmadaSeat').value = a.capacity;
-            if (document.getElementById('editArmadaTipe')) document.getElementById('editArmadaTipe').value = a.tipeArmada || 'Bus Besar';
-            if (typeof populateDenahDropdown === 'function') populateDenahDropdown('editArmadaDenah', a.denahId, a.tipeArmada);
+
+            const seatEl = document.getElementById('editArmadaSeat');
+            if (seatEl) seatEl.value = a.capacity;
+
+            const targetTipe = a.tipeArmada || 'Bus Besar';
+            const tipeEl = document.getElementById('editArmadaTipe');
+            if (tipeEl) {
+                if (![...tipeEl.options].some(o => o.value === targetTipe)) {
+                    const opt = document.createElement('option');
+                    opt.value = targetTipe;
+                    opt.textContent = targetTipe;
+                    tipeEl.appendChild(opt);
+                }
+                tipeEl.value = targetTipe;
+            }
+
+            const formEl = document.getElementById('formEditArmada');
+            if (formEl) {
+                formEl.dataset.origCapacity = String(a.capacity || '');
+                formEl.dataset.origTipe = targetTipe;
+            }
+
+            if (typeof populateDenahDropdown === 'function') populateDenahDropdown('editArmadaDenah', a.denahId, targetTipe);
 
             const m = document.getElementById('modalEditArmada');
             const c = document.getElementById('modalEditArmadaContent');
-            
+
             if (m) document.body.appendChild(m); // Safety append
-            
+
             m.classList.remove('hidden');
             m.classList.add('flex');
             setTimeout(() => {
@@ -3926,7 +4037,7 @@
                 }
             }, 10);
         } catch (e) {
-            Swal.fire('Error openEdit', e.message, 'error');
+            Swal.fire({ icon: 'error', title: 'Error openEdit', text: e.message, confirmButtonColor: '#8E2635' });
         }
     }
 
@@ -3952,14 +4063,20 @@
 
         const tipeVal = document.getElementById('editArmadaTipe')?.value || 'Bus Besar';
         const denahVal = document.getElementById('editArmadaDenah')?.value || null;
-        
+        const formEl = document.getElementById('formEditArmada');
+        const origCapacity = parseInt(formEl?.dataset?.origCapacity || '0', 10);
+        const origTipe = formEl?.dataset?.origTipe || '';
+
         let calculatedSeat = 0;
         if (denahVal && typeof getDenah === 'function') {
             const dObj = getDenah(denahVal);
             if (dObj && dObj.totalKursi) calculatedSeat = dObj.totalKursi;
         }
+        if (!calculatedSeat && !denahVal && origCapacity > 0 && tipeVal === origTipe) {
+            calculatedSeat = origCapacity;
+        }
         if (!calculatedSeat) {
-            const defaultSeatsByType = { 'Hiace': 14, 'Bus Besar': 40, 'Long Elf': 19, 'Medium Bus': 31, 'Elf Short': 12, 'Innova / MPV': 7 };
+            const defaultSeatsByType = { 'Hiace': 14, 'Bus Besar': 40, 'Long Elf': 19, 'Medium Bus': 31, 'Elf Short': 12, 'Innova / MPV': 7, 'Innova/MPV': 7 };
             calculatedSeat = defaultSeatsByType[tipeVal] || 40;
         }
 
@@ -4268,28 +4385,7 @@
             finalKet = finalKet ? `${finalKet}, ${ketTambahanText}` : ketTambahanText;
         }
 
-        let finalHargaSatuan = armada ? armada.price : 0;
-        
-        if (armada && rawDate && typeof fetchAllHargaKhusus === 'function') {
-            const hkList = cachedHargaKhusus || [];
-            const selectedDate = new Date(rawDate).getTime();
-            
-            const allArmadas = getArmadas();
-            const matchingArmadaIds = allArmadas
-                .filter(arm => arm.name === armada.name && arm.destination === armada.destination)
-                .map(arm => arm.id);
-                
-            const activeHk = hkList.find(hk => {
-                if (!matchingArmadaIds.includes(hk.idArmada)) return false;
-                const start = new Date(hk.tanggalAwal).getTime();
-                const end = new Date(hk.tanggalAkhir).getTime();
-                return selectedDate >= start && selectedDate <= end;
-            });
-            
-            if (activeHk) {
-                finalHargaSatuan = parseInt(activeHk.hargaBaru) || armada.price;
-            }
-        }
+        let finalHargaSatuan = getEffectiveHarga(armada, dObj);
         
         const total = armada ? (finalHargaSatuan * qty) + nominalBiayaTambahan : 0;
         
@@ -6304,6 +6400,8 @@ async function submitEditPo(e) {
     if (typeof openEditBookingModal !== 'undefined') window.openEditBookingModal = openEditBookingModal;
     if (typeof closeEditBookingModal !== 'undefined') window.closeEditBookingModal = closeEditBookingModal;
     if (typeof submitEditBooking !== 'undefined') window.submitEditBooking = submitEditBooking;
+    if (typeof onEditBookingDateChange !== 'undefined') window.onEditBookingDateChange = onEditBookingDateChange;
+    if (typeof recalcEditBooking !== 'undefined') window.recalcEditBooking = recalcEditBooking;
     
     if (typeof openAddArmadaModal !== 'undefined') window.openAddArmadaModal = openAddArmadaModal;
     if (typeof closeAddArmadaModal !== 'undefined') window.closeAddArmadaModal = closeAddArmadaModal;
