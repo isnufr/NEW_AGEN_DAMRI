@@ -301,6 +301,32 @@
         #bookingModal .armada-check-badge {
             transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease !important;
         }
+        /* Smooth collapsible accordion for Seat Map in Booking & Edit Modals */
+        .seat-collapse-wrapper {
+            display: grid;
+            grid-template-rows: 0fr;
+            transition: grid-template-rows 0.36s cubic-bezier(0.25, 1, 0.5, 1) !important;
+        }
+        .seat-collapse-wrapper.expanded {
+            grid-template-rows: 1fr;
+        }
+        .seat-collapse-inner {
+            overflow: hidden;
+            min-height: 0;
+            opacity: 0;
+            transform: translateY(-6px);
+            transition: opacity 0.28s ease, transform 0.32s cubic-bezier(0.25, 1, 0.5, 1) !important;
+        }
+        .seat-collapse-wrapper.expanded .seat-collapse-inner {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .seat-collapse-chevron {
+            transition: transform 0.32s cubic-bezier(0.25, 1, 0.5, 1) !important;
+        }
+        .seat-collapse-header.is-expanded .seat-collapse-chevron {
+            transform: rotate(180deg);
+        }
 
         /* Base body */
         body.dark-mode {

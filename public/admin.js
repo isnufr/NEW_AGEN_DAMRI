@@ -3663,9 +3663,6 @@
         editBookingSelectedSeats = new Set(prefillKursi);
         updateEditBookingSeatDisplay();
         const currentArmadaForEdit = b.armadaId && b.armadaId !== 'UNKNOWN' ? getArmada(b.armadaId) : null;
-        if (typeof loadEditBookingSeatMap === 'function') {
-            loadEditBookingSeatMap(b.bookingId, currentArmadaForEdit, b.dateTravel, prefillKursi);
-        }
         const statusSelect = document.getElementById('editBookingStatus');
         if (statusSelect) {
             statusSelect.value = (b.status === 'BELUM LUNAS') ? 'BELUM LUNAS' : 'LUNAS';
@@ -3700,6 +3697,15 @@
             jamSelect.value = waktuToSelect;
             
             updateEditBookingArmadaId(true);
+        }
+
+        const editSeatCollapse = document.getElementById('editBookingSeatCollapse');
+        if (editSeatCollapse) editSeatCollapse.dataset.dirty = '1';
+        const resolvedSeatArmada = getArmada(document.getElementById('editBookingArmada').value) || currentArmadaForEdit;
+        if (typeof toggleSeatPickerSection === 'function') {
+            toggleSeatPickerSection('editBooking', !isMobileSeatViewport());
+        } else if (typeof loadEditBookingSeatMap === 'function') {
+            loadEditBookingSeatMap(b.bookingId, resolvedSeatArmada, b.dateTravel, prefillKursi);
         }
 
         // Preserve existing booked unit price so editing date doesn't silently revert to an older price
@@ -3789,6 +3795,12 @@
                 if (hargaInput) {
                     hargaInput.value = getEffectiveHarga(armada, dObjForHarga);
                 }
+                const editSeatCollapse = document.getElementById('editBookingSeatCollapse');
+                if (editSeatCollapse) editSeatCollapse.dataset.dirty = '1';
+                if (typeof isSeatPickerExpanded === 'function' && isSeatPickerExpanded('editBooking') && typeof loadEditBookingSeatMap === 'function') {
+                    const id = document.getElementById('editBookingId')?.value;
+                    loadEditBookingSeatMap(id, armada, formatIndoDateFromInput(rawDate));
+                }
             }
         } else {
             document.getElementById('editBookingArmada').value = '';
@@ -3814,13 +3826,12 @@
 
         recalcEditBooking();
 
-        const id = document.getElementById('editBookingId')?.value;
-        if (typeof loadEditBookingSeatMap === 'function' && rawDate) {
-            const b = id ? getBooking(id) : null;
-            const prevSeats = editBookingSelectedSeats.size > 0
-                ? [...editBookingSelectedSeats]
-                : ((b && b.kursi && b.kursi !== '-') ? b.kursi.split(',').map(s => s.trim()).filter(Boolean) : []);
-            loadEditBookingSeatMap(id, armada, rawDate, prevSeats);
+        const editSeatCollapse = document.getElementById('editBookingSeatCollapse');
+        if (editSeatCollapse) editSeatCollapse.dataset.dirty = '1';
+        if (typeof isSeatPickerExpanded === 'function' && isSeatPickerExpanded('editBooking') && typeof loadEditBookingSeatMap === 'function' && rawDate) {
+            const id = document.getElementById('editBookingId')?.value;
+            loadEditBookingSeatMap(id, armada, formatIndoDateFromInput(rawDate));
+            if (editSeatCollapse) editSeatCollapse.dataset.dirty = '0';
         }
     }
 
@@ -3878,6 +3889,7 @@
 
     function recalcEditBooking() {
         renderEditBookingKursi();
+        if (typeof updateEditBookingSeatDisplay === 'function') updateEditBookingSeatDisplay();
         const armadaId = document.getElementById('editBookingArmada').value;
         const qty = parseInt(document.getElementById('editBookingPnp').value) || 1;
         const armada = getArmada(armadaId);
@@ -4602,6 +4614,9 @@
         modal.classList.remove('hidden');
         modal.classList.add('flex');
         if (typeof onAdminBookingTripChange === 'function') onAdminBookingTripChange();
+        if (typeof toggleSeatPickerSection === 'function') {
+            toggleSeatPickerSection('adminBooking', !isMobileSeatViewport());
+        }
     }
 
     function closeBookingModal() {
@@ -8257,11 +8272,74 @@ function goToBookingStep(step) {
     }
 
     if (step === 2) {
-        loadAdminBookingSeatMap();
+        updateAdminBookingSeatBadge();
+        const col = document.getElementById('adminBookingSeatCollapse');
+        if (isSeatPickerExpanded('adminBooking')) {
+            loadAdminBookingSeatMap();
+            if (col) col.dataset.dirty = '0';
+        } else if (col) {
+            col.dataset.dirty = '1';
+        }
     } else if (step === 3) {
         updateAdminBookingSummary();
     }
 }
+
+function formatIndoDateFromInput(rawDate) {
+    if (!rawDate) return '';
+    if (!String(rawDate).includes('-') || !/^\d{4}-\d{2}-\d{2}/.test(String(rawDate))) return String(rawDate);
+    const dObj = typeof parseLocalDateInput === 'function' ? parseLocalDateInput(rawDate) : new Date(rawDate);
+    if (!dObj || isNaN(dObj.getTime())) return String(rawDate);
+    return INDO_DAYS[dObj.getDay()] + ', ' + dObj.getDate() + ' ' + INDO_MONTHS[dObj.getMonth()] + ' ' + dObj.getFullYear();
+}
+
+function isMobileSeatViewport() {
+    return typeof window !== 'undefined' && window.innerWidth < 1024;
+}
+
+function isSeatPickerExpanded(prefix) {
+    const col = document.getElementById(prefix + 'SeatCollapse');
+    return Boolean(col && col.classList.contains('expanded'));
+}
+
+function toggleSeatPickerSection(prefix, forceExpanded = null) {
+    const col = document.getElementById(prefix + 'SeatCollapse');
+    const hdr = document.getElementById(prefix + 'SeatToggleHeader');
+    const txt = document.getElementById(prefix + 'SeatToggleText');
+    if (!col) return;
+
+    const currentlyExpanded = col.classList.contains('expanded');
+    const shouldExpand = (typeof forceExpanded === 'boolean') ? forceExpanded : !currentlyExpanded;
+
+    col.classList.toggle('expanded', shouldExpand);
+    if (hdr) {
+        hdr.classList.toggle('is-expanded', shouldExpand);
+        hdr.setAttribute('aria-expanded', shouldExpand ? 'true' : 'false');
+    }
+    if (txt) {
+        txt.innerText = shouldExpand ? 'Tutup Denah' : 'Pilih Kursi';
+    }
+
+    if (shouldExpand) {
+        const denahContainer = document.getElementById(prefix + 'DenahContainer');
+        const needsLoad = col.dataset.dirty === '1' || !denahContainer || !denahContainer.querySelector('.seatmap');
+        if (needsLoad) {
+            col.dataset.dirty = '0';
+            if (prefix === 'adminBooking' && typeof loadAdminBookingSeatMap === 'function') {
+                loadAdminBookingSeatMap();
+            } else if (prefix === 'editBooking' && typeof loadEditBookingSeatMap === 'function') {
+                const id = document.getElementById('editBookingId')?.value;
+                const armadaId = document.getElementById('editBookingArmada')?.value;
+                const armada = typeof getArmada === 'function' ? getArmada(armadaId) : null;
+                const rawDate = document.getElementById('editBookingDate')?.value;
+                const b = id && typeof getBooking === 'function' ? getBooking(id) : null;
+                const formattedDate = rawDate ? formatIndoDateFromInput(rawDate) : (b ? b.dateTravel : '');
+                loadEditBookingSeatMap(id, armada, formattedDate);
+            }
+        }
+    }
+}
+window.toggleSeatPickerSection = toggleSeatPickerSection;
 
 async function onAdminBookingTripChange() {
     recalcAdminBooking();
@@ -8272,7 +8350,7 @@ async function onAdminBookingTripChange() {
     
     if (armada) {
         const rawDate = document.getElementById('adminBookingDate')?.value;
-        const dObj = rawDate ? new Date(rawDate) : null;
+        const dObj = typeof parseLocalDateInput === 'function' ? parseLocalDateInput(rawDate) : (rawDate ? new Date(rawDate) : null);
         const effectivePrice = typeof getEffectiveHarga === 'function' ? getEffectiveHarga(armada, dObj) : armada.price;
         if (infoText) infoText.innerHTML = '<b>' + armada.name + '</b> (' + (armada.tipeArmada || 'Bus') + ') • Rute: ' + armada.destination + ' • Jam: ' + armada.time;
         if (tarifBadge) tarifBadge.innerText = formatRupiah(effectivePrice) + ' / kursi';
@@ -8281,9 +8359,12 @@ async function onAdminBookingTripChange() {
         if (tarifBadge) tarifBadge.innerText = 'Rp0 / kursi';
     }
 
-    // Refresh seat map if currently in step 2
-    if (adminBookingStep === 2) {
+    const col = document.getElementById('adminBookingSeatCollapse');
+    if (col) col.dataset.dirty = '1';
+    // Refresh seat map only if step 2 AND expanded
+    if (adminBookingStep === 2 && isSeatPickerExpanded('adminBooking')) {
         loadAdminBookingSeatMap();
+        if (col) col.dataset.dirty = '0';
     }
 }
 
@@ -8292,38 +8373,73 @@ function onAdminBookingPnpChange() {
     updateAdminBookingSeatBadge();
 }
 
-function updateAdminBookingSeatBadge() {
-    const qty = parseInt(document.getElementById('adminBookingPnp')?.value) || 1;
-    const selCount = adminBookingSelectedSeats.size;
-    const badge = document.getElementById('adminBookingSeatCounterBadge');
-    const disp = document.getElementById('adminBookingSelectedSeatsDisplay');
+/**
+ * Sync seat counter badge, summary label, collapsed header summary, and optional hidden input.
+ */
+function syncSeatSummaryElements({ qtyId, seats, badgeId, dispId, hdrSumId, hiddenId = null, emptyDispText = 'Belum memilih kursi', badgeSuffix = '' }) {
+    const qty = parseInt(document.getElementById(qtyId)?.value) || 1;
+    const selCount = seats.size;
+    const badge = document.getElementById(badgeId);
+    const disp = document.getElementById(dispId);
+    const hdrSum = document.getElementById(hdrSumId);
+    const hidden = hiddenId ? document.getElementById(hiddenId) : null;
 
     if (badge) {
-        badge.innerText = selCount + '/' + qty + ' kursi';
+        badge.innerText = selCount + '/' + qty + badgeSuffix;
         if (selCount === qty) {
-            badge.className = 'ml-2 text-[10px] bg-green-100 text-green-800 font-extrabold px-2 py-0.5 rounded-full';
+            badge.className = 'text-[10px] bg-green-100 text-green-800 font-extrabold px-2 py-0.5 rounded-full shrink-0';
         } else if (selCount > qty) {
-            badge.className = 'ml-2 text-[10px] bg-red-100 text-red-800 font-extrabold px-2 py-0.5 rounded-full';
+            badge.className = 'text-[10px] bg-red-100 text-red-800 font-extrabold px-2 py-0.5 rounded-full shrink-0';
         } else {
-            badge.className = 'ml-2 text-[10px] bg-slate-200 text-slate-700 font-extrabold px-2 py-0.5 rounded-full';
+            badge.className = 'text-[10px] bg-slate-200 text-slate-700 font-extrabold px-2 py-0.5 rounded-full shrink-0';
         }
     }
 
+    const seatText = selCount > 0 ? [...seats].join(', ') : '';
     if (disp) {
         if (selCount === 0) {
-            disp.innerText = 'Belum memilih kursi (Bisa dilewati)';
+            disp.innerText = emptyDispText;
             disp.className = 'font-bold text-slate-400 text-xs ml-1 italic';
         } else {
-            disp.innerText = [...adminBookingSelectedSeats].join(', ');
+            disp.innerText = seatText;
             disp.className = 'font-black text-amber-600 text-sm ml-1';
         }
     }
+    if (hdrSum) {
+        if (selCount === 0) {
+            hdrSum.innerText = 'Ketuk untuk pilih kursi';
+            hdrSum.className = 'text-[11px] font-bold text-slate-500 truncate';
+        } else {
+            hdrSum.innerText = 'Kursi: ' + seatText;
+            hdrSum.className = 'text-[11px] font-black text-amber-700 truncate';
+        }
+    }
+    if (hidden) {
+        hidden.value = seatText;
+    }
+}
+
+function updateAdminBookingSeatBadge() {
+    syncSeatSummaryElements({
+        qtyId: 'adminBookingPnp',
+        seats: adminBookingSelectedSeats,
+        badgeId: 'adminBookingSeatCounterBadge',
+        dispId: 'adminBookingSelectedSeatsDisplay',
+        hdrSumId: 'adminBookingSeatHeaderSummary',
+        emptyDispText: 'Belum memilih kursi (Bisa dilewati)',
+        badgeSuffix: ' kursi'
+    });
 }
 
 function clearAdminBookingSeats() {
     adminBookingSelectedSeats.clear();
     updateAdminBookingSeatBadge();
-    loadAdminBookingSeatMap(false);
+    if (isSeatPickerExpanded('adminBooking')) {
+        loadAdminBookingSeatMap(false);
+    } else {
+        const col = document.getElementById('adminBookingSeatCollapse');
+        if (col) col.dataset.dirty = '1';
+    }
 }
 
 // Fetch taken seats for selected trip & render denah
@@ -8358,15 +8474,51 @@ async function loadAdminBookingSeatMap(refetchTaken = true) {
     document.getElementById('adminBookingDenahTipeLabel').innerText = armada.tipeArmada || 'Bus';
     document.getElementById('adminBookingDenahNamaLabel').innerText = layout.nama;
 
-    // Load Taken Seats from cache & server
+    const renderSeatGrid = () => {
+        [...adminBookingSelectedSeats].forEach(s => {
+            if (adminBookingTakenSeats[s]) adminBookingSelectedSeats.delete(s);
+        });
+        container.innerHTML = '';
+        const seatMapEl = buildSeatMapElement(layout, {
+            taken: adminBookingTakenSeats,
+            selected: adminBookingSelectedSeats,
+            onSeat: (seatNo, isTaken) => {
+                if (isTaken) {
+                    if (typeof showMessage === 'function') showMessage('Kursi ' + seatNo + ' sudah terisi oleh penumpang lain!', 'warning');
+                    return;
+                }
+                const qty = parseInt(document.getElementById('adminBookingPnp').value) || 1;
+                if (adminBookingSelectedSeats.has(seatNo)) {
+                    adminBookingSelectedSeats.delete(seatNo);
+                } else {
+                    if (adminBookingSelectedSeats.size >= qty) {
+                        if (qty === 1) {
+                            adminBookingSelectedSeats.clear();
+                            adminBookingSelectedSeats.add(seatNo);
+                        } else {
+                            alert('Jumlah kursi yang dipilih sudah mencapai ' + qty + ' kursi. Batalkan kursi lain terlebih dahulu jika ingin mengganti.');
+                            return;
+                        }
+                    } else {
+                        adminBookingSelectedSeats.add(seatNo);
+                    }
+                }
+                updateAdminBookingSeatBadge();
+                loadAdminBookingSeatMap(false);
+            }
+        });
+        container.appendChild(seatMapEl);
+        updateAdminBookingSeatBadge();
+    };
+
+    // Load Taken Seats from local cache immediately so denah renders without blocking UI slide-open
+    let formattedDate = '';
     if (refetchTaken) {
         adminBookingTakenSeats = {};
-        
-        // 1. Ambil dari cachedBookings yang sudah ada di memori
         const [yyyy, mm, dd] = rawDate.split('-');
         const dObj = new Date(parseInt(yyyy), parseInt(mm)-1, parseInt(dd));
-        const formattedDate = INDO_DAYS[dObj.getDay()] + ', ' + dObj.getDate() + ' ' + INDO_MONTHS[dObj.getMonth()] + ' ' + dObj.getFullYear();
-        
+        formattedDate = INDO_DAYS[dObj.getDay()] + ', ' + dObj.getDate() + ' ' + INDO_MONTHS[dObj.getMonth()] + ' ' + dObj.getFullYear();
+
         const allBookings = (typeof getBookings === 'function' ? getBookings() : []) || [];
         allBookings.forEach(b => {
             if (b.status === 'DITOLAK' || b.status === 'CANCEL') return;
@@ -8384,53 +8536,24 @@ async function loadAdminBookingSeatMap(refetchTaken = true) {
                 }
             }
         });
+    }
 
-        // 2. Query server for freshness
+    renderSeatGrid();
+
+    // Query server for freshness after optimistic render without delaying accordion opening
+    if (refetchTaken && formattedDate) {
         try {
             const apiRes = await fetchFromSheets('getTakenSeats', '&tanggal=' + encodeURIComponent(formattedDate) + '&armada=' + encodeURIComponent(armada.name) + '&waktu=' + encodeURIComponent(armada.time));
-            if (apiRes && apiRes.data && apiRes.data.taken) {
-                Object.assign(adminBookingTakenSeats, apiRes.data.taken);
+            const stillSameTrip = document.getElementById('adminBookingArmada')?.value === armadaId
+                && document.getElementById('adminBookingDate')?.value === rawDate;
+            if (stillSameTrip && apiRes && apiRes.data && apiRes.data.taken) {
+                const serverTaken = apiRes.data.taken;
+                const hasChanges = Object.keys(serverTaken).some(k => !adminBookingTakenSeats[k]);
+                Object.assign(adminBookingTakenSeats, serverTaken);
+                if (hasChanges) renderSeatGrid();
             }
         } catch(e) {}
     }
-
-    // Clean up selected seats if already taken
-    [...adminBookingSelectedSeats].forEach(s => {
-        if (adminBookingTakenSeats[s]) adminBookingSelectedSeats.delete(s);
-    });
-
-    container.innerHTML = '';
-    const seatMapEl = buildSeatMapElement(layout, {
-        taken: adminBookingTakenSeats,
-        selected: adminBookingSelectedSeats,
-        onSeat: (seatNo, isTaken) => {
-            if (isTaken) {
-                if (typeof showMessage === 'function') showMessage('Kursi ' + seatNo + ' sudah terisi oleh penumpang lain!', 'warning');
-                return;
-            }
-            const qty = parseInt(document.getElementById('adminBookingPnp').value) || 1;
-            if (adminBookingSelectedSeats.has(seatNo)) {
-                adminBookingSelectedSeats.delete(seatNo);
-            } else {
-                if (adminBookingSelectedSeats.size >= qty) {
-                    if (qty === 1) {
-                        adminBookingSelectedSeats.clear();
-                        adminBookingSelectedSeats.add(seatNo);
-                    } else {
-                        alert('Jumlah kursi yang dipilih sudah mencapai ' + qty + ' kursi. Batalkan kursi lain terlebih dahulu jika ingin mengganti.');
-                        return;
-                    }
-                } else {
-                    adminBookingSelectedSeats.add(seatNo);
-                }
-            }
-            updateAdminBookingSeatBadge();
-            loadAdminBookingSeatMap(false);
-        }
-    });
-
-    container.appendChild(seatMapEl);
-    updateAdminBookingSeatBadge();
 }
 
 function updateAdminBookingSummary() {
@@ -8495,6 +8618,12 @@ function resetAdminBooking() {
     adminBookingStep = 1;
     adminBookingSelectedSeats.clear();
     adminBookingTakenSeats = {};
+    const adminCol = document.getElementById('adminBookingSeatCollapse');
+    if (adminCol) adminCol.dataset.dirty = '1';
+    if (typeof toggleSeatPickerSection === 'function') {
+        toggleSeatPickerSection('adminBooking', !isMobileSeatViewport());
+    }
+    updateAdminBookingSeatBadge();
     for (let i = 1; i <= 3; i++) {
         const badge = document.getElementById('bookingStepBadge' + i);
         const pane = document.getElementById('bookingStepPane' + i);
@@ -8594,37 +8723,33 @@ async function loadEditBookingSeatMap(bookingId, armada, formattedDate, initialK
 }
 
 function updateEditBookingSeatDisplay() {
-    const qty = parseInt(document.getElementById('editBookingPnp')?.value) || 1;
-    const selCount = editBookingSelectedSeats.size;
-    const badge = document.getElementById('editBookingSeatCounterBadge');
-    const disp = document.getElementById('editBookingSelectedSeatsDisplay');
-    const hidden = document.getElementById('editBookingKursiHidden');
-
-    if (badge) badge.innerText = selCount + '/' + qty;
-    if (disp) {
-        if (selCount === 0) {
-            disp.innerText = 'Belum memilih kursi';
-            disp.className = 'font-bold text-slate-400 text-xs ml-1 italic';
-        } else {
-            disp.innerText = [...editBookingSelectedSeats].join(', ');
-            disp.className = 'font-black text-amber-600 text-sm ml-1';
-        }
-    }
-    if (hidden) {
-        hidden.value = [...editBookingSelectedSeats].join(', ');
-    }
+    syncSeatSummaryElements({
+        qtyId: 'editBookingPnp',
+        seats: editBookingSelectedSeats,
+        badgeId: 'editBookingSeatCounterBadge',
+        dispId: 'editBookingSelectedSeatsDisplay',
+        hdrSumId: 'editBookingSeatHeaderSummary',
+        hiddenId: 'editBookingKursiHidden',
+        emptyDispText: 'Belum memilih kursi'
+    });
 }
 
 function clearEditBookingSeats() {
     editBookingSelectedSeats.clear();
     updateEditBookingSeatDisplay();
-    const id = document.getElementById('editBookingId')?.value;
-    const armadaId = document.getElementById('editBookingArmada')?.value;
-    const armada = typeof getArmada === 'function' ? getArmada(armadaId) : null;
-    const rawDate = document.getElementById('editBookingDate')?.value;
-    loadEditBookingSeatMap(id, armada, rawDate);
+    if (isSeatPickerExpanded('editBooking')) {
+        const id = document.getElementById('editBookingId')?.value;
+        const armadaId = document.getElementById('editBookingArmada')?.value;
+        const armada = typeof getArmada === 'function' ? getArmada(armadaId) : null;
+        const rawDate = document.getElementById('editBookingDate')?.value;
+        loadEditBookingSeatMap(id, armada, formatIndoDateFromInput(rawDate));
+    } else {
+        const col = document.getElementById('editBookingSeatCollapse');
+        if (col) col.dataset.dirty = '1';
+    }
 }
 
+    if (typeof toggleSeatPickerSection !== 'undefined') window.toggleSeatPickerSection = toggleSeatPickerSection;
     if (typeof toggleDashboardNominal !== 'undefined') window.toggleDashboardNominal = toggleDashboardNominal;
 
 // ========================================

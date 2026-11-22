@@ -85,7 +85,7 @@
     <script src="/socket.io/socket.io.js?v=2"></script>
     <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js"></script>
     <script src="app.js?v=10"></script>
-    <link rel="stylesheet" href="admin.css?v=3.1">
+    <link rel="stylesheet" href="admin.css?v=3.2">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.js"></script>
 </head>
@@ -1794,45 +1794,65 @@
                                     </div>
                                 </div>
 
-                                <!-- SEKSI DENAH TEMPAT DUDUK INTERAKTIF -->
-                                <div class="bg-white p-5 rounded-2xl border-2 border-slate-200 space-y-3">
-                                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 pb-3">
-                                        <div>
-                                            <h4 class="text-xs font-black text-slate-800 uppercase tracking-wider flex items-center gap-2">
-                                                <i class="fas fa-chair text-amber-500"></i> Skema / Denah Tempat Duduk
-                                            </h4>
-                                            <p class="text-[11px] text-slate-500 mt-0.5">Tipe Armada: <b id="adminBookingDenahTipeLabel" class="text-slate-800">-</b> • Format: <b id="adminBookingDenahNamaLabel" class="text-slate-800">-</b></p>
+                                <!-- SEKSI DENAH TEMPAT DUDUK INTERAKTIF (BISA MINIMIZE, DEFAULT MINIMIZE DI HP) -->
+                                <div id="adminBookingSeatSection" class="bg-white p-3.5 sm:p-5 rounded-2xl border-2 border-slate-200 transition-colors">
+                                    <button type="button" id="adminBookingSeatToggleHeader" onclick="toggleSeatPickerSection('adminBooking')" aria-expanded="false"
+                                        class="seat-collapse-header w-full flex items-center justify-between gap-2.5 text-left cursor-pointer select-none focus:outline-none">
+                                        <div class="flex items-center gap-2.5 min-w-0 flex-1">
+                                            <div class="w-9 h-9 rounded-xl bg-amber-50 border border-amber-200/80 text-amber-600 flex items-center justify-center shrink-0">
+                                                <i class="fas fa-chair text-sm"></i>
+                                            </div>
+                                            <div class="min-w-0 flex-1">
+                                                <h4 class="text-xs font-black text-slate-800 uppercase tracking-wider leading-tight">
+                                                    Pemilihan Nomor Kursi <span class="text-[10px] font-bold text-slate-400 normal-case">(Opsional)</span>
+                                                </h4>
+                                                <div class="flex items-center gap-1.5 flex-wrap mt-0.5">
+                                                    <span id="adminBookingSeatHeaderSummary" class="text-[11px] font-bold text-slate-500 truncate">Belum memilih kursi</span>
+                                                    <span id="adminBookingSeatCounterBadge" class="text-[10px] bg-slate-200 text-slate-700 font-extrabold px-2 py-0.5 rounded-full shrink-0">0/1 kursi</span>
+                                                </div>
+                                            </div>
                                         </div>
-                                        <div class="flex items-center gap-2">
-                                            <button type="button" onclick="clearAdminBookingSeats()" class="text-xs font-bold text-slate-500 hover:text-red-500 bg-slate-100 hover:bg-red-50 px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1.5 shadow-sm">
-                                                <i class="fas fa-undo"></i> Kosongkan Kursi
-                                            </button>
+                                        <div class="shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-50 hover:bg-amber-100 border border-amber-300/80 text-amber-800 text-[10px] font-black uppercase tracking-wider">
+                                            <span id="adminBookingSeatToggleText">Pilih Kursi</span>
+                                            <i class="fas fa-chevron-down seat-collapse-chevron text-[10px]"></i>
                                         </div>
-                                    </div>
+                                    </button>
 
-                                    <!-- Legend Kursi -->
-                                    <div class="seat-legend mb-2">
-                                        <span><i class="seat-legend-dot"></i> Tersedia (Klik)</span>
-                                        <span><i class="seat-legend-dot is-sel"></i> Dipilih</span>
-                                        <span><i class="seat-legend-dot is-book"></i> Terisi (Booked)</span>
-                                    </div>
+                                    <div id="adminBookingSeatCollapse" class="seat-collapse-wrapper">
+                                        <div class="seat-collapse-inner">
+                                            <div class="pt-3 mt-3 border-t border-slate-100 space-y-3">
+                                                <div class="flex flex-wrap items-center justify-between gap-2">
+                                                    <p class="text-[11px] text-slate-500">Tipe: <b id="adminBookingDenahTipeLabel" class="text-slate-800">-</b> • Format: <b id="adminBookingDenahNamaLabel" class="text-slate-800">-</b></p>
+                                                    <button type="button" onclick="clearAdminBookingSeats()" class="text-xs font-bold text-slate-500 hover:text-red-500 bg-slate-100 hover:bg-red-50 px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1.5 shadow-sm">
+                                                        <i class="fas fa-undo"></i> Kosongkan Kursi
+                                                    </button>
+                                                </div>
 
-                                    <!-- Container Denah Kursi -->
-                                    <div id="adminBookingDenahContainer" class="py-2 flex justify-center">
-                                        <div class="text-center py-6 text-slate-400 font-bold text-xs">
-                                            <i class="fas fa-spinner fa-spin text-lg mb-2 block"></i> Memuat denah tempat duduk...
-                                        </div>
-                                    </div>
+                                                <!-- Legend Kursi -->
+                                                <div class="seat-legend mb-2">
+                                                    <span><i class="seat-legend-dot"></i> Tersedia (Klik)</span>
+                                                    <span><i class="seat-legend-dot is-sel"></i> Dipilih</span>
+                                                    <span><i class="seat-legend-dot is-book"></i> Terisi (Booked)</span>
+                                                </div>
 
-                                    <!-- Ringkasan Kursi Terpilih & Skip Info -->
-                                    <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                                        <div class="text-xs">
-                                            <span class="text-slate-500 font-bold">Kursi Terpilih:</span>
-                                            <span id="adminBookingSelectedSeatsDisplay" class="font-black text-amber-600 text-sm ml-1">Belum memilih kursi</span>
-                                            <span id="adminBookingSeatCounterBadge" class="ml-2 text-[10px] bg-slate-200 text-slate-700 font-extrabold px-2 py-0.5 rounded-full">0/1 kursi</span>
-                                        </div>
-                                        <div class="text-[11px] text-slate-400 font-medium italic">
-                                            <i class="fas fa-info-circle mr-1 text-amber-500"></i> Pengisian kursi tidak wajib (bisa dilewati)
+                                                <!-- Container Denah Kursi -->
+                                                <div id="adminBookingDenahContainer" class="py-2 flex justify-center">
+                                                    <div class="text-center py-4 text-slate-400 font-bold text-xs">
+                                                        Ketuk &ldquo;Pilih Kursi&rdquo; untuk memuat denah
+                                                    </div>
+                                                </div>
+
+                                                <!-- Ringkasan Kursi Terpilih & Skip Info -->
+                                                <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                                                    <div class="text-xs">
+                                                        <span class="text-slate-500 font-bold">Kursi Terpilih:</span>
+                                                        <span id="adminBookingSelectedSeatsDisplay" class="font-black text-amber-600 text-sm ml-1">Belum memilih kursi</span>
+                                                    </div>
+                                                    <div class="text-[11px] text-slate-400 font-medium italic">
+                                                        <i class="fas fa-info-circle mr-1 text-amber-500"></i> Pengisian kursi tidak wajib (bisa dilewati)
+                                                    </div>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -2294,33 +2314,55 @@
                 </select>
             </div>
 
-            <div class="bg-amber-50/50 p-4 rounded-2xl border-2 border-amber-200/80 space-y-3 mt-3">
-                <div class="flex items-center justify-between border-b border-amber-200/60 pb-2">
-                    <div>
-                        <h4 class="text-xs font-black text-slate-800 uppercase tracking-wider flex items-center gap-1.5">
-                            <i class="fas fa-chair text-amber-500"></i> Ubah / Pindah Tempat Duduk
-                        </h4>
-                        <p class="text-[10px] text-slate-500 mt-0.5" id="editBookingDenahInfoText">Ketuk kursi pada denah untuk memilih nomor kursi</p>
+            <div id="editBookingSeatSection" class="bg-amber-50/50 p-3.5 sm:p-4 rounded-2xl border-2 border-amber-200/80 mt-3">
+                <button type="button" id="editBookingSeatToggleHeader" onclick="toggleSeatPickerSection('editBooking')" aria-expanded="false"
+                    class="seat-collapse-header w-full flex items-center justify-between gap-2.5 text-left cursor-pointer select-none focus:outline-none">
+                    <div class="flex items-center gap-2.5 min-w-0 flex-1">
+                        <div class="w-9 h-9 rounded-xl bg-white border border-amber-200 text-amber-600 flex items-center justify-center shrink-0 shadow-2xs">
+                            <i class="fas fa-chair text-sm"></i>
+                        </div>
+                        <div class="min-w-0 flex-1">
+                            <h4 class="text-xs font-black text-slate-800 uppercase tracking-wider leading-tight">
+                                Pilih / Ubah Nomor Kursi
+                            </h4>
+                            <div class="flex items-center gap-1.5 flex-wrap mt-0.5">
+                                <span id="editBookingSeatHeaderSummary" class="text-[11px] font-bold text-slate-500 truncate">Belum memilih kursi</span>
+                                <span id="editBookingSeatCounterBadge" class="text-[10px] bg-slate-200 text-slate-700 font-extrabold px-2 py-0.5 rounded-full shrink-0">0/1</span>
+                            </div>
+                        </div>
                     </div>
-                    <button type="button" onclick="clearEditBookingSeats()" class="text-[11px] font-bold text-slate-500 hover:text-red-500 bg-white px-2.5 py-1 rounded-lg border border-slate-200 shadow-sm transition-colors">
-                        <i class="fas fa-undo mr-1"></i> Kosongkan
-                    </button>
-                </div>
-                <div class="seat-legend mb-1 text-[10px]">
-                    <span><i class="seat-legend-dot"></i> Kosong</span>
-                    <span><i class="seat-legend-dot is-sel"></i> Kursi Anda</span>
-                    <span><i class="seat-legend-dot is-book"></i> Booked</span>
-                </div>
-                <div id="editBookingDenahContainer" class="py-1 flex justify-center">
-                    <!-- Rendered by renderEditBookingSeatMap() -->
-                </div>
-                <div class="p-2.5 bg-white rounded-xl border border-slate-200 flex items-center justify-between text-xs">
-                    <div>
-                        <span class="text-slate-500 font-bold">Kursi Dipilih:</span>
-                        <span id="editBookingSelectedSeatsDisplay" class="font-black text-amber-600 ml-1">-</span>
-                        <span id="editBookingSeatCounterBadge" class="ml-2 text-[10px] bg-slate-200 text-slate-700 font-extrabold px-2 py-0.5 rounded-full">0/1</span>
+                    <div class="shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white hover:bg-amber-50 border border-amber-300/80 text-amber-800 text-[10px] font-black uppercase tracking-wider shadow-2xs">
+                        <span id="editBookingSeatToggleText">Pilih Kursi</span>
+                        <i class="fas fa-chevron-down seat-collapse-chevron text-[10px]"></i>
                     </div>
-                    <small class="text-slate-400 font-semibold italic text-[10px]">Tidak wajib (bisa di-skip)</small>
+                </button>
+
+                <div id="editBookingSeatCollapse" class="seat-collapse-wrapper">
+                    <div class="seat-collapse-inner">
+                        <div class="pt-3 mt-3 border-t border-amber-200/60 space-y-3">
+                            <div class="flex items-center justify-between gap-2">
+                                <p class="text-[10px] text-slate-500" id="editBookingDenahInfoText">Ketuk kursi pada denah untuk memilih nomor kursi</p>
+                                <button type="button" onclick="clearEditBookingSeats()" class="text-[11px] font-bold text-slate-500 hover:text-red-500 bg-white px-2.5 py-1 rounded-lg border border-slate-200 shadow-sm transition-colors shrink-0">
+                                    <i class="fas fa-undo mr-1"></i> Kosongkan
+                                </button>
+                            </div>
+                            <div class="seat-legend mb-1 text-[10px]">
+                                <span><i class="seat-legend-dot"></i> Kosong</span>
+                                <span><i class="seat-legend-dot is-sel"></i> Kursi Anda</span>
+                                <span><i class="seat-legend-dot is-book"></i> Booked</span>
+                            </div>
+                            <div id="editBookingDenahContainer" class="py-1 flex justify-center">
+                                <!-- Rendered by renderEditBookingSeatMap() -->
+                            </div>
+                            <div class="p-2.5 bg-white rounded-xl border border-slate-200 flex items-center justify-between gap-2 text-xs">
+                                <div class="min-w-0 truncate">
+                                    <span class="text-slate-500 font-bold">Kursi Dipilih:</span>
+                                    <span id="editBookingSelectedSeatsDisplay" class="font-black text-amber-600 ml-1">-</span>
+                                </div>
+                                <small class="text-slate-400 font-semibold italic text-[10px] shrink-0">Tidak wajib (bisa di-skip)</small>
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 <input type="hidden" id="editBookingKursiHidden">
             </div>
@@ -2987,7 +3029,7 @@
 
     <!-- Custom script for admin dashboard -->
     <script src="routes-data.js"></script>
-    <script src="admin.js?v=2.67"></script>
+    <script src="admin.js?v=2.68"></script>
 
     <!-- ======================================= -->
     <!-- DETAIL DATA PELANGGAN & CRM MODAL        -->
