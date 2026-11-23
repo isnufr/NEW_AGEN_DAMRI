@@ -306,33 +306,352 @@ const SEAPORTS_DATA = [
     }
 ];
 
-const POPULAR_AIRLINES = [
-    "Garuda Indonesia",
-    "Citilink",
-    "Lion Air",
-    "Batik Air",
-    "Super Air Jet",
-    "Wings Air",
-    "Pelita Air",
-    "Sriwijaya Air",
-    "NAM Air",
-    "AirAsia Indonesia",
-    "AirAsia Malaysia",
-    "Scoot",
-    "Singapore Airlines",
-    "Malaysia Airlines",
-    "Saudia Airlines",
-    "flynas",
-    "Qatar Airways",
-    "Emirates",
-    "Etihad Airways",
-    "Turkish Airlines",
-    "All Nippon Airways (ANA)",
-    "Japan Airlines (JAL)",
-    "Korean Air",
-    "Cathay Pacific",
-    "Qantas Airways"
+const AIRLINE_PRINT_PORTALS = [
+    // Domestik Indonesia
+    {
+        id: "garuda",
+        name: "Garuda Indonesia",
+        code: "GA",
+        group: "domestik",
+        portalLabel: "My Trip / Cetak E-Tiket",
+        requirement: "Kode Booking (PNR) + Nama Belakang",
+        url: "https://www.garuda-indonesia.com/id/id/my-trip",
+        checkinUrl: "https://digital.garuda-indonesia.com/ssci/identification",
+        checkinLabel: "Check-In",
+        accent: "#00686b",
+        keywords: "ga garuda indonesia my trip bumn ssci"
+    },
+    {
+        id: "citilink",
+        name: "Citilink",
+        code: "QG",
+        group: "domestik",
+        portalLabel: "Look Up Booking / E-Tiket",
+        requirement: "Kode Konfirmasi + Nama Belakang",
+        url: "https://www.citilink.co.id/lookup-booking",
+        checkinUrl: "https://www.citilink.co.id/check-in",
+        checkinLabel: "Check-In",
+        accent: "#008f4c",
+        keywords: "qg citilink garuda group"
+    },
+    {
+        id: "lion-air",
+        name: "Lion Air",
+        code: "JT",
+        group: "domestik",
+        portalLabel: "Retrieve Booking / E-Tiket",
+        requirement: "Kode PNR + Nama Depan & Belakang",
+        url: "https://www.lionair.co.id/en/manage-booking/retrieve-booking",
+        checkinUrl: "https://www.bookcabin.com/check-in",
+        checkinLabel: "Check-In",
+        accent: "#c8102e",
+        keywords: "jt lion air group bookcabin retrieve"
+    },
+    {
+        id: "batik-air",
+        name: "Batik Air",
+        code: "ID",
+        group: "domestik",
+        portalLabel: "Manage Booking Batik Air",
+        requirement: "Kode Booking + Nama Belakang",
+        url: "https://www.batikair.com/en/Manage-Booking",
+        checkinUrl: "https://www.bookcabin.com/check-in",
+        checkinLabel: "Check-In",
+        accent: "#7b1fa2",
+        keywords: "id batik air indonesia lion group bookcabin"
+    },
+    {
+        id: "super-air-jet",
+        name: "Super Air Jet",
+        code: "IU",
+        group: "domestik",
+        portalLabel: "Kelola Pemesanan SAJ",
+        requirement: "Kode Booking + Nama Penumpang",
+        url: "https://www.superairjet.com/id/manage.php",
+        checkinUrl: "https://www.bookcabin.com/check-in",
+        checkinLabel: "Check-In",
+        accent: "#b91c1c",
+        keywords: "iu super air jet saj lion group bookcabin"
+    },
+    {
+        id: "wings-air",
+        name: "Wings Air",
+        code: "IW",
+        group: "domestik",
+        portalLabel: "Check-In & Boarding Pass",
+        requirement: "Kode Booking (IW) via BookCabin / PNR",
+        url: "https://www.bookcabin.com/check-in",
+        checkinUrl: "https://www.lionair.co.id/en/manage-booking/retrieve-booking",
+        checkinLabel: "Retrieve",
+        accent: "#dc2626",
+        keywords: "iw wings air lion group bookcabin"
+    },
+    {
+        id: "pelita-air",
+        name: "Pelita Air",
+        code: "IP",
+        group: "domestik",
+        portalLabel: "My Booking & Web Check-In",
+        requirement: "Kode Booking + Tgl Penerbangan",
+        url: "https://www.pelita-air.com/webcheckin",
+        accent: "#0f4c81",
+        keywords: "ip pelita air pertamina"
+    },
+    {
+        id: "sriwijaya-air",
+        name: "Sriwijaya Air",
+        code: "SJ",
+        group: "domestik",
+        portalLabel: "Portal Tiket Sriwijaya",
+        requirement: "Kode Booking + Nama Belakang",
+        url: "https://www.sriwijayaair.co.id",
+        checkinUrl: "https://sriwijaya-webcheckin.nieve.id",
+        checkinLabel: "Check-In",
+        accent: "#1d4ed8",
+        keywords: "sj sriwijaya air webcheckin"
+    },
+    {
+        id: "nam-air",
+        name: "NAM Air",
+        code: "IN",
+        group: "domestik",
+        portalLabel: "My Trip / Manage Booking",
+        requirement: "Kode Booking + Nama Belakang",
+        url: "https://www.flynamair.com",
+        accent: "#0369a1",
+        keywords: "in nam air sriwijaya group"
+    },
+    {
+        id: "airasia",
+        name: "AirAsia",
+        vendorAliases: ["AirAsia Indonesia", "AirAsia Malaysia"],
+        code: "QZ",
+        group: "domestik",
+        portalLabel: "Check-In & Cetak Boarding Pass",
+        requirement: "Kode Booking (6 digit) + Nama Belakang",
+        url: "https://www.airasia.com/check-in/",
+        accent: "#e11d48",
+        keywords: "qz ak airasia indonesia malaysia move"
+    },
+    {
+        id: "transnusa",
+        name: "TransNusa",
+        code: "8B",
+        group: "domestik",
+        portalLabel: "Manage Booking & Check-In",
+        requirement: "Kode PNR + Nama Belakang",
+        url: "https://www.transnusa.co.id/en",
+        accent: "#0284c7",
+        keywords: "8b transnusa comac arj"
+    },
+    {
+        id: "susi-air",
+        name: "Susi Air",
+        code: "SI",
+        group: "domestik",
+        portalLabel: "Check My Booking / Perintis",
+        requirement: "Kode Booking + Nama Penumpang",
+        url: "https://www.susiair.com",
+        accent: "#15803d",
+        keywords: "si susi air perintis"
+    },
+    {
+        id: "trigana-air",
+        name: "Trigana Air",
+        code: "IL",
+        group: "domestik",
+        portalLabel: "Portal Resmi & Konfirmasi",
+        requirement: "Cek Jadwal & Konfirmasi Konter",
+        url: "https://www.trigana-air.com",
+        accent: "#d97706",
+        keywords: "il trigana air papua regional"
+    },
+
+    // Umrah & Internasional
+    {
+        id: "batik-air-malaysia",
+        name: "Batik Air Malaysia",
+        code: "OD",
+        group: "internasional",
+        portalLabel: "Manage Booking (Kode OD)",
+        requirement: "PNR Booking + Nama Belakang",
+        url: "https://www.batikair.com.my/",
+        accent: "#6d28d9",
+        keywords: "od malindo batik air malaysia kuala lumpur"
+    },
+    {
+        id: "scoot",
+        name: "Scoot",
+        code: "TR",
+        group: "internasional",
+        portalLabel: "Manage Booking Scoot",
+        requirement: "Booking Ref + Nama Belakang / Email",
+        url: "https://www.flyscoot.com/en/manage",
+        checkinUrl: "https://www.flyscoot.com/en/check-in",
+        checkinLabel: "Check-In",
+        accent: "#ca8a04",
+        keywords: "tr scoot singapore tiger"
+    },
+    {
+        id: "singapore-airlines",
+        name: "Singapore Airlines",
+        code: "SQ",
+        group: "internasional",
+        portalLabel: "Manage Booking SIA",
+        requirement: "Booking Ref / E-Tiket + Nama Belakang",
+        url: "https://www.singaporeair.com/en_UK/plan-and-book/managebooking",
+        accent: "#1e3a5f",
+        keywords: "sq singapore airlines sia changi"
+    },
+    {
+        id: "malaysia-airlines",
+        name: "Malaysia Airlines",
+        code: "MH",
+        group: "internasional",
+        portalLabel: "Manage Booking MAS",
+        requirement: "Booking Ref (PNR) + Nama Belakang",
+        url: "https://www.malaysiaairlines.com/my/en/plan/manage-booking.html",
+        accent: "#1d4ed8",
+        keywords: "mh malaysia airlines mas klia"
+    },
+    {
+        id: "saudia",
+        name: "Saudia Airlines",
+        code: "SV",
+        group: "internasional",
+        portalLabel: "Manage Booking (Umrah/Haji)",
+        requirement: "Menu Manage • Booking Ref / No. Tiket",
+        url: "https://www.saudia.com/",
+        accent: "#166534",
+        keywords: "sv saudia saudi arabian airlines umrah haji jeddah madinah"
+    },
+    {
+        id: "flynas",
+        name: "flynas",
+        code: "XY",
+        group: "internasional",
+        portalLabel: "Manage My Booking",
+        requirement: "Kode PNR + Nama Belakang",
+        url: "https://www.flynas.com/",
+        accent: "#0d9488",
+        keywords: "xy flynas arab saudi umrah jeddah madinah"
+    },
+    {
+        id: "qatar-airways",
+        name: "Qatar Airways",
+        code: "QR",
+        group: "internasional",
+        portalLabel: "Manage Booking Qatar",
+        requirement: "Booking Ref / E-Tiket + Nama Belakang",
+        url: "https://www.qatarairways.com/en/manage-booking",
+        accent: "#5c0632",
+        keywords: "qr qatar airways doha"
+    },
+    {
+        id: "emirates",
+        name: "Emirates",
+        code: "EK",
+        group: "internasional",
+        portalLabel: "Kelola Pemesanan Emirates",
+        requirement: "Referensi Pemesanan + Nama Belakang",
+        url: "https://www.emirates.com/id/indonesian/manage-booking",
+        accent: "#b91c1c",
+        keywords: "ek emirates dubai"
+    },
+    {
+        id: "etihad",
+        name: "Etihad Airways",
+        code: "EY",
+        group: "internasional",
+        portalLabel: "Manage Booking Etihad",
+        requirement: "Booking Ref + Nama Belakang",
+        url: "https://www.etihad.com/manage",
+        accent: "#926c31",
+        keywords: "ey etihad airways abu dhabi"
+    },
+    {
+        id: "turkish-airlines",
+        name: "Turkish Airlines",
+        code: "TK",
+        group: "internasional",
+        portalLabel: "Manage Booking / Check-In",
+        requirement: "Kode PNR + Nama Belakang",
+        url: "https://www.turkishairlines.com/",
+        accent: "#dc2626",
+        keywords: "tk turkish airlines istanbul umrah"
+    },
+    {
+        id: "ana",
+        name: "All Nippon Airways (ANA)",
+        code: "NH",
+        group: "internasional",
+        portalLabel: "Manage Reservation ANA",
+        requirement: "Reservation Number + Nama Penumpang",
+        url: "https://www.ana.co.jp/en/jp/guide/boarding-procedures/reservation/",
+        accent: "#1e40af",
+        keywords: "nh ana all nippon jepang tokyo"
+    },
+    {
+        id: "jal",
+        name: "Japan Airlines (JAL)",
+        code: "JL",
+        group: "internasional",
+        portalLabel: "View Reservations JAL",
+        requirement: "Booking Ref / E-Tiket + Nama Belakang",
+        url: "https://www.jal.co.jp/jp/en/mys/",
+        accent: "#991b1b",
+        keywords: "jl jal japan airlines jepang tokyo"
+    },
+    {
+        id: "korean-air",
+        name: "Korean Air",
+        code: "KE",
+        group: "internasional",
+        portalLabel: "Booking Search / My Trips",
+        requirement: "PNR 6 Digit / No. Tiket + Nama",
+        url: "https://www.koreanair.com/reservation/search",
+        accent: "#0369a1",
+        keywords: "ke korean air seoul incheon"
+    },
+    {
+        id: "cathay-pacific",
+        name: "Cathay Pacific",
+        code: "CX",
+        group: "internasional",
+        portalLabel: "Manage Booking Cathay",
+        requirement: "Booking Reference + Nama Belakang",
+        url: "https://www.cathaypacific.com/cx/en_ID.html",
+        accent: "#006564",
+        keywords: "cx cathay pacific hongkong"
+    },
+    {
+        id: "qantas",
+        name: "Qantas Airways",
+        code: "QF",
+        group: "internasional",
+        portalLabel: "Manage Booking Qantas",
+        requirement: "Booking Reference + Nama Belakang",
+        url: "https://www.qantas.com/en-au/manage-booking",
+        accent: "#b91c1c",
+        keywords: "qf qantas airways australia sydney melbourne"
+    }
 ];
+
+function findAirlinePortalByName(vendorName) {
+    const raw = String(vendorName || '').trim().toLowerCase();
+    if (!raw) return null;
+    return AIRLINE_PRINT_PORTALS.find(a => {
+        if (a.name.toLowerCase() === raw) return true;
+        if (a.code.toLowerCase() === raw) return true;
+        if (Array.isArray(a.vendorAliases) && a.vendorAliases.some(v => v.toLowerCase() === raw)) return true;
+        const firstWord = a.name.toLowerCase().split(/[\s(]+/)[0];
+        return (firstWord.length >= 3 && raw.includes(firstWord)) || raw.includes(a.name.toLowerCase());
+    }) || null;
+}
+
+const POPULAR_AIRLINES = AIRLINE_PRINT_PORTALS.flatMap(a =>
+    Array.isArray(a.vendorAliases) ? a.vendorAliases : [a.name]
+);
 
 const POPULAR_SHIPS = [
     "PELNI",
@@ -423,6 +742,8 @@ function populateVendorDatalist(datalistId, tipe) {
 if (typeof window !== 'undefined') {
     window.AIRPORTS_DATA = AIRPORTS_DATA;
     window.SEAPORTS_DATA = SEAPORTS_DATA;
+    window.AIRLINE_PRINT_PORTALS = AIRLINE_PRINT_PORTALS;
+    window.findAirlinePortalByName = findAirlinePortalByName;
     window.POPULAR_AIRLINES = POPULAR_AIRLINES;
     window.POPULAR_SHIPS = POPULAR_SHIPS;
     window.populateRouteDropdown = populateRouteDropdown;

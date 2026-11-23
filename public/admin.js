@@ -5257,7 +5257,202 @@ function updateChartColors(isDark) {
             return '-';
         }
 
+        let airlineShortcutFilter = 'all';
+        let airlineShortcutQuery = '';
+
+        function toggleAirlineShortcutsCollapse(forceExpanded = null) {
+            const col = document.getElementById('airlineShortcutsCollapse');
+            const btn = document.getElementById('airlineShortcutsToggleBtn');
+            const txt = document.getElementById('airlineShortcutsToggleText');
+            if (!col) return;
+
+            const shouldExpand = (typeof forceExpanded === 'boolean') ? forceExpanded : !col.classList.contains('expanded');
+            col.classList.toggle('expanded', shouldExpand);
+            if (btn) {
+                btn.classList.toggle('is-expanded', shouldExpand);
+                btn.setAttribute('aria-expanded', shouldExpand ? 'true' : 'false');
+            }
+            if (txt) {
+                txt.innerText = shouldExpand ? 'Tutup' : 'Buka';
+            }
+        }
+        window.toggleAirlineShortcutsCollapse = toggleAirlineShortcutsCollapse;
+
+        function setAirlineShortcutFilter(group) {
+            airlineShortcutFilter = group || 'all';
+            renderAirlineShortcuts();
+        }
+        window.setAirlineShortcutFilter = setAirlineShortcutFilter;
+
+        function onAirlineShortcutSearchInput(val) {
+            airlineShortcutQuery = String(val || '');
+            const clearBtn = document.getElementById('airlineShortcutSearchClear');
+            if (clearBtn) clearBtn.classList.toggle('hidden', !airlineShortcutQuery.trim());
+            renderAirlineShortcuts();
+        }
+        window.onAirlineShortcutSearchInput = onAirlineShortcutSearchInput;
+
+        function clearAirlineShortcutSearch() {
+            airlineShortcutQuery = '';
+            const inp = document.getElementById('airlineShortcutSearch');
+            if (inp) {
+                inp.value = '';
+                inp.focus();
+            }
+            const clearBtn = document.getElementById('airlineShortcutSearchClear');
+            if (clearBtn) clearBtn.classList.add('hidden');
+            renderAirlineShortcuts();
+        }
+        window.clearAirlineShortcutSearch = clearAirlineShortcutSearch;
+
+        function buildAirlineShortcutCardHtml(item) {
+            const hasCheckin = Boolean(item.checkinUrl);
+            const primaryBtnLabel = hasCheckin ? 'E-Tiket' : 'Cetak Tiket';
+            const checkinLabel = item.checkinLabel || 'Check-In';
+            const badgeBg = item.accent || '#8E2635';
+
+            return `
+                <div class="airline-shortcut-card" data-airline-id="${item.id}">
+                    <a href="${item.url}" target="_blank" rel="noopener noreferrer" class="group block text-left focus:outline-none">
+                        <div class="flex items-center justify-between gap-1.5 mb-1.5">
+                            <span class="inline-flex items-center justify-center min-w-[28px] h-6 px-1.5 rounded-lg text-white font-black text-[10px] tracking-wider shadow-2xs shrink-0" style="background-color: ${badgeBg};">
+                                ${item.code}
+                            </span>
+                            <span class="inline-flex items-center gap-1 text-[9px] font-extrabold text-slate-400 group-hover:text-[#8E2635] transition-colors shrink-0 uppercase tracking-wider">
+                                <span>Portal</span>
+                                <i class="fas fa-external-link-alt text-[9px]"></i>
+                            </span>
+                        </div>
+                        <div class="font-black text-xs sm:text-[13px] text-slate-800 group-hover:text-[#8E2635] transition-colors leading-snug truncate" title="${item.name}">
+                            ${item.name}
+                        </div>
+                        <div class="airline-portal-label text-[10px] font-bold truncate mt-0.5" title="${item.portalLabel}">
+                            ${item.portalLabel}
+                        </div>
+                        <div class="text-[9px] font-semibold text-slate-400 truncate mt-0.5" title="Syarat: ${item.requirement}">
+                            <i class="fas fa-key text-[8px] text-amber-500 mr-1"></i>${item.requirement}
+                        </div>
+                    </a>
+                    <div class="grid ${hasCheckin ? 'grid-cols-2' : 'grid-cols-1'} items-center gap-1 sm:gap-1.5 pt-1.5 border-t border-slate-100 mt-auto">
+                        <a href="${item.url}" target="_blank" rel="noopener noreferrer" class="airline-action-primary min-w-0 inline-flex items-center justify-center gap-1 py-1.5 px-1 sm:px-2 rounded-lg text-[9px] sm:text-[10px] font-black uppercase tracking-tight sm:tracking-normal transition-all active:scale-95 whitespace-nowrap">
+                            <i class="fas fa-print text-[8px] sm:text-[9px] shrink-0"></i>
+                            <span>${primaryBtnLabel}</span>
+                        </a>
+                        ${hasCheckin ? `
+                            <a href="${item.checkinUrl}" target="_blank" rel="noopener noreferrer" class="airline-action-checkin min-w-0 inline-flex items-center justify-center gap-0.5 sm:gap-1 py-1.5 px-1 sm:px-2 rounded-lg text-[8.5px] sm:text-[10px] font-black uppercase tracking-tight sm:tracking-normal transition-all active:scale-95 whitespace-nowrap" title="Buka ${checkinLabel} ${item.name}">
+                                <i class="fas fa-plane-departure text-[8px] sm:text-[9px] shrink-0"></i>
+                                <span>${checkinLabel}</span>
+                            </a>
+                        ` : ''}
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderAirlineShortcuts() {
+            const grid = document.getElementById('airlineShortcutsGrid');
+            const portals = typeof AIRLINE_PRINT_PORTALS !== 'undefined' ? AIRLINE_PRINT_PORTALS : [];
+            if (!grid || portals.length === 0) return;
+
+            const q = airlineShortcutQuery.trim().toLowerCase();
+            const domCount = portals.filter(a => a.group === 'domestik').length;
+            const intlCount = portals.filter(a => a.group === 'internasional').length;
+
+            const totalBadge = document.getElementById('airlineShortcutsTotalBadge');
+            if (totalBadge) totalBadge.innerText = portals.length + ' Maskapai';
+
+            const countMap = {
+                All: portals.length,
+                Domestik: domCount,
+                Intl: intlCount
+            };
+            Object.entries(countMap).forEach(([suffix, val]) => {
+                const el = document.getElementById('airlineFilterCount' + suffix);
+                if (el) el.innerText = String(val);
+            });
+
+            const btnMap = {
+                all: 'airlineFilterBtnAll',
+                domestik: 'airlineFilterBtnDomestik',
+                internasional: 'airlineFilterBtnInternasional'
+            };
+            Object.entries(btnMap).forEach(([key, id]) => {
+                const btn = document.getElementById(id);
+                if (btn) btn.classList.toggle('active', airlineShortcutFilter === key);
+            });
+
+            const filtered = portals.filter(item => {
+                const matchGroup = airlineShortcutFilter === 'all' || item.group === airlineShortcutFilter;
+                if (!matchGroup) return false;
+                if (!q) return true;
+                const hay = (item.name + ' ' + item.code + ' ' + (item.portalLabel || '') + ' ' + (item.keywords || '')).toLowerCase();
+                return hay.includes(q);
+            });
+
+            if (filtered.length === 0) {
+                const safeQuery = airlineShortcutQuery
+                    .replace(/&/g, '&amp;')
+                    .replace(/</g, '&lt;')
+                    .replace(/>/g, '&gt;')
+                    .replace(/"/g, '&quot;');
+                grid.innerHTML = `
+                    <div class="py-8 px-4 text-center rounded-2xl bg-slate-50/70 border border-dashed border-slate-200">
+                        <i class="fas fa-plane-slash text-2xl text-slate-300 mb-2"></i>
+                        <p class="text-xs font-extrabold text-slate-500">Maskapai "${safeQuery}" tidak ditemukan</p>
+                        <button type="button" onclick="clearAirlineShortcutSearch()" class="mt-2.5 px-3 py-1.5 rounded-xl bg-amber-500 text-slate-900 text-[10px] font-black uppercase tracking-wider hover:bg-amber-600 transition-colors">
+                            Reset Pencarian
+                        </button>
+                    </div>
+                `;
+                return;
+            }
+
+            const domestikItems = filtered.filter(a => a.group === 'domestik');
+            const intlItems = filtered.filter(a => a.group === 'internasional');
+            const sections = [];
+
+            if (domestikItems.length > 0) {
+                sections.push({
+                    title: 'Domestik Indonesia',
+                    icon: 'fa-plane',
+                    items: domestikItems
+                });
+            }
+            if (intlItems.length > 0) {
+                sections.push({
+                    title: 'Umrah & Internasional',
+                    icon: 'fa-globe-asia',
+                    items: intlItems
+                });
+            }
+
+            const showSectionHeader = sections.length > 1 || (airlineShortcutFilter === 'all' && !q);
+            grid.innerHTML = sections.map(sec => `
+                <div>
+                    ${showSectionHeader ? `
+                        <div class="flex items-center justify-between gap-2 mb-2 px-0.5">
+                            <span class="airline-section-heading inline-flex items-center gap-1.5 text-[10px] sm:text-[11px] font-black uppercase tracking-widest">
+                                <i class="fas ${sec.icon} text-[#C5A46D]"></i>
+                                <span>${sec.title}</span>
+                            </span>
+                            <span class="text-[9px] font-extrabold text-slate-400 uppercase tracking-wider">${sec.items.length} Maskapai</span>
+                        </div>
+                    ` : ''}
+                    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-2 sm:gap-2.5">
+                        ${sec.items.map(buildAirlineShortcutCardHtml).join('')}
+                    </div>
+                </div>
+            `).join('<div class="my-3.5 border-t border-slate-100"></div>');
+        }
+        window.renderAirlineShortcuts = renderAirlineShortcuts;
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', renderAirlineShortcuts);
+        } else {
+            renderAirlineShortcuts();
+        }
+
         function renderEkstra() {
+            if (typeof renderAirlineShortcuts === 'function') renderAirlineShortcuts();
             const tbody = document.getElementById('ekstraTableBody');
             const data = getEkstraBookings() || [];
             
@@ -6477,6 +6672,9 @@ async function submitEditPo(e) {
 
             // Empty chat WA Link
             const waLink = formatHp ? `https://wa.me/${formatHp}` : '';
+            const matchedAirlinePortal = (isPlane && typeof findAirlinePortalByName === 'function')
+                ? findAirlinePortalByName(item.vendor)
+                : null;
 
             // Body Content HTML (Boarding Pass & Maritime Style)
             const contentEl = document.getElementById('ekstraDetailContent');
@@ -6539,6 +6737,28 @@ async function submitEditPo(e) {
                                     <span class="font-black text-[11px]">${item.jamBerangkat || '-'} WIB</span>
                                 </div>
                             </div>
+
+                            ${matchedAirlinePortal ? `
+                                <div class="mt-2.5 pt-2.5 border-t border-blue-200/70 flex items-center justify-between gap-2 flex-wrap">
+                                    <span class="text-[10px] font-extrabold text-slate-600 flex items-center gap-1.5">
+                                        <span class="px-1.5 py-0.5 rounded text-white text-[9px] font-black" style="background-color: ${matchedAirlinePortal.accent};">${matchedAirlinePortal.code}</span>
+                                        <span>Portal Cetak Resmi</span>
+                                    </span>
+                                    <div class="flex items-center gap-1.5">
+                                        <a href="${matchedAirlinePortal.url}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-[10px] font-black uppercase tracking-wider shadow-2xs transition-all">
+                                            <i class="fas fa-print text-[9px]"></i>
+                                            <span>${matchedAirlinePortal.checkinUrl ? 'Kelola / Cetak' : 'Cetak E-Tiket'}</span>
+                                            <i class="fas fa-external-link-alt text-[8px]"></i>
+                                        </a>
+                                        ${matchedAirlinePortal.checkinUrl ? `
+                                            <a href="${matchedAirlinePortal.checkinUrl}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1 px-2 py-1 rounded-lg bg-white hover:bg-amber-50 text-amber-700 border border-amber-200 text-[10px] font-black uppercase tracking-wider transition-all">
+                                                <span>${matchedAirlinePortal.checkinLabel || 'Check-In'}</span>
+                                                <i class="fas fa-external-link-alt text-[8px]"></i>
+                                            </a>
+                                        ` : ''}
+                                    </div>
+                                </div>
+                            ` : ''}
                         </div>
 
                         <!-- Data Penumpang -->

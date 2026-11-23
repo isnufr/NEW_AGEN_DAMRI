@@ -1314,6 +1314,190 @@ body.dark-mode .mobile-more-logout {
     color: #fca5a5 !important;
 }
 
+/* ============================================ */
+/* PINTASAN CETAK TIKET PESAWAT (MASKAPAI HUB)  */
+/* ============================================ */
+.airline-shortcuts-panel {
+    background: #FFFFFF;
+    border: 1px solid #E5D7C6;
+    border-radius: 1.5rem;
+    box-shadow: 0 10px 32px -12px rgba(88, 24, 32, 0.12);
+    overflow: hidden;
+    transition: border-color 0.25s ease, box-shadow 0.25s ease;
+}
+.airline-shortcuts-panel:hover {
+    border-color: rgba(197, 164, 109, 0.75);
+}
+.airline-guide-strip {
+    background: linear-gradient(90deg, #FBF7F0 0%, #F3E9DC 100%);
+    border: 1px solid #E5D7C6;
+    color: #581820;
+}
+.airline-filter-pill {
+    padding: 7px 8px;
+    border-radius: 10px;
+    font-size: 9.5px;
+    font-weight: 800;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    border: 1px solid #E5D7C6;
+    background: #FBF7F0;
+    color: #581820;
+    cursor: pointer;
+    white-space: nowrap;
+    text-align: center;
+    transition: all 0.2s ease;
+}
+@media (min-width: 640px) {
+    .airline-filter-pill {
+        padding: 6px 12px;
+        font-size: 10px;
+        letter-spacing: 0.06em;
+    }
+}
+.airline-filter-pill:hover {
+    background: #F3E9DC;
+}
+.airline-filter-pill.active {
+    background: linear-gradient(135deg, #8E2635, #581820);
+    color: #FFFFFF;
+    border-color: #C5A46D;
+    box-shadow: 0 4px 12px -3px rgba(142, 38, 53, 0.42);
+}
+.airline-shortcut-card {
+    background: #FFFFFF;
+    border: 1px solid #EADFD2;
+    border-radius: 1rem;
+    padding: 9px;
+    min-width: 0;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 7px;
+    transition: transform 0.18s ease, border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+}
+@media (min-width: 640px) {
+    .airline-shortcut-card {
+        padding: 12px;
+        border-radius: 1.125rem;
+    }
+}
+.airline-shortcut-card:hover {
+    transform: translateY(-2px);
+    border-color: #C5A46D;
+    background: #FFFDF9;
+    box-shadow: 0 10px 24px -10px rgba(88, 24, 32, 0.18);
+}
+.airline-grid-scroll::-webkit-scrollbar {
+    width: 5px;
+    height: 5px;
+}
+.airline-grid-scroll::-webkit-scrollbar-thumb {
+    background: rgba(197, 164, 109, 0.45);
+    border-radius: 999px;
+}
+.airline-toggle-btn {
+    background: #FBF7F0;
+    border: 1px solid #E5D7C6;
+    color: #581820;
+}
+.airline-toggle-btn:hover {
+    background: #F3E9DC;
+}
+.airline-section-heading {
+    color: #581820;
+}
+.airline-portal-label {
+    color: #8E2635;
+}
+.airline-action-primary {
+    background: #FBF7F0;
+    color: #581820;
+    border: 1px solid #E5D7C6;
+}
+.airline-action-primary:hover {
+    background: #8E2635;
+    color: #FFFFFF;
+    border-color: #8E2635;
+}
+.airline-action-checkin {
+    background: #FFFBEB;
+    color: #92400E;
+    border: 1px solid #FDE68A;
+}
+.airline-action-checkin:hover {
+    background: #F59E0B;
+    color: #171717;
+    border-color: #F59E0B;
+}
+
+body.dark-mode .airline-count-badge {
+    background: rgba(197, 164, 109, 0.16) !important;
+    border-color: rgba(197, 164, 109, 0.38) !important;
+    color: #C5A46D !important;
+}
+body.dark-mode .airline-shortcuts-panel {
+    background: #231215 !important;
+    border-color: #422026 !important;
+    box-shadow: 0 12px 32px -10px rgba(0, 0, 0, 0.5) !important;
+}
+body.dark-mode .airline-guide-strip {
+    background: linear-gradient(90deg, rgba(142, 38, 53, 0.22), rgba(197, 164, 109, 0.12)) !important;
+    border-color: #422026 !important;
+    color: #F3E9DC !important;
+}
+body.dark-mode .airline-filter-pill {
+    background: #1B0D10 !important;
+    border-color: #422026 !important;
+    color: #E5D7C6 !important;
+}
+body.dark-mode .airline-filter-pill.active {
+    background: linear-gradient(135deg, #8E2635, #581820) !important;
+    border-color: #C5A46D !important;
+    color: #FFFFFF !important;
+}
+body.dark-mode .airline-shortcut-card {
+    background: #1B0D10 !important;
+    border-color: #422026 !important;
+}
+body.dark-mode .airline-shortcut-card:hover {
+    background: #291519 !important;
+    border-color: #C5A46D !important;
+}
+body.dark-mode .airline-toggle-btn {
+    background: #1B0D10 !important;
+    border-color: #422026 !important;
+    color: #C5A46D !important;
+}
+body.dark-mode .airline-toggle-btn:hover {
+    background: #2D181C !important;
+}
+body.dark-mode .airline-section-heading,
+body.dark-mode .airline-portal-label {
+    color: #C5A46D !important;
+}
+body.dark-mode .airline-action-primary {
+    background: #291519 !important;
+    border-color: #422026 !important;
+    color: #F3E9DC !important;
+}
+body.dark-mode .airline-action-primary:hover {
+    background: #8E2635 !important;
+    border-color: #C5A46D !important;
+    color: #FFFFFF !important;
+}
+body.dark-mode .airline-action-checkin {
+    background: rgba(197, 164, 109, 0.14) !important;
+    border-color: rgba(197, 164, 109, 0.35) !important;
+    color: #C5A46D !important;
+}
+body.dark-mode .airline-action-checkin:hover {
+    background: #C5A46D !important;
+    border-color: #C5A46D !important;
+    color: #171717 !important;
+}
+
 /* Mobile Device Optimization */
 @media (max-width: 640px) {
     .chart-card {
