@@ -1498,6 +1498,48 @@ body.dark-mode .airline-action-checkin:hover {
     color: #171717 !important;
 }
 
+/* ============================================ */
+/* PESAWAT & KAPAL MOBILE CARDS (100% FIT)      */
+/* ============================================ */
+.ekstra-mobile-card {
+    background: #FFFFFF;
+    border: 1px solid #EADFD2;
+    border-radius: 1.125rem;
+    padding: 12px;
+    box-shadow: 0 4px 16px -8px rgba(88, 24, 32, 0.1);
+}
+.ekstra-mobile-card:hover {
+    border-color: #C5A46D;
+}
+.ekstra-mobile-card:active {
+    transform: scale(0.99);
+}
+.ekstra-route-strip {
+    background: #FBF7F0;
+    border: 1px solid #EFE3D4;
+}
+.ekstra-total-price {
+    color: #171717;
+}
+body.dark-mode .ekstra-mobile-card {
+    background: #231215 !important;
+    border-color: #422026 !important;
+    box-shadow: 0 6px 20px -8px rgba(0, 0, 0, 0.45) !important;
+}
+body.dark-mode .ekstra-mobile-card:hover {
+    border-color: #C5A46D !important;
+}
+body.dark-mode .ekstra-route-strip {
+    background: #1B0D10 !important;
+    border-color: #422026 !important;
+}
+body.dark-mode .ekstra-route-strip span {
+    color: #F3E9DC !important;
+}
+body.dark-mode .ekstra-total-price {
+    color: #C5A46D !important;
+}
+
 /* Mobile Device Optimization */
 @media (max-width: 640px) {
     .chart-card {

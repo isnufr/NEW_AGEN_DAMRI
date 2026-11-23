@@ -5262,18 +5262,29 @@ function updateChartColors(isDark) {
 
         function toggleAirlineShortcutsCollapse(forceExpanded = null) {
             const col = document.getElementById('airlineShortcutsCollapse');
+            const hdrBar = document.getElementById('airlineShortcutsHeaderBar');
             const btn = document.getElementById('airlineShortcutsToggleBtn');
             const txt = document.getElementById('airlineShortcutsToggleText');
             if (!col) return;
 
             const shouldExpand = (typeof forceExpanded === 'boolean') ? forceExpanded : !col.classList.contains('expanded');
             col.classList.toggle('expanded', shouldExpand);
+            if (hdrBar) {
+                hdrBar.classList.toggle('border-b', shouldExpand);
+                hdrBar.classList.toggle('border-slate-100/80', shouldExpand);
+            }
             if (btn) {
                 btn.classList.toggle('is-expanded', shouldExpand);
                 btn.setAttribute('aria-expanded', shouldExpand ? 'true' : 'false');
             }
             if (txt) {
                 txt.innerText = shouldExpand ? 'Tutup' : 'Buka';
+            }
+            if (shouldExpand) {
+                const grid = document.getElementById('airlineShortcutsGrid');
+                if (grid && !grid.querySelector('.airline-shortcut-card') && !grid.querySelector('button')) {
+                    renderAirlineShortcuts();
+                }
             }
         }
         window.toggleAirlineShortcutsCollapse = toggleAirlineShortcutsCollapse;
@@ -5351,15 +5362,18 @@ function updateChartColors(isDark) {
 
         function renderAirlineShortcuts() {
             const grid = document.getElementById('airlineShortcutsGrid');
+            const col = document.getElementById('airlineShortcutsCollapse');
             const portals = typeof AIRLINE_PRINT_PORTALS !== 'undefined' ? AIRLINE_PRINT_PORTALS : [];
             if (!grid || portals.length === 0) return;
+
+            const totalBadge = document.getElementById('airlineShortcutsTotalBadge');
+            if (totalBadge) totalBadge.innerText = portals.length + ' Maskapai';
+
+            if (col && !col.classList.contains('expanded')) return;
 
             const q = airlineShortcutQuery.trim().toLowerCase();
             const domCount = portals.filter(a => a.group === 'domestik').length;
             const intlCount = portals.filter(a => a.group === 'internasional').length;
-
-            const totalBadge = document.getElementById('airlineShortcutsTotalBadge');
-            if (totalBadge) totalBadge.innerText = portals.length + ' Maskapai';
 
             const countMap = {
                 All: portals.length,
@@ -5453,62 +5467,86 @@ function updateChartColors(isDark) {
 
         function renderEkstra() {
             if (typeof renderAirlineShortcuts === 'function') renderAirlineShortcuts();
+            const mobileList = document.getElementById('ekstraMobileList');
             const tbody = document.getElementById('ekstraTableBody');
             const data = getEkstraBookings() || [];
-            
-            if(data.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="6" class="p-8 text-center text-slate-400 font-medium">Belum ada data tiket pesawat / kapal</td></tr>';
+
+            if (data.length === 0) {
+                if (mobileList) {
+                    mobileList.innerHTML = `
+                        <div class="ekstra-mobile-card text-center py-8 px-4">
+                            <i class="fas fa-ticket-alt text-2xl text-slate-300 mb-2"></i>
+                            <p class="text-xs font-extrabold text-slate-400">Belum ada data tiket pesawat / kapal</p>
+                        </div>
+                    `;
+                }
+                if (tbody) {
+                    tbody.innerHTML = '<tr><td colspan="6" class="p-8 text-center text-slate-400 font-medium">Belum ada data tiket pesawat / kapal</td></tr>';
+                }
                 return;
             }
 
-            // Urutkan dari yang terbaru (bisa pakai createdAt)
-            let html = '';
-            data.forEach((item, index) => {
+            let mobileHtml = '';
+            let desktopHtml = '';
+            data.forEach((item) => {
                 const isPlane = item.tipe === 'PESAWAT';
                 const isLunas = item.statusPembayaran === 'LUNAS';
                 const statusColor = isLunas ? 'bg-emerald-100 text-emerald-700 border-emerald-200' : 'bg-amber-100 text-amber-700 border-amber-200';
                 const pnpList = parseEkstraPnp(item);
                 const icon = isPlane ? 'fa-plane' : 'fa-ship';
                 const pnpNamesSummary = pnpList.map(p => p.nama).join(', ') || 'Tanpa Nama';
-                
-                // Mobile View: 2-Baris Presisi seperti Manifest (OnClick to Detail)
-                html += `
-                    <div onclick="openEkstraDetailModal('${item.id}')" class="block lg:hidden bg-white p-3 rounded-2xl border border-slate-200/80 shadow-xs hover:bg-blue-50/70 active:bg-blue-100/60 cursor-pointer transition-all select-none">
-                        <!-- Baris 1: Vendor & Rute (Kiri) | Status (Kanan) -->
-                        <div class="flex items-center justify-between gap-2">
-                            <div class="flex items-center gap-1.5 min-w-0 flex-1">
-                                <div class="w-6 h-6 rounded-lg ${isPlane ? 'bg-blue-100 text-blue-600' : 'bg-teal-100 text-teal-600'} flex items-center justify-center text-[10px] shrink-0">
+                const rawHp = parseEkstraHp(item);
+                const tipeLabel = isPlane ? 'PESAWAT' : 'KAPAL';
+
+                // Mobile Card: 100% pas lebar layar HP tanpa scroll kanan-kiri
+                mobileHtml += `
+                    <div onclick="openEkstraDetailModal('${item.id}')" class="ekstra-mobile-card w-full min-w-0 overflow-hidden cursor-pointer transition-all select-none">
+                        <!-- Baris 1: Vendor (Kiri) | Status + Panah (Kanan) -->
+                        <div class="flex items-center justify-between gap-2 min-w-0">
+                            <div class="flex items-center gap-2 min-w-0 flex-1">
+                                <div class="w-7 h-7 rounded-xl ${isPlane ? 'bg-blue-100 text-blue-600' : 'bg-teal-100 text-teal-600'} flex items-center justify-center text-xs shrink-0">
                                     <i class="fas ${icon}"></i>
                                 </div>
-                                <span class="text-xs font-black text-slate-800 uppercase tracking-tight truncate">${item.vendor}</span>
-                                <span class="text-[10px] font-extrabold text-blue-600 uppercase tracking-wider truncate">• ${item.rute}</span>
+                                <div class="min-w-0 flex-1">
+                                    <div class="text-xs font-black text-slate-800 uppercase tracking-tight truncate">${item.vendor}</div>
+                                    <div class="text-[9px] font-bold text-slate-400 uppercase tracking-wider leading-none mt-0.5">${tipeLabel}</div>
+                                </div>
                             </div>
                             <div class="flex items-center gap-1.5 shrink-0">
-                                <span class="inline-block px-2 py-0.5 rounded-full text-[8px] font-black uppercase tracking-wider shadow-2xs border ${statusColor}">${item.statusPembayaran}</span>
-                                <div class="w-5 h-5 rounded-full bg-slate-100 flex items-center justify-center text-slate-400">
-                                    <i class="fas fa-chevron-right text-[8px]"></i>
+                                <span class="inline-block px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider shadow-2xs border ${statusColor}">${item.statusPembayaran}</span>
+                                <div class="w-6 h-6 rounded-full bg-slate-100 flex items-center justify-center text-slate-400">
+                                    <i class="fas fa-chevron-right text-[9px]"></i>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- Baris 2: Nama Penumpang (Kiri) | Total Bayar (Kanan) -->
-                        <div class="flex items-center justify-between gap-2 mt-1.5 pt-1.5 border-t border-slate-100/80">
-                            <div class="min-w-0 flex-1 pr-2">
-                                <span class="font-bold text-xs text-slate-700 truncate block">
+                        <!-- Baris 2: Rute Penuh (Auto-wrap rapi agar terbaca tanpa scroll horizontal) -->
+                        <div class="ekstra-route-strip mt-2 px-2.5 py-1.5 rounded-xl flex items-start gap-1.5 min-w-0">
+                            <i class="fas fa-route text-[10px] mt-0.5 shrink-0 ${isPlane ? 'text-blue-600' : 'text-teal-600'}"></i>
+                            <span class="text-[11px] font-extrabold leading-snug break-words min-w-0 flex-1 ${isPlane ? 'text-blue-700' : 'text-teal-700'}">${item.rute || '-'}</span>
+                        </div>
+
+                        <!-- Baris 3: Nama Penumpang & Jadwal (Kiri) | Total Bayar (Kanan) -->
+                        <div class="flex items-end justify-between gap-2 mt-2 pt-2 border-t border-slate-100/80 min-w-0">
+                            <div class="min-w-0 flex-1 pr-1">
+                                <div class="font-bold text-xs text-slate-700 truncate">
                                     <i class="fas fa-users text-slate-400 text-[10px] mr-1"></i>${pnpNamesSummary} <span class="text-[10px] text-slate-400 font-semibold">(${pnpList.length} Org)</span>
-                                </span>
-                                <span class="text-[9px] font-bold text-slate-400 block mt-0.5">
-                                    <i class="far fa-calendar-alt mr-1"></i>${item.tanggalBerangkat} • ${item.jamBerangkat}
-                                </span>
+                                </div>
+                                <div class="text-[10px] font-bold text-slate-400 truncate mt-0.5">
+                                    <i class="far fa-calendar-alt mr-1"></i>${item.tanggalBerangkat || '-'} • ${item.jamBerangkat || '-'}
+                                </div>
                             </div>
                             <div class="text-right shrink-0">
-                                <span class="font-black text-sm text-slate-900 block">${formatRupiah(item.totalHarga)}</span>
+                                <span class="text-[9px] font-bold text-slate-400 uppercase tracking-wider block leading-none mb-0.5">Total Bayar</span>
+                                <span class="ekstra-total-price font-black text-sm block leading-tight">${formatRupiah(item.totalHarga)}</span>
                             </div>
                         </div>
                     </div>
+                `;
 
-                    <!-- Desktop View: Table Row (OnClick to Detail) -->
-                    <tr onclick="openEkstraDetailModal('${item.id}')" class="hidden lg:table-row hover:bg-blue-50/70 transition-colors group cursor-pointer border-b border-slate-100 select-none">
+                // Desktop View: Strictly <tr> inside <tbody>
+                desktopHtml += `
+                    <tr onclick="openEkstraDetailModal('${item.id}')" class="hover:bg-blue-50/70 transition-colors group cursor-pointer border-b border-slate-100 select-none">
                         <td class="p-3.5">
                             <div class="flex items-center gap-3">
                                 <div class="w-10 h-10 rounded-xl ${isPlane ? 'bg-blue-50 text-blue-600' : 'bg-teal-50 text-teal-600'} flex items-center justify-center flex-shrink-0">
@@ -5526,7 +5564,7 @@ function updateChartColors(isDark) {
                         </td>
                         <td class="p-3.5">
                             <div class="font-black text-blue-600 text-xs">${pnpNamesSummary} <span class="text-[10px] text-slate-400 font-bold">(${pnpList.length} Org)</span></div>
-                            <div class="text-[10px] font-bold text-slate-400 mt-0.5"><i class="fas fa-phone mr-1"></i> ${parseEkstraHp(item)}</div>
+                            <div class="text-[10px] font-bold text-slate-400 mt-0.5"><i class="fas fa-phone mr-1"></i> ${rawHp}</div>
                         </td>
                         <td class="p-3.5 text-right font-black text-xs text-slate-800 whitespace-nowrap">
                             ${formatRupiah(item.totalHarga)}
@@ -5545,7 +5583,8 @@ function updateChartColors(isDark) {
                     </tr>
                 `;
             });
-            tbody.innerHTML = html;
+            if (mobileList) mobileList.innerHTML = mobileHtml;
+            if (tbody) tbody.innerHTML = desktopHtml;
         }
 
                 // =========================================================
