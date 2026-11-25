@@ -170,7 +170,7 @@
         }
         .fade-up { animation: fadeUp 0.5s ease forwards; }
 
-        /* Thermal Ticket Display & 58mm Landscape Print (47.6mm x 169.3mm Full 1:1 Scale = Pilihan 2) */
+        /* Thermal Ticket Display & 58mm Landscape Print (47.6mm x 169.3mm Full 1:1 Scale = Pilihan 2, Crisp 203-DPI Typography) */
         .thermal-ticket-paper {
             width: 640px;
             height: 180px;
@@ -178,10 +178,15 @@
             margin: 0;
             background: #ffffff !important;
             color: #000000 !important;
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+            font-family: Verdana, Tahoma, Arial, sans-serif;
             padding: 0;
             box-sizing: border-box;
             user-select: none;
+            -webkit-font-smoothing: none;
+            -moz-osx-font-smoothing: unset;
+            font-smooth: never;
+            text-rendering: optimizeSpeed;
+            font-synthesis: none;
         }
         #ticketDisplayStage {
             width: 100%;
@@ -203,21 +208,36 @@
             display: grid;
             grid-template-columns: 446px 18px 164px;
             align-items: stretch;
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+            font-family: Verdana, Tahoma, Arial, sans-serif;
+            -webkit-font-smoothing: none;
+            font-smooth: never;
+            text-rendering: optimizeSpeed;
+            font-synthesis: none;
         }
         .tt-land-sheet,
         .tt-land-sheet * {
             color: #000000 !important;
             box-sizing: border-box;
             transition: none !important;
+            -webkit-font-smoothing: none;
+            font-smooth: never;
+            font-synthesis: none;
+        }
+        .thermal-ticket-paper .tt-head-font {
+            font-family: Tahoma, Verdana, Arial, sans-serif !important;
         }
         .thermal-ticket-paper .tt-mono {
-            font-family: 'Consolas', 'SFMono-Regular', 'Courier New', monospace !important;
+            font-family: Consolas, 'Lucida Console', 'Courier New', monospace !important;
+        }
+        .thermal-ticket-paper .tt-num {
+            font-family: Verdana, Tahoma, Arial, sans-serif !important;
+            font-variant-numeric: tabular-nums;
         }
         .thermal-ticket-paper .tt-lbl {
-            font-size: 7.5px;
-            font-weight: 800;
-            letter-spacing: 0.05em;
+            font-family: Tahoma, Verdana, Arial, sans-serif !important;
+            font-size: 7.8px;
+            font-weight: 400;
+            letter-spacing: 0.06em;
             text-transform: uppercase;
             line-height: 1.15;
         }
@@ -226,17 +246,20 @@
             justify-content: space-between;
             align-items: baseline;
             gap: 4px;
-            font-size: 9.2px;
-            line-height: 1.34;
+            font-size: 8.8px;
+            line-height: 1.38;
         }
         .thermal-ticket-paper .tt-row span {
             color: #000000 !important;
-            font-weight: 600;
+            font-weight: 400;
             flex-shrink: 0;
         }
         .thermal-ticket-paper .tt-row strong {
+            font-family: Verdana, Tahoma, Arial, sans-serif !important;
             color: #000000 !important;
-            font-weight: 800;
+            font-size: 9.2px;
+            font-weight: 700;
+            letter-spacing: 0.03em;
             text-align: right;
             white-space: nowrap;
         }
@@ -252,14 +275,15 @@
         .tt-v-cut::after {
             content: "";
             flex: 1;
-            border-left: 1.3px dashed #000000;
+            border-left: 1.2px dashed #000000;
         }
         .tt-v-cut span {
+            font-family: Tahoma, Verdana, Arial, sans-serif !important;
             writing-mode: vertical-rl;
             transform: rotate(180deg);
-            font-size: 7.5px;
-            font-weight: 900;
-            letter-spacing: 0.1em;
+            font-size: 7.6px;
+            font-weight: 700;
+            letter-spacing: 0.12em;
             white-space: nowrap;
         }
         body.dark-mode #ticketModal #ticketModalInner,

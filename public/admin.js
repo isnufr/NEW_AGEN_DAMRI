@@ -3867,25 +3867,25 @@
             : (t.keterangan || '-');
 
         const seatLen = String(t.kursi || '').length;
-        const mainSeatFont = seatLen > 13 ? '10.5px' : (seatLen > 8 ? '12.5px' : '15.5px');
-        const stubSeatFont = seatLen > 13 ? '10.5px' : (seatLen > 8 ? '12.5px' : '14.5px');
+        const mainSeatFont = seatLen > 13 ? '10.5px' : (seatLen > 8 ? '13px' : '16.5px');
+        const stubSeatFont = seatLen > 13 ? '10.5px' : (seatLen > 8 ? '12.5px' : '15px');
         const armLen = String(t.armada || '').length;
         const armadaMainFont = armLen > 20 ? '12.5px' : (armLen > 15 ? '14px' : '15.5px');
         const armadaStubFont = armLen > 16 ? '10px' : '11.5px';
 
         return `
             <div class="tt-land-sheet">
-                <!-- Left Framed Ticket (446px x 172px — Exact Pilihan 2 Structured Table Slip) -->
+                <!-- Left Framed Ticket (446px x 172px — Exact Pilihan 2, Crisp Low-DPI Thermal Fonts) -->
                 <div style="border:1.5px solid #000;display:flex;flex-direction:column;height:172px;overflow:hidden;">
                     <!-- Row 1: Header Bar (30px) -->
-                    <div style="height:30px;padding:0 9px;border-bottom:1.5px solid #000;display:flex;justify-content:space-between;align-items:center;gap:6px;flex-shrink:0;">
+                    <div style="height:30px;padding:0 8px;border-bottom:1.5px solid #000;display:flex;justify-content:space-between;align-items:center;gap:6px;flex-shrink:0;">
                         <div style="display:flex;align-items:baseline;gap:6px;min-width:0;overflow:hidden;">
-                            <span style="font-size:${armadaMainFont};font-weight:900;letter-spacing:0.02em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${escapeTicketHtml(t.armada)}</span>
-                            <span style="font-size:8px;font-weight:800;letter-spacing:0.03em;white-space:nowrap;flex-shrink:0;">AGEN DAMRI KAWUNGANTEN</span>
+                            <span class="tt-head-font" style="font-size:${armadaMainFont};font-weight:700;letter-spacing:0.03em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${escapeTicketHtml(t.armada)}</span>
+                            <span class="tt-head-font" style="font-size:7.8px;font-weight:400;letter-spacing:0.06em;white-space:nowrap;flex-shrink:0;">AGEN DAMRI KAWUNGANTEN</span>
                         </div>
                         <div style="display:flex;align-items:baseline;gap:4px;flex-shrink:0;white-space:nowrap;">
-                            <span style="font-size:9.5px;font-weight:800;">KODE:</span>
-                            <strong class="tt-mono" style="font-size:13px;font-weight:900;letter-spacing:0.05em;">${escapeTicketHtml(t.idTiket)}</strong>
+                            <span class="tt-head-font" style="font-size:8.6px;font-weight:400;letter-spacing:0.04em;">KODE:</span>
+                            <strong class="tt-mono" style="font-size:13.5px;font-weight:700;letter-spacing:0.06em;">${escapeTicketHtml(t.idTiket)}</strong>
                         </div>
                     </div>
 
@@ -3896,53 +3896,53 @@
                             <!-- Sub-Row A: 3 Cells (142 + 112 + 90 = 344px) -->
                             <div style="display:grid;grid-template-columns:142px 112px 90px;border-bottom:1px dashed #000;">
                                 <!-- Cell A1: Rute -->
-                                <div style="padding:3px 8px;border-right:1px dashed #444;display:flex;flex-direction:column;justify-content:center;overflow:hidden;">
+                                <div style="padding:3px 7px;border-right:1px dashed #000;display:flex;flex-direction:column;justify-content:center;overflow:hidden;">
                                     <div class="tt-lbl">RUTE PERJALANAN</div>
-                                    <div style="font-size:15.5px;font-weight:900;line-height:1.1;margin-top:1px;white-space:nowrap;">${escapeTicketHtml(t.asalCode)} &#8594; ${escapeTicketHtml(t.tujuanCode)}</div>
-                                    <div style="font-size:7.5px;font-weight:700;line-height:1.15;margin-top:1px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;">${escapeTicketHtml(t.asalText)} - ${escapeTicketHtml(t.tujuan)}</div>
+                                    <div class="tt-head-font" style="font-size:16px;font-weight:700;letter-spacing:0.03em;line-height:1.12;margin-top:1px;white-space:nowrap;">${escapeTicketHtml(t.asalCode)} &#8594; ${escapeTicketHtml(t.tujuanCode)}</div>
+                                    <div class="tt-head-font" style="font-size:7.8px;font-weight:400;letter-spacing:0.01em;line-height:1.16;margin-top:1px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;">${escapeTicketHtml(t.asalText)} - ${escapeTicketHtml(t.tujuan)}</div>
                                 </div>
                                 <!-- Cell A2: Keberangkatan -->
-                                <div style="padding:4px 8px;border-right:1px dashed #444;display:flex;flex-direction:column;justify-content:center;overflow:hidden;">
+                                <div style="padding:3px 7px;border-right:1px dashed #000;display:flex;flex-direction:column;justify-content:center;overflow:hidden;">
                                     <div class="tt-lbl">KEBERANGKATAN</div>
-                                    <div style="font-size:11px;font-weight:900;line-height:1.2;margin-top:2px;white-space:nowrap;">${escapeTicketHtml(t.tglBerangkatShort)}</div>
-                                    <div style="font-size:11px;font-weight:900;line-height:1.2;white-space:nowrap;">${escapeTicketHtml(t.jam)} WIB</div>
+                                    <div class="tt-head-font" style="font-size:10.8px;font-weight:700;letter-spacing:0.03em;line-height:1.22;margin-top:2px;white-space:nowrap;">${escapeTicketHtml(t.tglBerangkatShort)}</div>
+                                    <div class="tt-num" style="font-size:10.8px;font-weight:700;letter-spacing:0.03em;line-height:1.22;white-space:nowrap;">${escapeTicketHtml(t.jam)} WIB</div>
                                 </div>
                                 <!-- Cell A3: Kursi -->
-                                <div style="padding:4px 5px;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;overflow:hidden;">
+                                <div style="padding:3px 4px;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;overflow:hidden;">
                                     <div class="tt-lbl" style="white-space:nowrap;">KURSI (${t.qty} ORG)</div>
-                                    <div style="font-size:${mainSeatFont};font-weight:900;line-height:1.15;margin-top:2px;word-break:break-word;">${escapeTicketHtml(t.kursi)}</div>
+                                    <div class="tt-num" style="font-size:${mainSeatFont};font-weight:700;letter-spacing:0.03em;line-height:1.15;margin-top:2px;word-break:break-word;">${escapeTicketHtml(t.kursi)}</div>
                                 </div>
                             </div>
 
                             <!-- Sub-Row B: 2 Cells (185 + 159 = 344px) -->
                             <div style="display:grid;grid-template-columns:185px 159px;">
                                 <!-- Cell B1: Passenger Info -->
-                                <div style="padding:4px 8px;border-right:1px dashed #444;display:flex;flex-direction:column;justify-content:center;gap:1.5px;font-size:9.2px;line-height:1.3;overflow:hidden;">
-                                    <div style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Penumpang: <strong style="font-size:10.5px;font-weight:900;">${escapeTicketHtml(t.nama)}</strong></div>
-                                    <div style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Naik: <strong style="font-weight:800;">${escapeTicketHtml(t.titikNaik)}</strong></div>
-                                    <div style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Ket: <strong style="font-weight:700;">${escapeTicketHtml(ketCombined)}</strong></div>
+                                <div style="padding:4px 7px;border-right:1px dashed #000;display:flex;flex-direction:column;justify-content:center;gap:2px;font-size:8.8px;font-weight:400;line-height:1.32;overflow:hidden;">
+                                    <div style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Penumpang: <strong style="font-size:10px;font-weight:700;letter-spacing:0.02em;">${escapeTicketHtml(t.nama)}</strong></div>
+                                    <div style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Naik: <span style="font-weight:400;">${escapeTicketHtml(t.titikNaik)}</span></div>
+                                    <div style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Ket: <span style="font-weight:400;">${escapeTicketHtml(ketCombined)}</span></div>
                                 </div>
                                 <!-- Cell B2: Fare & Total -->
-                                <div style="padding:4px 8px;display:flex;flex-direction:column;justify-content:center;gap:1.5px;overflow:hidden;">
-                                    <div class="tt-row" style="font-size:9px;"><span>Tiket ${t.qty}&times;${escapeTicketHtml(hargaShort)}</span><strong>${escapeTicketHtml(t.subtotalTiket)}</strong></div>
-                                    <div class="tt-row" style="font-size:9px;"><span>${extraLabel}</span><strong>${extraValue}</strong></div>
+                                <div style="padding:4px 7px;display:flex;flex-direction:column;justify-content:center;gap:1.5px;overflow:hidden;">
+                                    <div class="tt-row"><span>Tiket ${t.qty}&times;${escapeTicketHtml(hargaShort)}</span><strong>${escapeTicketHtml(t.subtotalTiket)}</strong></div>
+                                    <div class="tt-row"><span>${extraLabel}</span><strong>${extraValue}</strong></div>
                                     <div style="border-top:1.3px solid #000;margin-top:2px;padding-top:2px;display:flex;justify-content:space-between;align-items:baseline;gap:4px;">
-                                        <span style="font-size:10.8px;font-weight:900;">TOTAL</span>
-                                        <strong style="font-size:11px;font-weight:900;white-space:nowrap;">${escapeTicketHtml(t.totalHarga)}</strong>
+                                        <span class="tt-head-font" style="font-size:10.5px;font-weight:700;letter-spacing:0.04em;">TOTAL</span>
+                                        <strong class="tt-num" style="font-size:10.8px;font-weight:700;letter-spacing:0.03em;white-space:nowrap;">${escapeTicketHtml(t.totalHarga)}</strong>
                                     </div>
                                 </div>
                             </div>
                         </div>
 
                         <!-- QR Cell (98px x 120px) -->
-                        <div style="padding:5px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;text-align:center;">
+                        <div style="padding:4px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;text-align:center;">
                             ${renderThermalQrSvg(t.qrPayload, 82)}
-                            <span style="font-size:7px;font-weight:900;letter-spacing:0.05em;white-space:nowrap;">E-TIKET RESMI</span>
+                            <span class="tt-head-font" style="font-size:7.4px;font-weight:400;letter-spacing:0.08em;white-space:nowrap;">E-TIKET RESMI</span>
                         </div>
                     </div>
 
                     <!-- Row 4: Footer Strip (19px) -->
-                    <div style="height:19px;padding:0 8px;border-top:1.2px solid #000;display:flex;justify-content:space-between;align-items:center;gap:6px;font-size:7.8px;font-weight:700;white-space:nowrap;flex-shrink:0;">
+                    <div class="tt-head-font" style="height:19px;padding:0 7px;border-top:1.2px solid #000;display:flex;justify-content:space-between;align-items:center;gap:6px;font-size:7.8px;font-weight:400;letter-spacing:0.015em;white-space:nowrap;flex-shrink:0;">
                         <span>Hadir 30 mnt sblm jadwal &bull; Cancel maks H-1 (1&times;24 jam)</span>
                         <span>WA: 0821-3360-7759 &bull; Beli: ${escapeTicketHtml(t.tglBeliShort)}</span>
                     </div>
@@ -3952,22 +3952,22 @@
                 <div class="tt-v-cut"><span>&#9986; POTONG</span></div>
 
                 <!-- Right Framed Stub: Arsip Agen / Kru (164px x 172px, NO PRICE!) -->
-                <div style="border:1.5px solid #000;height:172px;padding:5px 8px;display:flex;flex-direction:column;justify-content:space-between;overflow:hidden;">
+                <div style="border:1.5px solid #000;height:172px;padding:5px 7px;display:flex;flex-direction:column;justify-content:space-between;overflow:hidden;">
                     <div style="border-bottom:1.2px solid #000;padding-bottom:3px;flex-shrink:0;">
-                        <div style="font-size:7.5px;font-weight:900;letter-spacing:0.07em;">ARSIP AGEN / KRU</div>
-                        <div style="font-size:${armadaStubFont};font-weight:900;line-height:1.15;margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${escapeTicketHtml(t.armada)}</div>
+                        <div class="tt-lbl" style="letter-spacing:0.08em;">ARSIP AGEN / KRU</div>
+                        <div class="tt-head-font" style="font-size:${armadaStubFont};font-weight:700;letter-spacing:0.02em;line-height:1.18;margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${escapeTicketHtml(t.armada)}</div>
                     </div>
 
-                    <div style="font-size:9.2px;line-height:1.38;display:flex;flex-direction:column;justify-content:center;gap:1px;overflow:hidden;">
-                        <div style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Kode: <strong class="tt-mono" style="font-weight:900;">${escapeTicketHtml(t.idTiket)}</strong></div>
-                        <div style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Nama: <strong style="font-weight:900;">${escapeTicketHtml(t.nama)} (${t.qty} Org)</strong></div>
-                        <div style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Rute: <strong style="font-weight:900;">${escapeTicketHtml(t.asalCode)} &#8594; ${escapeTicketHtml(t.tujuanCode)}</strong></div>
-                        <div style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Jadwal: <strong style="font-weight:800;">${escapeTicketHtml(t.tglBerangkatStub)} &bull; ${escapeTicketHtml(t.jam)}</strong></div>
+                    <div style="font-size:8.6px;font-weight:400;line-height:1.42;display:flex;flex-direction:column;justify-content:center;gap:1px;overflow:hidden;">
+                        <div style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Kode: <strong class="tt-mono" style="font-size:10.2px;font-weight:700;letter-spacing:0.04em;">${escapeTicketHtml(t.idTiket)}</strong></div>
+                        <div style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Nama: <strong style="font-size:9px;font-weight:700;letter-spacing:0.01em;">${escapeTicketHtml(t.nama)} (${t.qty} Org)</strong></div>
+                        <div style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Rute: <strong class="tt-head-font" style="font-size:9.5px;font-weight:700;letter-spacing:0.03em;">${escapeTicketHtml(t.asalCode)} &#8594; ${escapeTicketHtml(t.tujuanCode)}</strong></div>
+                        <div style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Jadwal: <strong class="tt-num" style="font-size:8.8px;font-weight:700;letter-spacing:0.02em;">${escapeTicketHtml(t.tglBerangkatStub)} &bull; ${escapeTicketHtml(t.jam)}</strong></div>
                     </div>
 
                     <div style="border-top:1.2px solid #000;padding-top:3px;display:flex;justify-content:space-between;align-items:baseline;gap:4px;flex-shrink:0;">
                         <span class="tt-lbl">NO. KURSI</span>
-                        <strong style="font-size:${stubSeatFont};font-weight:900;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${escapeTicketHtml(t.kursi)}</strong>
+                        <strong class="tt-num" style="font-size:${stubSeatFont};font-weight:700;letter-spacing:0.03em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${escapeTicketHtml(t.kursi)}</strong>
                     </div>
                 </div>
             </div>
@@ -5341,7 +5341,11 @@
                 x.fillRect(px, py, thick, Math.min(6, y1 - py));
             }
         };
-        const fitTextSingle = (text, px, py, maxW, baseSize, weight = '900', family = 'Arial, sans-serif', align = 'left', minSize = 14) => {
+        const F_BODY = 'Verdana, Tahoma, Arial, sans-serif';
+        const F_HEAD = 'Tahoma, Verdana, Arial, sans-serif';
+        const F_MONO = 'Consolas, "Lucida Console", "Courier New", monospace';
+
+        const fitTextSingle = (text, px, py, maxW, baseSize, weight = '700', family = F_HEAD, align = 'left', minSize = 14) => {
             const str = String(text || '-');
             let sz = baseSize;
             while (sz > minSize) {
@@ -5361,38 +5365,38 @@
             x.fillText(outStr, px, py);
             return { width: x.measureText(outStr).width, size: sz };
         };
-        const drawInlineField = (labelStr, valStr, px, py, maxW, lblSize = 19.5, valSize = 20, valFamily = 'Arial, sans-serif') => {
+        const drawInlineField = (labelStr, valStr, px, py, maxW, lblSize = 18.5, valSize = 19.5, valWeight = '700', valFamily = F_BODY) => {
             x.textAlign = 'left';
-            x.font = `700 ${lblSize}px Arial, sans-serif`;
+            x.font = `400 ${lblSize}px ${F_BODY}`;
             const lw = x.measureText(labelStr).width;
             x.fillText(labelStr, px, py);
-            fitTextSingle(valStr, px + lw, py - Math.round((valSize - lblSize) * 0.4), Math.max(50, maxW - lw), valSize, '900', valFamily, 'left', 14);
+            fitTextSingle(valStr, px + lw, py - Math.round((valSize - lblSize) * 0.4), Math.max(50, maxW - lw), valSize, valWeight, valFamily, 'left', 14);
         };
 
         // =================================================================
         // 1. LEFT FRAMED TICKET (x: 12..954 -> 942w, y: 8..376 -> 368h)
-        //    Exact 2.1125x scale of HTML (446px x 172px)
+        //    Exact 2.1125x scale of HTML (446px x 172px) with Open-Counter Thermal Fonts
         // =================================================================
         drawBox(12, 8, 942, 368, 3);
 
         // Row 1: Header Bar (y: 8..72 -> 64px)
         drawHLine(12, 954, 72, 3);
-        x.font = '900 27.5px Consolas, "Courier New", monospace';
+        x.font = `700 28.5px ${F_MONO}`;
         const idW = x.measureText(t.idTiket).width;
         x.textAlign = 'right';
-        x.fillText(t.idTiket, 935, 25);
-        x.font = '800 20px Arial, sans-serif';
+        x.fillText(t.idTiket, 935, 24);
+        x.font = `400 18.5px ${F_HEAD}`;
         const kodeLbl = 'KODE: ';
         const kodeLblW = x.measureText(kodeLbl).width;
         x.fillText(kodeLbl, 935 - idW, 30);
 
         const agenSubLbl = 'AGEN DAMRI KAWUNGANTEN';
-        x.font = '800 17px Arial, sans-serif';
+        x.font = `400 16.5px ${F_HEAD}`;
         const agenSubW = x.measureText(agenSubLbl).width;
         const maxArmW = Math.max(180, 935 - idW - kodeLblW - 32 - agenSubW - 14);
-        const armRes = fitTextSingle(t.armada, 31, 23, maxArmW, 33, '900', 'Arial, sans-serif', 'left', 22);
+        const armRes = fitTextSingle(t.armada, 31, 22, maxArmW, 32.5, '700', F_HEAD, 'left', 22);
         x.textAlign = 'left';
-        x.font = '800 17px Arial, sans-serif';
+        x.font = `400 16.5px ${F_HEAD}`;
         x.fillText(agenSubLbl, 31 + armRes.width + 14, 33);
 
         // Row 2+3: Merged Core Grid (x: 15..744) + QR Cell (x: 747..951), y: 72..332 (260px)
@@ -5405,25 +5409,25 @@
 
         // Cell A1: Rute Perjalanan (x: 15..314)
         x.textAlign = 'left';
-        x.font = '800 16px Arial, sans-serif';
-        x.fillText('RUTE PERJALANAN', 31, 86);
-        fitTextSingle(`${t.asalCode} \u2192 ${t.tujuanCode}`, 31, 110, 268, 33, '900', 'Arial, sans-serif', 'left', 24);
-        fitTextSingle(`${t.asalText} - ${t.tujuan}`, 31, 154, 268, 17.5, '700', 'Arial, sans-serif', 'left', 13.5);
+        x.font = `400 16.5px ${F_HEAD}`;
+        x.fillText('RUTE PERJALANAN', 29, 85);
+        fitTextSingle(`${t.asalCode} \u2192 ${t.tujuanCode}`, 29, 108, 272, 33.5, '700', F_HEAD, 'left', 24);
+        fitTextSingle(`${t.asalText} - ${t.tujuan}`, 29, 154, 272, 16.5, '400', F_HEAD, 'left', 13.5);
 
         // Cell A2: Keberangkatan (x: 314..552)
         x.textAlign = 'left';
-        x.font = '800 16px Arial, sans-serif';
-        x.fillText('KEBERANGKATAN', 331, 86);
-        fitTextSingle(t.tglBerangkatShort, 331, 114, 206, 23.5, '900', 'Arial, sans-serif', 'left', 17);
-        fitTextSingle(`${t.jam} WIB`, 331, 146, 206, 23.5, '900', 'Arial, sans-serif', 'left', 17);
+        x.font = `400 16.5px ${F_HEAD}`;
+        x.fillText('KEBERANGKATAN', 330, 85);
+        fitTextSingle(t.tglBerangkatShort, 330, 113, 208, 22.5, '700', F_HEAD, 'left', 17);
+        fitTextSingle(`${t.jam} WIB`, 330, 145, 208, 22.5, '700', F_BODY, 'left', 17);
 
         // Cell A3: Kursi (x: 552..744, center = 648)
         x.textAlign = 'center';
-        x.font = '800 16px Arial, sans-serif';
-        x.fillText(`KURSI (${t.qty} ORG)`, 648, 86);
+        x.font = `400 16.5px ${F_HEAD}`;
+        x.fillText(`KURSI (${t.qty} ORG)`, 648, 85);
         const seatLen = String(t.kursi || '').length;
-        const seatSz = seatLen > 13 ? 22 : (seatLen > 8 ? 26.5 : 33);
-        fitTextSingle(t.kursi, 648, 120, 174, seatSz, '900', 'Arial, sans-serif', 'center', 18);
+        const seatSz = seatLen > 13 ? 21 : (seatLen > 8 ? 26 : 33);
+        fitTextSingle(t.kursi, 648, 118, 176, seatSz, '700', F_BODY, 'center', 18);
 
         // Sub-Row B: 2 Cells (y: 193..332 -> divider at 405)
         drawVDash(405, 193, 332, 2);
@@ -5432,9 +5436,9 @@
         const ketCombined = (t.hasBiayaTambahan && t.biayaTambahanKet)
             ? ((t.keterangan && t.keterangan !== '-') ? `${t.keterangan} • ${t.biayaTambahanKet}` : t.biayaTambahanKet)
             : (t.keterangan || '-');
-        drawInlineField('Penumpang: ', t.nama, 31, 209, 358, 19.5, 22.5);
-        drawInlineField('Naik: ', t.titikNaik, 31, 245, 358, 19.5, 20);
-        drawInlineField('Ket: ', ketCombined, 31, 281, 358, 19.5, 19.5);
+        drawInlineField('Penumpang: ', t.nama, 29, 208, 362, 18.5, 21, '700', F_BODY);
+        drawInlineField('Naik: ', t.titikNaik, 29, 245, 362, 18.5, 18.5, '400', F_BODY);
+        drawInlineField('Ket: ', ketCombined, 29, 281, 362, 18.5, 18.5, '400', F_BODY);
 
         // Cell B2: Fare & Total (x: 405..744)
         const hargaShort = formatShortRupiahUnit(t.hargaSatuanNum);
@@ -5444,24 +5448,23 @@
         const extraVal = t.hasBiayaTambahan ? t.biayaTambahanFormatted : '-';
 
         x.textAlign = 'left';
-        x.font = '700 19px Arial, sans-serif';
-        x.fillText(`Tiket ${t.qty}\u00D7${hargaShort}`, 422, 209);
-        fitTextSingle(t.subtotalTiket, 727, 208, 165, 19.5, '900', 'Arial, sans-serif', 'right', 15);
+        x.font = `400 18.5px ${F_BODY}`;
+        x.fillText(`Tiket ${t.qty}\u00D7${hargaShort}`, 420, 209);
+        fitTextSingle(t.subtotalTiket, 728, 208, 172, 19.5, '700', F_BODY, 'right', 15);
 
         x.textAlign = 'left';
-        fitTextSingle(extraLabel, 422, 241, 182, 19, '700', 'Arial, sans-serif', 'left', 15);
-        fitTextSingle(extraVal, 727, 240, 150, 19.5, '900', 'Arial, sans-serif', 'right', 15);
+        fitTextSingle(extraLabel, 420, 241, 182, 18.5, '400', F_BODY, 'left', 14.5);
+        fitTextSingle(extraVal, 728, 240, 155, 19.5, '700', F_BODY, 'right', 15);
 
-        drawHLine(422, 727, 274, 3);
+        drawHLine(420, 728, 274, 3);
         x.textAlign = 'left';
-        x.font = '900 23px Arial, sans-serif';
-        x.fillText('TOTAL', 422, 287);
-        fitTextSingle(t.totalHarga, 727, 286, 208, 23.5, '900', 'Arial, sans-serif', 'right', 17);
+        x.font = `700 22px ${F_HEAD}`;
+        x.fillText('TOTAL', 420, 287);
+        fitTextSingle(t.totalHarga, 728, 286, 212, 23, '700', F_BODY, 'right', 17);
 
         // QR Cell (x: 747..951, y: 72..332 -> centerX = 849)
         const qrMatrix = getThermalQrMatrix(t.qrPayload);
         const qMod = qrMatrix.length;
-        // Pick an EVEN module size so 2:1 vertical m=2 pooling preserves every QR module edge 100% identically
         const rawMod = Math.max(4, Math.floor(176 / qMod));
         const modPx = rawMod % 2 === 0 ? rawMod : (rawMod - 1 >= 4 ? rawMod - 1 : rawMod + 1);
         const qrSize = qMod * modPx;
@@ -5475,27 +5478,27 @@
             }
         }
         x.textAlign = 'center';
-        x.font = '900 15px Arial, sans-serif';
+        x.font = `400 15.5px ${F_HEAD}`;
         x.fillText('E-TIKET RESMI', 849, qy + qrSize + 8);
 
         // Row 4: Footer Strip (y: 332..376 -> 44px)
         drawHLine(12, 954, 332, 3);
         x.textAlign = 'left';
-        x.font = '700 16.5px Arial, sans-serif';
-        x.fillText('Hadir 30 mnt sblm jadwal \u2022 Cancel maks H-1 (1\u00D724 jam)', 29, 345);
-        fitTextSingle(`WA: 0821-3360-7759 \u2022 Beli: ${t.tglBeliShort || t.tglBeli}`, 936, 345, 420, 16.5, '700', 'Arial, sans-serif', 'right', 14);
+        x.font = `400 16.5px ${F_HEAD}`;
+        x.fillText('Hadir 30 mnt sblm jadwal \u2022 Cancel maks H-1 (1\u00D724 jam)', 27, 345);
+        fitTextSingle(`WA: 0821-3360-7759 \u2022 Beli: ${t.tglBeliShort || t.tglBeli}`, 936, 345, 425, 16.5, '400', F_HEAD, 'right', 14);
 
         // =================================================================
         // 2. CENTER VERTICAL TEAR LINE (x: 954..992, center = 973)
         // =================================================================
-        drawVDash(972, 10, 146, 2);
-        drawVDash(972, 238, 374, 2);
+        drawVDash(972, 10, 134, 2);
+        drawVDash(972, 250, 374, 2);
         x.save();
         x.translate(973, 192);
         x.rotate(-Math.PI / 2);
         x.textAlign = 'center';
         x.textBaseline = 'middle';
-        x.font = '900 16px Arial, sans-serif';
+        x.font = `700 16px ${F_HEAD}`;
         x.fillText('\u2702 POTONG', 0, 0);
         x.restore();
         x.textBaseline = 'top';
@@ -5504,29 +5507,30 @@
         // 3. RIGHT FRAMED STUB: ARSIP AGEN / KRU (x: 992..1340 -> 348w x 368h)
         // =================================================================
         drawBox(992, 8, 348, 368, 3);
-        drawHLine(1010, 1322, 80, 2);
+        drawHLine(1008, 1324, 80, 2);
 
         x.textAlign = 'left';
-        x.font = '900 16px Arial, sans-serif';
-        x.fillText('ARSIP AGEN / KRU', 1010, 20);
-        fitTextSingle(t.armada, 1010, 42, 312, 24.5, '900', 'Arial, sans-serif', 'left', 18);
+        x.font = `400 16px ${F_HEAD}`;
+        x.fillText('ARSIP AGEN / KRU', 1008, 20);
+        fitTextSingle(t.armada, 1008, 42, 316, 24, '700', F_HEAD, 'left', 18);
 
-        drawInlineField('Kode: ', t.idTiket, 1010, 102, 312, 19.5, 20.5, 'Consolas, "Courier New", monospace');
-        drawInlineField('Nama: ', `${t.nama} (${t.qty} Org)`, 1010, 142, 312, 19.5, 20);
-        drawInlineField('Rute: ', `${t.asalCode} \u2192 ${t.tujuanCode}`, 1010, 182, 312, 19.5, 20.5);
-        drawInlineField('Jadwal: ', `${t.tglBerangkatStub || t.tglBerangkatShort} \u2022 ${t.jam}`, 1010, 222, 312, 19.5, 19.5);
+        drawInlineField('Kode: ', t.idTiket, 1008, 102, 316, 18, 21.5, '700', F_MONO);
+        drawInlineField('Nama: ', `${t.nama} (${t.qty} Org)`, 1008, 142, 316, 18, 19, '700', F_BODY);
+        drawInlineField('Rute: ', `${t.asalCode} \u2192 ${t.tujuanCode}`, 1008, 182, 316, 18, 20, '700', F_HEAD);
+        drawInlineField('Jadwal: ', `${t.tglBerangkatStub || t.tglBerangkatShort} \u2022 ${t.jam}`, 1008, 222, 316, 18, 18.5, '700', F_BODY);
 
-        // Stub Bottom Seat Bar (y: 304..376)
-        drawHLine(1010, 1322, 306, 2);
+        // Stub Bottom Seat Bar (y: 306..376)
+        drawHLine(1008, 1324, 306, 2);
         x.textAlign = 'left';
-        x.font = '900 16.5px Arial, sans-serif';
-        x.fillText('NO. KURSI', 1010, 331);
-        fitTextSingle(t.kursi, 1322, 322, 205, 31, '900', 'Arial, sans-serif', 'right', 20);
+        x.font = `400 16.5px ${F_HEAD}`;
+        x.fillText('NO. KURSI', 1008, 331);
+        fitTextSingle(t.kursi, 1324, 321, 208, 31, '700', F_BODY, 'right', 20);
 
         // =================================================================
         // 4. ROTATE 90° CW TO 384x1352 & EMIT GS v 0 m=2 (384x676 = 32.5 KB)
+        //    Preserve thin 400-weight vertical stems while keeping open counters clean
         // =================================================================
-        const LUM_CUTOFF = 162;
+        const LUM_CUTOFF = 150;
 
         if (returnDebugCanvas === 'landscape') {
             const ldbg = document.createElement('canvas');
@@ -5563,8 +5567,8 @@
             const i1 = (r1 * W + px) * 4;
             const l0 = rawPixels[i0] * 0.299 + rawPixels[i0 + 1] * 0.587 + rawPixels[i0 + 2] * 0.114;
             const l1 = rawPixels[i1] * 0.299 + rawPixels[i1 + 1] * 0.587 + rawPixels[i1 + 2] * 0.114;
-            // Preserve pure-black 1px/2px rules while keeping anti-aliased letter strokes crisp without dilation
-            if (l0 < 24 || l1 < 24) return Math.min(l0, l1) * 0.5 + (l0 + l1) * 0.25;
+            // Preserve thin 400-weight stems (l0 or l1 < 95) while keeping open counters crisp
+            if (l0 < 95 || l1 < 95) return Math.min(l0, l1) * 0.65 + (l0 + l1) * 0.175;
             return (l0 + l1) * 0.5;
         };
 
