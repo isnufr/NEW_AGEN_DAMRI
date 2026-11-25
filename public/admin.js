@@ -3703,12 +3703,30 @@
         return String(dateText || '-').replace(/^(Senin|Selasa|Rabu|Kamis|Jumat|Sabtu|Minggu),\s*/i, '');
     }
 
+    function formatStubIndoDate(dateText) {
+        const dObj = (typeof parseIndoDate === 'function') ? parseIndoDate(dateText) : null;
+        if (dObj && !isNaN(dObj.getTime())) {
+            return `${dObj.getDate()} ${INDO_SHORT_MONTHS[dObj.getMonth()]}`;
+        }
+        return formatShortIndoDate(dateText).replace(/\s+\d{4}$/, '');
+    }
+
     function formatTicketTglBeli(dateInput) {
         const d = dateInput ? new Date(dateInput) : new Date();
         const safe = isNaN(d.getTime()) ? new Date() : d;
         const hh = String(safe.getHours()).padStart(2, '0');
         const mm = String(safe.getMinutes()).padStart(2, '0');
         return `${safe.getDate()} ${INDO_SHORT_MONTHS[safe.getMonth()]} ${safe.getFullYear()} • ${hh}:${mm} WIB`;
+    }
+
+    function formatTicketTglBeliCompact(dateInput) {
+        const d = dateInput ? new Date(dateInput) : new Date();
+        const safe = isNaN(d.getTime()) ? new Date() : d;
+        const dd = String(safe.getDate()).padStart(2, '0');
+        const mo = String(safe.getMonth() + 1).padStart(2, '0');
+        const hh = String(safe.getHours()).padStart(2, '0');
+        const mm = String(safe.getMinutes()).padStart(2, '0');
+        return `${dd}/${mo} ${hh}:${mm}`;
     }
 
     function formatShortRupiahUnit(amount) {
@@ -3721,7 +3739,7 @@
         const text = String(payload || 'AGEN-DAMRI-KAWUNGANTEN');
         try {
             if (typeof window !== 'undefined' && typeof window.qrcode === 'function') {
-                const qr = window.qrcode(0, 'M');
+                const qr = window.qrcode(0, 'L');
                 qr.addData(text);
                 qr.make();
                 const count = qr.getModuleCount();
@@ -3759,11 +3777,10 @@
         return m;
     }
 
-    function renderThermalQrSvg(payload, sizePx = 0) {
+    function renderThermalQrSvg(payload, sizePx = 80) {
         const matrix = getThermalQrMatrix(payload);
         const n = matrix.length;
-        const modPx = Math.max(2, Math.min(5, Math.floor(111 / n)));
-        const finalPx = sizePx > 0 ? sizePx : (n * modPx);
+        const finalPx = sizePx > 0 ? sizePx : (n * Math.max(2, Math.floor(82 / n)));
         let paths = '';
         for (let r = 0; r < n; r++) {
             for (let c = 0; c < n; c++) {
@@ -3786,7 +3803,9 @@
         const tujuanCode = getCityCodeFromRoute(tujuanFull);
         const formattedDate = src.dateTravel || '-';
         const tglBerangkatShort = formatShortIndoDate(formattedDate);
+        const tglBerangkatStub = formatStubIndoDate(formattedDate);
         const tglBeli = formatTicketTglBeli(src.createdAt);
+        const tglBeliShort = formatTicketTglBeliCompact(src.createdAt);
 
         const hargaSatuan = Math.max(0, parseInt(src.hargaSatuan, 10) || 0);
         const subtotalTiket = hargaSatuan * qty;
@@ -3803,6 +3822,7 @@
         return {
             idTiket,
             tglBeli,
+            tglBeliShort,
             armada: armadaName,
             asalFull: asalFull.toUpperCase(),
             tujuanFull: tujuanFull.toUpperCase(),
@@ -3812,6 +3832,7 @@
             tujuanCode,
             tglBerangkat: formattedDate,
             tglBerangkatShort,
+            tglBerangkatStub,
             jam,
             qty,
             jumlahPnp: `${qty} Orang`,
@@ -3831,7 +3852,7 @@
             hasBiayaTambahan: extra.hasBiayaTambahan,
             totalHarga: formatRupiah(total),
             status: src.status || 'LUNAS',
-            qrPayload: `DAMRI-KWT|${idTiket}|${armadaName}|${tglBerangkatShort}|${jam}|${kursi}`
+            qrPayload: `DAMRI|${idTiket}|${asalCode}-${tujuanCode}|${kursi.substring(0, 8)}`
         };
     }
 
@@ -3839,114 +3860,113 @@
         const hargaShort = formatShortRupiahUnit(t.hargaSatuanNum);
         const extraLabel = (t.hasBiayaTambahan && t.qty > 1)
             ? `Biaya Tmb (${t.qty}&times;${escapeTicketHtml(t.biayaTambahanPerTiketShort)})`
-            : 'Biaya Tambahan/Tiket';
+            : 'Biaya Tmb';
         const extraValue = t.hasBiayaTambahan ? escapeTicketHtml(t.biayaTambahanFormatted) : '-';
-        const extraKetHtml = (t.hasBiayaTambahan && t.biayaTambahanKet)
-            ? `<div style="font-size:10px;font-weight:700;line-height:1.2;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Tmb: ${escapeTicketHtml(t.biayaTambahanKet)}</div>`
-            : '';
+        const ketCombined = (t.hasBiayaTambahan && t.biayaTambahanKet)
+            ? ((t.keterangan && t.keterangan !== '-') ? `${t.keterangan} • ${t.biayaTambahanKet}` : t.biayaTambahanKet)
+            : (t.keterangan || '-');
 
         const seatLen = String(t.kursi || '').length;
-        const mainSeatFont = seatLen > 14 ? '14px' : (seatLen > 9 ? '17px' : (seatLen > 5 ? '20px' : '23px'));
-        const stubSeatFont = seatLen > 14 ? '13px' : (seatLen > 9 ? '15.5px' : '19px');
+        const mainSeatFont = seatLen > 13 ? '10.5px' : (seatLen > 8 ? '12.5px' : '15.5px');
+        const stubSeatFont = seatLen > 13 ? '10.5px' : (seatLen > 8 ? '12.5px' : '14.5px');
         const armLen = String(t.armada || '').length;
-        const armadaMainFont = armLen > 20 ? '14px' : (armLen > 15 ? '15.5px' : '17.5px');
-        const armadaStubFont = armLen > 17 ? '12.5px' : '14.5px';
+        const armadaMainFont = armLen > 20 ? '12.5px' : (armLen > 15 ? '14px' : '15.5px');
+        const armadaStubFont = armLen > 16 ? '10px' : '11.5px';
 
         return `
             <div class="tt-land-sheet">
-                <!-- Left Framed Ticket (526px x 368px -> inner 522px) -->
-                <div style="border:2px solid #000;display:flex;flex-direction:column;height:368px;overflow:hidden;">
-                    <!-- Row 1: Header Bar (50px) -->
-                    <div style="height:50px;padding:0 10px;border-bottom:2px solid #000;display:flex;justify-content:space-between;align-items:center;gap:6px;flex-shrink:0;">
-                        <div style="display:flex;align-items:baseline;gap:7px;min-width:0;overflow:hidden;">
-                            <span style="font-size:${armadaMainFont};font-weight:900;letter-spacing:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${escapeTicketHtml(t.armada)}</span>
-                            <span style="font-size:8.6px;font-weight:800;letter-spacing:0.02em;white-space:nowrap;flex-shrink:0;">AGEN DAMRI KAWUNGANTEN</span>
+                <!-- Left Framed Ticket (446px x 172px — Exact Pilihan 2 Structured Table Slip) -->
+                <div style="border:1.5px solid #000;display:flex;flex-direction:column;height:172px;overflow:hidden;">
+                    <!-- Row 1: Header Bar (30px) -->
+                    <div style="height:30px;padding:0 9px;border-bottom:1.5px solid #000;display:flex;justify-content:space-between;align-items:center;gap:6px;flex-shrink:0;">
+                        <div style="display:flex;align-items:baseline;gap:6px;min-width:0;overflow:hidden;">
+                            <span style="font-size:${armadaMainFont};font-weight:900;letter-spacing:0.02em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${escapeTicketHtml(t.armada)}</span>
+                            <span style="font-size:8px;font-weight:800;letter-spacing:0.03em;white-space:nowrap;flex-shrink:0;">AGEN DAMRI KAWUNGANTEN</span>
                         </div>
                         <div style="display:flex;align-items:baseline;gap:4px;flex-shrink:0;white-space:nowrap;">
-                            <span style="font-size:9.5px;font-weight:900;letter-spacing:0.02em;">KODE BOKING:</span>
-                            <strong class="tt-mono" style="font-size:16.5px;font-weight:900;letter-spacing:0.03em;">${escapeTicketHtml(t.idTiket)}</strong>
+                            <span style="font-size:9.5px;font-weight:800;">KODE:</span>
+                            <strong class="tt-mono" style="font-size:13px;font-weight:900;letter-spacing:0.05em;">${escapeTicketHtml(t.idTiket)}</strong>
                         </div>
                     </div>
 
-                    <!-- Row 2+3: Core Grid (396px) + QR Cell (126px) = 522px -->
-                    <div style="height:280px;display:grid;grid-template-columns:396px 126px;flex-shrink:0;">
-                        <!-- Left Sub-Grid (396px -> 394px inner + 2px right border) -->
-                        <div style="border-right:2px solid #000;display:grid;grid-template-rows:126px 154px;">
-                            <!-- Sub-Row A: 3 Cells (170 + 120 + 104 = 394px) -->
-                            <div style="display:grid;grid-template-columns:170px 120px 104px;border-bottom:2px dashed #000;">
+                    <!-- Row 2+3: Merged Core Grid (345px) + QR Cell (98px) = 443px -->
+                    <div style="height:120px;display:grid;grid-template-columns:345px 98px;flex-shrink:0;">
+                        <!-- Left Sub-Grid -->
+                        <div style="border-right:1.2px solid #000;display:grid;grid-template-rows:56px 64px;">
+                            <!-- Sub-Row A: 3 Cells (142 + 112 + 90 = 344px) -->
+                            <div style="display:grid;grid-template-columns:142px 112px 90px;border-bottom:1px dashed #000;">
                                 <!-- Cell A1: Rute -->
-                                <div style="padding:8px 9px;border-right:2px dashed #000;display:flex;flex-direction:column;justify-content:center;overflow:hidden;">
-                                    <div style="font-size:9.5px;font-weight:800;letter-spacing:0.04em;">RUTE PERJALANAN</div>
-                                    <div style="font-size:21px;font-weight:900;line-height:1.12;margin-top:3px;white-space:nowrap;">${escapeTicketHtml(t.asalCode)} &#8594; ${escapeTicketHtml(t.tujuanCode)}</div>
-                                    <div style="font-size:10.5px;font-weight:700;line-height:1.22;margin-top:3px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;">${escapeTicketHtml(t.asalText)} - ${escapeTicketHtml(t.tujuan)}</div>
+                                <div style="padding:3px 8px;border-right:1px dashed #444;display:flex;flex-direction:column;justify-content:center;overflow:hidden;">
+                                    <div class="tt-lbl">RUTE PERJALANAN</div>
+                                    <div style="font-size:15.5px;font-weight:900;line-height:1.1;margin-top:1px;white-space:nowrap;">${escapeTicketHtml(t.asalCode)} &#8594; ${escapeTicketHtml(t.tujuanCode)}</div>
+                                    <div style="font-size:7.5px;font-weight:700;line-height:1.15;margin-top:1px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;">${escapeTicketHtml(t.asalText)} - ${escapeTicketHtml(t.tujuan)}</div>
                                 </div>
                                 <!-- Cell A2: Keberangkatan -->
-                                <div style="padding:8px 8px;border-right:2px dashed #000;display:flex;flex-direction:column;justify-content:center;overflow:hidden;">
-                                    <div style="font-size:9.5px;font-weight:800;letter-spacing:0.04em;">KEBERANGKATAN</div>
-                                    <div style="font-size:14px;font-weight:900;line-height:1.2;margin-top:5px;white-space:nowrap;">${escapeTicketHtml(t.tglBerangkatShort)}</div>
-                                    <div style="font-size:14.5px;font-weight:900;line-height:1.2;margin-top:2px;white-space:nowrap;">${escapeTicketHtml(t.jam)} WIB</div>
+                                <div style="padding:4px 8px;border-right:1px dashed #444;display:flex;flex-direction:column;justify-content:center;overflow:hidden;">
+                                    <div class="tt-lbl">KEBERANGKATAN</div>
+                                    <div style="font-size:11px;font-weight:900;line-height:1.2;margin-top:2px;white-space:nowrap;">${escapeTicketHtml(t.tglBerangkatShort)}</div>
+                                    <div style="font-size:11px;font-weight:900;line-height:1.2;white-space:nowrap;">${escapeTicketHtml(t.jam)} WIB</div>
                                 </div>
                                 <!-- Cell A3: Kursi -->
-                                <div style="padding:8px 5px;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;overflow:hidden;">
-                                    <div style="font-size:9.5px;font-weight:800;letter-spacing:0.03em;white-space:nowrap;">KURSI (${t.qty} ORG)</div>
-                                    <div style="font-size:${mainSeatFont};font-weight:900;line-height:1.15;margin-top:5px;word-break:break-word;">${escapeTicketHtml(t.kursi)}</div>
+                                <div style="padding:4px 5px;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;overflow:hidden;">
+                                    <div class="tt-lbl" style="white-space:nowrap;">KURSI (${t.qty} ORG)</div>
+                                    <div style="font-size:${mainSeatFont};font-weight:900;line-height:1.15;margin-top:2px;word-break:break-word;">${escapeTicketHtml(t.kursi)}</div>
                                 </div>
                             </div>
 
-                            <!-- Sub-Row B: 2 Cells (206 + 188 = 394px) -->
-                            <div style="display:grid;grid-template-columns:206px 188px;">
+                            <!-- Sub-Row B: 2 Cells (185 + 159 = 344px) -->
+                            <div style="display:grid;grid-template-columns:185px 159px;">
                                 <!-- Cell B1: Passenger Info -->
-                                <div style="padding:9px 9px;border-right:2px dashed #000;display:flex;flex-direction:column;justify-content:center;gap:4px;font-size:11.5px;line-height:1.3;overflow:hidden;">
-                                    <div style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Penumpang: <strong style="font-size:12.5px;font-weight:900;">${escapeTicketHtml(t.nama)}</strong></div>
-                                    <div style="display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;">Naik: <strong style="font-weight:800;">${escapeTicketHtml(t.titikNaik)}</strong></div>
-                                    <div style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Ket: <strong style="font-weight:700;">${escapeTicketHtml(t.keterangan)}</strong></div>
-                                    ${extraKetHtml}
+                                <div style="padding:4px 8px;border-right:1px dashed #444;display:flex;flex-direction:column;justify-content:center;gap:1.5px;font-size:9.2px;line-height:1.3;overflow:hidden;">
+                                    <div style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Penumpang: <strong style="font-size:10.5px;font-weight:900;">${escapeTicketHtml(t.nama)}</strong></div>
+                                    <div style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Naik: <strong style="font-weight:800;">${escapeTicketHtml(t.titikNaik)}</strong></div>
+                                    <div style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Ket: <strong style="font-weight:700;">${escapeTicketHtml(ketCombined)}</strong></div>
                                 </div>
                                 <!-- Cell B2: Fare & Total -->
-                                <div style="padding:9px 10px;display:flex;flex-direction:column;justify-content:center;gap:5px;overflow:hidden;">
-                                    <div class="tt-row" style="font-size:11px;"><span>Tiket ${t.qty}&times;${escapeTicketHtml(hargaShort)}</span><strong>${escapeTicketHtml(t.subtotalTiket)}</strong></div>
-                                    <div class="tt-row" style="font-size:10.5px;"><span>${extraLabel}</span><strong>${extraValue}</strong></div>
-                                    <div style="border-top:2px solid #000;margin-top:4px;padding-top:5px;display:flex;justify-content:space-between;align-items:baseline;gap:4px;">
-                                        <span style="font-size:13.5px;font-weight:900;">TOTAL</span>
-                                        <strong style="font-size:14.5px;font-weight:900;white-space:nowrap;">${escapeTicketHtml(t.totalHarga)}</strong>
+                                <div style="padding:4px 8px;display:flex;flex-direction:column;justify-content:center;gap:1.5px;overflow:hidden;">
+                                    <div class="tt-row" style="font-size:9px;"><span>Tiket ${t.qty}&times;${escapeTicketHtml(hargaShort)}</span><strong>${escapeTicketHtml(t.subtotalTiket)}</strong></div>
+                                    <div class="tt-row" style="font-size:9px;"><span>${extraLabel}</span><strong>${extraValue}</strong></div>
+                                    <div style="border-top:1.3px solid #000;margin-top:2px;padding-top:2px;display:flex;justify-content:space-between;align-items:baseline;gap:4px;">
+                                        <span style="font-size:10.8px;font-weight:900;">TOTAL</span>
+                                        <strong style="font-size:11px;font-weight:900;white-space:nowrap;">${escapeTicketHtml(t.totalHarga)}</strong>
                                     </div>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- QR Cell (126px) -->
-                        <div style="padding:6px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;text-align:center;">
-                            ${renderThermalQrSvg(t.qrPayload, 0)}
-                            <div style="font-size:9px;font-weight:900;letter-spacing:0.03em;line-height:1.22;">E-TIKET<br>(TIKET RESMI)</div>
+                        <!-- QR Cell (98px x 120px) -->
+                        <div style="padding:5px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;text-align:center;">
+                            ${renderThermalQrSvg(t.qrPayload, 82)}
+                            <span style="font-size:7px;font-weight:900;letter-spacing:0.05em;white-space:nowrap;">E-TIKET RESMI</span>
                         </div>
                     </div>
 
-                    <!-- Row 4: Footer Strip (38px) -->
-                    <div style="height:38px;padding:0 10px;border-top:2px solid #000;display:flex;justify-content:space-between;align-items:center;gap:6px;font-size:9.6px;font-weight:700;white-space:nowrap;flex-shrink:0;">
+                    <!-- Row 4: Footer Strip (19px) -->
+                    <div style="height:19px;padding:0 8px;border-top:1.2px solid #000;display:flex;justify-content:space-between;align-items:center;gap:6px;font-size:7.8px;font-weight:700;white-space:nowrap;flex-shrink:0;">
                         <span>Hadir 30 mnt sblm jadwal &bull; Cancel maks H-1 (1&times;24 jam)</span>
-                        <span>WA: 0821-3360-7759 &bull; Beli: ${escapeTicketHtml(t.tglBeli)}</span>
+                        <span>WA: 0821-3360-7759 &bull; Beli: ${escapeTicketHtml(t.tglBeliShort)}</span>
                     </div>
                 </div>
 
-                <!-- Center Vertical Tear Line (24px) -->
+                <!-- Center Vertical Tear Line (18px) -->
                 <div class="tt-v-cut"><span>&#9986; POTONG</span></div>
 
-                <!-- Right Framed Stub: Arsip Agen / Kru (194px x 368px, NO PRICE!) -->
-                <div style="border:2px solid #000;height:368px;display:flex;flex-direction:column;justify-content:space-between;overflow:hidden;">
-                    <div style="height:58px;padding:7px 9px;border-bottom:2px solid #000;display:flex;flex-direction:column;justify-content:center;flex-shrink:0;">
-                        <div style="font-size:9px;font-weight:900;letter-spacing:0.07em;">ARSIP AGEN / KRU</div>
-                        <div style="font-size:${armadaStubFont};font-weight:900;line-height:1.15;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${escapeTicketHtml(t.armada)}</div>
+                <!-- Right Framed Stub: Arsip Agen / Kru (164px x 172px, NO PRICE!) -->
+                <div style="border:1.5px solid #000;height:172px;padding:5px 8px;display:flex;flex-direction:column;justify-content:space-between;overflow:hidden;">
+                    <div style="border-bottom:1.2px solid #000;padding-bottom:3px;flex-shrink:0;">
+                        <div style="font-size:7.5px;font-weight:900;letter-spacing:0.07em;">ARSIP AGEN / KRU</div>
+                        <div style="font-size:${armadaStubFont};font-weight:900;line-height:1.15;margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${escapeTicketHtml(t.armada)}</div>
                     </div>
 
-                    <div style="padding:8px 9px;flex:1;display:flex;flex-direction:column;justify-content:center;gap:6px;font-size:11px;line-height:1.3;overflow:hidden;">
-                        <div style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Kode: <strong class="tt-mono" style="font-size:12.5px;font-weight:900;">${escapeTicketHtml(t.idTiket)}</strong></div>
-                        <div style="display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;">Nama: <strong style="font-weight:900;">${escapeTicketHtml(t.nama)} (${t.qty} Org)</strong></div>
+                    <div style="font-size:9.2px;line-height:1.38;display:flex;flex-direction:column;justify-content:center;gap:1px;overflow:hidden;">
+                        <div style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Kode: <strong class="tt-mono" style="font-weight:900;">${escapeTicketHtml(t.idTiket)}</strong></div>
+                        <div style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Nama: <strong style="font-weight:900;">${escapeTicketHtml(t.nama)} (${t.qty} Org)</strong></div>
                         <div style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Rute: <strong style="font-weight:900;">${escapeTicketHtml(t.asalCode)} &#8594; ${escapeTicketHtml(t.tujuanCode)}</strong></div>
-                        <div style="display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;">Jadwal: <strong style="font-weight:800;">${escapeTicketHtml(t.tglBerangkatShort)} &bull; ${escapeTicketHtml(t.jam)}</strong></div>
+                        <div style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Jadwal: <strong style="font-weight:800;">${escapeTicketHtml(t.tglBerangkatStub)} &bull; ${escapeTicketHtml(t.jam)}</strong></div>
                     </div>
 
-                    <div style="height:54px;padding:0 9px;border-top:2px solid #000;display:flex;justify-content:space-between;align-items:center;gap:4px;flex-shrink:0;">
-                        <span style="font-size:9.5px;font-weight:900;letter-spacing:0.04em;white-space:nowrap;">NO. KURSI</span>
+                    <div style="border-top:1.2px solid #000;padding-top:3px;display:flex;justify-content:space-between;align-items:baseline;gap:4px;flex-shrink:0;">
+                        <span class="tt-lbl">NO. KURSI</span>
                         <strong style="font-size:${stubSeatFont};font-weight:900;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${escapeTicketHtml(t.kursi)}</strong>
                     </div>
                 </div>
@@ -3960,9 +3980,9 @@
         if (!stage || !receipt) return;
         const cw = stage.clientWidth;
         if (cw <= 0) return;
-        const scale = Math.min(1, cw / 760);
+        const scale = Math.min(1.185, cw / 640);
         receipt.style.transform = `scale(${scale.toFixed(4)})`;
-        stage.style.height = `${Math.ceil(384 * scale)}px`;
+        stage.style.height = `${Math.ceil(180 * scale)}px`;
     }
     window.addEventListener('resize', syncTicketDisplayScale);
 
@@ -5279,12 +5299,14 @@
     function buildRawBtCanvasBitmapBytes(t, returnDebugCanvas = false) {
         if (typeof document === 'undefined') return null;
 
-        // 1:1 Coordinate Match with .tt-land-sheet (760px x 384px -> rotated 90° CW to 384 x 760 dots)
-        // 384 dots = 48mm printable width on 58mm paper; 760 rows * 48 bytes = 36,480 bytes (< 38.6 KB RPP210A ceiling)
-        const LW = 760;
+        // 1:1 Physical & Proportional Match with .tt-land-sheet (640x180 CSS px = 169mm x 48mm = Pilihan 2)
+        // Drawn at native 203 DPI square-pixel resolution (1352 x 384 dots), rotated 90° CW to 384 x 1352,
+        // and emitted via ESC/POS GS v 0 m=2 (Double-Height: 384 x 676 rows = 32,448 bytes < 38.6 KB RPP210A buffer ceiling).
+        const LW = 1352;
         const LH = 384;
         const W = 384;
-        const finalH = 760;
+        const FULL_H = 1352;
+        const RASTER_H = 676; // 676 * 2 dot-steps = 1,352 physical dot-steps (169mm full boarding-pass length)
 
         const land = document.createElement('canvas');
         land.width = LW;
@@ -5297,54 +5319,29 @@
         x.fillStyle = '#000000';
         x.textBaseline = 'top';
 
-        const drawBox = (bx, by, bw, bh, thick = 2) => {
+        const drawBox = (bx, by, bw, bh, thick = 3) => {
             x.fillRect(bx, by, bw, thick);
             x.fillRect(bx, by + bh - thick, bw, thick);
             x.fillRect(bx, by, thick, bh);
             x.fillRect(bx + bw - thick, by, thick, bh);
         };
-        const drawHLine = (x0, x1, py, thick = 2) => {
+        const drawHLine = (x0, x1, py, thick = 3) => {
             x.fillRect(x0, py, x1 - x0, thick);
         };
-        const drawVLine = (px, y0, y1, thick = 2) => {
+        const drawVLine = (px, y0, y1, thick = 3) => {
             x.fillRect(px, y0, thick, y1 - y0);
         };
         const drawHDash = (x0, x1, py, thick = 2) => {
-            for (let px = x0; px < x1; px += 9) {
-                x.fillRect(px, py, Math.min(5, x1 - px), thick);
+            for (let px = x0; px < x1; px += 11) {
+                x.fillRect(px, py, Math.min(6, x1 - px), thick);
             }
         };
         const drawVDash = (px, y0, y1, thick = 2) => {
-            for (let py = y0; py < y1; py += 9) {
-                x.fillRect(px, py, thick, Math.min(5, y1 - py));
+            for (let py = y0; py < y1; py += 11) {
+                x.fillRect(px, py, thick, Math.min(6, y1 - py));
             }
         };
-        const wrapLines = (text, maxW, font, maxLines = 2) => {
-            x.font = font;
-            const words = String(text || '-').split(/\s+/).filter(Boolean);
-            if (!words.length) return ['-'];
-            const lines = [];
-            let cur = words[0];
-            for (let i = 1; i < words.length; i++) {
-                const cand = cur + ' ' + words[i];
-                if (x.measureText(cand).width <= maxW) {
-                    cur = cand;
-                } else {
-                    lines.push(cur);
-                    cur = words[i];
-                }
-            }
-            lines.push(cur);
-            if (lines.length <= maxLines) return lines;
-            const kept = lines.slice(0, maxLines);
-            let last = kept[maxLines - 1];
-            while (last.length > 1 && x.measureText(last + '…').width > maxW) {
-                last = last.slice(0, -1);
-            }
-            kept[maxLines - 1] = last + '…';
-            return kept;
-        };
-        const fitTextSingle = (text, px, py, maxW, baseSize, weight = '900', family = 'Arial, sans-serif', align = 'left', minSize = 10) => {
+        const fitTextSingle = (text, px, py, maxW, baseSize, weight = '900', family = 'Arial, sans-serif', align = 'left', minSize = 14) => {
             const str = String(text || '-');
             let sz = baseSize;
             while (sz > minSize) {
@@ -5364,126 +5361,112 @@
             x.fillText(outStr, px, py);
             return { width: x.measureText(outStr).width, size: sz };
         };
-        const drawLabelBoldValue = (labelStr, valStr, px, py, maxW, fontSize = 12, maxLines = 1) => {
+        const drawInlineField = (labelStr, valStr, px, py, maxW, lblSize = 19.5, valSize = 20, valFamily = 'Arial, sans-serif') => {
             x.textAlign = 'left';
-            x.font = `700 ${fontSize}px Arial, sans-serif`;
+            x.font = `700 ${lblSize}px Arial, sans-serif`;
             const lw = x.measureText(labelStr).width;
             x.fillText(labelStr, px, py);
-            const remW = Math.max(40, maxW - lw);
-            if (maxLines <= 1) {
-                fitTextSingle(valStr, px + lw, py, remW, fontSize + 0.5, '900', 'Arial, sans-serif', 'left', 10);
-                return py + Math.round(fontSize * 1.45);
-            }
-            const lines = wrapLines(valStr, remW, `900 ${fontSize}px Arial, sans-serif`, maxLines);
-            x.font = `900 ${fontSize}px Arial, sans-serif`;
-            lines.forEach((ln, idx) => {
-                x.fillText(ln, idx === 0 ? (px + lw) : px, py + idx * Math.round(fontSize * 1.26));
-            });
-            return py + lines.length * Math.round(fontSize * 1.3);
+            fitTextSingle(valStr, px + lw, py - Math.round((valSize - lblSize) * 0.4), Math.max(50, maxW - lw), valSize, '900', valFamily, 'left', 14);
         };
 
         // =================================================================
-        // 1. LEFT FRAMED TICKET (x: 8..534, y: 8..376 -> 526 x 368)
+        // 1. LEFT FRAMED TICKET (x: 12..954 -> 942w, y: 8..376 -> 368h)
+        //    Exact 2.1125x scale of HTML (446px x 172px)
         // =================================================================
-        drawBox(8, 8, 526, 368, 2);
+        drawBox(12, 8, 942, 368, 3);
 
-        // Row 1: Header Bar (y: 8..58)
-        drawHLine(8, 534, 58, 2);
-        x.font = '900 16.5px Consolas, "Courier New", monospace';
+        // Row 1: Header Bar (y: 8..72 -> 64px)
+        drawHLine(12, 954, 72, 3);
+        x.font = '900 27.5px Consolas, "Courier New", monospace';
         const idW = x.measureText(t.idTiket).width;
         x.textAlign = 'right';
-        x.fillText(t.idTiket, 522, 24);
-        x.font = '900 9.5px Arial, sans-serif';
-        const kodeLbl = 'KODE BOKING: ';
+        x.fillText(t.idTiket, 935, 25);
+        x.font = '800 20px Arial, sans-serif';
+        const kodeLbl = 'KODE: ';
         const kodeLblW = x.measureText(kodeLbl).width;
-        x.fillText(kodeLbl, 522 - idW, 29);
+        x.fillText(kodeLbl, 935 - idW, 30);
 
         const agenSubLbl = 'AGEN DAMRI KAWUNGANTEN';
-        x.font = '800 9px Arial, sans-serif';
+        x.font = '800 17px Arial, sans-serif';
         const agenSubW = x.measureText(agenSubLbl).width;
-        const maxHeaderLeftW = 522 - idW - kodeLblW - 28;
-        const maxArmW = Math.max(95, maxHeaderLeftW - agenSubW - 7);
-        const armRes = fitTextSingle(t.armada, 18, 23, maxArmW, 17.5, '900', 'Arial, sans-serif', 'left', 13);
+        const maxArmW = Math.max(180, 935 - idW - kodeLblW - 32 - agenSubW - 14);
+        const armRes = fitTextSingle(t.armada, 31, 23, maxArmW, 33, '900', 'Arial, sans-serif', 'left', 22);
         x.textAlign = 'left';
-        x.font = '800 8.8px Arial, sans-serif';
-        x.fillText(agenSubLbl, 18 + armRes.width + 7, 29);
+        x.font = '800 17px Arial, sans-serif';
+        x.fillText(agenSubLbl, 31 + armRes.width + 14, 33);
 
-        // Row 2+3: Core Grid (x: 10..404) + QR Cell (x: 406..532), y: 58..338
-        drawVLine(404, 58, 338, 2);
-        drawHDash(8, 404, 184, 2);
+        // Row 2+3: Merged Core Grid (x: 15..744) + QR Cell (x: 747..951), y: 72..332 (260px)
+        drawVLine(744, 72, 332, 3);
+        drawHDash(15, 744, 193, 2);
 
-        // Sub-Row A: 3 Cells (170 + 120 + 104 -> dividers at 180 & 300)
-        drawVDash(180, 58, 184, 2);
-        drawVDash(300, 58, 184, 2);
+        // Sub-Row A: 3 Cells (y: 72..193 -> dividers at 314 & 552)
+        drawVDash(314, 72, 193, 2);
+        drawVDash(552, 72, 193, 2);
 
-        // Cell A1: Rute (x: 10..180)
+        // Cell A1: Rute Perjalanan (x: 15..314)
         x.textAlign = 'left';
-        x.font = '800 9.5px Arial, sans-serif';
-        x.fillText('RUTE PERJALANAN', 18, 72);
-        fitTextSingle(`${t.asalCode} \u2192 ${t.tujuanCode}`, 18, 88, 152, 21, '900', 'Arial, sans-serif', 'left', 15);
-        const routeSubLines = wrapLines(`${t.asalText} - ${t.tujuan}`, 152, '700 10.5px Arial, sans-serif', 2);
-        x.font = '700 10.5px Arial, sans-serif';
-        routeSubLines.forEach((ln, i) => x.fillText(ln, 18, 118 + i * 14));
+        x.font = '800 16px Arial, sans-serif';
+        x.fillText('RUTE PERJALANAN', 31, 86);
+        fitTextSingle(`${t.asalCode} \u2192 ${t.tujuanCode}`, 31, 110, 268, 33, '900', 'Arial, sans-serif', 'left', 24);
+        fitTextSingle(`${t.asalText} - ${t.tujuan}`, 31, 154, 268, 17.5, '700', 'Arial, sans-serif', 'left', 13.5);
 
-        // Cell A2: Keberangkatan (x: 180..300)
+        // Cell A2: Keberangkatan (x: 314..552)
         x.textAlign = 'left';
-        x.font = '800 9.5px Arial, sans-serif';
-        x.fillText('KEBERANGKATAN', 189, 72);
-        fitTextSingle(t.tglBerangkatShort, 189, 93, 102, 14, '900', 'Arial, sans-serif', 'left', 11);
-        fitTextSingle(`${t.jam} WIB`, 189, 114, 102, 14.5, '900', 'Arial, sans-serif', 'left', 11);
+        x.font = '800 16px Arial, sans-serif';
+        x.fillText('KEBERANGKATAN', 331, 86);
+        fitTextSingle(t.tglBerangkatShort, 331, 114, 206, 23.5, '900', 'Arial, sans-serif', 'left', 17);
+        fitTextSingle(`${t.jam} WIB`, 331, 146, 206, 23.5, '900', 'Arial, sans-serif', 'left', 17);
 
-        // Cell A3: Kursi (x: 300..404, center = 352)
+        // Cell A3: Kursi (x: 552..744, center = 648)
         x.textAlign = 'center';
-        x.font = '800 9.5px Arial, sans-serif';
-        x.fillText(`KURSI (${t.qty} ORG)`, 352, 72);
+        x.font = '800 16px Arial, sans-serif';
+        x.fillText(`KURSI (${t.qty} ORG)`, 648, 86);
         const seatLen = String(t.kursi || '').length;
-        const seatBaseSz = seatLen > 14 ? 14 : (seatLen > 9 ? 17 : (seatLen > 5 ? 20 : 23));
-        const seatLines = wrapLines(t.kursi, 92, `900 ${seatBaseSz}px Arial, sans-serif`, 2);
-        x.font = `900 ${seatBaseSz}px Arial, sans-serif`;
-        const seatStartY = seatLines.length > 1 ? 92 : 98;
-        seatLines.forEach((ln, i) => x.fillText(ln, 352, seatStartY + i * Math.round(seatBaseSz * 1.15)));
+        const seatSz = seatLen > 13 ? 22 : (seatLen > 8 ? 26.5 : 33);
+        fitTextSingle(t.kursi, 648, 120, 174, seatSz, '900', 'Arial, sans-serif', 'center', 18);
 
-        // Sub-Row B: 2 Cells (206 + 188 -> divider at 216)
-        drawVDash(216, 184, 338, 2);
+        // Sub-Row B: 2 Cells (y: 193..332 -> divider at 405)
+        drawVDash(405, 193, 332, 2);
 
-        // Cell B1: Passenger Details (x: 10..216)
-        let py = (t.hasBiayaTambahan && t.biayaTambahanKet) ? 196 : 204;
-        py = drawLabelBoldValue('Penumpang: ', t.nama, 18, py, 188, 12, 1) + 3;
-        py = drawLabelBoldValue('Naik: ', t.titikNaik, 18, py, 188, 11.5, 2) + 3;
-        py = drawLabelBoldValue('Ket: ', t.keterangan || '-', 18, py, 188, 11.5, 1) + 2;
-        if (t.hasBiayaTambahan && t.biayaTambahanKet) {
-            fitTextSingle('Tmb: ' + t.biayaTambahanKet, 18, py, 188, 10, '800', 'Arial, sans-serif', 'left', 9);
-        }
+        // Cell B1: Passenger Info (x: 15..405)
+        const ketCombined = (t.hasBiayaTambahan && t.biayaTambahanKet)
+            ? ((t.keterangan && t.keterangan !== '-') ? `${t.keterangan} • ${t.biayaTambahanKet}` : t.biayaTambahanKet)
+            : (t.keterangan || '-');
+        drawInlineField('Penumpang: ', t.nama, 31, 209, 358, 19.5, 22.5);
+        drawInlineField('Naik: ', t.titikNaik, 31, 245, 358, 19.5, 20);
+        drawInlineField('Ket: ', ketCombined, 31, 281, 358, 19.5, 19.5);
 
-        // Cell B2: Fare & Total (x: 216..404)
+        // Cell B2: Fare & Total (x: 405..744)
         const hargaShort = formatShortRupiahUnit(t.hargaSatuanNum);
         const extraLabel = (t.hasBiayaTambahan && t.qty > 1)
             ? `Biaya Tmb (${t.qty}\u00D7${t.biayaTambahanPerTiketShort})`
-            : 'Biaya Tambahan/Tiket';
+            : 'Biaya Tmb';
         const extraVal = t.hasBiayaTambahan ? t.biayaTambahanFormatted : '-';
 
         x.textAlign = 'left';
-        x.font = '700 11px Arial, sans-serif';
-        x.fillText(`Tiket ${t.qty}\u00D7${hargaShort}`, 226, 212);
-        fitTextSingle(t.subtotalTiket, 394, 211, 86, 11.5, '900', 'Arial, sans-serif', 'right', 10);
+        x.font = '700 19px Arial, sans-serif';
+        x.fillText(`Tiket ${t.qty}\u00D7${hargaShort}`, 422, 209);
+        fitTextSingle(t.subtotalTiket, 727, 208, 165, 19.5, '900', 'Arial, sans-serif', 'right', 15);
 
         x.textAlign = 'left';
-        fitTextSingle(extraLabel, 226, 236, 102, 10.5, '700', 'Arial, sans-serif', 'left', 9);
-        fitTextSingle(extraVal, 394, 235, 76, 11.5, '900', 'Arial, sans-serif', 'right', 10);
+        fitTextSingle(extraLabel, 422, 241, 182, 19, '700', 'Arial, sans-serif', 'left', 15);
+        fitTextSingle(extraVal, 727, 240, 150, 19.5, '900', 'Arial, sans-serif', 'right', 15);
 
-        drawHLine(226, 394, 263, 2);
+        drawHLine(422, 727, 274, 3);
         x.textAlign = 'left';
-        x.font = '900 13.5px Arial, sans-serif';
-        x.fillText('TOTAL', 226, 274);
-        fitTextSingle(t.totalHarga, 394, 273, 112, 14.5, '900', 'Arial, sans-serif', 'right', 11.5);
+        x.font = '900 23px Arial, sans-serif';
+        x.fillText('TOTAL', 422, 287);
+        fitTextSingle(t.totalHarga, 727, 286, 208, 23.5, '900', 'Arial, sans-serif', 'right', 17);
 
-        // QR Cell (x: 406..532, y: 58..338 -> centerX = 469)
+        // QR Cell (x: 747..951, y: 72..332 -> centerX = 849)
         const qrMatrix = getThermalQrMatrix(t.qrPayload);
         const qMod = qrMatrix.length;
-        const modPx = Math.max(2, Math.min(5, Math.floor(111 / qMod)));
+        // Pick an EVEN module size so 2:1 vertical m=2 pooling preserves every QR module edge 100% identically
+        const rawMod = Math.max(4, Math.floor(176 / qMod));
+        const modPx = rawMod % 2 === 0 ? rawMod : (rawMod - 1 >= 4 ? rawMod - 1 : rawMod + 1);
         const qrSize = qMod * modPx;
-        const qx = Math.round(469 - qrSize / 2);
-        const qy = 58 + Math.round((280 - (qrSize + 28)) / 2);
+        const qx = Math.round(849 - qrSize / 2);
+        const qy = 72 + Math.round((260 - (qrSize + 24)) / 2);
         for (let r = 0; r < qMod; r++) {
             for (let col = 0; col < qMod; col++) {
                 if (qrMatrix[r][col]) {
@@ -5492,66 +5475,58 @@
             }
         }
         x.textAlign = 'center';
-        x.font = '900 9px Arial, sans-serif';
-        x.fillText('E-TIKET', 469, qy + qrSize + 7);
-        x.fillText('(TIKET RESMI)', 469, qy + qrSize + 18);
+        x.font = '900 15px Arial, sans-serif';
+        x.fillText('E-TIKET RESMI', 849, qy + qrSize + 8);
 
-        // Row 4: Footer Strip (y: 338..376)
-        drawHLine(8, 534, 338, 2);
+        // Row 4: Footer Strip (y: 332..376 -> 44px)
+        drawHLine(12, 954, 332, 3);
         x.textAlign = 'left';
-        x.font = '700 9.6px Arial, sans-serif';
-        x.fillText('Hadir 30 mnt sblm jadwal \u2022 Cancel maks H-1 (1\u00D724 jam)', 18, 352);
-        fitTextSingle(`WA: 0821-3360-7759 \u2022 Beli: ${t.tglBeli}`, 524, 352, 232, 9.6, '700', 'Arial, sans-serif', 'right', 8.5);
+        x.font = '700 16.5px Arial, sans-serif';
+        x.fillText('Hadir 30 mnt sblm jadwal \u2022 Cancel maks H-1 (1\u00D724 jam)', 29, 345);
+        fitTextSingle(`WA: 0821-3360-7759 \u2022 Beli: ${t.tglBeliShort || t.tglBeli}`, 936, 345, 420, 16.5, '700', 'Arial, sans-serif', 'right', 14);
 
         // =================================================================
-        // 2. CENTER VERTICAL TEAR LINE (x: 534..558, center = 546)
+        // 2. CENTER VERTICAL TEAR LINE (x: 954..992, center = 973)
         // =================================================================
-        drawVDash(545, 10, 156, 2);
-        drawVDash(545, 228, 374, 2);
+        drawVDash(972, 10, 146, 2);
+        drawVDash(972, 238, 374, 2);
         x.save();
-        x.translate(546, 192);
+        x.translate(973, 192);
         x.rotate(-Math.PI / 2);
         x.textAlign = 'center';
         x.textBaseline = 'middle';
-        x.font = '900 9px Arial, sans-serif';
+        x.font = '900 16px Arial, sans-serif';
         x.fillText('\u2702 POTONG', 0, 0);
         x.restore();
         x.textBaseline = 'top';
 
         // =================================================================
-        // 3. RIGHT FRAMED STUB: ARSIP AGEN / KRU (x: 558..752 -> 194 x 368)
+        // 3. RIGHT FRAMED STUB: ARSIP AGEN / KRU (x: 992..1340 -> 348w x 368h)
         // =================================================================
-        drawBox(558, 8, 194, 368, 2);
-        drawHLine(558, 752, 66, 2);
+        drawBox(992, 8, 348, 368, 3);
+        drawHLine(1010, 1322, 80, 2);
 
         x.textAlign = 'left';
-        x.font = '900 9px Arial, sans-serif';
-        x.fillText('ARSIP AGEN / KRU', 569, 18);
-        fitTextSingle(t.armada, 569, 34, 174, 14.5, '900', 'Arial, sans-serif', 'left', 11);
+        x.font = '900 16px Arial, sans-serif';
+        x.fillText('ARSIP AGEN / KRU', 1010, 20);
+        fitTextSingle(t.armada, 1010, 42, 312, 24.5, '900', 'Arial, sans-serif', 'left', 18);
 
-        let sy = 86;
+        drawInlineField('Kode: ', t.idTiket, 1010, 102, 312, 19.5, 20.5, 'Consolas, "Courier New", monospace');
+        drawInlineField('Nama: ', `${t.nama} (${t.qty} Org)`, 1010, 142, 312, 19.5, 20);
+        drawInlineField('Rute: ', `${t.asalCode} \u2192 ${t.tujuanCode}`, 1010, 182, 312, 19.5, 20.5);
+        drawInlineField('Jadwal: ', `${t.tglBerangkatStub || t.tglBerangkatShort} \u2022 ${t.jam}`, 1010, 222, 312, 19.5, 19.5);
+
+        // Stub Bottom Seat Bar (y: 304..376)
+        drawHLine(1010, 1322, 306, 2);
         x.textAlign = 'left';
-        x.font = '700 11px Arial, sans-serif';
-        const kw = x.measureText('Kode: ').width;
-        x.fillText('Kode: ', 569, sy);
-        fitTextSingle(t.idTiket, 569 + kw, sy - 1, 174 - kw, 12.5, '900', 'Consolas, "Courier New", monospace', 'left', 10.5);
-        sy += 24;
-
-        sy = drawLabelBoldValue('Nama: ', `${t.nama} (${t.qty} Org)`, 569, sy, 174, 11, 2) + 8;
-        sy = drawLabelBoldValue('Rute: ', `${t.asalCode} \u2192 ${t.tujuanCode}`, 569, sy, 174, 11.5, 1) + 8;
-        drawLabelBoldValue('Jadwal: ', `${t.tglBerangkatShort} \u2022 ${t.jam}`, 569, sy, 174, 11, 2);
-
-        // Stub Bottom Seat Bar (y: 322..376)
-        drawHLine(558, 752, 322, 2);
-        x.textAlign = 'left';
-        x.font = '900 9.5px Arial, sans-serif';
-        x.fillText('NO. KURSI', 569, 344);
-        fitTextSingle(t.kursi, 742, 339, 108, 19, '900', 'Arial, sans-serif', 'right', 12);
+        x.font = '900 16.5px Arial, sans-serif';
+        x.fillText('NO. KURSI', 1010, 331);
+        fitTextSingle(t.kursi, 1322, 322, 205, 31, '900', 'Arial, sans-serif', 'right', 20);
 
         // =================================================================
-        // 4. ROTATE 90° CLOCKWISE TO 384x760 VERTICAL PRINTER BITMAP
+        // 4. ROTATE 90° CW TO 384x1352 & EMIT GS v 0 m=2 (384x676 = 32.5 KB)
         // =================================================================
-        const LUM_CUTOFF = 148;
+        const LUM_CUTOFF = 162;
 
         if (returnDebugCanvas === 'landscape') {
             const ldbg = document.createElement('canvas');
@@ -5571,52 +5546,65 @@
 
         const rotCanvas = document.createElement('canvas');
         rotCanvas.width = W;
-        rotCanvas.height = finalH;
+        rotCanvas.height = FULL_H;
         const rctx = rotCanvas.getContext('2d');
         rctx.imageSmoothingEnabled = false;
         rctx.fillStyle = '#ffffff';
-        rctx.fillRect(0, 0, W, finalH);
+        rctx.fillRect(0, 0, W, FULL_H);
         rctx.translate(W, 0);
         rctx.rotate(Math.PI / 2);
         rctx.drawImage(land, 0, 0);
 
-        const rawPixels = rctx.getImageData(0, 0, W, finalH).data;
+        const rawPixels = rctx.getImageData(0, 0, W, FULL_H).data;
+        const rowLumSample = (rasterRow, px) => {
+            const r0 = rasterRow * 2;
+            const r1 = r0 + 1;
+            const i0 = (r0 * W + px) * 4;
+            const i1 = (r1 * W + px) * 4;
+            const l0 = rawPixels[i0] * 0.299 + rawPixels[i0 + 1] * 0.587 + rawPixels[i0 + 2] * 0.114;
+            const l1 = rawPixels[i1] * 0.299 + rawPixels[i1 + 1] * 0.587 + rawPixels[i1 + 2] * 0.114;
+            // Preserve pure-black 1px/2px rules while keeping anti-aliased letter strokes crisp without dilation
+            if (l0 < 24 || l1 < 24) return Math.min(l0, l1) * 0.5 + (l0 + l1) * 0.25;
+            return (l0 + l1) * 0.5;
+        };
 
         if (returnDebugCanvas) {
             const dbg = document.createElement('canvas');
             dbg.width = W;
-            dbg.height = finalH;
+            dbg.height = FULL_H;
             const dctx = dbg.getContext('2d');
-            const outImg = dctx.createImageData(W, finalH);
+            const outImg = dctx.createImageData(W, FULL_H);
             const od = outImg.data;
-            for (let i = 0; i < rawPixels.length; i += 4) {
-                const lum = rawPixels[i] * 0.299 + rawPixels[i + 1] * 0.587 + rawPixels[i + 2] * 0.114;
-                const v = (lum < LUM_CUTOFF) ? 0 : 255;
-                od[i] = v; od[i + 1] = v; od[i + 2] = v; od[i + 3] = 255;
+            for (let rr = 0; rr < RASTER_H; rr++) {
+                for (let px = 0; px < W; px++) {
+                    const v = (rowLumSample(rr, px) < LUM_CUTOFF) ? 0 : 255;
+                    for (let dy = 0; dy < 2; dy++) {
+                        const di = ((rr * 2 + dy) * W + px) * 4;
+                        od[di] = v; od[di + 1] = v; od[di + 2] = v; od[di + 3] = 255;
+                    }
+                }
             }
             dctx.putImageData(outImg, 0, 0);
             return dbg.toDataURL('image/png');
         }
 
-        // Pure continuous GS v 0 bands (BAND_H = 120 rows = 5 * 24-dot printhead height)
+        // GS v 0 m=2 (0x02 Double-Height): 384 dots wide (203 DPI) x 676 double-step rows (169mm physical length) = 32,448 bytes
         const widthBytes = W / 8; // 48 bytes per row
         const BAND_H = 120;
         const out = [0x1B, 0x40];
-        for (let startRow = 0; startRow < finalH; startRow += BAND_H) {
-            const bandRows = Math.min(BAND_H, finalH - startRow);
+        for (let startRow = 0; startRow < RASTER_H; startRow += BAND_H) {
+            const bandRows = Math.min(BAND_H, RASTER_H - startRow);
             const xL = widthBytes & 0xff;
             const xH = (widthBytes >> 8) & 0xff;
             const yL = bandRows & 0xff;
             const yH = (bandRows >> 8) & 0xff;
-            out.push(0x1D, 0x76, 0x30, 0x00, xL, xH, yL, yH);
-            for (let row = startRow; row < startRow + bandRows; row++) {
+            out.push(0x1D, 0x76, 0x30, 0x02, xL, xH, yL, yH);
+            for (let rr = startRow; rr < startRow + bandRows; rr++) {
                 for (let bx = 0; bx < widthBytes; bx++) {
                     let byteVal = 0;
                     for (let bit = 0; bit < 8; bit++) {
                         const px = bx * 8 + bit;
-                        const idx = (row * W + px) * 4;
-                        const lum = rawPixels[idx] * 0.299 + rawPixels[idx + 1] * 0.587 + rawPixels[idx + 2] * 0.114;
-                        if (lum < LUM_CUTOFF) byteVal |= (0x80 >> bit);
+                        if (rowLumSample(rr, px) < LUM_CUTOFF) byteVal |= (0x80 >> bit);
                     }
                     out.push(byteVal);
                 }

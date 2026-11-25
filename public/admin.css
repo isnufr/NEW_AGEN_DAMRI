@@ -170,15 +170,15 @@
         }
         .fade-up { animation: fadeUp 0.5s ease forwards; }
 
-        /* Thermal Ticket Display & 58mm Landscape Print (48mm x 95mm / 384x760 Dots 1:1 Match) */
+        /* Thermal Ticket Display & 58mm Landscape Print (47.6mm x 169.3mm Full 1:1 Scale = Pilihan 2) */
         .thermal-ticket-paper {
-            width: 760px;
-            height: 384px;
+            width: 640px;
+            height: 180px;
             max-width: none;
             margin: 0;
             background: #ffffff !important;
             color: #000000 !important;
-            font-family: Arial, 'Inter', 'Segoe UI', sans-serif;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
             padding: 0;
             box-sizing: border-box;
             user-select: none;
@@ -194,16 +194,16 @@
             transform-origin: top left;
         }
         .tt-land-sheet {
-            width: 760px;
-            height: 384px;
-            padding: 8px;
+            width: 640px;
+            height: 180px;
+            padding: 4px 6px;
             box-sizing: border-box;
             background: #ffffff !important;
             color: #000000 !important;
             display: grid;
-            grid-template-columns: 526px 24px 194px;
+            grid-template-columns: 446px 18px 164px;
             align-items: stretch;
-            font-family: Arial, 'Inter', sans-serif;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
         }
         .tt-land-sheet,
         .tt-land-sheet * {
@@ -212,24 +212,31 @@
             transition: none !important;
         }
         .thermal-ticket-paper .tt-mono {
-            font-family: 'Consolas', 'Courier New', monospace !important;
+            font-family: 'Consolas', 'SFMono-Regular', 'Courier New', monospace !important;
+        }
+        .thermal-ticket-paper .tt-lbl {
+            font-size: 7.5px;
+            font-weight: 800;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            line-height: 1.15;
         }
         .thermal-ticket-paper .tt-row {
             display: flex;
             justify-content: space-between;
             align-items: baseline;
-            gap: 6px;
-            font-size: 12px;
-            line-height: 1.3;
+            gap: 4px;
+            font-size: 9.2px;
+            line-height: 1.34;
         }
         .thermal-ticket-paper .tt-row span {
             color: #000000 !important;
-            font-weight: 700;
+            font-weight: 600;
             flex-shrink: 0;
         }
         .thermal-ticket-paper .tt-row strong {
             color: #000000 !important;
-            font-weight: 900;
+            font-weight: 800;
             text-align: right;
             white-space: nowrap;
         }
@@ -238,19 +245,19 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            gap: 5px;
+            gap: 4px;
             height: 100%;
         }
         .tt-v-cut::before,
         .tt-v-cut::after {
             content: "";
             flex: 1;
-            border-left: 1.5px dashed #000000;
+            border-left: 1.3px dashed #000000;
         }
         .tt-v-cut span {
             writing-mode: vertical-rl;
             transform: rotate(180deg);
-            font-size: 9px;
+            font-size: 7.5px;
             font-weight: 900;
             letter-spacing: 0.1em;
             white-space: nowrap;
@@ -275,12 +282,12 @@
 
         @media print {
             html, body {
-                width: 48mm !important;
+                width: auto !important;
                 height: auto !important;
                 min-height: 0 !important;
                 margin: 0 !important;
                 padding: 0 !important;
-                overflow: hidden !important;
+                overflow: visible !important;
                 background: #ffffff !important;
             }
             body > :not(#eticketModal) {
@@ -290,7 +297,7 @@
                 display: block !important;
                 position: static !important;
                 inset: auto !important;
-                width: 48mm !important;
+                width: auto !important;
                 height: auto !important;
                 background: #ffffff !important;
                 margin: 0 !important;
@@ -301,9 +308,9 @@
             }
             #eticketModal > div:last-child {
                 display: block !important;
-                width: 48mm !important;
+                width: auto !important;
                 max-width: none !important;
-                overflow: hidden !important;
+                overflow: visible !important;
                 padding: 0 !important;
                 margin: 0 !important;
                 background: #ffffff !important;
@@ -315,8 +322,8 @@
                 position: relative !important;
                 display: block !important;
                 width: 47.8mm !important;
-                height: 94.8mm !important;
-                max-width: none !important;
+                height: 170mm !important;
+                max-width: 100% !important;
                 box-sizing: border-box !important;
                 margin: 0 auto !important;
                 padding: 0 !important;
@@ -330,13 +337,13 @@
                 position: absolute !important;
                 top: 0.2mm !important;
                 left: 47.7mm !important;
-                width: 760px !important;
-                height: 384px !important;
+                width: 640px !important;
+                height: 180px !important;
                 transform-origin: 0 0 !important;
-                transform: rotate(90deg) scale(0.4685) !important;
+                transform: rotate(90deg) scale(1) !important;
             }
             @page {
-                size: 48mm 98mm;
+                size: portrait;
                 margin: 0;
             }
         }
