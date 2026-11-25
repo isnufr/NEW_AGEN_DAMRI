@@ -1540,6 +1540,186 @@ body.dark-mode .ekstra-total-price {
     color: #C5A46D !important;
 }
 
+/* ============================================ */
+/* MANIFEST WA BLAST (GUIDED ANTI-SPAM QUEUE)   */
+/* ============================================ */
+.wa-blast-armada-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 8px;
+    border-radius: 7px;
+    font-size: 9.5px;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    background: linear-gradient(135deg, #059669, #047857);
+    color: #FFFFFF;
+    border: 1px solid rgba(255, 255, 255, 0.22);
+    box-shadow: 0 2px 8px -2px rgba(5, 150, 105, 0.45);
+    cursor: pointer;
+    white-space: nowrap;
+    transition: transform 0.15s ease, box-shadow 0.2s ease, filter 0.2s ease;
+}
+.wa-blast-armada-btn:hover {
+    filter: brightness(1.07);
+    transform: translateY(-1px);
+}
+.wa-blast-armada-btn:active {
+    transform: scale(0.95);
+}
+.wa-blast-armada-btn.is-partial {
+    background: linear-gradient(135deg, #8E2635, #581820);
+    border-color: #C5A46D;
+    color: #FBF7F0;
+    box-shadow: 0 2px 8px -2px rgba(142, 38, 53, 0.45);
+}
+.wa-blast-armada-btn.is-done {
+    background: #ECFDF5;
+    color: #047857;
+    border-color: #A7F3D0;
+    box-shadow: none;
+}
+
+.wa-blast-preset-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    padding: 7px 4px;
+    border-radius: 12px;
+    border: 1px solid #E5D7C6;
+    background: #FBF7F0;
+    color: #581820;
+    font-size: 9.5px;
+    font-weight: 800;
+    line-height: 1.15;
+    cursor: pointer;
+    transition: transform 0.12s ease, border-color 0.15s ease, box-shadow 0.15s ease !important;
+}
+.wa-blast-modal-header,
+.wa-blast-modal-footer {
+    background: #FAF6F0;
+    border-color: #EADFD2;
+}
+.wa-blast-progress-strip {
+    background: #FBF7F0;
+    border-color: #E5D7C6;
+}
+.wa-blast-preview-card {
+    background: #FAF6F0;
+    border: 1px solid #E5D7C6;
+}
+.wa-blast-resend-btn {
+    background: #FBF7F0;
+    color: #581820;
+    border: 1px solid #E5D7C6;
+}
+.wa-blast-resend-btn:hover {
+    background: #ECFDF5;
+    color: #047857;
+    border-color: #A7F3D0;
+}
+.wa-blast-preset-btn:hover {
+    background: #F3E9DC;
+}
+.wa-blast-preset-btn.active {
+    background: linear-gradient(135deg, #8E2635, #581820);
+    color: #FFFFFF !important;
+    border-color: #C5A46D;
+    box-shadow: 0 6px 14px -4px rgba(142, 38, 53, 0.45);
+}
+.wa-blast-preset-btn.active span {
+    color: #FFFFFF !important;
+}
+.wa-blast-preset-btn.active i {
+    color: #C5A46D !important;
+}
+
+.wa-blast-recipient-card {
+    background: #FFFFFF;
+    border: 1px solid #EADFD2;
+    border-radius: 14px;
+    padding: 10px 11px;
+    transition: border-color 0.2s ease, background-color 0.2s ease;
+}
+.wa-blast-recipient-card.is-next {
+    border-color: #059669;
+    background: linear-gradient(90deg, rgba(236, 253, 245, 0.65) 0%, #FFFFFF 100%);
+    box-shadow: 0 4px 14px -6px rgba(5, 150, 105, 0.3);
+}
+.wa-blast-recipient-card.is-sent {
+    background: #F8FAFC;
+    border-color: #E2E8F0;
+    opacity: 0.88;
+}
+.wa-blast-preview-box {
+    background: #FBF7F0;
+    border: 1px solid #E5D7C6;
+    color: #291519;
+}
+
+body.dark-mode .wa-blast-armada-btn.is-done {
+    background: rgba(16, 185, 129, 0.16) !important;
+    color: #6EE7B7 !important;
+    border-color: rgba(16, 185, 129, 0.35) !important;
+}
+body.dark-mode .wa-blast-preset-btn {
+    background: #1B0D10 !important;
+    border-color: #422026 !important;
+    color: #E5D7C6 !important;
+}
+body.dark-mode .wa-blast-preset-btn.active {
+    background: linear-gradient(135deg, #8E2635, #581820) !important;
+    border-color: #C5A46D !important;
+    color: #FFFFFF !important;
+}
+body.dark-mode .wa-blast-recipient-card {
+    background: #231215 !important;
+    border-color: #422026 !important;
+}
+body.dark-mode .wa-blast-recipient-card.is-next {
+    background: linear-gradient(90deg, rgba(5, 150, 105, 0.16) 0%, #231215 100%) !important;
+    border-color: #10B981 !important;
+}
+body.dark-mode .wa-blast-recipient-card.is-sent {
+    background: #1B0D10 !important;
+    border-color: #33191E !important;
+}
+body.dark-mode .wa-blast-preview-box {
+    background: #1B0D10 !important;
+    border-color: #422026 !important;
+    color: #F3E9DC !important;
+}
+body.dark-mode #manifestWaBlastModalInner {
+    background: #1B0D10 !important;
+    border-color: #422026 !important;
+}
+body.dark-mode .wa-blast-modal-header,
+body.dark-mode .wa-blast-modal-footer {
+    background: #231215 !important;
+    border-color: #422026 !important;
+}
+body.dark-mode .wa-blast-progress-strip {
+    background: linear-gradient(90deg, rgba(142, 38, 53, 0.22), rgba(197, 164, 109, 0.12)) !important;
+    border-color: #422026 !important;
+}
+body.dark-mode .wa-blast-preview-card {
+    background: #231215 !important;
+    border-color: #422026 !important;
+}
+body.dark-mode .wa-blast-resend-btn {
+    background: #291519 !important;
+    color: #E5D7C6 !important;
+    border-color: #422026 !important;
+}
+body.dark-mode .wa-blast-resend-btn:hover {
+    background: rgba(16, 185, 129, 0.2) !important;
+    color: #6EE7B7 !important;
+    border-color: #10B981 !important;
+}
+
 /* Mobile Device Optimization */
 @media (max-width: 640px) {
     .chart-card {

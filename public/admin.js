@@ -711,6 +711,8 @@
         `).join(' ');
     }
 
+    let manifestWaBlastGroups = {};
+
     function renderTodayTable() {
         // Record open manifests before re-render
         const openManifestIds = [];
@@ -829,6 +831,9 @@
             return 0;
         });
 
+        manifestWaBlastGroups = {};
+        let manifestWaBlastCounter = 0;
+
         let html = '';
         sortedGroups.forEach((g) => {
             const totalPnp = g.bookings.reduce((sum, b) => sum + (parseInt(b.qty) || 1), 0);
@@ -917,15 +922,43 @@
                 const ig = innerGroups[key];
                 const innerTotalPnp = ig.bookings.reduce((sum, b) => sum + (parseInt(b.qty || b['JUMLAH PNP']) || 1), 0);
                 const combinedTujuan = Array.from(ig.tujuans).join(', ');
+                const blastId = 'wablast_' + (++manifestWaBlastCounter);
+                manifestWaBlastGroups[blastId] = {
+                    blastId,
+                    dateTravel: g.dateTravel,
+                    formattedDate,
+                    waktu: ig.waktu,
+                    armadaName: ig.armadaName,
+                    combinedTujuan,
+                    bookings: ig.bookings
+                };
+                const blastStats = getManifestArmadaWaBlastStats(manifestWaBlastGroups[blastId]);
+                let blastBtnClass = 'wa-blast-armada-btn';
+                let blastBtnIcon = 'fab fa-whatsapp';
+                let blastBtnLabel = 'Blast WA';
+                if (blastStats.validCount > 0 && blastStats.sentCount === blastStats.validCount) {
+                    blastBtnClass = 'wa-blast-armada-btn is-done';
+                    blastBtnIcon = 'fas fa-check-circle';
+                    blastBtnLabel = 'WA ' + blastStats.sentCount + '/' + blastStats.validCount;
+                } else if (blastStats.sentCount > 0) {
+                    blastBtnClass = 'wa-blast-armada-btn is-partial';
+                    blastBtnLabel = 'Blast ' + blastStats.sentCount + '/' + blastStats.validCount;
+                }
                 
                 html += `
                             <div class="bg-white rounded-xl border border-slate-200 overflow-hidden">
-                                <div class="bg-slate-200/80 border-b-2 border-slate-300 px-3 py-2 flex items-center justify-between gap-2">
-                                    <div class="flex items-center gap-2 min-w-0 flex-1">
+                                <div class="bg-slate-200/80 border-b-2 border-slate-300 px-2.5 sm:px-3 py-2 flex items-center justify-between gap-1.5 sm:gap-2">
+                                    <div class="flex items-center gap-1.5 sm:gap-2 min-w-0 flex-1">
                                         <div class="bg-blue-600 text-white font-black text-[10px] sm:text-xs px-2 py-1 rounded shadow-sm leading-none shrink-0">${ig.waktu}</div>
                                         <p class="font-black text-xs sm:text-sm text-slate-700 uppercase tracking-wide truncate">${ig.armadaName}</p>
                                     </div>
-                                    <span class="inline-block bg-white text-orange-600 border border-orange-200 px-2 py-1 rounded text-[9px] sm:text-[10px] font-black uppercase shadow-sm whitespace-nowrap shrink-0">${innerTotalPnp} PNP</span>
+                                    <div class="flex items-center gap-1.5 shrink-0">
+                                        <button type="button" onclick="event.stopPropagation(); openManifestWaBlastModal('${blastId}')" class="${blastBtnClass}" title="Blast Info WhatsApp Armada">
+                                            <i class="${blastBtnIcon} text-[10px]"></i>
+                                            <span>${blastBtnLabel}</span>
+                                        </button>
+                                        <span class="inline-block bg-white text-orange-600 border border-orange-200 px-2 py-1 rounded text-[9px] sm:text-[10px] font-black uppercase shadow-sm whitespace-nowrap shrink-0">${innerTotalPnp} PNP</span>
+                                    </div>
                                 </div>
                                 <!-- Group List -->
                                 <div class="flex flex-col">
@@ -1058,6 +1091,567 @@
             }
         }
     };
+
+    // =========================================================================
+    // MANIFEST WHATSAPP BLAST PER ARMADA (OPSI 1: GUIDED ANTI-SPAM QUEUE)
+    // =========================================================================
+    const WA_BLAST_SENT_STORAGE_KEY = 'damri_manifest_wa_sent_v1';
+    const WA_BLAST_CUSTOM_TPL_KEY = 'damri_manifest_wa_custom_tpl_v1';
+    const WA_BLAST_COOLDOWN_MS = 4000;
+
+    const WA_BLAST_PRESET_TEMPLATES = {
+        pengingat: `{sapaan}\nKami dari *Agen Bus Damri Kawunganten* menginformasikan pengingat keberangkatan Anda:\n\n🚌 Armada: *{armada}*\n📍 Tujuan: *{tujuan}*\n🗓️ Tanggal: *{tanggal}*\n⏰ Jam: *{jam} WIB*\n💺 Kursi: *{kursi}* ({jumlah_pnp} Penumpang)\n🎫 Kode Tiket: *{id_tiket}*{catatan_tambahan}\n\nMohon hadir di titik keberangkatan *30 menit sebelum jadwal*. Balas *OK* jika info ini sudah diterima. Terima kasih 🙏`,
+        tiba: `{sapaan}\nInformasi dari *Agen Bus Damri Kawunganten*, armada keberangkatan Anda *segera tiba / siap diberangkatkan*:\n\n🚌 Armada: *{armada}* ({jam} WIB)\n📍 Tujuan: *{tujuan}*\n💺 Kursi: *{kursi}* • Tiket: *{id_tiket}*{catatan_tambahan}\n\nMohon segera bersiap di lokasi penjemputan/agen. Balas *SIAP* jika sudah di lokasi. Terima kasih 🙏`,
+        terlambat: `{sapaan}\nMohon maaf atas ketidaknyamanannya. Kami dari *Agen Bus Damri Kawunganten* menginformasikan bahwa armada *{armada}* tujuan *{tujuan}* jadwal *{jam} WIB* (Tiket *{id_tiket}*, Kursi *{kursi}*) mengalami sedikit penyesuaian waktu keberangkatan karena kondisi lalu lintas.{catatan_tambahan}\n\nKami akan mengabari begitu armada mendekat. Mohon balas *OK* bila pesan ini sudah diterima. Terima kasih atas pengertiannya 🙏`,
+        kustom: `{sapaan}\nInformasi keberangkatan *Agen Bus Damri Kawunganten*:\nArmada *{armada}* tujuan *{tujuan}* pukul *{jam} WIB* (Kursi *{kursi}*, Kode *{id_tiket}*).{catatan_tambahan}\n\nMohon balas *OK* jika informasi sudah diterima. Terima kasih 🙏`
+    };
+
+    let activeWaBlastId = null;
+    let activeWaBlastPreset = 'pengingat';
+    let waBlastCooldownUntil = 0;
+    let waBlastCooldownTimer = null;
+
+    function escapeWaHtml(str) {
+        return String(str ?? '')
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;');
+    }
+
+    function normalizeIndoWaNumber(rawHp) {
+        let digits = String(rawHp || '').replace(/\D/g, '');
+        if (!digits) return '';
+        if (digits.startsWith('0062')) digits = '62' + digits.slice(4);
+        else if (digits.startsWith('0')) digits = '62' + digits.slice(1);
+        else if (digits.startsWith('8')) digits = '62' + digits;
+        if (!digits.startsWith('62') || digits.length < 10 || digits.length > 16) return '';
+        return digits;
+    }
+
+    function loadWaBlastSentStore() {
+        try {
+            const raw = localStorage.getItem(WA_BLAST_SENT_STORAGE_KEY);
+            if (!raw) return {};
+            const parsed = JSON.parse(raw);
+            if (!parsed || typeof parsed !== 'object') return {};
+            const cutoff = Date.now() - 14 * 24 * 60 * 60 * 1000;
+            let pruned = false;
+            Object.keys(parsed).forEach(k => {
+                if (!parsed[k] || parsed[k] < cutoff) {
+                    delete parsed[k];
+                    pruned = true;
+                }
+            });
+            if (pruned) localStorage.setItem(WA_BLAST_SENT_STORAGE_KEY, JSON.stringify(parsed));
+            return parsed;
+        } catch (e) {
+            return {};
+        }
+    }
+
+    function saveWaBlastSentStore(store) {
+        try {
+            localStorage.setItem(WA_BLAST_SENT_STORAGE_KEY, JSON.stringify(store));
+        } catch (e) {}
+    }
+
+    function makeWaBlastSentKey(group, waNumber) {
+        return `${group.dateTravel || '-'}||${group.waktu || '-'}||${group.armadaName || '-'}||${waNumber}`;
+    }
+
+    function buildWaBlastRecipients(group) {
+        if (!group || !Array.isArray(group.bookings)) {
+            return { recipients: [], validCount: 0, mergedDuplicates: 0 };
+        }
+        const byPhone = new Map();
+        const invalidRows = [];
+        let validBookingRows = 0;
+
+        group.bookings.forEach((b) => {
+            const bId = String(b.bookingId || b.id || '-').trim();
+            const bArmadaObj = b.armadaId && b.armadaId !== 'UNKNOWN' ? getArmada(b.armadaId) : null;
+            const bTujuan = bArmadaObj ? bArmadaObj.destination : String(b.tujuan || b['Tujuan'] || group.combinedTujuan || '-').trim();
+            const bName = String(b.name || b['NAMA'] || 'Penumpang').trim();
+            const bHp = String(b.hp || b['NOMOR HP'] || '').trim();
+            const bQty = parseInt(b.qty || b['JUMLAH PNP']) || 1;
+            const rawSeat = String(b.kursi || b['NOMOR KURSI'] || '').trim();
+            const isPaid = b.status === 'paid'
+                || String(b.status).toUpperCase() === 'LUNAS'
+                || String(b.status).toUpperCase() === 'ACC'
+                || String(b.pembayaran).toUpperCase() === 'LUNAS'
+                || String(b.pembayaran).toUpperCase() === 'ACC';
+            const waNumber = normalizeIndoWaNumber(bHp);
+
+            if (!waNumber) {
+                invalidRows.push({
+                    waNumber: '',
+                    rawHpDisplay: bHp || '-',
+                    name: bName,
+                    bookingIds: bId,
+                    kursi: (rawSeat && rawSeat !== '-') ? rawSeat : 'Menyesuaikan',
+                    qty: bQty,
+                    tujuan: bTujuan,
+                    isAllPaid: isPaid,
+                    isValidPhone: false
+                });
+                return;
+            }
+
+            validBookingRows++;
+            if (!byPhone.has(waNumber)) {
+                byPhone.set(waNumber, {
+                    waNumber,
+                    rawHpDisplay: bHp,
+                    namesSet: new Set([bName]),
+                    idsSet: new Set([bId]),
+                    seatsList: (rawSeat && rawSeat !== '-') ? rawSeat.split(',').map(s => s.trim()).filter(Boolean) : [],
+                    tujuanSet: new Set([bTujuan]),
+                    qty: bQty,
+                    isAllPaid: isPaid
+                });
+            } else {
+                const entry = byPhone.get(waNumber);
+                entry.namesSet.add(bName);
+                entry.idsSet.add(bId);
+                if (rawSeat && rawSeat !== '-') {
+                    rawSeat.split(',').map(s => s.trim()).filter(Boolean).forEach(s => {
+                        if (!entry.seatsList.includes(s)) entry.seatsList.push(s);
+                    });
+                }
+                entry.tujuanSet.add(bTujuan);
+                entry.qty += bQty;
+                if (!isPaid) entry.isAllPaid = false;
+            }
+        });
+
+        const validRecipients = Array.from(byPhone.values()).map(entry => ({
+            waNumber: entry.waNumber,
+            rawHpDisplay: entry.rawHpDisplay,
+            name: Array.from(entry.namesSet).join(', '),
+            bookingIds: Array.from(entry.idsSet).join(', '),
+            kursi: entry.seatsList.length > 0 ? entry.seatsList.join(', ') : 'Menyesuaikan',
+            qty: entry.qty,
+            tujuan: Array.from(entry.tujuanSet).join(', '),
+            isAllPaid: entry.isAllPaid,
+            isValidPhone: true
+        }));
+
+        const mergedDuplicates = Math.max(0, validBookingRows - validRecipients.length);
+        return {
+            recipients: [...validRecipients, ...invalidRows],
+            validCount: validRecipients.length,
+            mergedDuplicates
+        };
+    }
+
+    function getManifestArmadaWaBlastStats(group) {
+        const { recipients, validCount } = buildWaBlastRecipients(group);
+        if (validCount === 0) return { validCount: 0, sentCount: 0 };
+        const store = loadWaBlastSentStore();
+        let sentCount = 0;
+        recipients.forEach(r => {
+            if (r.isValidPhone && store[makeWaBlastSentKey(group, r.waNumber)]) {
+                sentCount++;
+            }
+        });
+        return { validCount, sentCount };
+    }
+
+    function getGreetingTimeWord() {
+        const hr = new Date().getHours();
+        if (hr >= 4 && hr < 11) return 'pagi';
+        if (hr >= 11 && hr < 15) return 'siang';
+        if (hr >= 15 && hr < 18) return 'sore';
+        return 'malam';
+    }
+
+    function buildPersonalizedWaMessage(group, recipient, idx = 0) {
+        const useSpintax = document.getElementById('waBlastSpintaxToggle')?.checked !== false;
+        const extraNote = (document.getElementById('waBlastExtraNote')?.value || '').trim();
+        const customText = document.getElementById('waBlastCustomTemplate')?.value || WA_BLAST_PRESET_TEMPLATES.kustom;
+        const rawTpl = activeWaBlastPreset === 'kustom'
+            ? customText
+            : (WA_BLAST_PRESET_TEMPLATES[activeWaBlastPreset] || WA_BLAST_PRESET_TEMPLATES.pengingat);
+
+        const pName = recipient ? recipient.name : 'Penumpang';
+        const sapaWaktu = getGreetingTimeWord();
+        const greetings = [
+            `Halo Bpk/Ibu *${pName}*,`,
+            `Selamat ${sapaWaktu} Kak *${pName}*,`,
+            `Yth. Penumpang *${pName}*,`,
+            `Info Keberangkatan untuk *${pName}*,`
+        ];
+        const sapaan = useSpintax ? greetings[idx % greetings.length] : greetings[0];
+        const catatanBlock = extraNote ? `\n📌 Info Tambahan: *${extraNote}*` : '';
+
+        return rawTpl
+            .replace(/\{sapaan\}/g, sapaan)
+            .replace(/\{nama\}/g, pName)
+            .replace(/\{armada\}/g, group.armadaName || '-')
+            .replace(/\{tujuan\}/g, (recipient && recipient.tujuan) || group.combinedTujuan || '-')
+            .replace(/\{tanggal\}/g, group.dateTravel || '-')
+            .replace(/\{jam\}/g, group.waktu || '-')
+            .replace(/\{kursi\}/g, (recipient && recipient.kursi) || 'Menyesuaikan')
+            .replace(/\{jumlah_pnp\}/g, String((recipient && recipient.qty) || 1))
+            .replace(/\{id_tiket\}/g, (recipient && recipient.bookingIds) || '-')
+            .replace(/\{catatan_tambahan\}/g, catatanBlock);
+    }
+
+    function toggleWaBlastPreview(forceExpanded = null) {
+        const col = document.getElementById('waBlastPreviewCollapse');
+        const btn = document.getElementById('waBlastPreviewToggleBtn');
+        if (!col) return;
+        const shouldExpand = (typeof forceExpanded === 'boolean') ? forceExpanded : !col.classList.contains('expanded');
+        col.classList.toggle('expanded', shouldExpand);
+        if (btn) {
+            btn.classList.toggle('is-expanded', shouldExpand);
+            btn.setAttribute('aria-expanded', shouldExpand ? 'true' : 'false');
+        }
+    }
+    window.toggleWaBlastPreview = toggleWaBlastPreview;
+
+    function setWaBlastPreset(preset) {
+        activeWaBlastPreset = WA_BLAST_PRESET_TEMPLATES[preset] ? preset : 'pengingat';
+        ['pengingat', 'tiba', 'terlambat', 'kustom'].forEach(k => {
+            const btn = document.getElementById('waPresetBtn_' + k);
+            if (btn) btn.classList.toggle('active', k === activeWaBlastPreset);
+        });
+        const customWrap = document.getElementById('waBlastCustomEditorWrap');
+        if (customWrap) customWrap.classList.toggle('hidden', activeWaBlastPreset !== 'kustom');
+        if (activeWaBlastPreset === 'kustom') {
+            toggleWaBlastPreview(true);
+        }
+        renderManifestWaBlastModalBody();
+    }
+    window.setWaBlastPreset = setWaBlastPreset;
+
+    function insertWaBlastVar(token) {
+        const ta = document.getElementById('waBlastCustomTemplate');
+        if (!ta) return;
+        const start = ta.selectionStart ?? ta.value.length;
+        const end = ta.selectionEnd ?? ta.value.length;
+        ta.value = ta.value.slice(0, start) + token + ta.value.slice(end);
+        ta.focus();
+        ta.selectionStart = ta.selectionEnd = start + token.length;
+        onWaBlastConfigChange();
+    }
+    window.insertWaBlastVar = insertWaBlastVar;
+
+    function onWaBlastConfigChange() {
+        const ta = document.getElementById('waBlastCustomTemplate');
+        if (activeWaBlastPreset === 'kustom' && ta) {
+            try { localStorage.setItem(WA_BLAST_CUSTOM_TPL_KEY, ta.value); } catch (e) {}
+        }
+        renderManifestWaBlastModalBody();
+    }
+    window.onWaBlastConfigChange = onWaBlastConfigChange;
+
+    function startWaBlastCooldown() {
+        waBlastCooldownUntil = Date.now() + WA_BLAST_COOLDOWN_MS;
+        if (waBlastCooldownTimer) clearInterval(waBlastCooldownTimer);
+        updateWaBlastFooterBtnState();
+        waBlastCooldownTimer = setInterval(() => {
+            if (Date.now() >= waBlastCooldownUntil) {
+                clearInterval(waBlastCooldownTimer);
+                waBlastCooldownTimer = null;
+            }
+            updateWaBlastFooterBtnState();
+        }, 250);
+    }
+
+    function updateWaBlastFooterBtnState() {
+        const group = activeWaBlastId ? manifestWaBlastGroups[activeWaBlastId] : null;
+        const btn = document.getElementById('waBlastNextActionBtn');
+        const lbl = document.getElementById('waBlastNextActionLabel');
+        if (!group || !btn || !lbl) return;
+
+        const { recipients, validCount } = buildWaBlastRecipients(group);
+        const store = loadWaBlastSentStore();
+        const validList = recipients.filter(r => r.isValidPhone);
+        const nextIdx = validList.findIndex(r => !store[makeWaBlastSentKey(group, r.waNumber)]);
+
+        if (validCount === 0) {
+            btn.disabled = true;
+            btn.className = 'w-full py-3 px-4 rounded-2xl bg-slate-300 text-slate-500 font-black text-xs sm:text-sm uppercase tracking-wider flex items-center justify-center gap-2 cursor-not-allowed';
+            lbl.textContent = 'Tidak Ada Nomor WhatsApp Valid';
+            return;
+        }
+
+        if (nextIdx === -1) {
+            btn.disabled = false;
+            btn.className = 'w-full py-3 px-4 rounded-2xl bg-gradient-to-r from-[#8E2635] to-[#581820] text-[#FBF7F0] border border-[#C5A46D] font-black text-xs sm:text-sm uppercase tracking-wider shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer';
+            lbl.textContent = `Semua Terkirim (${validCount}/${validCount}) • Tutup`;
+            return;
+        }
+
+        const remainingSec = Math.ceil((waBlastCooldownUntil - Date.now()) / 1000);
+        if (remainingSec > 0) {
+            btn.disabled = true;
+            btn.className = 'w-full py-3 px-4 rounded-2xl bg-amber-500/90 text-slate-900 font-black text-xs sm:text-sm uppercase tracking-wider transition-all flex items-center justify-center gap-2 cursor-wait opacity-90';
+            lbl.textContent = `Jeda Aman Anti-Spam (${remainingSec} dtk)...`;
+            return;
+        }
+
+        const nextRec = validList[nextIdx];
+        const shortName = nextRec.name.length > 18 ? nextRec.name.slice(0, 18) + '…' : nextRec.name;
+        btn.disabled = false;
+        btn.className = 'w-full py-3 px-4 rounded-2xl bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-700 hover:to-emerald-800 active:scale-[0.99] text-white font-black text-xs sm:text-sm uppercase tracking-wider shadow-lg shadow-emerald-600/25 transition-all flex items-center justify-center gap-2 cursor-pointer';
+        lbl.textContent = `Kirim ke ${shortName} (${nextIdx + 1}/${validCount})`;
+    }
+
+    function renderManifestWaBlastModalBody() {
+        const group = activeWaBlastId ? manifestWaBlastGroups[activeWaBlastId] : null;
+        if (!group) return;
+
+        const { recipients, validCount, mergedDuplicates } = buildWaBlastRecipients(group);
+        const store = loadWaBlastSentStore();
+
+        let sentCount = 0;
+        let firstUnsentValidPhone = '';
+        recipients.forEach(r => {
+            if (!r.isValidPhone) return;
+            const isSent = Boolean(store[makeWaBlastSentKey(group, r.waNumber)]);
+            if (isSent) sentCount++;
+            else if (!firstUnsentValidPhone) firstUnsentValidPhone = r.waNumber;
+        });
+
+        // Update Progress Bar & Dedup Badge
+        const progLabel = document.getElementById('waBlastProgressLabel');
+        const progBar = document.getElementById('waBlastProgressBar');
+        const dedupBadge = document.getElementById('waBlastDedupBadge');
+
+        if (progLabel) {
+            progLabel.innerHTML = `<i class="fas fa-shield-alt text-emerald-600"></i><span>Progres Aman: ${sentCount} / ${validCount} Nomor Terkirim</span>`;
+        }
+        if (progBar) {
+            const pct = validCount > 0 ? Math.round((sentCount / validCount) * 100) : 0;
+            progBar.style.width = pct + '%';
+        }
+        if (dedupBadge) {
+            if (mergedDuplicates > 0) {
+                dedupBadge.textContent = `${mergedDuplicates} duplikat digabung`;
+                dedupBadge.classList.remove('hidden');
+            } else {
+                dedupBadge.classList.add('hidden');
+            }
+        }
+
+        // Live Message Preview (based on next unsent recipient, or first recipient)
+        const previewEl = document.getElementById('waBlastLivePreview');
+        if (previewEl) {
+            const sampleIdx = Math.max(0, recipients.findIndex(r => r.isValidPhone && r.waNumber === firstUnsentValidPhone));
+            const sampleRec = recipients[sampleIdx] || recipients[0] || null;
+            previewEl.textContent = buildPersonalizedWaMessage(group, sampleRec, sampleIdx);
+        }
+
+        // Render Recipient Queue List
+        const listEl = document.getElementById('waBlastRecipientList');
+        if (listEl) {
+            if (recipients.length === 0) {
+                listEl.innerHTML = '<div class="text-center text-xs font-bold text-slate-400 py-6">Tidak ada penumpang pada armada ini.</div>';
+            } else {
+                listEl.innerHTML = recipients.map((rec, idx) => {
+                    if (!rec.isValidPhone) {
+                        return `
+                            <div class="wa-blast-recipient-card opacity-75 flex items-center justify-between gap-2 min-w-0">
+                                <div class="flex items-center gap-2.5 min-w-0 flex-1">
+                                    <div class="w-7 h-7 rounded-full bg-rose-100 text-rose-600 font-black text-[10px] flex items-center justify-center shrink-0">
+                                        <i class="fas fa-exclamation"></i>
+                                    </div>
+                                    <div class="min-w-0 flex-1">
+                                        <p class="font-black text-xs text-slate-700 uppercase truncate">${escapeWaHtml(rec.name)}</p>
+                                        <p class="text-[10px] font-bold text-rose-500 truncate">No HP tidak valid (${escapeWaHtml(rec.rawHpDisplay)}) • Kursi ${escapeWaHtml(rec.kursi)}</p>
+                                    </div>
+                                </div>
+                                <span class="px-2 py-1 rounded-lg bg-rose-50 text-rose-600 border border-rose-200 text-[9px] font-black uppercase shrink-0">Lewati</span>
+                            </div>
+                        `;
+                    }
+
+                    const isSent = Boolean(store[makeWaBlastSentKey(group, rec.waNumber)]);
+                    const isNext = !isSent && rec.waNumber === firstUnsentValidPhone;
+                    const cardCls = isSent
+                        ? 'wa-blast-recipient-card is-sent'
+                        : (isNext ? 'wa-blast-recipient-card is-next' : 'wa-blast-recipient-card');
+
+                    return `
+                        <div class="${cardCls} flex items-center justify-between gap-2 min-w-0">
+                            <div class="flex items-center gap-2.5 min-w-0 flex-1">
+                                <button type="button" onclick="toggleWaBlastSentByIndex(${idx})"
+                                    class="w-7 h-7 rounded-full ${isSent ? 'bg-emerald-500 text-white' : (isNext ? 'bg-emerald-100 text-emerald-700 ring-2 ring-emerald-500/40' : 'bg-slate-100 text-slate-600')} font-black text-[10px] flex items-center justify-center shrink-0 cursor-pointer transition-all"
+                                    title="${isSent ? 'Klik untuk tandai belum dikirim' : 'Klik untuk tandai sudah dikirim manual'}">
+                                    ${isSent ? '<i class="fas fa-check text-[10px]"></i>' : (idx + 1)}
+                                </button>
+                                <div class="min-w-0 flex-1">
+                                    <div class="flex items-center gap-1.5 min-w-0">
+                                        <span class="font-black text-xs text-slate-800 uppercase truncate">${escapeWaHtml(rec.name)}</span>
+                                        ${!rec.isAllPaid ? '<span class="px-1.5 py-0.5 rounded bg-amber-100 text-amber-800 text-[8px] font-black uppercase shrink-0">Belum Lunas</span>' : ''}
+                                    </div>
+                                    <p class="text-[10px] font-bold text-slate-400 truncate mt-0.5">
+                                        Kursi <b class="text-slate-600">${escapeWaHtml(rec.kursi)}</b> (${rec.qty} Pnp) • ${escapeWaHtml(rec.rawHpDisplay)}
+                                    </p>
+                                </div>
+                            </div>
+                            <button type="button" onclick="sendWaBlastRecipientByIndex(${idx})"
+                                class="shrink-0 inline-flex items-center justify-center gap-1 px-2.5 py-1.5 rounded-xl font-black text-[10px] uppercase tracking-wider transition-all active:scale-95 cursor-pointer ${isSent ? 'wa-blast-resend-btn' : 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-xs'}">
+                                <i class="fab fa-whatsapp text-xs"></i>
+                                <span>${isSent ? 'Ulang' : 'Kirim'}</span>
+                            </button>
+                        </div>
+                    `;
+                }).join('');
+            }
+        }
+
+        updateWaBlastFooterBtnState();
+    }
+
+    function openManifestWaBlastModal(blastId) {
+        const group = manifestWaBlastGroups[blastId];
+        if (!group) {
+            if (typeof showMessage === 'function') showMessage('Data manifest armada tidak ditemukan, silakan muat ulang.', 'warning');
+            return;
+        }
+        activeWaBlastId = blastId;
+
+        const timeBadge = document.getElementById('waBlastTimeBadge');
+        const subtitle = document.getElementById('waBlastSubtitle');
+        const extraInput = document.getElementById('waBlastExtraNote');
+        const customTa = document.getElementById('waBlastCustomTemplate');
+
+        if (timeBadge) timeBadge.textContent = group.waktu || '-';
+        if (subtitle) subtitle.textContent = `${group.armadaName || '-'} • ${group.formattedDate || group.dateTravel || '-'}`;
+        if (extraInput) extraInput.value = '';
+        if (customTa && !customTa.value) {
+            try {
+                customTa.value = localStorage.getItem(WA_BLAST_CUSTOM_TPL_KEY) || WA_BLAST_PRESET_TEMPLATES.kustom;
+            } catch (e) {
+                customTa.value = WA_BLAST_PRESET_TEMPLATES.kustom;
+            }
+        }
+
+        toggleWaBlastPreview(false);
+        setWaBlastPreset(activeWaBlastPreset || 'pengingat');
+
+        const modal = document.getElementById('manifestWaBlastModal');
+        const inner = document.getElementById('manifestWaBlastModalInner');
+        if (modal) {
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            setTimeout(() => {
+                if (inner) {
+                    inner.classList.remove('translate-y-6', 'sm:scale-95', 'opacity-0');
+                    inner.classList.add('translate-y-0', 'sm:scale-100', 'opacity-100');
+                }
+            }, 15);
+        }
+    }
+    window.openManifestWaBlastModal = openManifestWaBlastModal;
+
+    function closeManifestWaBlastModal() {
+        const modal = document.getElementById('manifestWaBlastModal');
+        const inner = document.getElementById('manifestWaBlastModalInner');
+        if (waBlastCooldownTimer) {
+            clearInterval(waBlastCooldownTimer);
+            waBlastCooldownTimer = null;
+        }
+        if (inner) {
+            inner.classList.remove('translate-y-0', 'sm:scale-100', 'opacity-100');
+            inner.classList.add('translate-y-6', 'sm:scale-95', 'opacity-0');
+        }
+        setTimeout(() => {
+            if (modal) {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+            }
+        }, 200);
+    }
+    window.closeManifestWaBlastModal = closeManifestWaBlastModal;
+
+    function sendWaBlastRecipientByIndex(idx) {
+        const group = activeWaBlastId ? manifestWaBlastGroups[activeWaBlastId] : null;
+        if (!group) return;
+        const { recipients } = buildWaBlastRecipients(group);
+        const rec = recipients[idx];
+        if (!rec || !rec.isValidPhone) return;
+
+        const msg = buildPersonalizedWaMessage(group, rec, idx);
+        const waUrl = `https://wa.me/${rec.waNumber}?text=${encodeURIComponent(msg)}`;
+        window.open(waUrl, '_blank', 'noopener,noreferrer');
+
+        const store = loadWaBlastSentStore();
+        store[makeWaBlastSentKey(group, rec.waNumber)] = Date.now();
+        saveWaBlastSentStore(store);
+
+        startWaBlastCooldown();
+        renderTodayTable();
+        // Re-bind activeWaBlastId in case renderTodayTable rebuilt group keys in the same order
+        const updatedEntry = Object.values(manifestWaBlastGroups).find(
+            g => g.dateTravel === group.dateTravel && g.waktu === group.waktu && g.armadaName === group.armadaName
+        );
+        if (updatedEntry) activeWaBlastId = updatedEntry.blastId;
+        renderManifestWaBlastModalBody();
+    }
+    window.sendWaBlastRecipientByIndex = sendWaBlastRecipientByIndex;
+
+    function toggleWaBlastSentByIndex(idx) {
+        const group = activeWaBlastId ? manifestWaBlastGroups[activeWaBlastId] : null;
+        if (!group) return;
+        const { recipients } = buildWaBlastRecipients(group);
+        const rec = recipients[idx];
+        if (!rec || !rec.isValidPhone) return;
+
+        const store = loadWaBlastSentStore();
+        const key = makeWaBlastSentKey(group, rec.waNumber);
+        if (store[key]) delete store[key];
+        else store[key] = Date.now();
+        saveWaBlastSentStore(store);
+
+        renderTodayTable();
+        const updatedEntry = Object.values(manifestWaBlastGroups).find(
+            g => g.dateTravel === group.dateTravel && g.waktu === group.waktu && g.armadaName === group.armadaName
+        );
+        if (updatedEntry) activeWaBlastId = updatedEntry.blastId;
+        renderManifestWaBlastModalBody();
+    }
+    window.toggleWaBlastSentByIndex = toggleWaBlastSentByIndex;
+
+    function sendNextWaBlastRecipient() {
+        if (Date.now() < waBlastCooldownUntil) return;
+        const group = activeWaBlastId ? manifestWaBlastGroups[activeWaBlastId] : null;
+        if (!group) return;
+        const { recipients } = buildWaBlastRecipients(group);
+        const store = loadWaBlastSentStore();
+        const nextIdx = recipients.findIndex(r => r.isValidPhone && !store[makeWaBlastSentKey(group, r.waNumber)]);
+        if (nextIdx === -1) {
+            closeManifestWaBlastModal();
+            return;
+        }
+        sendWaBlastRecipientByIndex(nextIdx);
+    }
+    window.sendNextWaBlastRecipient = sendNextWaBlastRecipient;
+
+    function resetCurrentArmadaWaBlastStatus() {
+        const group = activeWaBlastId ? manifestWaBlastGroups[activeWaBlastId] : null;
+        if (!group) return;
+        const { recipients } = buildWaBlastRecipients(group);
+        const store = loadWaBlastSentStore();
+        recipients.forEach(r => {
+            if (r.isValidPhone) delete store[makeWaBlastSentKey(group, r.waNumber)];
+        });
+        saveWaBlastSentStore(store);
+        waBlastCooldownUntil = 0;
+
+        renderTodayTable();
+        const updatedEntry = Object.values(manifestWaBlastGroups).find(
+            g => g.dateTravel === group.dateTravel && g.waktu === group.waktu && g.armadaName === group.armadaName
+        );
+        if (updatedEntry) activeWaBlastId = updatedEntry.blastId;
+        renderManifestWaBlastModalBody();
+    }
+    window.resetCurrentArmadaWaBlastStatus = resetCurrentArmadaWaBlastStatus;
 
     // ========================================
     // REQUEST PESANAN

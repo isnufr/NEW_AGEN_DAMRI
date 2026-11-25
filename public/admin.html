@@ -88,7 +88,7 @@
     <script src="/socket.io/socket.io.js?v=2"></script>
     <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js"></script>
     <script src="app.js?v=10"></script>
-    <link rel="stylesheet" href="admin.css?v=3.4">
+    <link rel="stylesheet" href="admin.css?v=3.5">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.js"></script>
 </head>
@@ -4273,6 +4273,161 @@
     </div>
 
     <!-- ======================================= -->
+    <!-- MODAL BLAST WA ARMADA (ANTI-SPAM QUEUE) -->
+    <!-- ======================================= -->
+    <div id="manifestWaBlastModal"
+        class="fixed inset-0 bg-slate-900/65 backdrop-blur-xs z-[170] hidden items-end sm:items-center justify-center p-0 sm:p-4 overscroll-none"
+        onclick="if(event.target === this) closeManifestWaBlastModal()">
+        <div id="manifestWaBlastModalInner"
+            class="bg-white rounded-t-3xl sm:rounded-3xl shadow-2xl w-full sm:max-w-lg overflow-hidden transform translate-y-6 sm:translate-y-0 sm:scale-95 opacity-0 transition-all duration-250 flex flex-col max-h-[92dvh] sm:max-h-[88vh] border border-[#E5D7C6]"
+            onclick="event.stopPropagation()">
+
+            <!-- Sticky Header -->
+            <div class="wa-blast-modal-header px-3.5 py-3 sm:px-4 sm:py-3.5 border-b flex items-center justify-between gap-2.5 shrink-0">
+                <div class="flex items-center gap-2.5 min-w-0 flex-1">
+                    <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-br from-[#8E2635] to-[#581820] text-[#C5A46D] border border-[#C5A46D]/40 flex items-center justify-center text-base sm:text-lg shadow-sm shrink-0">
+                        <i class="fab fa-whatsapp text-emerald-400"></i>
+                    </div>
+                    <div class="min-w-0 flex-1">
+                        <div class="flex items-center gap-1.5 flex-wrap">
+                            <h3 class="text-sm sm:text-base font-black text-slate-800 tracking-tight truncate">Blast Info Armada</h3>
+                            <span id="waBlastTimeBadge" class="px-1.5 py-0.5 rounded bg-[#581820] text-[#C5A46D] text-[9px] font-black tracking-wider shrink-0">18.00</span>
+                        </div>
+                        <p id="waBlastSubtitle" class="text-[10px] sm:text-[11px] font-bold text-slate-400 truncate mt-0.5">DAMRI JAKARTA • Hari Ini</p>
+                    </div>
+                </div>
+                <button type="button" onclick="closeManifestWaBlastModal()"
+                    class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-800 flex items-center justify-center text-xs transition-colors shrink-0 cursor-pointer"
+                    title="Tutup">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <!-- Progress & Anti-Spam Guard Bar -->
+            <div class="wa-blast-progress-strip px-3.5 py-2 sm:px-4 border-b shrink-0">
+                <div class="flex items-center justify-between gap-2 text-[10px] font-extrabold mb-1">
+                    <span id="waBlastProgressLabel" class="airline-section-heading flex items-center gap-1.5">
+                        <i class="fas fa-shield-alt text-emerald-600"></i>
+                        <span>Antrean Aman: 0 / 0 Terkirim</span>
+                    </span>
+                    <div class="flex items-center gap-2 shrink-0">
+                        <span id="waBlastDedupBadge" class="hidden airline-count-badge text-[9px] font-black px-1.5 py-0.5 rounded bg-amber-100 text-amber-800 border border-amber-200"></span>
+                        <button type="button" onclick="resetCurrentArmadaWaBlastStatus()" class="text-[9.5px] font-black text-slate-400 hover:text-rose-600 uppercase tracking-wider cursor-pointer" title="Ulangi status kirim armada ini">
+                            Reset
+                        </button>
+                    </div>
+                </div>
+                <div class="w-full h-1.5 bg-slate-200/80 rounded-full overflow-hidden">
+                    <div id="waBlastProgressBar" class="h-full bg-gradient-to-r from-emerald-500 to-emerald-600 rounded-full transition-all duration-300" style="width: 0%;"></div>
+                </div>
+            </div>
+
+            <!-- Scrollable Body -->
+            <div class="p-3 sm:p-4 overflow-y-auto flex-1 overscroll-contain space-y-3">
+                <!-- 1. Pilih Jenis Pesan (4 Preset) -->
+                <div>
+                    <div class="flex items-center justify-between mb-1.5">
+                        <label class="text-[10px] font-black text-slate-500 uppercase tracking-wider">1. Pilih Template Informasi</label>
+                        <label class="inline-flex items-center gap-1.5 cursor-pointer select-none" title="Acak kata sapaan otomatis agar tiap pesan unik & bebas deteksi spam">
+                            <input type="checkbox" id="waBlastSpintaxToggle" checked onchange="onWaBlastConfigChange()" class="rounded text-emerald-600 focus:ring-0 w-3.5 h-3.5">
+                            <span class="text-[9.5px] font-extrabold text-emerald-700">Variasi Anti-Spam</span>
+                        </label>
+                    </div>
+                    <div class="grid grid-cols-4 gap-1.5">
+                        <button type="button" id="waPresetBtn_pengingat" onclick="setWaBlastPreset('pengingat')" class="wa-blast-preset-btn active">
+                            <i class="fas fa-bell text-xs"></i>
+                            <span>Pengingat</span>
+                        </button>
+                        <button type="button" id="waPresetBtn_tiba" onclick="setWaBlastPreset('tiba')" class="wa-blast-preset-btn">
+                            <i class="fas fa-bus text-xs"></i>
+                            <span>Bus Tiba</span>
+                        </button>
+                        <button type="button" id="waPresetBtn_terlambat" onclick="setWaBlastPreset('terlambat')" class="wa-blast-preset-btn">
+                            <i class="fas fa-clock text-xs"></i>
+                            <span>Terlambat</span>
+                        </button>
+                        <button type="button" id="waPresetBtn_kustom" onclick="setWaBlastPreset('kustom')" class="wa-blast-preset-btn">
+                            <i class="fas fa-pen text-xs"></i>
+                            <span>Kustom</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 2. Catatan Tambahan Cepat (Nopol / Estimasi / Info Supir) -->
+                <div>
+                    <label for="waBlastExtraNote" class="block text-[10px] font-black text-slate-500 uppercase tracking-wider mb-1">
+                        2. Info Tambahan Armada <span class="text-slate-400 font-semibold normal-case">(Opsional)</span>
+                    </label>
+                    <div class="relative">
+                        <i class="fas fa-tag absolute left-3 top-1/2 -translate-y-1/2 text-amber-600 text-[11px] pointer-events-none"></i>
+                        <input type="text" id="waBlastExtraNote" oninput="onWaBlastConfigChange()"
+                            class="w-full bg-slate-50 border border-slate-200 rounded-xl pl-8 pr-3 py-2 text-xs font-bold text-slate-800 outline-none focus:border-[#8E2635] focus:bg-white transition-colors"
+                            placeholder="Cth: Bus B 7128 TGA / Kumpul 17.30 WIB di Loket...">
+                    </div>
+                </div>
+
+                <!-- 3. Collapsible Preview & Custom Editor (Default Minimize agar Daftar Penumpang Langsung Terlihat di HP) -->
+                <div class="wa-blast-preview-card rounded-2xl overflow-hidden">
+                    <button type="button" id="waBlastPreviewToggleBtn" onclick="toggleWaBlastPreview()" aria-expanded="false"
+                        class="seat-collapse-header w-full px-3 py-2 flex items-center justify-between gap-2 text-left cursor-pointer hover:opacity-90 transition-opacity">
+                        <span class="text-[10px] font-black text-slate-600 uppercase tracking-wider flex items-center gap-1.5">
+                            <i class="fas fa-eye text-[#8E2635]"></i>
+                            <span id="waBlastPreviewToggleLabel">Lihat / Edit Pratinjau Pesan</span>
+                        </span>
+                        <i class="fas fa-chevron-down text-[10px] text-slate-400 seat-collapse-chevron"></i>
+                    </button>
+                    <div id="waBlastPreviewCollapse" class="seat-collapse-wrapper">
+                        <div class="seat-collapse-inner">
+                            <div class="p-2.5 sm:p-3 pt-1 space-y-2 border-t border-slate-200/70">
+                                <div id="waBlastCustomEditorWrap" class="hidden space-y-1.5">
+                                    <div class="flex items-center justify-between">
+                                        <span class="text-[9.5px] font-extrabold text-slate-500 uppercase">Template Kustom:</span>
+                                        <span class="text-[9px] font-semibold text-slate-400">Klik tag untuk sisipkan</span>
+                                    </div>
+                                    <div class="flex flex-wrap gap-1">
+                                        <button type="button" onclick="insertWaBlastVar('{nama}')" class="px-1.5 py-0.5 rounded bg-white border border-slate-200 text-[9px] font-bold text-[#581820] hover:border-[#C5A46D]">{nama}</button>
+                                        <button type="button" onclick="insertWaBlastVar('{armada}')" class="px-1.5 py-0.5 rounded bg-white border border-slate-200 text-[9px] font-bold text-[#581820] hover:border-[#C5A46D]">{armada}</button>
+                                        <button type="button" onclick="insertWaBlastVar('{jam}')" class="px-1.5 py-0.5 rounded bg-white border border-slate-200 text-[9px] font-bold text-[#581820] hover:border-[#C5A46D]">{jam}</button>
+                                        <button type="button" onclick="insertWaBlastVar('{tujuan}')" class="px-1.5 py-0.5 rounded bg-white border border-slate-200 text-[9px] font-bold text-[#581820] hover:border-[#C5A46D]">{tujuan}</button>
+                                        <button type="button" onclick="insertWaBlastVar('{kursi}')" class="px-1.5 py-0.5 rounded bg-white border border-slate-200 text-[9px] font-bold text-[#581820] hover:border-[#C5A46D]">{kursi}</button>
+                                        <button type="button" onclick="insertWaBlastVar('{id_tiket}')" class="px-1.5 py-0.5 rounded bg-white border border-slate-200 text-[9px] font-bold text-[#581820] hover:border-[#C5A46D]">{id_tiket}</button>
+                                    </div>
+                                    <textarea id="waBlastCustomTemplate" rows="4" oninput="onWaBlastConfigChange()"
+                                        class="w-full bg-white border border-slate-200 rounded-xl p-2.5 text-[11px] font-medium text-slate-800 outline-none focus:border-[#8E2635] leading-relaxed"></textarea>
+                                </div>
+                                <div>
+                                    <p class="text-[9px] font-extrabold text-slate-400 uppercase tracking-wider mb-1">Contoh Pesan (Penumpang Pertama):</p>
+                                    <pre id="waBlastLivePreview" class="wa-blast-preview-box rounded-xl p-2.5 text-[10.5px] font-medium whitespace-pre-wrap break-words font-sans leading-relaxed max-h-40 overflow-y-auto"></pre>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 4. Daftar Antrean Penumpang Armada Ini -->
+                <div>
+                    <div class="flex items-center justify-between mb-1.5">
+                        <span class="text-[10px] font-black text-slate-500 uppercase tracking-wider">3. Antrean Penerima</span>
+                        <span class="text-[9.5px] font-bold text-slate-400">Kirim urut 1-per-1 via WA resmi</span>
+                    </div>
+                    <div id="waBlastRecipientList" class="space-y-2">
+                        <!-- Populated dynamically -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sticky Footer Guided Action (1-Tap Next di HP) -->
+            <div class="wa-blast-modal-footer p-3 sm:p-3.5 border-t shrink-0 pb-[calc(12px+env(safe-area-inset-bottom,0px))] sm:pb-3.5">
+                <button type="button" id="waBlastNextActionBtn" onclick="sendNextWaBlastRecipient()"
+                    class="w-full py-3 px-4 rounded-2xl bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-700 hover:to-emerald-800 active:scale-[0.99] text-white font-black text-xs sm:text-sm uppercase tracking-wider shadow-lg shadow-emerald-600/25 transition-all flex items-center justify-center gap-2 cursor-pointer">
+                    <i class="fab fa-whatsapp text-base"></i>
+                    <span id="waBlastNextActionLabel">Kirim Penumpang Berikutnya</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ======================================= -->
     <!-- TOAST NOTIFICATION -->
     <!-- ======================================= -->
     <div id="toast"
@@ -4286,7 +4441,7 @@
 
     <!-- Custom script for admin dashboard -->
     <script src="routes-data.js?v=2"></script>
-    <script src="admin.js?v=2.71"></script>
+    <script src="admin.js?v=2.72"></script>
 
     <!-- ======================================= -->
     <!-- DETAIL DATA PELANGGAN & CRM MODAL        -->
