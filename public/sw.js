@@ -1,15 +1,15 @@
-const CACHE_NAME = 'damri-cache-v69';
+const CACHE_NAME = 'damri-cache-v70';
 const urlsToCache = [
   '/',
   '/index.html',
   '/admin.html',
-  '/app.js?v=10',
-  '/admin.css?v=3.10',
+  '/tailwind.out.css?v=1.1',
+  '/app.js?v=11',
+  '/admin.css?v=3.12',
   '/logo.png?v=3',
   '/logobiru.webp?v=3',
   '/logoadm-192.png?v=3',
   '/logoadm-512.png?v=3',
-  'https://cdn.tailwindcss.com?v=2',
   'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css',
   'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js?v=2'
 ];

@@ -36,6 +36,8 @@ let cachedTipeArmada = [];
 let cachedPoProfiles = {};
 let cachedSiteConfig = null;
 let isDataLoaded = false;
+window.__currentBookingScope = 'active';
+window.__currentBookingRange = { from: '', to: '' };
 
 // Pre-hydrate from localStorage for instantaneous 0ms initial render
 try {
@@ -100,11 +102,165 @@ async function postToSheets(action, payload) {
 // ==========================================
 // 3. INITIALIZATION & MAPPING DATA
 // ==========================================
+function hydrateBookingsAndLaporan(bData) {
+    if (!bData || !Array.isArray(bData)) return;
+    const normTime = (s) => String(s || '').trim().replace(':', '.');
+    const findBestArmada = (bArmada, bTujuan, bWaktu, bUnitPrice) => {
+        const cleanTujuan = String(bTujuan || '').replace(/^\[PULANG\]\s*/i, '').trim();
+        const cleanWaktu = normTime(bWaktu);
+        const candidates = cachedArmadas.filter(a =>
+            (a.name === bArmada || bArmada.includes(a.name) || a.name.includes(bArmada)) &&
+            (a.destination === cleanTujuan || cleanTujuan.includes(a.destination) || a.destination.includes(cleanTujuan))
+        );
+        if (!candidates.length) return null;
+        let best = candidates[0];
+        let bestScore = -1;
+        for (const a of candidates) {
+            let score = 0;
+            if (a.isActive !== false) score += 100;
+            if (cleanWaktu && normTime(a.time) === cleanWaktu) score += 50;
+            if (a.name.toUpperCase() === bArmada.toUpperCase()) score += 30;
+            if (a.destination.toUpperCase() === cleanTujuan.toUpperCase()) score += 25;
+            if (bUnitPrice > 0 && parseInt(a.price, 10) === bUnitPrice) score += 20;
+            if (score > bestScore) {
+                bestScore = score;
+                best = a;
+            }
+        }
+        return best;
+    };
+
+    cachedBookings = bData.map(b => {
+        const bArmada = b["JENIS KENDARAAN"] ? String(b["JENIS KENDARAAN"]).trim() : "";
+        const bTujuan = b["Tujuan"] ? String(b["Tujuan"]).trim() : "";
+        const bWaktu = b["WAKTU"] ? String(b["WAKTU"]).trim() : "";
+        const bUnitPrice = parseInt(b["Harga"]) || 0;
+        const bQty = parseInt(b["JUMLAH PNP"]) || 1;
+        const bTotalPrice = parseInt(b["Total Harga"]) || (bUnitPrice * bQty) || 0;
+
+        const armadaMatch = findBestArmada(bArmada, bTujuan, bWaktu, bUnitPrice);
+        const effectivePoName = armadaMatch ? armadaMatch.name : bArmada;
+        const commCalc = computePoCommission(effectivePoName, bUnitPrice, bQty, bTotalPrice);
+        const serverTotalKomisi = (b["Total Komisi"] !== undefined && b["Total Komisi"] !== null && Number(b["Total Komisi"]) > 0)
+            ? Number(b["Total Komisi"])
+            : commCalc.totalKomisi;
+        const serverKomisi = (b["Komisi"] !== undefined && b["Komisi"] !== null && Number(b["Komisi"]) > 0)
+            ? Number(b["Komisi"])
+            : commCalc.komisi;
+
+        let statusLocal = "waiting_payment";
+        const bStatus = b["Status"] ? String(b["Status"]).toUpperCase() : "";
+        const bPembayaran = b["PEMBAYARAN"] ? String(b["PEMBAYARAN"]).toUpperCase() : "";
+
+        if (bStatus === "LUNAS" || bStatus === "ACC" || bPembayaran === "LUNAS" || bPembayaran === "ACC") {
+            statusLocal = "paid";
+        } else if (bStatus === "BELUM LUNAS" || bPembayaran === "BELUM LUNAS") {
+            statusLocal = "BELUM LUNAS";
+        } else {
+            statusLocal = bStatus || bPembayaran || "waiting_payment";
+        }
+
+        let tgl = "";
+        if (b["TANGGAL PEMBERANGKATAN"]) {
+            const rawDate = String(b["TANGGAL PEMBERANGKATAN"]);
+            if (rawDate.includes('T')) {
+                const d = new Date(rawDate);
+                if (!isNaN(d.getTime())) {
+                    tgl = String(d.getDate()).padStart(2,'0') + '/' + String(d.getMonth()+1).padStart(2,'0') + '/' + d.getFullYear();
+                } else {
+                    tgl = rawDate.split('T')[0];
+                }
+            } else {
+                tgl = rawDate;
+            }
+        }
+
+        const rawCheckIn = String(b["CHECK_IN_STATUS"] || "BELUM").toUpperCase();
+
+        return {
+            bookingId: b["ID_TIKET"] || "UNKNOWN",
+            name: b["NAMA"] || "Tanpa Nama",
+            hp: b["NOMOR HP"] || "-",
+            alamat: b["ALAMAT"] || b["alamat"] || "-",
+            armadaId: armadaMatch ? armadaMatch.id : "UNKNOWN",
+            kendaraan: bArmada,
+            tujuan: bTujuan,
+            qty: bQty,
+            unitPrice: bUnitPrice,
+            totalPrice: bTotalPrice,
+            komisi: serverKomisi,
+            totalKomisi: serverTotalKomisi,
+            status: statusLocal,
+            dateCreated: b["Timestamp"] || "",
+            dateTravel: tgl,
+            tanggalIso: b["TANGGAL_ISO"] || "",
+            waktu: bWaktu,
+            pembayaran: b["PEMBAYARAN"] || "",
+            keterangan: b["KETERANGAN"] || b["Keterangan"] || b["keterangan"] || "",
+            kursi: b["NOMOR KURSI"] || "",
+            checkInStatus: rawCheckIn === "HADIR" ? "HADIR" : "BELUM",
+            checkInAt: b["CHECK_IN_AT"] || null
+        };
+    });
+    localStorage.setItem("app_bookings", JSON.stringify(cachedBookings));
+
+    cachedLaporan = bData
+        .filter(l => {
+            const st = String(l["Status"] || l["PEMBAYARAN"] || "").toUpperCase();
+            return st !== "DITOLAK" && st !== "CANCEL";
+        })
+        .map(l => {
+            const harga = parseInt(String(l["Harga"] || '0').replace(/[^0-9]/g, '')) || 0;
+            const jumlahPnp = parseInt(l["JUMLAH PNP"]) || 1;
+            const totalHarga = parseInt(String(l["Total Harga"] || '0').replace(/[^0-9]/g, '')) || 0;
+            const jenisKendaraan = l["JENIS KENDARAAN"] || '';
+            const commCalc = computePoCommission(jenisKendaraan, harga, jumlahPnp, totalHarga);
+            const totalKomisi = (l["Total Komisi"] !== undefined && l["Total Komisi"] !== null && Number(l["Total Komisi"]) > 0)
+                ? Number(l["Total Komisi"])
+                : commCalc.totalKomisi;
+            const komisi = (l["Komisi"] !== undefined && l["Komisi"] !== null && Number(l["Komisi"]) > 0)
+                ? Number(l["Komisi"])
+                : commCalc.komisi;
+            return {
+                timestamp: l["Timestamp"] || '',
+                tanggal: l["TANGGAL PEMBERANGKATAN"] || '',
+                tanggalIso: l["TANGGAL_ISO"] || '',
+                idTiket: l["ID_TIKET"] || '',
+                jenisKendaraan,
+                tujuan: l["Tujuan"] || '',
+                harga,
+                jumlahPnp,
+                totalHarga,
+                komisi,
+                totalKomisi
+            };
+        });
+    localStorage.setItem('app_laporan', JSON.stringify(cachedLaporan));
+}
+
+window.fetchServerBookingsRange = async function({ scope = '', from = '', to = '' } = {}) {
+    let params = '';
+    if (from) params += `&from=${encodeURIComponent(from)}`;
+    if (to) params += `&to=${encodeURIComponent(to)}`;
+    if (scope) params += `&scope=${encodeURIComponent(scope)}`;
+    const bData = await fetchFromSheets('getBookings', params);
+    if (bData && Array.isArray(bData)) {
+        window.__currentBookingScope = (from || to) ? 'custom' : (scope || 'all');
+        window.__currentBookingRange = { from: from || '', to: to || '' };
+        hydrateBookingsAndLaporan(bData);
+        return bData;
+    }
+    return null;
+};
+
 async function initData() {
     if (isDataLoaded) return true;
 
     try {
         const isAdmin = localStorage.getItem('isAdminLoggedIn') === 'true';
+        const scopeParam = window.__currentBookingRange?.from || window.__currentBookingRange?.to
+            ? `${window.__currentBookingRange.from ? '&from=' + encodeURIComponent(window.__currentBookingRange.from) : ''}${window.__currentBookingRange.to ? '&to=' + encodeURIComponent(window.__currentBookingRange.to) : ''}`
+            : `&scope=${encodeURIComponent(window.__currentBookingScope || 'active')}`;
         
         const promises = [
             fetchFromSheets('getArmada'),
@@ -117,8 +273,7 @@ async function initData() {
         
         if (isAdmin) {
             promises.push(
-                fetchFromSheets('getBookings'),
-                fetchFromSheets('getLaporan'),
+                fetchFromSheets('getBookings', scopeParam),
                 fetchFromSheets('getEkstraBookings')
             );
         }
@@ -131,12 +286,11 @@ async function initData() {
         const tData = results[3];
         const pData = results[4];
         const sData = results[5];
-        let bData = [], lData = [], eData = [];
+        let bData = [], eData = [];
         
         if (isAdmin) {
             bData = results[6];
-            lData = results[7];
-            eData = results[8];
+            eData = results[7];
         }
 
         if (sData && typeof sData === 'object') {
@@ -217,115 +371,7 @@ async function initData() {
         }
 
         if (bData && Array.isArray(bData)) {
-            const normTime = (s) => String(s || '').trim().replace(':', '.');
-            const findBestArmada = (bArmada, bTujuan, bWaktu, bUnitPrice) => {
-                const cleanTujuan = String(bTujuan || '').replace(/^\[PULANG\]\s*/i, '').trim();
-                const cleanWaktu = normTime(bWaktu);
-                const candidates = cachedArmadas.filter(a =>
-                    (a.name === bArmada || bArmada.includes(a.name) || a.name.includes(bArmada)) &&
-                    (a.destination === cleanTujuan || cleanTujuan.includes(a.destination) || a.destination.includes(cleanTujuan))
-                );
-                if (!candidates.length) return null;
-                let best = candidates[0];
-                let bestScore = -1;
-                for (const a of candidates) {
-                    let score = 0;
-                    if (a.isActive !== false) score += 100;
-                    if (cleanWaktu && normTime(a.time) === cleanWaktu) score += 50;
-                    if (a.name.toUpperCase() === bArmada.toUpperCase()) score += 30;
-                    if (a.destination.toUpperCase() === cleanTujuan.toUpperCase()) score += 25;
-                    if (bUnitPrice > 0 && parseInt(a.price, 10) === bUnitPrice) score += 20;
-                    if (score > bestScore) {
-                        bestScore = score;
-                        best = a;
-                    }
-                }
-                return best;
-            };
-
-            cachedBookings = bData.map(b => {
-                const bArmada = b["JENIS KENDARAAN"] ? String(b["JENIS KENDARAAN"]).trim() : "";
-                const bTujuan = b["Tujuan"] ? String(b["Tujuan"]).trim() : "";
-                const bWaktu = b["WAKTU"] ? String(b["WAKTU"]).trim() : "";
-                const bUnitPrice = parseInt(b["Harga"]) || 0;
-
-                const armadaMatch = findBestArmada(bArmada, bTujuan, bWaktu, bUnitPrice);
-                
-                let statusLocal = "waiting_payment";
-                const bStatus = b["Status"] ? String(b["Status"]).toUpperCase() : "";
-                const bPembayaran = b["PEMBAYARAN"] ? String(b["PEMBAYARAN"]).toUpperCase() : "";
-                
-                if (bStatus === "LUNAS" || bStatus === "ACC" || bPembayaran === "LUNAS" || bPembayaran === "ACC") {
-                    statusLocal = "paid";
-                } else if (bStatus === "BELUM LUNAS" || bPembayaran === "BELUM LUNAS") {
-                    statusLocal = "BELUM LUNAS";
-                } else {
-                    statusLocal = bStatus || bPembayaran || "waiting_payment";
-                }
-
-                let tgl = "";
-                if (b["TANGGAL PEMBERANGKATAN"]) {
-                    const rawDate = String(b["TANGGAL PEMBERANGKATAN"]);
-                    if (rawDate.includes('T')) {
-                        const d = new Date(rawDate);
-                        if (!isNaN(d.getTime())) {
-                            tgl = String(d.getDate()).padStart(2,'0') + '/' + String(d.getMonth()+1).padStart(2,'0') + '/' + d.getFullYear();
-                        } else {
-                            tgl = rawDate.split('T')[0];
-                        }
-                    } else {
-                        tgl = rawDate;
-                    }
-                }
-
-                return {
-                    bookingId: b["ID_TIKET"] || "UNKNOWN",
-                    name: b["NAMA"] || "Tanpa Nama",
-                    hp: b["NOMOR HP"] || "-",
-                    alamat: b["ALAMAT"] || b["alamat"] || "-",
-                    armadaId: armadaMatch ? armadaMatch.id : "UNKNOWN",
-                    tujuan: bTujuan,
-                    qty: parseInt(b["JUMLAH PNP"]) || 1,
-                    unitPrice: bUnitPrice,
-                    totalPrice: parseInt(b["Total Harga"]) || bUnitPrice || 0,
-                    status: statusLocal,
-                    dateCreated: b["Timestamp"] || "",
-                    dateTravel: tgl,
-                    waktu: b["WAKTU"] || "",
-                    pembayaran: b["PEMBAYARAN"] || "",
-                    keterangan: b["KETERANGAN"] || b["Keterangan"] || b["keterangan"] || "",
-                    kursi: b["NOMOR KURSI"] || ""
-                };
-            });
-            localStorage.setItem("app_bookings", JSON.stringify(cachedBookings));
-        }
-
-        if (lData && Array.isArray(lData)) {
-            cachedLaporan = lData.map(l => {
-                const keys = Object.keys(l);
-                const find = (candidates) => {
-                    for (const c of candidates) {
-                        const match = keys.find(k => k.toLowerCase().trim() === c.toLowerCase());
-                        if (match && l[match] !== undefined && l[match] !== "") return l[match];
-                    }
-                    return null;
-                };
-                const mappedLaporan = {
-                    timestamp: find(['Timestamp', 'timestamp']) || '',
-                    tanggal: find(['TANGGAL PEMBERANGKATAN', 'Tanggal Pemberangkatan', 'tanggal_pemberangkatan']) || '',
-                    idTiket: find(['ID_TIKET', 'id_tiket', 'ID Tiket']) || '',
-                    jenisKendaraan: find(['JENIS KENDARAAN', 'Jenis Kendaraan', 'jenis_kendaraan']) || '',
-                    tujuan: find(['Tujuan', 'tujuan', 'TUJUAN']) || '',
-                    harga: parseInt(String(find(['Harga', 'harga', 'HARGA']) || '0').replace(/[^0-9]/g, '')) || 0,
-                    jumlahPnp: parseInt(find(['JUMLAH PNP', 'Jumlah PNP', 'jumlah_pnp'])) || 1,
-                    totalHarga: parseInt(String(find(['Total Harga', 'total_harga', 'TOTAL HARGA']) || '0').replace(/[^0-9]/g, '')) || 0,
-                };
-                // Calculate 10% commission dynamically
-                mappedLaporan.komisi = mappedLaporan.harga * 0.1;
-                mappedLaporan.totalKomisi = mappedLaporan.totalHarga * 0.1;
-                return mappedLaporan;
-            });
-            localStorage.setItem('app_laporan', JSON.stringify(cachedLaporan));
+            hydrateBookingsAndLaporan(bData);
         }
 
         if (eData && Array.isArray(eData)) {
@@ -386,7 +432,9 @@ function getPoProfile(poName) {
             logo: profiles[key].logo || (clean.includes('DAMRI') ? 'logo.png' : ''),
             tagline: profiles[key].tagline || 'Eksekutif & Nyaman',
             description: profiles[key].description || `Layanan perjalanan terbaik dari ${poName}.`,
-            facilities: Array.isArray(profiles[key].facilities) ? profiles[key].facilities : ["Full AC", "Reclining Seat", "Bagasi Luas"]
+            facilities: Array.isArray(profiles[key].facilities) ? profiles[key].facilities : ["Full AC", "Reclining Seat", "Bagasi Luas"],
+            komisiTipe: profiles[key].komisiTipe === 'nominal' ? 'nominal' : 'persen',
+            komisiNilai: (profiles[key].komisiNilai !== undefined && !isNaN(Number(profiles[key].komisiNilai))) ? Number(profiles[key].komisiNilai) : 10
         };
     }
     // Fallback preset
@@ -405,9 +453,53 @@ function getPoProfile(poName) {
         logo: clean.includes('DAMRI') ? 'logo.png' : '',
         tagline: 'Aman & Nyaman',
         description: `Layanan transportasi perjalanan terpercaya dari ${poName}.`,
-        facilities: ["Full AC", "Reclining Seat", "Bagasi Luas", "USB Charger"]
+        facilities: ["Full AC", "Reclining Seat", "Bagasi Luas", "USB Charger"],
+        komisiTipe: 'persen',
+        komisiNilai: 10
     };
 }
+
+function computePoCommission(poName, unitPrice, qty = 1, totalPrice = 0) {
+    const prof = getPoProfile(poName);
+    const pnp = Math.max(1, parseInt(qty, 10) || 1);
+    const unit = Math.max(0, parseInt(unitPrice, 10) || 0);
+    const tot = Math.max(0, parseInt(totalPrice, 10) || 0);
+
+    if (prof && prof.komisiTipe === 'nominal') {
+        const perSeat = Math.max(0, Math.round(Number(prof.komisiNilai) || 0));
+        return {
+            komisiTipe: 'nominal',
+            komisiNilai: perSeat,
+            komisi: perSeat,
+            totalKomisi: perSeat * pnp
+        };
+    }
+
+    const pct = Math.max(0, Math.min(100, (prof && prof.komisiNilai !== undefined) ? Number(prof.komisiNilai) : 10));
+    const baseTotal = unit > 0 ? (unit * pnp) : tot;
+    return {
+        komisiTipe: 'persen',
+        komisiNilai: pct,
+        komisi: unit > 0 ? Math.round(unit * (pct / 100)) : Math.round((tot / pnp) * (pct / 100)),
+        totalKomisi: Math.round(baseTotal * (pct / 100))
+    };
+}
+
+function formatPoCommissionBadgeText(poName) {
+    const prof = getPoProfile(poName);
+    if (prof && prof.komisiTipe === 'nominal') {
+        const nom = Math.max(0, Math.round(Number(prof.komisiNilai) || 0));
+        if (nom >= 1000 && nom % 1000 === 0) {
+            return `Rp ${nom / 1000}rb/kursi`;
+        }
+        return `Rp ${nom.toLocaleString('id-ID')}/kursi`;
+    }
+    const pct = (prof && prof.komisiNilai !== undefined) ? Number(prof.komisiNilai) : 10;
+    const pctStr = Number.isInteger(pct) ? String(pct) : String(pct).replace('.', ',');
+    return `${pctStr}%`;
+}
+window.computePoCommission = computePoCommission;
+window.formatPoCommissionBadgeText = formatPoCommissionBadgeText;
 
 function getArmadas() {
     return cachedArmadas;

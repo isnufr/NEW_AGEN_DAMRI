@@ -38,6 +38,7 @@ model Booking {
   bookingId             String   @id
   createdAt             String
   tanggalPemberangkatan String
+  tanggalIso            String?  @db.VarChar(10)
   jenisKendaraan        String
   tujuan                String
   harga                 Int
@@ -50,9 +51,18 @@ model Booking {
   totalHarga            Int
   pembayaran            String
   status                String
-  komisi           Int      @default(0)
-  totalKomisi      Int      @default(0)
-  alamat           String   @default("-")
+  komisi                Int      @default(0)
+  totalKomisi           Int      @default(0)
+  alamat                String   @default("-")
+  checkInStatus         String   @default("BELUM")
+  checkInAt             String?
+
+  @@index([tanggalIso])
+  @@index([tanggalPemberangkatan])
+  @@index([createdAt])
+  @@index([jenisKendaraan, tanggalPemberangkatan])
+  @@index([status])
+  @@index([checkInStatus])
 }
 
 model Admin {
@@ -75,6 +85,9 @@ model EkstraBooking {
   totalHarga       Int
   statusPembayaran String
   createdAt        String
+
+  @@index([tanggalBerangkat])
+  @@index([createdAt])
 }
 
 model HargaKhusus {
@@ -84,6 +97,8 @@ model HargaKhusus {
   tanggalAkhir String
   hargaBaru    String
   armada       Armada   @relation(fields: [idArmada], references: [idArmada], onDelete: Cascade)
+
+  @@index([idArmada, tanggalAwal, tanggalAkhir])
 }
 
 model Pelanggan {
@@ -94,6 +109,9 @@ model Pelanggan {
   catatan      String?
   alamat       String   @default("-")
   createdAt    DateTime @default(now())
+
+  @@index([nama])
+  @@index([totalBooking])
 }
 
 model PopupIklan {
@@ -117,6 +135,8 @@ model PoProfile {
   tagline      String   @default("")
   description  String   @db.Text
   facilities   String   @db.Text
+  komisiTipe   String   @default("persen")
+  komisiNilai  Float    @default(10)
   updatedAt    DateTime @default(now()) @updatedAt
 }
 

@@ -261,6 +261,82 @@ function parseCustomDate(dateStr) {
     return new Date(dateStr);
 }
 
+// Helper untuk konversi berbagai format tanggal keberangkatan menjadi ISO YYYY-MM-DD untuk index SQL
+const INDO_MONTH_MAP = {
+    januari: '01', jan: '01',
+    februari: '02', feb: '02', pebruari: '02',
+    maret: '03', mar: '03',
+    april: '04', apr: '04',
+    mei: '05', may: '05',
+    juni: '06', jun: '06',
+    juli: '07', jul: '07',
+    agustus: '08', agu: '08', ags: '08', aug: '08',
+    september: '09', sep: '09', sept: '09',
+    oktober: '10', okt: '10', oct: '10',
+    november: '11', nov: '11', nopember: '11',
+    desember: '12', des: '12', dec: '12'
+};
+
+function parseTravelDateToIso(dateStr) {
+    if (!dateStr) return null;
+    let s = String(dateStr).trim();
+    if (!s || s === '-') return null;
+
+    // 1. Exact YYYY-MM-DD prefix without timezone shift
+    if (/^\d{4}-\d{2}-\d{2}$/.test(s)) return s;
+
+    // 2. Full ISO timestamp (convert to WIB UTC+7 date)
+    if (s.includes('T')) {
+        const d = new Date(s);
+        if (!isNaN(d.getTime())) {
+            const wib = new Date(d.getTime() + 7 * 3600 * 1000);
+            const y = wib.getUTCFullYear();
+            const m = String(wib.getUTCMonth() + 1).padStart(2, '0');
+            const day = String(wib.getUTCDate()).padStart(2, '0');
+            return `${y}-${m}-${day}`;
+        }
+    }
+
+    // 3. Strip Indonesian day prefix ("Rabu, 25 November 2026")
+    s = s.replace(/^[A-Za-zÀ-ÿ]+\s*,\s*/, '').trim();
+
+    // 4. DD Month YYYY
+    const parts = s.split(/\s+/);
+    if (parts.length >= 3) {
+        const dd = parseInt(parts[0], 10);
+        const mm = INDO_MONTH_MAP[parts[1].toLowerCase()];
+        const yyyy = parseInt(parts[2], 10);
+        if (dd >= 1 && dd <= 31 && mm && yyyy >= 2000 && yyyy <= 2100) {
+            return `${yyyy}-${mm}-${String(dd).padStart(2, '0')}`;
+        }
+    }
+
+    // 5. DD/MM/YYYY or DD-MM-YYYY
+    const dmy = s.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})/);
+    if (dmy) {
+        const dd = String(parseInt(dmy[1], 10)).padStart(2, '0');
+        const mm = String(parseInt(dmy[2], 10)).padStart(2, '0');
+        return `${dmy[3]}-${mm}-${dd}`;
+    }
+
+    const fb = new Date(s);
+    if (!isNaN(fb.getTime())) {
+        const y = fb.getFullYear();
+        const m = String(fb.getMonth() + 1).padStart(2, '0');
+        const day = String(fb.getDate()).padStart(2, '0');
+        return `${y}-${m}-${day}`;
+    }
+    return null;
+}
+
+function getTodayWibIso(offsetDays = 0) {
+    const wib = new Date(Date.now() + 7 * 3600 * 1000 + offsetDays * 86400000);
+    const y = wib.getUTCFullYear();
+    const m = String(wib.getUTCMonth() + 1).padStart(2, '0');
+    const d = String(wib.getUTCDate()).padStart(2, '0');
+    return `${y}-${m}-${d}`;
+}
+
 // Helper untuk menyimpan data pelanggan secara otomatis
 function normalizeHp(hp) {
     if (!hp) return hp;
@@ -635,7 +711,11 @@ async function getPoProfilesMerged() {
                         logo: item.logo !== undefined ? item.logo : (merged[item.namaArmada]?.logo || ''),
                         tagline: item.tagline !== undefined ? item.tagline : (merged[item.namaArmada]?.tagline || ''),
                         description: item.description !== undefined ? item.description : (merged[item.namaArmada]?.description || ''),
-                        facilities: Array.isArray(fac) && fac.length > 0 ? fac : (merged[item.namaArmada]?.facilities || [])
+                        facilities: Array.isArray(fac) && fac.length > 0 ? fac : (merged[item.namaArmada]?.facilities || []),
+                        komisiTipe: item.komisiTipe || merged[item.namaArmada]?.komisiTipe || 'persen',
+                        komisiNilai: (item.komisiNilai !== undefined && item.komisiNilai !== null)
+                            ? Number(item.komisiNilai)
+                            : (merged[item.namaArmada]?.komisiNilai !== undefined ? Number(merged[item.namaArmada].komisiNilai) : 10)
                     };
                 }
             } else {
@@ -650,7 +730,9 @@ async function getPoProfilesMerged() {
                                 logo: prof.logo || '',
                                 tagline: prof.tagline || '',
                                 description: prof.description || '',
-                                facilities: JSON.stringify(prof.facilities || [])
+                                facilities: JSON.stringify(prof.facilities || []),
+                                komisiTipe: prof.komisiTipe === 'nominal' ? 'nominal' : 'persen',
+                                komisiNilai: prof.komisiNilai !== undefined ? Number(prof.komisiNilai) : 10
                             }
                         });
                     } catch(seedErr) {}
@@ -661,8 +743,64 @@ async function getPoProfilesMerged() {
         console.warn('Notice: PoProfile DB query skipped/failed, using file:', dbErr.message);
     }
 
+    // Normalize commission fields across all merged profiles
+    for (const k of Object.keys(merged)) {
+        merged[k] = {
+            ...merged[k],
+            komisiTipe: merged[k]?.komisiTipe === 'nominal' ? 'nominal' : 'persen',
+            komisiNilai: (merged[k]?.komisiNilai !== undefined && merged[k]?.komisiNilai !== null && !isNaN(Number(merged[k].komisiNilai)))
+                ? Number(merged[k].komisiNilai)
+                : 10
+        };
+    }
+
     cachedPoProfilesMerged = merged;
     return merged;
+}
+
+function resolvePoCommissionRule(poName, profilesMap) {
+    const map = profilesMap || {};
+    const clean = String(poName || '').trim().toUpperCase();
+    if (!clean) return { komisiTipe: 'persen', komisiNilai: 10 };
+
+    let key = Object.keys(map).find(k => k.toUpperCase().trim() === clean);
+    if (!key) {
+        key = Object.keys(map)
+            .sort((a, b) => b.length - a.length)
+            .find(k => {
+                const ku = k.toUpperCase().trim();
+                return ku && (clean.startsWith(ku + ' ') || ku.startsWith(clean + ' '));
+            });
+    }
+    if (key && map[key]) {
+        return {
+            komisiTipe: map[key].komisiTipe === 'nominal' ? 'nominal' : 'persen',
+            komisiNilai: (map[key].komisiNilai !== undefined && !isNaN(Number(map[key].komisiNilai))) ? Number(map[key].komisiNilai) : 10
+        };
+    }
+    return { komisiTipe: 'persen', komisiNilai: 10 };
+}
+
+function computeCommissionForBooking({ poName, harga, jumlahPnp, totalHarga }, profilesMap) {
+    const rule = resolvePoCommissionRule(poName, profilesMap);
+    const qty = Math.max(1, parseInt(jumlahPnp, 10) || 1);
+    const unit = Math.max(0, parseInt(harga, 10) || 0);
+    const tot = Math.max(0, parseInt(totalHarga, 10) || 0);
+
+    if (rule.komisiTipe === 'nominal') {
+        const perSeat = Math.max(0, Math.round(Number(rule.komisiNilai) || 0));
+        return {
+            komisi: perSeat,
+            totalKomisi: perSeat * qty
+        };
+    }
+
+    const pct = Math.max(0, Math.min(100, Number(rule.komisiNilai) ?? 10));
+    const baseTotal = unit > 0 ? (unit * qty) : tot;
+    return {
+        komisi: unit > 0 ? Math.round(unit * (pct / 100)) : Math.round((tot / qty) * (pct / 100)),
+        totalKomisi: Math.round(baseTotal * (pct / 100))
+    };
 }
 
 async function persistPoProfile(nama, prof, allProfiles) {
@@ -673,6 +811,9 @@ async function persistPoProfile(nama, prof, allProfiles) {
         console.error('Error saving po profiles file:', e);
     }
 
+    const kTipe = prof.komisiTipe === 'nominal' ? 'nominal' : 'persen';
+    const kNilai = (prof.komisiNilai !== undefined && !isNaN(Number(prof.komisiNilai))) ? Number(prof.komisiNilai) : 10;
+
     try {
         if (prisma.poProfile) {
             await prisma.poProfile.upsert({
@@ -682,7 +823,9 @@ async function persistPoProfile(nama, prof, allProfiles) {
                     logo: prof.logo !== undefined ? prof.logo : '',
                     tagline: prof.tagline !== undefined ? prof.tagline : '',
                     description: prof.description !== undefined ? prof.description : '',
-                    facilities: JSON.stringify(prof.facilities || [])
+                    facilities: JSON.stringify(prof.facilities || []),
+                    komisiTipe: kTipe,
+                    komisiNilai: kNilai
                 },
                 create: {
                     namaArmada: nama,
@@ -690,7 +833,9 @@ async function persistPoProfile(nama, prof, allProfiles) {
                     logo: prof.logo || '',
                     tagline: prof.tagline || '',
                     description: prof.description || '',
-                    facilities: JSON.stringify(prof.facilities || [])
+                    facilities: JSON.stringify(prof.facilities || []),
+                    komisiTipe: kTipe,
+                    komisiNilai: kNilai
                 }
             });
         }
@@ -993,6 +1138,7 @@ app.get('/api', async (req, res) => {
             const formattedBooking = {
                 'Timestamp': booking.createdAt,
                 'TANGGAL PEMBERANGKATAN': booking.tanggalPemberangkatan,
+                'TANGGAL_ISO': booking.tanggalIso || parseTravelDateToIso(booking.tanggalPemberangkatan),
                 'ID_TIKET': booking.bookingId,
                 'JENIS KENDARAAN': booking.jenisKendaraan,
                 'Tujuan': booking.tujuan,
@@ -1005,42 +1151,106 @@ app.get('/api', async (req, res) => {
                 'KETERANGAN': booking.keterangan,
                 'ALAMAT': booking.alamat,
                 'Total Harga': booking.totalHarga,
+                'Komisi': booking.komisi || 0,
+                'Total Komisi': booking.totalKomisi || 0,
                 'PEMBAYARAN': booking.pembayaran,
-                'Status': booking.status
+                'Status': booking.status,
+                'CHECK_IN_STATUS': booking.checkInStatus || 'BELUM',
+                'CHECK_IN_AT': booking.checkInAt || null
             };
             return res.json({ status: 'success', data: formattedBooking });
         }
 
         if (action === 'getBookings') {
+            const scope = String(req.query.scope || '').toLowerCase();
+            let fromIso = req.query.from && /^\d{4}-\d{2}-\d{2}$/.test(String(req.query.from)) ? String(req.query.from) : null;
+            let toIso = req.query.to && /^\d{4}-\d{2}-\d{2}$/.test(String(req.query.to)) ? String(req.query.to) : null;
+
+            if (!fromIso && !toIso && scope === 'active') {
+                const startOfYear = `${new Date(Date.now() + 7 * 3600 * 1000).getUTCFullYear()}-01-01`;
+                const ninetyDaysAgo = getTodayWibIso(-90);
+                fromIso = startOfYear < ninetyDaysAgo ? startOfYear : ninetyDaysAgo;
+                toIso = getTodayWibIso(365);
+            }
+
+            const hasDateFilter = Boolean(fromIso || toIso);
             let bookings = [];
             try {
-                bookings = await prisma.booking.findMany();
-                // Sort in memory for accurate chronological order regardless of string format
+                if (hasDateFilter) {
+                    const isoCond = {};
+                    if (fromIso) isoCond.gte = fromIso;
+                    if (toIso) isoCond.lte = toIso;
+                    const rawRows = await prisma.booking.findMany({
+                        where: {
+                            OR: [
+                                { tanggalIso: isoCond },
+                                { tanggalIso: null }
+                            ]
+                        }
+                    });
+                    bookings = rawRows.filter(b => {
+                        const iso = b.tanggalIso || parseTravelDateToIso(b.tanggalPemberangkatan);
+                        if (!iso) return true;
+                        if (fromIso && iso < fromIso) return false;
+                        if (toIso && iso > toIso) return false;
+                        return true;
+                    });
+                } else {
+                    bookings = await prisma.booking.findMany();
+                }
                 bookings.sort((a, b) => parseCustomDate(b.createdAt) - parseCustomDate(a.createdAt));
             } catch (dbErr) {
                 console.warn('Prisma getBookings notice, using fallback:', dbErr.message);
-                return res.json({ status: 'success', data: Object.values(memoryTestBookings) });
+                const memRows = Object.values(memoryTestBookings).filter(b => {
+                    if (!hasDateFilter) return true;
+                    const iso = b['TANGGAL_ISO'] || parseTravelDateToIso(b['TANGGAL PEMBERANGKATAN']);
+                    if (!iso) return true;
+                    if (fromIso && iso < fromIso) return false;
+                    if (toIso && iso > toIso) return false;
+                    return true;
+                });
+                return res.json({ status: 'success', data: memRows, meta: { scope: scope || 'all', from: fromIso, to: toIso } });
             }
-            // Google Sheets script returns raw array for bookings, we need to mimic the previous Google Sheets structure exactly
-            const formattedBookings = bookings.map(b => ({
-                'Timestamp': b.createdAt,
-                'TANGGAL PEMBERANGKATAN': b.tanggalPemberangkatan,
-                'ID_TIKET': b.bookingId,
-                'JENIS KENDARAAN': b.jenisKendaraan,
-                'Tujuan': b.tujuan,
-                'Harga': b.harga,
-                'NAMA': b.nama,
-                'NOMOR HP': b.nomorHp,
-                'JUMLAH PNP': b.jumlahPnp,
-                'WAKTU': b.waktu,
-                'NOMOR KURSI': b.nomorKursi,
-                'KETERANGAN': b.keterangan,
-                'ALAMAT': b.alamat,
-                'Total Harga': b.totalHarga,
-                'PEMBAYARAN': b.pembayaran,
-                'Status': b.status
-            }));
-            return res.json({ status: 'success', data: formattedBookings });
+
+            const poProfiles = await getPoProfilesMerged();
+            const formattedBookings = bookings.map(b => {
+                let komisi = b.komisi || 0;
+                let totalKomisi = b.totalKomisi || 0;
+                if (!totalKomisi && (b.harga > 0 || b.totalHarga > 0)) {
+                    const calc = computeCommissionForBooking({
+                        poName: b.jenisKendaraan,
+                        harga: b.harga,
+                        jumlahPnp: b.jumlahPnp,
+                        totalHarga: b.totalHarga
+                    }, poProfiles);
+                    komisi = calc.komisi;
+                    totalKomisi = calc.totalKomisi;
+                }
+                return {
+                    'Timestamp': b.createdAt,
+                    'TANGGAL PEMBERANGKATAN': b.tanggalPemberangkatan,
+                    'TANGGAL_ISO': b.tanggalIso || parseTravelDateToIso(b.tanggalPemberangkatan),
+                    'ID_TIKET': b.bookingId,
+                    'JENIS KENDARAAN': b.jenisKendaraan,
+                    'Tujuan': b.tujuan,
+                    'Harga': b.harga,
+                    'NAMA': b.nama,
+                    'NOMOR HP': b.nomorHp,
+                    'JUMLAH PNP': b.jumlahPnp,
+                    'WAKTU': b.waktu,
+                    'NOMOR KURSI': b.nomorKursi,
+                    'KETERANGAN': b.keterangan,
+                    'ALAMAT': b.alamat,
+                    'Total Harga': b.totalHarga,
+                    'Komisi': komisi,
+                    'Total Komisi': totalKomisi,
+                    'PEMBAYARAN': b.pembayaran,
+                    'Status': b.status,
+                    'CHECK_IN_STATUS': b.checkInStatus || 'BELUM',
+                    'CHECK_IN_AT': b.checkInAt || null
+                };
+            });
+            return res.json({ status: 'success', data: formattedBookings, meta: { scope: scope || 'all', from: fromIso, to: toIso } });
         }
         
         if (action === 'getArmada') {
@@ -1165,33 +1375,72 @@ app.get('/api', async (req, res) => {
         }
         
         if (action === 'getLaporan') {
+            const fromIso = req.query.from && /^\d{4}-\d{2}-\d{2}$/.test(String(req.query.from)) ? String(req.query.from) : null;
+            const toIso = req.query.to && /^\d{4}-\d{2}-\d{2}$/.test(String(req.query.to)) ? String(req.query.to) : null;
+            const hasDateFilter = Boolean(fromIso || toIso);
             let laporan = [];
             try {
-                laporan = await prisma.booking.findMany();
-                // Sort in memory for accurate chronological order
+                if (hasDateFilter) {
+                    const isoCond = {};
+                    if (fromIso) isoCond.gte = fromIso;
+                    if (toIso) isoCond.lte = toIso;
+                    const rawRows = await prisma.booking.findMany({
+                        where: {
+                            OR: [
+                                { tanggalIso: isoCond },
+                                { tanggalIso: null }
+                            ]
+                        }
+                    });
+                    laporan = rawRows.filter(b => {
+                        const iso = b.tanggalIso || parseTravelDateToIso(b.tanggalPemberangkatan);
+                        if (!iso) return true;
+                        if (fromIso && iso < fromIso) return false;
+                        if (toIso && iso > toIso) return false;
+                        return true;
+                    });
+                } else {
+                    laporan = await prisma.booking.findMany();
+                }
                 laporan.sort((a, b) => parseCustomDate(b.createdAt) - parseCustomDate(a.createdAt));
             } catch (dbErr) {
                 console.warn('Prisma getLaporan notice, using fallback:', dbErr.message);
                 return res.json({ status: 'success', data: Object.values(memoryTestBookings) });
             }
-            const formattedLaporan = laporan.map(l => ({
-                'Timestamp': l.createdAt,
-                'TANGGAL PEMBERANGKATAN': l.tanggalPemberangkatan,
-                'ID_TIKET': l.bookingId,
-                'JENIS KENDARAAN': l.jenisKendaraan,
-                'Tujuan': l.tujuan,
-                'Harga': l.harga,
-                'NAMA': l.nama,
-                'NOMOR HP': l.nomorHp,
-                'JUMLAH PNP': l.jumlahPnp,
-                'WAKTU': l.waktu,
-                'NOMOR KURSI': l.nomorKursi,
-                'KETERANGAN': l.keterangan,
-                'Total Harga': l.totalHarga,
-                'Komisi': l.komisi,
-                'Total Komisi': l.totalKomisi,
-                'PEMBAYARAN': l.pembayaran
-            }));
+            const poProfiles = await getPoProfilesMerged();
+            const formattedLaporan = laporan.map(l => {
+                let komisi = l.komisi || 0;
+                let totalKomisi = l.totalKomisi || 0;
+                if (!totalKomisi && (l.harga > 0 || l.totalHarga > 0)) {
+                    const calc = computeCommissionForBooking({
+                        poName: l.jenisKendaraan,
+                        harga: l.harga,
+                        jumlahPnp: l.jumlahPnp,
+                        totalHarga: l.totalHarga
+                    }, poProfiles);
+                    komisi = calc.komisi;
+                    totalKomisi = calc.totalKomisi;
+                }
+                return {
+                    'Timestamp': l.createdAt,
+                    'TANGGAL PEMBERANGKATAN': l.tanggalPemberangkatan,
+                    'TANGGAL_ISO': l.tanggalIso || parseTravelDateToIso(l.tanggalPemberangkatan),
+                    'ID_TIKET': l.bookingId,
+                    'JENIS KENDARAAN': l.jenisKendaraan,
+                    'Tujuan': l.tujuan,
+                    'Harga': l.harga,
+                    'NAMA': l.nama,
+                    'NOMOR HP': l.nomorHp,
+                    'JUMLAH PNP': l.jumlahPnp,
+                    'WAKTU': l.waktu,
+                    'NOMOR KURSI': l.nomorKursi,
+                    'KETERANGAN': l.keterangan,
+                    'Total Harga': l.totalHarga,
+                    'Komisi': komisi,
+                    'Total Komisi': totalKomisi,
+                    'PEMBAYARAN': l.pembayaran
+                };
+            });
             return res.json({ status: 'success', data: formattedLaporan });
         }
 
@@ -1423,18 +1672,28 @@ app.post('/api', async (req, res) => {
 
         if (action === 'addBooking') {
             const harga = payload['Harga'] ? parseInt(payload['Harga'].toString().replace(/\D/g,'')) || 0 : 0;
-            const totalHarga = parseInt(payload['Total Harga']) || harga * (parseInt(payload['JUMLAH PNP']) || 1);
+            const qtyPnp = parseInt(payload['JUMLAH PNP']) || 1;
+            const totalHarga = parseInt(payload['Total Harga']) || harga * qtyPnp;
+            const poProfiles = await getPoProfilesMerged();
+            const commCalc = computeCommissionForBooking({
+                poName: payload['JENIS KENDARAAN'],
+                harga,
+                jumlahPnp: qtyPnp,
+                totalHarga
+            }, poProfiles);
+            const tanggalIso = parseTravelDateToIso(payload['TANGGAL PEMBERANGKATAN']);
             
             const bookingRecord = {
                 'Timestamp': new Date().toISOString(),
                 'TANGGAL PEMBERANGKATAN': payload['TANGGAL PEMBERANGKATAN'],
+                'TANGGAL_ISO': tanggalIso,
                 'ID_TIKET': payload['ID_TIKET'],
                 'JENIS KENDARAAN': payload['JENIS KENDARAAN'],
                 'Tujuan': payload['Tujuan'],
                 'Harga': harga,
                 'NAMA': payload['NAMA'],
                 'NOMOR HP': payload['NOMOR HP'],
-                'JUMLAH PNP': parseInt(payload['JUMLAH PNP']) || 1,
+                'JUMLAH PNP': qtyPnp,
                 'WAKTU': payload['WAKTU'],
                 'NOMOR KURSI': payload['NOMOR KURSI'] || '',
                 'KETERANGAN': payload['KETERANGAN'] || payload['Keterangan'] || payload['keterangan'] || '',
@@ -1442,8 +1701,10 @@ app.post('/api', async (req, res) => {
                 'Total Harga': totalHarga,
                 'PEMBAYARAN': payload['PEMBAYARAN'] || 'CASH',
                 'Status': payload['Status'] ? payload['Status'] : (payload['PEMBAYARAN'] === 'LUNAS' || payload['PEMBAYARAN'] === 'ACC' ? 'LUNAS' : 'WAITING'),
-                'Komisi': harga * 0.1,
-                'Total Komisi': totalHarga * 0.1
+                'Komisi': commCalc.komisi,
+                'Total Komisi': commCalc.totalKomisi,
+                'CHECK_IN_STATUS': 'BELUM',
+                'CHECK_IN_AT': null
             };
 
             memoryTestBookings[payload['ID_TIKET']] = bookingRecord;
@@ -1455,12 +1716,13 @@ app.post('/api', async (req, res) => {
                         bookingId: payload['ID_TIKET'],
                         createdAt: new Date().toISOString(),
                         tanggalPemberangkatan: payload['TANGGAL PEMBERANGKATAN'],
+                        tanggalIso: tanggalIso,
                         jenisKendaraan: payload['JENIS KENDARAAN'],
                         tujuan: payload['Tujuan'],
                         harga: harga,
                         nama: payload['NAMA'],
                         nomorHp: payload['NOMOR HP'],
-                        jumlahPnp: parseInt(payload['JUMLAH PNP']) || 1,
+                        jumlahPnp: qtyPnp,
                         waktu: payload['WAKTU'],
                         nomorKursi: payload['NOMOR KURSI'] || '',
                         keterangan: payload['KETERANGAN'] || payload['Keterangan'] || payload['keterangan'] || '',
@@ -1468,8 +1730,10 @@ app.post('/api', async (req, res) => {
                         totalHarga: totalHarga,
                         pembayaran: payload['PEMBAYARAN'] || 'CASH',
                         status: payload['Status'] ? payload['Status'] : (payload['PEMBAYARAN'] === 'LUNAS' || payload['PEMBAYARAN'] === 'ACC' ? 'LUNAS' : 'WAITING'),
-                        komisi: harga * 0.1,
-                        totalKomisi: totalHarga * 0.1,
+                        komisi: commCalc.komisi,
+                        totalKomisi: commCalc.totalKomisi,
+                        checkInStatus: 'BELUM',
+                        checkInAt: null
                     }
                 });
                 
@@ -1482,6 +1746,34 @@ app.post('/api', async (req, res) => {
             }
             
             return res.json({ status: 'success', message: 'Booking berhasil', data: newBooking });
+        }
+
+        if (action === 'toggleCheckIn') {
+            const { id_tiket, status } = payload || {};
+            if (!id_tiket) return res.status(400).json({ status: 'error', message: 'ID tiket wajib diisi' });
+            const nextStatus = String(status || '').toUpperCase() === 'HADIR' ? 'HADIR' : 'BELUM';
+            const nextAt = nextStatus === 'HADIR' ? new Date().toISOString() : null;
+
+            if (memoryTestBookings[id_tiket]) {
+                memoryTestBookings[id_tiket]['CHECK_IN_STATUS'] = nextStatus;
+                memoryTestBookings[id_tiket]['CHECK_IN_AT'] = nextAt;
+            }
+            try {
+                await prisma.booking.updateMany({
+                    where: { bookingId: id_tiket },
+                    data: {
+                        checkInStatus: nextStatus,
+                        checkInAt: nextAt
+                    }
+                });
+            } catch (dbErr) {
+                console.warn('Prisma toggleCheckIn notice:', dbErr.message);
+            }
+            return res.json({
+                status: 'success',
+                message: nextStatus === 'HADIR' ? 'Penumpang ditandai sudah hadir di ruang tunggu' : 'Status ruang tunggu direset ke Belum Tiba',
+                data: { id_tiket, checkInStatus: nextStatus, checkInAt: nextAt }
+            });
         }
 
         if (action === 'updateStatus') {
@@ -1520,21 +1812,33 @@ app.post('/api', async (req, res) => {
 
         if (action === 'editBookingData') {
             const { id_tiket, nama, hp, tanggalPemberangkatan, jenisKendaraan, tujuan, jumlahPnp, harga, totalHarga, waktu, nomorKursi, status, keterangan, alamat } = payload;
+            const qtyPnp = parseInt(jumlahPnp) || 1;
+            const unitHarga = parseInt(harga) || 0;
+            const totHarga = parseInt(totalHarga) || 0;
+            const poProfiles = await getPoProfilesMerged();
+            const commCalc = computeCommissionForBooking({
+                poName: jenisKendaraan,
+                harga: unitHarga,
+                jumlahPnp: qtyPnp,
+                totalHarga: totHarga
+            }, poProfiles);
+            const tanggalIso = parseTravelDateToIso(tanggalPemberangkatan);
             
             const updateData = {
                 nama: nama,
                 nomorHp: hp,
                 tanggalPemberangkatan: tanggalPemberangkatan,
+                tanggalIso: tanggalIso,
                 jenisKendaraan: jenisKendaraan,
                 tujuan: tujuan,
-                jumlahPnp: parseInt(jumlahPnp) || 1,
+                jumlahPnp: qtyPnp,
                 waktu: waktu,
                 nomorKursi: nomorKursi || '',
                 alamat: alamat || '-',
-                harga: parseInt(harga) || 0,
-                totalHarga: parseInt(totalHarga) || 0,
-                komisi: (parseInt(harga) || 0) * 0.1,
-                totalKomisi: (parseInt(totalHarga) || 0) * 0.1
+                harga: unitHarga,
+                totalHarga: totHarga,
+                komisi: commCalc.komisi,
+                totalKomisi: commCalc.totalKomisi
             };
             if (status) {
                 updateData.status = status;
@@ -1542,10 +1846,35 @@ app.post('/api', async (req, res) => {
             }
             if (keterangan !== undefined) updateData.keterangan = keterangan;
 
-            await prisma.booking.update({
-                where: { bookingId: id_tiket },
-                data: updateData
-            });
+            if (memoryTestBookings[id_tiket]) {
+                Object.assign(memoryTestBookings[id_tiket], {
+                    'NAMA': nama,
+                    'NOMOR HP': hp,
+                    'TANGGAL PEMBERANGKATAN': tanggalPemberangkatan,
+                    'TANGGAL_ISO': tanggalIso,
+                    'JENIS KENDARAAN': jenisKendaraan,
+                    'Tujuan': tujuan,
+                    'JUMLAH PNP': qtyPnp,
+                    'WAKTU': waktu,
+                    'NOMOR KURSI': nomorKursi || '',
+                    'ALAMAT': alamat || '-',
+                    'Harga': unitHarga,
+                    'Total Harga': totHarga,
+                    'Komisi': commCalc.komisi,
+                    'Total Komisi': commCalc.totalKomisi,
+                    ...(status ? { 'Status': status, 'PEMBAYARAN': status } : {}),
+                    ...(keterangan !== undefined ? { 'KETERANGAN': keterangan } : {})
+                });
+            }
+
+            try {
+                await prisma.booking.update({
+                    where: { bookingId: id_tiket },
+                    data: updateData
+                });
+            } catch (dbErr) {
+                console.warn('Prisma editBookingData notice:', dbErr.message);
+            }
             return res.json({ status: 'success', message: 'Data pesanan berhasil diperbarui' });
         }
 
@@ -1647,20 +1976,78 @@ app.post('/api', async (req, res) => {
         }
 
         if (action === 'savePoProfile') {
-            const { nama_armada, image, logo, description, facilities, tagline, tipe_armada, denah_id } = payload;
+            const { nama_armada, image, logo, description, facilities, tagline, tipe_armada, denah_id, komisi_tipe, komisi_nilai, terapkan_pesanan_aktif } = payload;
             if (!nama_armada) return res.status(400).json({ status: 'error', message: 'Nama PO wajib diisi' });
 
             const profiles = await getPoProfilesMerged();
             const cleanKey = String(nama_armada || '').trim().toUpperCase();
             let foundKey = Object.keys(profiles).find(k => k.toUpperCase() === cleanKey) || String(nama_armada || '').trim();
+            const prevKomisiTipe = profiles[foundKey]?.komisiTipe === 'nominal' ? 'nominal' : 'persen';
+            const prevKomisiNilai = profiles[foundKey]?.komisiNilai !== undefined ? Number(profiles[foundKey].komisiNilai) : 10;
+
+            const nextKomisiTipe = komisi_tipe !== undefined ? (komisi_tipe === 'nominal' ? 'nominal' : 'persen') : prevKomisiTipe;
+            const nextKomisiNilai = (komisi_nilai !== undefined && komisi_nilai !== '' && !isNaN(Number(komisi_nilai)))
+                ? Math.max(0, Number(komisi_nilai))
+                : prevKomisiNilai;
+
             profiles[foundKey] = {
                 image: image || profiles[foundKey]?.image || 'damri.webp',
                 logo: logo !== undefined ? logo : (profiles[foundKey]?.logo || ''),
                 tagline: tagline !== undefined ? tagline : (profiles[foundKey]?.tagline || ''),
                 description: description !== undefined ? description : (profiles[foundKey]?.description || ''),
-                facilities: Array.isArray(facilities) ? facilities : (profiles[foundKey]?.facilities || [])
+                facilities: Array.isArray(facilities) ? facilities : (profiles[foundKey]?.facilities || []),
+                komisiTipe: nextKomisiTipe,
+                komisiNilai: nextKomisiNilai
             };
             await persistPoProfile(foundKey, profiles[foundKey], profiles);
+
+            // Recalculate commission on active (today & future) bookings of this PO when requested
+            if (komisi_tipe !== undefined && terapkan_pesanan_aktif !== false) {
+                const todayIso = getTodayWibIso(0);
+                // Update in-memory fallback bookings
+                Object.values(memoryTestBookings).forEach(mb => {
+                    const mbPo = String(mb['JENIS KENDARAAN'] || '').trim().toUpperCase();
+                    const mbIso = mb['TANGGAL_ISO'] || parseTravelDateToIso(mb['TANGGAL PEMBERANGKATAN']);
+                    if ((mbPo === cleanKey || mbPo.startsWith(cleanKey + ' ')) && (!mbIso || mbIso >= todayIso)) {
+                        const c = computeCommissionForBooking({
+                            poName: mb['JENIS KENDARAAN'],
+                            harga: mb['Harga'],
+                            jumlahPnp: mb['JUMLAH PNP'],
+                            totalHarga: mb['Total Harga']
+                        }, profiles);
+                        mb['Komisi'] = c.komisi;
+                        mb['Total Komisi'] = c.totalKomisi;
+                    }
+                });
+                // Update database active bookings
+                try {
+                    const activeRows = await prisma.booking.findMany({
+                        where: {
+                            OR: [
+                                { jenisKendaraan: nama_armada },
+                                { jenisKendaraan: { startsWith: `${foundKey} ` } }
+                            ]
+                        }
+                    });
+                    for (const row of activeRows) {
+                        const iso = row.tanggalIso || parseTravelDateToIso(row.tanggalPemberangkatan);
+                        if (!iso || iso >= todayIso) {
+                            const c = computeCommissionForBooking({
+                                poName: row.jenisKendaraan,
+                                harga: row.harga,
+                                jumlahPnp: row.jumlahPnp,
+                                totalHarga: row.totalHarga
+                            }, profiles);
+                            await prisma.booking.update({
+                                where: { bookingId: row.bookingId },
+                                data: { komisi: c.komisi, totalKomisi: c.totalKomisi, tanggalIso: iso || row.tanggalIso }
+                            });
+                        }
+                    }
+                } catch (recalcErr) {
+                    console.warn('Notice: Could not recalculate active bookings commission in DB:', recalcErr.message);
+                }
+            }
 
             // Also synchronize tipe_armada and denah_id to database if provided
             if (tipe_armada || denah_id) {
@@ -2344,12 +2731,42 @@ app.use((req, res) => {
     res.sendFile(path.join(__dirname, '../public/index.html'));
 });
 
+async function backfillBookingIsoDates() {
+    try {
+        const missing = await prisma.booking.findMany({
+            where: { tanggalIso: null },
+            select: { bookingId: true, tanggalPemberangkatan: true },
+            take: 2000
+        });
+        if (!missing || missing.length === 0) return;
+        let updated = 0;
+        for (const row of missing) {
+            const iso = parseTravelDateToIso(row.tanggalPemberangkatan);
+            if (iso) {
+                try {
+                    await prisma.booking.update({
+                        where: { bookingId: row.bookingId },
+                        data: { tanggalIso: iso }
+                    });
+                    updated++;
+                } catch (_) {}
+            }
+        }
+        if (updated > 0) {
+            console.log(`[INDEX-BACKFILL] Normalized tanggalIso on ${updated} booking row(s).`);
+        }
+    } catch (e) {
+        console.warn('[INDEX-BACKFILL] Skipped (DB offline or migrating):', e.message);
+    }
+}
+
 server.listen(PORT, async () => {
     console.log(`Server is running on port ${PORT}`);
     try {
         await restoreUploadedFilesFromDb();
         await syncDiskUploadsToDb();
         await getSiteConfigData();
+        await backfillBookingIsoDates();
     } catch (e) {
         console.warn('Startup sync notice:', e.message);
     }

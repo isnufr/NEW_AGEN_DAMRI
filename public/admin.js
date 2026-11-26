@@ -17,6 +17,7 @@
     // ========================================
     let currentMenu = 'dashboard';
     let currentFilter = 'all';
+    let currentManifestCheckInFilter = 'all';
     let currentPesananSubtab = 'tiket';
     let chartOmsetInstance = null;
     let chartArmadaInstance = null;
@@ -273,11 +274,16 @@
     // ========================================
     // FILTER
     // ========================================
-    function setFilter(f) {
+    async function setFilter(f) {
         currentFilter = f;
         document.querySelectorAll('.filter-btn').forEach(btn => {
             btn.classList.toggle('active', btn.dataset.filter === f);
         });
+        if (f === 'all' && window.__currentBookingScope === 'active' && typeof window.fetchServerBookingsRange === 'function') {
+            renderDashboard();
+            await window.fetchServerBookingsRange({ scope: 'all' });
+            syncServerScopeUi('all');
+        }
         renderDashboard();
     }
 
@@ -688,7 +694,86 @@
         if(el) el.value = '';
         const searchEl = document.getElementById('manifestSearchInput');
         if(searchEl) searchEl.value = '';
+        currentManifestCheckInFilter = 'all';
+        document.querySelectorAll('#manifestCheckInFilterBar .checkin-filter-chip').forEach(btn => {
+            btn.classList.toggle('active', btn.dataset.checkinFilter === 'all');
+        });
         renderTodayTable();
+    };
+
+    window.setManifestCheckInFilter = function(mode) {
+        currentManifestCheckInFilter = mode || 'all';
+        document.querySelectorAll('#manifestCheckInFilterBar .checkin-filter-chip').forEach(btn => {
+            btn.classList.toggle('active', btn.dataset.checkinFilter === currentManifestCheckInFilter);
+        });
+        renderTodayTable();
+    };
+
+    function formatCheckInWibShort(isoStr) {
+        if (!isoStr) return '';
+        const d = new Date(isoStr);
+        if (isNaN(d.getTime())) return '';
+        const hh = String(d.getHours()).padStart(2, '0');
+        const mm = String(d.getMinutes()).padStart(2, '0');
+        return `${hh}:${mm}`;
+    }
+
+    function getBookingEffectiveCommission(b) {
+        if (!b) return { komisi: 0, totalKomisi: 0 };
+        const armada = b.armadaId && b.armadaId !== 'UNKNOWN' ? getArmada(b.armadaId) : null;
+        const poName = armada ? armada.name : (b.kendaraan || b['JENIS KENDARAAN'] || '');
+        const qty = Math.max(1, parseInt(b.qty || b['JUMLAH PNP'], 10) || 1);
+        const unitPrice = parseInt(b.unitPrice || b['Harga'], 10) || (armada ? parseInt(armada.price, 10) || 0 : 0);
+        const totalPrice = parseInt(b.totalPrice || b['Total Harga'], 10) || (unitPrice * qty);
+        if (typeof computePoCommission === 'function') {
+            return computePoCommission(poName, unitPrice, qty, totalPrice);
+        }
+        const savedTot = Number(b.totalKomisi);
+        if (savedTot > 0) return { komisi: Math.round(savedTot / qty), totalKomisi: savedTot };
+        return { komisi: Math.round(unitPrice * 0.1), totalKomisi: Math.round(totalPrice * 0.1) };
+    }
+
+    window.togglePassengerCheckIn = async function(bookingId, ev) {
+        if (ev && typeof ev.stopPropagation === 'function') ev.stopPropagation();
+        if (!bookingId) return;
+
+        const allBookings = getBookings();
+        const target = allBookings.find(x => String(x.bookingId) === String(bookingId) || String(x.id) === String(bookingId));
+        if (!target) return;
+
+        const prevStatus = target.checkInStatus === 'HADIR' ? 'HADIR' : 'BELUM';
+        const prevAt = target.checkInAt || null;
+        const nextStatus = prevStatus === 'HADIR' ? 'BELUM' : 'HADIR';
+        const nextAt = nextStatus === 'HADIR' ? new Date().toISOString() : null;
+
+        // Optimistic 0ms UI update
+        target.checkInStatus = nextStatus;
+        target.checkInAt = nextAt;
+        try { localStorage.setItem('app_bookings', JSON.stringify(allBookings)); } catch (_) {}
+
+        renderTodayTable();
+        const detailModal = document.getElementById('bookingDetailModal');
+        if (detailModal && !detailModal.classList.contains('hidden')) {
+            window.openBookingDetailModal(bookingId);
+        }
+
+        if (typeof window.showAdminToast === 'function') {
+            window.showAdminToast(
+                nextStatus === 'HADIR'
+                    ? `${target.name || 'Penumpang'} ditandai Hadir di Ruang Tunggu`
+                    : `Status ${target.name || 'Penumpang'} diubah ke Belum Tiba`
+            );
+        }
+
+        const res = await postToSheets('toggleCheckIn', { id_tiket: bookingId, status: nextStatus });
+        if (!res || res.status !== 'success') {
+            target.checkInStatus = prevStatus;
+            target.checkInAt = prevAt;
+            renderTodayTable();
+            if (typeof window.showAdminToast === 'function') {
+                window.showAdminToast('Gagal menyimpan status ruang tunggu', false);
+            }
+        }
     };
 
     // Helper to render seat number badges with rounded/circular styling
@@ -750,10 +835,11 @@
                                 String(b.pembayaran).toUpperCase() === "BELUM LUNAS";
                                 
             const armada = b.armadaId !== 'UNKNOWN' ? getArmada(b.armadaId) : null;
-            const armadaName = armada ? armada.name.toLowerCase() : '';
+            const armadaName = armada ? armada.name.toLowerCase() : String(b.kendaraan || '').toLowerCase();
             const tgl = b.dateTravel ? b.dateTravel.toLowerCase() : '';
             const name = b.name ? b.name.toLowerCase() : '';
-            const ticketId = b.id ? String(b.id).toLowerCase() : '';
+            const ticketId = String(b.bookingId || b.id || '').toLowerCase();
+            const kursiStr = String(b.kursi || '').toLowerCase();
             const tj = b.tujuan ? b.tujuan.toLowerCase() : '';
             const tk = b.titikKumpul ? b.titikKumpul.toLowerCase() : '';
             const p = b.penumpangList ? b.penumpangList.toLowerCase() : '';
@@ -762,6 +848,7 @@
                                 armadaName.includes(searchTerm) || 
                                 name.includes(searchTerm) || 
                                 ticketId.includes(searchTerm) || 
+                                kursiStr.includes(searchTerm) ||
                                 tj.includes(searchTerm) || 
                                 tk.includes(searchTerm) ||
                                 p.includes(searchTerm) ||
@@ -775,23 +862,47 @@
             return isTodayOrFuture(b.dateTravel) && isConfirmed;
         });
 
-        // --- Summary Cards ---
+        // --- Summary Cards & Ruang Tunggu Counters (before check-in subfilter) ---
         const todayOnlyBookings = targetIndoDate ? manifestBookings : manifestBookings.filter(b => isToday(b.dateTravel));
         const todayPnp = todayOnlyBookings.reduce((sum, b) => sum + (parseInt(b.qty) || 1), 0);
         
+        // Count Check-In passenger totals across current manifest scope (Today if no date picked, else selected date)
+        const loungeScopeBookings = manifestBookings;
+        let pnpAllCount = 0, pnpHadirCount = 0, pnpBelumCount = 0;
+        loungeScopeBookings.forEach(b => {
+            const q = parseInt(b.qty) || 1;
+            pnpAllCount += q;
+            if (b.checkInStatus === 'HADIR') pnpHadirCount += q;
+            else pnpBelumCount += q;
+        });
+        const elCntAll = document.getElementById('checkInCountAll');
+        const elCntBelum = document.getElementById('checkInCountBelum');
+        const elCntHadir = document.getElementById('checkInCountHadir');
+        if (elCntAll) elCntAll.textContent = pnpAllCount;
+        if (elCntBelum) elCntBelum.textContent = pnpBelumCount;
+        if (elCntHadir) elCntHadir.textContent = pnpHadirCount;
+
+        // Apply Ruang Tunggu status filter if active
+        const visibleManifestBookings = currentManifestCheckInFilter === 'all'
+            ? manifestBookings
+            : manifestBookings.filter(b => {
+                const st = b.checkInStatus === 'HADIR' ? 'HADIR' : 'BELUM';
+                return st === currentManifestCheckInFilter;
+            });
+
         // Count unique armada berangkat hari ini
         const todayArmadaSet = new Set();
         todayOnlyBookings.forEach(b => {
             const waktu = b.waktu || '-';
             const armada = b.armadaId !== 'UNKNOWN' ? getArmada(b.armadaId) : null;
-            const armadaName = armada ? armada.name : '-';
+            const armadaName = armada ? armada.name : (b.kendaraan || '-');
             todayArmadaSet.add(waktu + '___' + armadaName);
         });
         
         const todayOmset = todayOnlyBookings.reduce((sum, b) => sum + (parseInt(b.totalPrice) || 0), 0);
-        // Setoran is Omset - Komisi (10% of Omset)
-        const todaySetoran = todayOmset * 0.9;
-        const todayPendapatan = todayOmset - todaySetoran;
+        // Accurate PO Commission (% or Nominal Rp/seat per PO)
+        const todayPendapatan = todayOnlyBookings.reduce((sum, b) => sum + getBookingEffectiveCommission(b).totalKomisi, 0);
+        const todaySetoran = Math.max(0, todayOmset - todayPendapatan);
         
         const elPnp = document.getElementById('manifestTotalPnpToday');
         const elArmada = document.getElementById('manifestTotalArmada');
@@ -805,14 +916,17 @@
         if (elSetoran) elSetoran.textContent = formatRupiah(todaySetoran);
         if (labelEl) labelEl.textContent = targetIndoDate ? targetIndoDate : 'Hari Ini & Mendatang';
 
-        if (manifestBookings.length === 0) {
-            tbody.innerHTML = '<tr><td class="text-center text-sm text-slate-400 font-bold py-8 italic uppercase tracking-widest">Tidak ada jadwal keberangkatan</td></tr>';
+        if (visibleManifestBookings.length === 0) {
+            const emptyMsg = currentManifestCheckInFilter === 'BELUM'
+                ? 'Semua penumpang sudah hadir di ruang tunggu'
+                : (currentManifestCheckInFilter === 'HADIR' ? 'Belum ada penumpang yang ditandai hadir' : 'Tidak ada jadwal keberangkatan');
+            tbody.innerHTML = `<tr><td class="text-center text-sm text-slate-400 font-bold py-8 italic uppercase tracking-widest">${emptyMsg}</td></tr>`;
             return;
         }
 
         // Group by Date ONLY
         const groups = {};
-        manifestBookings.forEach(b => {
+        visibleManifestBookings.forEach(b => {
             const dateStr = b.dateTravel || 'UNKNOWN_DATE';
             const key = dateStr;
             if(!groups[key]) {
@@ -921,6 +1035,11 @@
             sortedInnerKeys.forEach(key => {
                 const ig = innerGroups[key];
                 const innerTotalPnp = ig.bookings.reduce((sum, b) => sum + (parseInt(b.qty || b['JUMLAH PNP']) || 1), 0);
+                const innerHadirPnp = ig.bookings.reduce((sum, b) => sum + (b.checkInStatus === 'HADIR' ? (parseInt(b.qty || b['JUMLAH PNP']) || 1) : 0), 0);
+                const allHadirInArmada = innerTotalPnp > 0 && innerHadirPnp === innerTotalPnp;
+                const loungeBadgeClass = allHadirInArmada ? 'armada-lounge-badge is-complete' : 'armada-lounge-badge';
+                const loungeBadgeHtml = `<span class="${loungeBadgeClass}" title="Status kehadiran ruang tunggu armada ini"><i class="fas ${allHadirInArmada ? 'fa-check-circle' : 'fa-couch'} text-[8.5px]"></i><span>${innerHadirPnp}/${innerTotalPnp} Hadir</span></span>`;
+
                 const combinedTujuan = Array.from(ig.tujuans).join(', ');
                 const blastId = 'wablast_' + (++manifestWaBlastCounter);
                 manifestWaBlastGroups[blastId] = {
@@ -947,17 +1066,21 @@
                 
                 html += `
                             <div class="bg-white rounded-xl border border-slate-200 overflow-hidden">
-                                <div class="bg-slate-200/80 border-b-2 border-slate-300 px-2.5 sm:px-3 py-2 flex items-center justify-between gap-1.5 sm:gap-2">
-                                    <div class="flex items-center gap-1.5 sm:gap-2 min-w-0 flex-1">
-                                        <div class="bg-blue-600 text-white font-black text-[10px] sm:text-xs px-2 py-1 rounded shadow-sm leading-none shrink-0">${ig.waktu}</div>
-                                        <p class="font-black text-xs sm:text-sm text-slate-700 uppercase tracking-wide truncate">${ig.armadaName}</p>
+                                <div class="manifest-armada-header bg-slate-200/80 border-b-2 border-slate-300 px-2.5 sm:px-3 py-2 flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 sm:gap-2">
+                                    <div class="flex items-center justify-between sm:justify-start gap-2 min-w-0 flex-1">
+                                        <div class="flex items-center gap-2 min-w-0">
+                                            <div class="bg-blue-600 text-white font-black text-[10px] sm:text-xs px-2 py-1 rounded shadow-sm leading-none shrink-0">${ig.waktu}</div>
+                                            <p class="font-black text-xs sm:text-sm text-slate-700 uppercase tracking-wide truncate">${ig.armadaName}</p>
+                                        </div>
+                                        <span class="sm:hidden inline-block bg-white text-orange-600 border border-orange-200 px-2 py-0.5 rounded text-[9px] font-black uppercase shadow-2xs whitespace-nowrap shrink-0">${innerTotalPnp} PNP</span>
                                     </div>
-                                    <div class="flex items-center gap-1.5 shrink-0">
+                                    <div class="flex items-center justify-between sm:justify-end gap-1.5 shrink-0">
+                                        ${loungeBadgeHtml}
                                         <button type="button" onclick="event.stopPropagation(); openManifestWaBlastModal('${blastId}')" class="${blastBtnClass}" title="Blast Info WhatsApp Armada">
                                             <i class="${blastBtnIcon} text-[10px]"></i>
                                             <span>${blastBtnLabel}</span>
                                         </button>
-                                        <span class="inline-block bg-white text-orange-600 border border-orange-200 px-2 py-1 rounded text-[9px] sm:text-[10px] font-black uppercase shadow-sm whitespace-nowrap shrink-0">${innerTotalPnp} PNP</span>
+                                        <span class="hidden sm:inline-block bg-white text-orange-600 border border-orange-200 px-2 py-1 rounded text-[10px] font-black uppercase shadow-sm whitespace-nowrap shrink-0">${innerTotalPnp} PNP</span>
                                     </div>
                                 </div>
                                 <!-- Group List -->
@@ -1022,16 +1145,23 @@
                         }
                     }
                     const waNumber = String(bHp).replace(/\D/g, '').replace(/^0/, '62');
+                    const isHadir = b.checkInStatus === 'HADIR';
+                    const hadirTime = isHadir ? formatCheckInWibShort(b.checkInAt) : '';
+                    const safeBidAttr = String(bId).replace(/'/g, "\\'");
+                    const checkInBtnHtml = isHadir
+                        ? `<button type="button" onclick="togglePassengerCheckIn('${safeBidAttr}', event)" class="checkin-toggle-btn is-hadir" title="Klik untuk batalkan status hadir"><i class="fas fa-check text-[8px]"></i><span>Hadir${hadirTime ? ' ' + hadirTime : ''}</span></button>`
+                        : `<button type="button" onclick="togglePassengerCheckIn('${safeBidAttr}', event)" class="checkin-toggle-btn is-belum" title="Klik untuk tandai penumpang sudah tiba di ruang tunggu"><i class="far fa-circle text-[8px]"></i><span>Belum Tiba</span></button>`;
 
                     html += `
-                                    <div onclick="openBookingDetailModal('${bId}')" class="group flex flex-col justify-center p-2.5 sm:p-3 border-b border-slate-100 last:border-0 hover:bg-blue-50/70 active:bg-blue-100/60 cursor-pointer transition-all w-full overflow-hidden select-none" title="Klik untuk lihat Detail Data Pesanan">
-                                        <!-- Baris 1: Kode Booking & Rute (Kiri) | Status Pembayaran (Kanan) -->
-                                        <div class="flex items-center justify-between gap-2">
+                                    <div onclick="openBookingDetailModal('${safeBidAttr}')" class="manifest-pnp-card ${isHadir ? 'is-hadir' : ''} group flex flex-col justify-center p-2.5 sm:p-3 border-b border-slate-100 last:border-0 hover:bg-blue-50/70 active:bg-blue-100/60 cursor-pointer transition-all w-full overflow-hidden select-none" title="Klik untuk lihat Detail Data Pesanan">
+                                        <!-- Baris 1: Kode Booking & Rute (Kiri) | Check-In Ruang Tunggu & Status Bayar (Kanan) -->
+                                        <div class="flex items-center justify-between gap-1.5">
                                             <div class="flex items-center gap-1.5 min-w-0 flex-1">
                                                 <span class="text-[10px] sm:text-[11px] font-black text-blue-600 uppercase tracking-wider truncate">${bId} • ${bTujuan}</span>
                                             </div>
-                                            <div class="flex items-center gap-1.5 shrink-0">
-                                                <span class="inline-block px-2 sm:px-2.5 py-0.5 rounded-full text-[8px] sm:text-[9px] font-black uppercase tracking-wider shadow-xs ${badgeClass}">${badgeText}</span>
+                                            <div class="flex items-center gap-1 sm:gap-1.5 shrink-0">
+                                                ${checkInBtnHtml}
+                                                <span class="inline-block px-2 py-0.5 rounded-full text-[8px] sm:text-[9px] font-black uppercase tracking-wider shadow-2xs ${badgeClass}">${badgeText}</span>
                                                 <div class="w-5 h-5 rounded-full bg-slate-100 group-hover:bg-blue-600 group-hover:text-white flex items-center justify-center text-slate-400 transition-all shadow-2xs">
                                                     <i class="fas fa-chevron-right text-[8px] transform group-hover:translate-x-0.5 transition-transform"></i>
                                                 </div>
@@ -1823,6 +1953,82 @@
     const itemsPerPagePesanan = 10;
     let filteredPesanan = [];
 
+    function syncServerScopeUi(activeKey, labelHtml = '') {
+        document.querySelectorAll('[data-server-scope]').forEach(btn => {
+            btn.classList.toggle('active', btn.dataset.serverScope === activeKey);
+        });
+        const badge = document.getElementById('pesananServerScopeBadge');
+        if (badge && labelHtml) badge.innerHTML = labelHtml;
+    }
+
+    window.applyServerBookingScope = async function(mode) {
+        if (typeof window.fetchServerBookingsRange !== 'function') return;
+        const fromInput = document.getElementById('pesananServerFrom');
+        const toInput = document.getElementById('pesananServerTo');
+        const today = new Date();
+        let opts = {};
+        let badgeHtml = '';
+
+        if (mode === 'month') {
+            const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
+            const lastDay = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+            const fStr = getLocalYYYYMMDD(firstDay);
+            const tStr = getLocalYYYYMMDD(lastDay);
+            if (fromInput) fromInput.value = fStr;
+            if (toInput) toInput.value = tStr;
+            opts = { from: fStr, to: tStr };
+            badgeHtml = '<i class="fas fa-calendar-check text-amber-600 mr-1"></i>Bulan Ini';
+        } else if (mode === '30d') {
+            const d30 = new Date(today);
+            d30.setDate(today.getDate() - 30);
+            const fStr = getLocalYYYYMMDD(d30);
+            const tStr = getLocalYYYYMMDD(today);
+            if (fromInput) fromInput.value = fStr;
+            if (toInput) toInput.value = tStr;
+            opts = { from: fStr, to: tStr };
+            badgeHtml = '<i class="fas fa-clock text-amber-600 mr-1"></i>30 Hari Terakhir';
+        } else if (mode === 'all') {
+            if (fromInput) fromInput.value = '';
+            if (toInput) toInput.value = '';
+            opts = { scope: 'all' };
+            badgeHtml = '<i class="fas fa-archive text-amber-600 mr-1"></i>Semua Arsip Database';
+        } else {
+            if (fromInput) fromInput.value = '';
+            if (toInput) toInput.value = '';
+            opts = { scope: 'active' };
+            badgeHtml = '<i class="fas fa-bolt text-amber-600 mr-1"></i>Data Aktif &amp; Tahun Ini';
+        }
+
+        syncServerScopeUi(mode, '<i class="fas fa-spinner fa-spin mr-1"></i>Memuat Server...');
+        await window.fetchServerBookingsRange(opts);
+        syncServerScopeUi(mode, badgeHtml);
+        renderAll();
+    };
+
+    window.applyCustomServerBookingRange = async function() {
+        if (typeof window.fetchServerBookingsRange !== 'function') return;
+        const fromVal = document.getElementById('pesananServerFrom')?.value || '';
+        const toVal = document.getElementById('pesananServerTo')?.value || '';
+        if (!fromVal && !toVal) {
+            return window.applyServerBookingScope('active');
+        }
+        syncServerScopeUi('custom', '<i class="fas fa-spinner fa-spin mr-1"></i>Memfilter Server...');
+        await window.fetchServerBookingsRange({ from: fromVal, to: toVal });
+        const label = `${fromVal || '...'} s/d ${toVal || '...'}`;
+        syncServerScopeUi('custom', `<i class="fas fa-filter text-amber-600 mr-1"></i>${label}`);
+        renderPesanan(true);
+    };
+
+    window.resetPesananFilters = async function() {
+        const sEl = document.getElementById('pesananSearch');
+        if (sEl) sEl.value = '';
+        if (window.__currentBookingScope !== 'active' || window.__currentBookingRange?.from || window.__currentBookingRange?.to) {
+            await window.applyServerBookingScope('active');
+        } else {
+            renderPesanan(true);
+        }
+    };
+
     function renderPesanan(resetPage = false) {
         if (resetPage) currentPagePesanan = 1;
 
@@ -2125,6 +2331,22 @@
                         <p class="font-bold text-slate-800 text-xs sm:text-sm uppercase truncate">${b.pembayaran || '-'}</p>
                     </div>
 
+                    <!-- Ruang Tunggu Check-In Card -->
+                    <div class="col-span-2 ${b.checkInStatus === 'HADIR' ? 'bg-emerald-50 border-emerald-200' : 'bg-amber-50/60 border-amber-200'} p-2.5 sm:p-3 rounded-xl border flex items-center justify-between gap-2">
+                        <div class="min-w-0">
+                            <p class="text-[9px] font-black ${b.checkInStatus === 'HADIR' ? 'text-emerald-700' : 'text-amber-700'} uppercase tracking-widest">Status Ruang Tunggu</p>
+                            <p class="font-extrabold text-xs text-slate-800 mt-0.5">
+                                ${b.checkInStatus === 'HADIR'
+                                    ? `<i class="fas fa-check-circle text-emerald-600 mr-1"></i>Sudah Tiba di Agen${formatCheckInWibShort(b.checkInAt) ? ' (' + formatCheckInWibShort(b.checkInAt) + ' WIB)' : ''}`
+                                    : '<i class="fas fa-clock text-amber-600 mr-1"></i>Belum Tiba di Ruang Tunggu'}
+                            </p>
+                        </div>
+                        <button type="button" onclick="togglePassengerCheckIn('${String(bTicketId).replace(/'/g, "\\'")}', event)"
+                            class="px-3 py-2 rounded-xl text-[10px] font-black uppercase tracking-wider shrink-0 transition-all active:scale-95 cursor-pointer ${b.checkInStatus === 'HADIR' ? 'bg-white text-slate-700 border border-slate-200 hover:bg-slate-100' : 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm'}">
+                            ${b.checkInStatus === 'HADIR' ? 'Batalkan' : 'Tandai Hadir'}
+                        </button>
+                    </div>
+
                     <!-- Keterangan jika ada -->
                     ${rawKet !== '-' ? `
                     <div class="col-span-2 bg-slate-50/80 p-2.5 sm:p-3 rounded-xl border border-slate-100">
@@ -2415,6 +2637,7 @@
             const poSeat = poDenah?.totalKursi || firstA.capacity || 40;
             const poProf = typeof getPoProfile === 'function' ? getPoProfile(key) : null;
             const poImg = poProf?.image || 'damri.webp';
+            const poKomisiBadgeText = typeof formatPoCommissionBadgeText === 'function' ? formatPoCommissionBadgeText(key) : '10%';
             const poTagline = poProf?.tagline ? `<span class="hidden md:inline-block text-[10px] font-bold text-slate-500 italic bg-white/80 px-2 py-0.5 rounded-md border border-slate-200">${poProf.tagline}</span>` : '';
 
             // --- 1. Desktop Table Row HTML ---
@@ -2429,13 +2652,16 @@
                                     <span class="text-[10px] font-extrabold text-amber-800 bg-amber-100/80 border border-amber-300 px-2 py-0.5 rounded-lg flex items-center gap-1 shadow-2xs">
                                         <i class="fas fa-shuttle-van text-[9px] text-amber-600"></i> ${poTipe} • ${poSeat} Kursi
                                     </span>
+                                    <span class="text-[10px] font-extrabold text-emerald-800 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-lg flex items-center gap-1 shadow-2xs" title="Aturan Komisi Agen untuk PO ${key}">
+                                        <i class="fas fa-coins text-[9px] text-emerald-600"></i> Komisi: ${poKomisiBadgeText}
+                                    </span>
                                     <span class="text-[10px] font-bold text-blue-600 bg-blue-100 px-2 py-0.5 rounded-md">${rutes.length} Rute</span>
                                     ${poTagline}
                                 </div>
                             </div>
                             <div class="flex items-center gap-2 shrink-0">
-                                <button type="button" onclick="event.stopPropagation(); openEditPoModal('${key}')" class="px-2.5 py-1.5 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-slate-900 text-[10px] font-black rounded-xl shadow-xs transition-all flex items-center gap-1.5 active:scale-95" title="Kelola informasi PO, foto armada & tipe bus ${key}">
-                                    <i class="fas fa-sliders-h"></i> Kelola Info & Foto PO
+                                <button type="button" onclick="event.stopPropagation(); openEditPoModal('${key}')" class="px-2.5 py-1.5 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-slate-900 text-[10px] font-black rounded-xl shadow-xs transition-all flex items-center gap-1.5 active:scale-95" title="Kelola informasi PO, komisi, foto armada & tipe bus ${key}">
+                                    <i class="fas fa-sliders-h"></i> Kelola PO &amp; Komisi
                                 </button>
                                 <i class="fas fa-chevron-down text-blue-600 text-xs transition-transform duration-300 ml-1" id="icon-armada-${index}" style="transform: ${iconRotate};"></i>
                             </div>
@@ -2538,6 +2764,9 @@
                                     <span class="text-[10px] font-bold text-slate-600 bg-white/90 border border-slate-200/70 px-2 py-0.5 rounded-lg flex items-center gap-1 shadow-2xs">
                                         <i class="fas fa-chair text-[9px] text-slate-400"></i> ${poSeat} Kursi
                                     </span>
+                                    <span class="text-[10px] font-extrabold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-lg flex items-center gap-1 shadow-2xs">
+                                        <i class="fas fa-coins text-[9px] text-emerald-600"></i> ${poKomisiBadgeText}
+                                    </span>
                                 </div>
                                 ${poProf?.tagline ? `<p class="text-[10px] font-medium text-slate-400 italic mt-1 line-clamp-1">${poProf.tagline}</p>` : ''}
                             </div>
@@ -2546,7 +2775,7 @@
                         <!-- Action & Toggle Indicator -->
                         <div class="mt-3 pt-2.5 border-t border-blue-100/80 flex items-center justify-between gap-2">
                             <button type="button" onclick="event.stopPropagation(); openEditPoModal('${key}')" class="px-2.5 py-1.5 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 text-slate-950 text-[10px] font-black uppercase tracking-wider rounded-xl shadow-xs transition-all flex items-center gap-1.5 active:scale-95">
-                                <i class="fas fa-sliders-h text-[10px]"></i> Kelola Info & Foto PO
+                                <i class="fas fa-sliders-h text-[10px]"></i> Kelola PO &amp; Komisi
                             </button>
                             <div class="flex items-center gap-1.5 text-xs font-black text-blue-600 bg-white/90 border border-blue-200/80 px-2.5 py-1.5 rounded-xl shadow-2xs">
                                 <span class="text-[10px] uppercase tracking-wider">Rute</span>
@@ -7186,6 +7415,14 @@ function openEditPoModal(poName) {
 
     populateDenahDropdown('editPoDenah', firstA.denahId);
 
+    // Set Aturan Komisi PO (Persentase vs Besaran Uang)
+    const currentKomisiTipe = poProf?.komisiTipe === 'nominal' ? 'nominal' : 'persen';
+    const currentKomisiNilai = (poProf?.komisiNilai !== undefined && !isNaN(Number(poProf.komisiNilai))) ? Number(poProf.komisiNilai) : 10;
+    window.__editPoSamplePrice = parseInt(firstA.price, 10) || 200000;
+    const chkAktif = document.getElementById('editPoTerapkanAktif');
+    if (chkAktif) chkAktif.checked = true;
+    setEditPoKomisiMode(currentKomisiTipe, currentKomisiNilai);
+
     const m = document.getElementById('modalEditPo');
     const c = document.getElementById('modalEditPoContent');
     if (m) {
@@ -7227,11 +7464,114 @@ function onEditPoTipeChange() {
     }
 }
 
+function setEditPoKomisiMode(mode, explicitVal = null) {
+    const cleanMode = mode === 'nominal' ? 'nominal' : 'persen';
+    const tipeInput = document.getElementById('editPoKomisiTipe');
+    const valInput = document.getElementById('editPoKomisiNilai');
+    const btnPersen = document.getElementById('btnKomisiModePersen');
+    const btnNominal = document.getElementById('btnKomisiModeNominal');
+    const badge = document.getElementById('editPoKomisiModeBadge');
+    const lbl = document.getElementById('editPoKomisiInputLabel');
+    const prefix = document.getElementById('editPoKomisiPrefix');
+    const suffix = document.getElementById('editPoKomisiSuffix');
+    const presetsEl = document.getElementById('editPoKomisiPresets');
+
+    if (tipeInput) tipeInput.value = cleanMode;
+    if (btnPersen) btnPersen.classList.toggle('active', cleanMode === 'persen');
+    if (btnNominal) btnNominal.classList.toggle('active', cleanMode === 'nominal');
+    if (badge) badge.textContent = cleanMode === 'nominal' ? 'Nominal Rupiah' : 'Persentase';
+
+    if (cleanMode === 'nominal') {
+        if (lbl) lbl.textContent = 'Besaran Komisi per Kursi (Rupiah)';
+        if (prefix) prefix.classList.remove('hidden');
+        if (suffix) suffix.textContent = '/ Kursi';
+        if (valInput) {
+            valInput.classList.add('pl-10', 'pr-16');
+            valInput.step = '500';
+            const curV = explicitVal !== null ? Number(explicitVal) : Number(valInput.value);
+            valInput.value = (explicitVal !== null) ? curV : (curV > 100 ? curV : 10000);
+        }
+        if (presetsEl) {
+            const nomPresets = [
+                { label: 'Rp 10rb', val: 10000 },
+                { label: 'Rp 12rb', val: 12000 },
+                { label: 'Rp 15rb', val: 15000 },
+                { label: 'Rp 20rb', val: 20000 },
+                { label: 'Rp 25rb', val: 25000 },
+                { label: 'Rp 30rb', val: 30000 }
+            ];
+            presetsEl.innerHTML = nomPresets.map(p =>
+                `<button type="button" onclick="pickEditPoKomisiPreset(${p.val})" class="komisi-preset-chip" data-preset-val="${p.val}">${p.label}</button>`
+            ).join('');
+        }
+    } else {
+        if (lbl) lbl.textContent = 'Besaran Persentase Komisi (%)';
+        if (prefix) prefix.classList.add('hidden');
+        if (suffix) suffix.textContent = '% / Tiket';
+        if (valInput) {
+            valInput.classList.remove('pl-10');
+            valInput.classList.add('pr-20');
+            valInput.step = '0.1';
+            const curV = explicitVal !== null ? Number(explicitVal) : Number(valInput.value);
+            valInput.value = (explicitVal !== null) ? curV : (curV > 0 && curV <= 100 ? curV : 10);
+        }
+        if (presetsEl) {
+            const pctPresets = [
+                { label: '5%', val: 5 },
+                { label: '8%', val: 8 },
+                { label: '9,8%', val: 9.8 },
+                { label: '10%', val: 10 },
+                { label: '12%', val: 12 },
+                { label: '15%', val: 15 }
+            ];
+            presetsEl.innerHTML = pctPresets.map(p =>
+                `<button type="button" onclick="pickEditPoKomisiPreset(${p.val})" class="komisi-preset-chip" data-preset-val="${p.val}">${p.label}</button>`
+            ).join('');
+        }
+    }
+    updateEditPoKomisiSimulasi();
+}
+
+function pickEditPoKomisiPreset(val) {
+    const valInput = document.getElementById('editPoKomisiNilai');
+    if (valInput) valInput.value = val;
+    updateEditPoKomisiSimulasi();
+}
+
+function updateEditPoKomisiSimulasi() {
+    const mode = document.getElementById('editPoKomisiTipe')?.value === 'nominal' ? 'nominal' : 'persen';
+    const rawVal = Math.max(0, Number(document.getElementById('editPoKomisiNilai')?.value) || 0);
+    const samplePrice = window.__editPoSamplePrice || 200000;
+    const simBox = document.getElementById('editPoKomisiSimulasi');
+
+    document.querySelectorAll('#editPoKomisiPresets .komisi-preset-chip').forEach(chip => {
+        chip.classList.toggle('active', Number(chip.dataset.presetVal) === rawVal);
+    });
+
+    const komisi1 = mode === 'nominal'
+        ? Math.round(rawVal)
+        : Math.round(samplePrice * (Math.min(100, rawVal) / 100));
+    const setoran1 = Math.max(0, samplePrice - komisi1);
+
+    if (simBox) {
+        simBox.innerHTML = `
+            <span class="font-bold text-slate-600">Contoh Tiket ${formatRupiah(samplePrice)}:</span>
+            <span class="font-black text-slate-900">Komisi <span class="text-emerald-700">${formatRupiah(komisi1)}</span> • Setor <span class="text-amber-800">${formatRupiah(setoran1)}</span></span>
+        `;
+    }
+}
+window.setEditPoKomisiMode = setEditPoKomisiMode;
+window.pickEditPoKomisiPreset = pickEditPoKomisiPreset;
+window.updateEditPoKomisiSimulasi = updateEditPoKomisiSimulasi;
+
 async function submitEditPo(e) {
     e.preventDefault();
     const poNama = document.getElementById('editPoNama')?.value;
     const tipe = document.getElementById('editPoTipe')?.value;
     const denahId = document.getElementById('editPoDenah')?.value || null;
+    const komisiTipe = document.getElementById('editPoKomisiTipe')?.value === 'nominal' ? 'nominal' : 'persen';
+    const komisiNilai = Math.max(0, Number(document.getElementById('editPoKomisiNilai')?.value) || 0);
+    const terapkanAktif = document.getElementById('editPoTerapkanAktif')?.checked !== false;
     let imgUrl = document.getElementById('editPoImageUrl')?.value?.trim() || 'damri.webp';
     let logoUrl = document.getElementById('editPoLogoUrl')?.value?.trim() || '';
     const tagline = document.getElementById('editPoTagline')?.value?.trim() || '';
@@ -7297,12 +7637,18 @@ async function submitEditPo(e) {
             logo: logoUrl,
             tagline: tagline,
             description: desc,
-            facilities: facilities
+            facilities: facilities,
+            komisi_tipe: komisiTipe,
+            komisi_nilai: komisiNilai,
+            terapkan_pesanan_aktif: terapkanAktif
         };
 
         const res = await postToSheets('savePoProfile', payload);
         if (res && res.status === 'success') {
-            if (typeof showMessage === 'function') showMessage(`Informasi, logo, dan foto armada PO ${poNama} berhasil disimpan!`);
+            if (res.data && typeof cachedPoProfiles === 'object' && cachedPoProfiles) {
+                cachedPoProfiles[poNama] = res.data;
+            }
+            if (typeof showMessage === 'function') showMessage(`Informasi, foto, dan aturan komisi PO ${poNama} berhasil disimpan!`);
             closeEditPoModal();
             await refreshData();
             renderArmada();

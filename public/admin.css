@@ -1812,6 +1812,222 @@ body.dark-mode .wa-blast-resend-btn:hover {
     border-color: #10B981 !important;
 }
 
+/* ======================================================== */
+/* RUANG TUNGGU CHECK-IN, KOMISI PO & SERVER FILTER UI      */
+/* ======================================================== */
+.checkin-filter-chip {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    padding: 6px 8px;
+    border-radius: 11px;
+    font-size: 9.5px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    background: #FFFFFF;
+    color: #5C4440;
+    border: 1px solid #E5D7C6;
+    cursor: pointer;
+    transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease !important;
+    white-space: nowrap;
+}
+.checkin-filter-chip:hover {
+    border-color: #C5A46D;
+}
+.checkin-filter-chip.active[data-checkin-filter="all"] {
+    background: linear-gradient(135deg, #8E2635, #581820) !important;
+    color: #FFFFFF !important;
+    border-color: #581820 !important;
+}
+.checkin-filter-chip.active[data-checkin-filter="BELUM"] {
+    background: linear-gradient(135deg, #D97706, #B45309) !important;
+    color: #FFFFFF !important;
+    border-color: #B45309 !important;
+}
+.checkin-filter-chip.active[data-checkin-filter="HADIR"] {
+    background: linear-gradient(135deg, #059669, #047857) !important;
+    color: #FFFFFF !important;
+    border-color: #047857 !important;
+}
+.checkin-filter-count {
+    padding: 1px 6px;
+    border-radius: 999px;
+    font-size: 9px;
+    font-weight: 900;
+    background: rgba(0, 0, 0, 0.07);
+}
+.checkin-filter-chip.active .checkin-filter-count {
+    background: rgba(255, 255, 255, 0.22);
+    color: #FFFFFF !important;
+}
+
+.checkin-toggle-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 8px;
+    min-height: 24px;
+    border-radius: 999px;
+    font-size: 9px;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    cursor: pointer;
+    transition: transform 0.1s ease, background-color 0.15s ease, border-color 0.15s ease !important;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+.checkin-toggle-btn:active {
+    transform: scale(0.95);
+}
+.checkin-toggle-btn.is-belum {
+    background: #FFFBEB;
+    color: #B45309;
+    border: 1px dashed #F59E0B;
+}
+.checkin-toggle-btn.is-belum:hover {
+    background: #FEF3C7;
+    border-style: solid;
+}
+.checkin-toggle-btn.is-hadir {
+    background: linear-gradient(135deg, #10B981, #059669);
+    color: #FFFFFF !important;
+    border: 1px solid #059669;
+    box-shadow: 0 2px 6px rgba(16, 185, 129, 0.22);
+}
+
+.manifest-pnp-card.is-hadir {
+    border-left: 3.5px solid #10B981 !important;
+    background: linear-gradient(90deg, rgba(16, 185, 129, 0.055) 0%, transparent 65%);
+}
+
+.armada-lounge-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 7px;
+    border-radius: 6px;
+    font-size: 9px;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    background: #FFFFFF;
+    color: #64748B;
+    border: 1px solid #CBD5E1;
+    white-space: nowrap;
+}
+.armada-lounge-badge.is-complete {
+    background: #ECFDF5;
+    color: #047857;
+    border-color: #6EE7B7;
+}
+
+.komisi-mode-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 9px 10px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 800;
+    border: 1.5px solid #E5D7C6;
+    background: #FFFFFF;
+    color: #5C4440;
+    cursor: pointer;
+    transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease !important;
+}
+.komisi-mode-btn.active {
+    background: linear-gradient(135deg, #8E2635, #581820) !important;
+    color: #FFFFFF !important;
+    border-color: #C5A46D !important;
+    box-shadow: 0 4px 12px rgba(88, 24, 32, 0.2);
+}
+.komisi-preset-chip {
+    padding: 5px 10px;
+    border-radius: 9px;
+    font-size: 10.5px;
+    font-weight: 800;
+    background: #FFFFFF;
+    color: #581820;
+    border: 1px solid #E5D7C6;
+    cursor: pointer;
+    transition: all 0.12s ease !important;
+}
+.komisi-preset-chip:hover,
+.komisi-preset-chip.active {
+    background: #C5A46D !important;
+    color: #171717 !important;
+    border-color: #A8844A !important;
+}
+.komisi-simulasi-box {
+    background: linear-gradient(135deg, #FBF7F0 0%, #F3E9DC 100%);
+    border: 1px solid #E5D7C6;
+}
+
+.server-scope-chip {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 7px 10px;
+    border-radius: 10px;
+    font-size: 9.5px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    background: #FBF7F2;
+    color: #5C4440;
+    border: 1px solid #E5D7C6;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease !important;
+}
+.server-scope-chip.active {
+    background: linear-gradient(135deg, #8E2635, #581820) !important;
+    color: #FBF7F0 !important;
+    border-color: #C5A46D !important;
+}
+
+body.dark-mode .checkin-filter-chip:not(.active),
+body.dark-mode .komisi-mode-btn:not(.active),
+body.dark-mode .komisi-preset-chip:not(.active),
+body.dark-mode .server-scope-chip:not(.active) {
+    background: #1B0D10 !important;
+    border-color: #422026 !important;
+    color: #E5D7C6 !important;
+}
+body.dark-mode .manifest-armada-header {
+    background: #291519 !important;
+    border-color: #422026 !important;
+}
+body.dark-mode .manifest-armada-header p {
+    color: #FBF7F0 !important;
+}
+body.dark-mode .checkin-toggle-btn.is-belum {
+    background: rgba(245, 158, 11, 0.12) !important;
+    color: #FCD34D !important;
+    border-color: rgba(245, 158, 11, 0.45) !important;
+}
+body.dark-mode .manifest-pnp-card.is-hadir {
+    background: linear-gradient(90deg, rgba(16, 185, 129, 0.14) 0%, transparent 70%) !important;
+}
+body.dark-mode .armada-lounge-badge {
+    background: #1B0D10 !important;
+    color: #CBD5E1 !important;
+    border-color: #422026 !important;
+}
+body.dark-mode .armada-lounge-badge.is-complete {
+    background: rgba(16, 185, 129, 0.18) !important;
+    color: #6EE7B7 !important;
+    border-color: #10B981 !important;
+}
+body.dark-mode .komisi-simulasi-box {
+    background: #1B0D10 !important;
+    border-color: #422026 !important;
+}
+
 /* Mobile Device Optimization */
 @media (max-width: 640px) {
     .chart-card {
